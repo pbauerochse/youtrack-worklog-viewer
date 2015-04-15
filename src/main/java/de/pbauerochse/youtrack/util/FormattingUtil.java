@@ -1,6 +1,10 @@
 package de.pbauerochse.youtrack.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 /**
@@ -11,6 +15,7 @@ public class FormattingUtil {
 
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("i18n/ytwv");
 
+    private static DateTimeFormatter dateTimeFormatter;
     private static final int MINUTES_PER_HOUR = 60;
 
     /**
@@ -65,6 +70,15 @@ public class FormattingUtil {
 
     public static String getFormatted(String messageKey, Object... parameters) {
         return MessageFormat.format(RESOURCE_BUNDLE.getString(messageKey), parameters);
+    }
+
+    public static String formatDate(LocalDate date) {
+        if (date == null) return StringUtils.EMPTY;
+
+        if (dateTimeFormatter == null) {
+            dateTimeFormatter = DateTimeFormatter.ofPattern(getFormatted("date.column.format"));
+        }
+        return dateTimeFormatter.format(date);
     }
 
 }

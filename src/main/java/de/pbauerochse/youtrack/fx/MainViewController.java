@@ -43,7 +43,6 @@ import java.util.ResourceBundle;
  */
 public class MainViewController implements Initializable {
 
-    private static final DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
     private static final String SUMMARY_COLUMN_OR_CELL_CSS_CLASS = "summary";
     private static final String WEEKEND_COLUMN_OR_CELL_CSS_CLASS = "weekend";
     private static final String ISSUE_CELL_CSS_CLASS = "issue-cell";
@@ -185,7 +184,7 @@ public class MainViewController implements Initializable {
         for (int days = 0; days <= daysToDisplay; days++) {
             LocalDate currentColumnDate = timerangeProvider.getStartDate().plus(days, ChronoUnit.DAYS);
             DayOfWeek currentColumnDayOfWeek = currentColumnDate.getDayOfWeek();
-            String displayDate = DATEFORMATTER.format(currentColumnDate);
+            String displayDate = FormattingUtil.formatDate(currentColumnDate);
 
             // create column
             TableColumn<UserTaskWorklogs, UserTaskWorklogs> column = new TableColumn<>(displayDate);
