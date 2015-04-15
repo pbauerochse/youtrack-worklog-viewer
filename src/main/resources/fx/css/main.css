@@ -1,0 +1,45 @@
+#fetchWorklogButton {
+    -fx-background-image: url(../img/application_view_detail.png);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+#settingsButton {
+    -fx-background-image: url(../img/cog.png);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+.weekend {
+    -fx-background-color: rgba(189, 255, 209, 0.5);
+}
+
+.summary {
+    -fx-font-weight: bold;
+}
+
+.table-view .column-header {
+    -fx-font-size: 11px;
+}
+
+.table-cell {
+    -fx-font-size: 11px;
+}
+
+.scroll-bar {
+    -fx-unit-increment: 100.0;
+    -fx-block-increment: 500.0;
+}
+
+.issue-cell {
+    -fx-text-fill: #3b6aed;
+    -fx-highlight-fill: #ffffff;
+    -fx-highlight-text-fill: #ffffff;
+    -fx-underline: true;
+}
+
+.issue-cell:hover {
+    -fx-cursor: hand;
+}
