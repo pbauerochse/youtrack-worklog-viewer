@@ -34,4 +34,5 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 *The application logs on to your YouTrack installation using the regular YouTrack API and the data provided by you in the settings screen. It then creates a temporary time report and downloads it as .csv file. The data in that file is being processed and displayed in the main window. After retrieving the data, the temporarily created report will be deleted to prevent polluting your reports section*
 
 **What reporting options are available?**
-*You can create a report for the current week, previous week, current month and previous month. You can also enter your daily work hours to adjust the time format (e.g. 9 booked hours will be presented in an 8 hour workday with `1d 1h` and in an 9 hour workday with `1h`)*  
+
+*You can create a report for the current week, previous week, current month and previous month. You can also enter your daily work hours to adjust the time format (e.g. 9 booked hours will be presented in an 8 hour workday with `1d 1h` and in an 9 hour workday with `1d`)*  
