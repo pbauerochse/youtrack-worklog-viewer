@@ -40,3 +40,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 **I just get a blank report. What's wrong?**
 
 *This tool checks your personal worklog by comparing your username from the settings screen, with the worklog author name from the report. YouTrack seems to allow you to have a different username than the login name. Please make sure, that in your YouTrack profile, the login name is the same as your actual username*
+
+**Why are worklogs for subtasks not taken into calculation?**
+
+*This seems to be a bug in YouTrack with the generation of the time report. See https://youtrack.jetbrains.com/issue/JT-29447 . Unfortunately I can't do anything about this :disappointed:*
