@@ -36,3 +36,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 **What reporting options are available?**
 
 *You can create a report for the current week, previous week, current month and previous month. You can also enter your daily work hours to adjust the time format (e.g. 9 booked hours will be presented in an 8 hour workday with `1d 1h` and in an 9 hour workday with `1d`)*  
+
+**I just get a blank report. What's wrong?**
+
+*This tool checks your personal worklog by comparing your username from the settings screen, with the worklog author name from the report. YouTrack seems to allow you to have a different username than the login name. Please make sure, that in your YouTrack profile, the login name is the same as your actual username*
