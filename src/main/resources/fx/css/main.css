@@ -33,9 +33,12 @@
     -fx-block-increment: 500.0;
 }
 
+.table-view:focused .table-row-cell:filled:focused:selected .issue-cell {
+    -fx-text-fill: #ffffff;
+}
+
 .issue-cell {
     -fx-text-fill: #3b6aed;
-    -fx-highlight-fill: #ffffff;
     -fx-highlight-text-fill: #ffffff;
     -fx-underline: true;
 }
