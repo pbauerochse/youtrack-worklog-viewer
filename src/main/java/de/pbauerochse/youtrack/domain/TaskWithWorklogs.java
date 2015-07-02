@@ -8,15 +8,17 @@ import java.util.List;
  * @author Patrick Bauerochse
  * @since 01.04.15
  */
-public class UserTaskWorklogs {
+public class TaskWithWorklogs {
 
     private String issue;
     private String summary;
+    private long estimatedWorktimeInMinutes;
+
     private List<WorklogItem> worklogItemList = new ArrayList<>(50);
 
     private boolean isSummaryRow;
 
-    public UserTaskWorklogs(boolean isSummaryRow) {
+    public TaskWithWorklogs(boolean isSummaryRow) {
         this.isSummaryRow = isSummaryRow;
     }
 
@@ -34,6 +36,14 @@ public class UserTaskWorklogs {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public long getEstimatedWorktimeInMinutes() {
+        return estimatedWorktimeInMinutes;
+    }
+
+    public void setEstimatedWorktimeInMinutes(long estimatedWorktimeInMinutes) {
+        this.estimatedWorktimeInMinutes = estimatedWorktimeInMinutes;
     }
 
     public List<WorklogItem> getWorklogItemList() {

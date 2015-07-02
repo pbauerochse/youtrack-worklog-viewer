@@ -8,17 +8,19 @@ import java.time.LocalDate;
  */
 public class WorklogItem {
 
-    private String username;
+    private String workDescription;
     private LocalDate date;
-    private String description;
     private long durationInMinutes;
+    private String username;
+    private String userDisplayname;
+    private String workType;
 
-    public String getUsername() {
-        return username;
+    public String getWorkDescription() {
+        return workDescription;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setWorkDescription(String workDescription) {
+        this.workDescription = workDescription;
     }
 
     public LocalDate getDate() {
@@ -29,19 +31,35 @@ public class WorklogItem {
         this.date = date;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public long getDurationInMinutes() {
         return durationInMinutes;
     }
 
     public void setDurationInMinutes(long durationInMinutes) {
         this.durationInMinutes = durationInMinutes;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUserDisplayname() {
+        return userDisplayname;
+    }
+
+    public void setUserDisplayname(String userDisplayname) {
+        this.userDisplayname = userDisplayname;
+    }
+
+    public String getWorkType() {
+        return workType;
+    }
+
+    public void setWorkType(String workType) {
+        this.workType = workType;
     }
 }

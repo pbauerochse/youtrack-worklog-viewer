@@ -127,7 +127,7 @@ public class YouTrackConnector {
                     HttpGet request = new HttpGet(String.format(downloadReportUrlTemplate, reportDetailsResponse.getId()));
 
                     WorklogResult worklogResult = client.execute(request, response -> {
-                        WorklogResult result = new WorklogResult();
+                        WorklogResult result = new WorklogResult(username);
 
                         HttpEntity entity = response.getEntity();
                         ByteArrayInputStream reportDataInputStream = null;

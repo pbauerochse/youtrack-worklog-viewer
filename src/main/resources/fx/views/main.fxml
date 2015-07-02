@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.pbauerochse.youtrack.fx.MainViewController">
+
+<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.youtrack.fx.MainViewController">
 
     <top>
         <VBox>
@@ -15,28 +16,28 @@
                     <menus>
                         <Menu mnemonicParsing="false" text="%view.menu.file">
                             <items>
-                                <MenuItem mnemonicParsing="false" text="%view.menu.file.exportexcel" fx:id="exportToExcelMenuItem"/>
-                                <MenuItem mnemonicParsing="false" text="%view.settings.title" fx:id="settingsMenuItem" />
-                                <SeparatorMenuItem mnemonicParsing="false"/>
-                                <MenuItem mnemonicParsing="false" text="%view.menu.file.exit" fx:id="exitMenuItem"/>
+                                <MenuItem fx:id="exportToExcelMenuItem" mnemonicParsing="false" text="%view.menu.file.exportexcel" />
+                                <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="%view.settings.title" />
+                                <SeparatorMenuItem mnemonicParsing="false" />
+                                <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" text="%view.menu.file.exit" />
                             </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="%view.menu.help">
                             <items>
-                                <MenuItem mnemonicParsing="false" text="%view.menu.help.logs" fx:id="logMessagesMenuItem"/>
-                                <SeparatorMenuItem mnemonicParsing="false"/>
-                                <MenuItem mnemonicParsing="false" text="%view.menu.help.about"/>
+                                <MenuItem fx:id="logMessagesMenuItem" mnemonicParsing="false" text="%view.menu.help.logs" />
+                                <SeparatorMenuItem mnemonicParsing="false" />
+                                <MenuItem mnemonicParsing="false" text="%view.menu.help.about" />
                             </items>
                         </Menu>
                     </menus>
                 </MenuBar>
                 <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                     <items>
-                        <Label text="%view.main.timerange"/>
-                        <ComboBox fx:id="timerangeComboBox" prefWidth="150.0"/>
+                        <Label text="%view.main.timerange" />
+                        <ComboBox fx:id="timerangeComboBox" prefWidth="150.0" />
                         <Button fx:id="fetchWorklogButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0">
                             <tooltip>
-                                <Tooltip text="%view.main.download"/>
+                                <Tooltip text="%view.main.download" />
                             </tooltip>
                         </Button>
                     </items>
@@ -45,21 +46,20 @@
         </VBox>
     </top>
 
-    <center>
-        <TableView fx:id="worklogTableView" BorderPane.alignment="CENTER"/>
-    </center>
-
     <bottom>
         <StackPane BorderPane.alignment="CENTER">
             <children>
-                <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0"/>
+                <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
                 <Text fx:id="progressText" strokeType="OUTSIDE" strokeWidth="0.0" text="">
                     <font>
-                        <Font size="10.0"/>
+                        <Font size="10.0" />
                     </font>
                 </Text>
             </children>
         </StackPane>
     </bottom>
+   <center>
+      <TabPane fx:id="resultTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" />
+   </center>
 
 </BorderPane>
