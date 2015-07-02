@@ -8,9 +8,18 @@ import java.time.LocalDate;
  */
 public class WorklogItem {
 
+    private String username;
     private LocalDate date;
     private String description;
     private long durationInMinutes;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public LocalDate getDate() {
         return date;

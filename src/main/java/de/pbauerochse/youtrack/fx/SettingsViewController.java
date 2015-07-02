@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,6 +19,8 @@ import java.util.ResourceBundle;
  * @since 15.04.15
  */
 public class SettingsViewController implements Initializable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsViewController.class);
 
     @FXML
     private TextField youtrackUrlField;
@@ -38,6 +42,7 @@ public class SettingsViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        LOGGER.debug("Initializing");
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
         for (int i = 1; i <= 24; i++) {
@@ -47,6 +52,7 @@ public class SettingsViewController implements Initializable {
         // button clicks
         cancelSettingsButton.setOnAction(event -> ((Node) event.getSource()).getScene().getWindow().hide());
         saveSettingsButton.setOnAction(event -> {
+            LOGGER.debug("Save settings clicked");
             settings.setYoutrackUrl(youtrackUrlField.getText());
             settings.setYoutrackUsername(youtrackUsernameField.getText());
             settings.setYoutrackPassword(youtrackPasswordField.getText());

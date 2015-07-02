@@ -5,7 +5,8 @@ import de.pbauerochse.youtrack.connector.YouTrackConnector;
 import de.pbauerochse.youtrack.domain.ReportTimerange;
 import de.pbauerochse.youtrack.domain.TimerangeProvider;
 import de.pbauerochse.youtrack.domain.UserTaskWorklogs;
-import de.pbauerochse.youtrack.domain.UserWorklogResult;
+import de.pbauerochse.youtrack.domain.WorklogResult;
+import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.application.Platform;
@@ -17,7 +18,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -27,13 +27,13 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.ResourceBundle;
 
@@ -42,6 +42,8 @@ import java.util.ResourceBundle;
  * @since 01.04.15
  */
 public class MainViewController implements Initializable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainViewController.class);
 
     private static final String SUMMARY_COLUMN_OR_CELL_CSS_CLASS = "summary";
     private static final String WEEKEND_COLUMN_OR_CELL_CSS_CLASS = "weekend";
@@ -54,7 +56,13 @@ public class MainViewController implements Initializable {
     private Button fetchWorklogButton;
 
     @FXML
-    private Button settingsButton;
+    private MenuItem settingsMenuItem;
+
+    @FXML
+    private MenuItem logMessagesMenuItem;
+
+    @FXML
+    private MenuItem exitMenuItem;
 
     @FXML
     private ProgressBar progressBar;
@@ -69,33 +77,51 @@ public class MainViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         this.resources = resources;
-
-        // settings button click
-        settingsButton.setOnAction(event -> {
-            Platform.runLater(() -> {
-                try {
-                    Parent settingsContent = FXMLLoader.load(MainViewController.class.getResource("/fx/views/settings.fxml"), resources);
-
-                    Scene settingsScene = new Scene(settingsContent);
-                    Stage settingsStage = new Stage();
-                    settingsStage.initOwner(((Node) event.getSource()).getScene().getWindow());
-                    settingsStage.initStyle(StageStyle.UTILITY);
-                    settingsStage.initModality(Modality.APPLICATION_MODAL);
-                    settingsStage.setResizable(false);
-                    settingsStage.setTitle(resources.getString("view.settings.title"));
-                    settingsStage.setScene(settingsScene);
-                    settingsStage.showAndWait();
-                } catch (IOException e) {
-                    throw new RuntimeException(resources.getString("exceptions.settingsview.io"), e);
-                }
-            });
-        });
-
+        LOGGER.debug("Initializing main view");
 
         // prepopulate timerange dropdown
-        timerangeComboBox.setConverter(new StringConverter<ReportTimerange>() {
+        timerangeComboBox.setConverter(getTimerangeComboBoxConverter(resources));
+        timerangeComboBox.getItems().addAll(ReportTimerange.values());
+        timerangeComboBox.getSelectionModel().select(ReportTimerange.THIS_WEEK);    // preselect "this week"
+
+        // menu items click
+        settingsMenuItem.setOnAction(event -> showSettingsDialogue());
+        exitMenuItem.setOnAction(event -> WorklogViewer.getInstance().requestShutdown());
+        logMessagesMenuItem.setOnAction(event -> showLogMessagesDialogue());
+
+        // fetch worklog button click
+        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        fetchWorklogButton.setOnAction(clickEvent -> handleFetchWorklogButtonClick(settings));
+    }
+
+    /**
+     * Fetch worklogs if all settings are set,
+     * otherwise trigger the "open settings" button
+     *
+     * @param settings The settings object from the SettingsManager
+     */
+    private void handleFetchWorklogButtonClick(SettingsUtil.Settings settings) {
+        LOGGER.debug("Fetch worklogs button clicked");
+        if (settings.hasMissingConnectionParameters()) {
+            // connection data missing hence trigger settings button click and show warning
+            LOGGER.info("No settings present yet, redirecting user to settings dialogue");
+            progressText.setText(resources.getString("view.main.warning.settingsblank"));
+            settingsMenuItem.fire();
+        } else {
+            // settings present, fetch worklogs
+            fetchWorklogs(settings, timerangeComboBox.getSelectionModel().getSelectedItem());
+        }
+    }
+
+    /**
+     * Get the converter for the ReportTimerange ComboBox
+     *
+     * @param resources the resource bundle to retrieve the display label from
+     * @return a converter from {@link ReportTimerange} to {@link String} and back
+     */
+    private static StringConverter<ReportTimerange> getTimerangeComboBoxConverter(ResourceBundle resources) {
+        return new StringConverter<ReportTimerange>() {
             @Override
             public String toString(ReportTimerange object) {
                 return resources.getString(object.getLabelKey());
@@ -110,53 +136,71 @@ public class MainViewController implements Initializable {
                 }
                 return null;
             }
-        });
-        timerangeComboBox.getItems().addAll(ReportTimerange.values());
-        timerangeComboBox.getSelectionModel().select(ReportTimerange.THIS_WEEK);    // preselect "this week"
+        };
+    }
 
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+    /**
+     * Opens the settings dialogue
+     * @param window The main window to attach the scene to
+     */
+    private void showSettingsDialogue() {
+        LOGGER.debug("Showing settings dialogue");
+        openDialogue("/fx/views/settings.fxml", "view.settings.title", true);
+    }
 
-        // fetch worklog button click
-        fetchWorklogButton.setOnAction(clickEvent -> {
-            if (StringUtils.isBlank(settings.getYoutrackUrl()) || StringUtils.isBlank(settings.getYoutrackUsername()) || StringUtils.isBlank(settings.getYoutrackPassword())) {
-                // connection data missing hence trigger settings button click and show warning
-                progressText.setText(resources.getString("view.main.warning.settingsblank"));
-                settingsButton.fire();
-            } else {
-                // settings present, fetch worklogs
-                fetchWorklogs(settings, timerangeComboBox.getSelectionModel().getSelectedItem());
+    private void showLogMessagesDialogue() {
+        LOGGER.debug("Showing log messages dialogue");
+        openDialogue("/fx/views/logMessagesView.fxml", "view.menu.help.logs", false);
+    }
+
+    private void openDialogue(String view, String titleResourceKey, boolean modal) {
+        Platform.runLater(() -> {
+            try {
+                Parent settingsContent = FXMLLoader.load(MainViewController.class.getResource(view), resources);
+
+                Scene settingsScene = new Scene(settingsContent);
+                Stage settingsStage = new Stage();
+                settingsStage.initOwner(progressBar.getScene().getWindow());
+
+                if (modal) {
+                    settingsStage.initStyle(StageStyle.UTILITY);
+                    settingsStage.initModality(Modality.APPLICATION_MODAL);
+                    settingsStage.setResizable(false);
+                }
+
+                settingsStage.setTitle(resources.getString(titleResourceKey));
+                settingsStage.setScene(settingsScene);
+                settingsStage.showAndWait();
+            } catch (IOException e) {
+                LOGGER.error("Could not open dialogue {}", view, e);
+                throw ExceptionUtil.getRuntimeException("exceptions.view.io", e, view);
             }
         });
     }
 
     private void fetchWorklogs(SettingsUtil.Settings settings, ReportTimerange timerange) {
-        Task<UserWorklogResult> worklogTaskForUser = YouTrackConnector.getInstance().getWorklogTaskForUser(settings.getYoutrackUrl(), settings.getYoutrackUsername(), settings.getYoutrackPassword(), timerange);
+        LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
+        Task<WorklogResult> worklogTaskForUser = YouTrackConnector.getInstance()
+                .getWorklogTaskForUser(settings.getYoutrackUrl(), settings.getYoutrackUsername(), settings.getYoutrackPassword(), timerange);
 
         // disabled worklog button while still waiting for response
         worklogTaskForUser.stateProperty().addListener((observable, oldValue, newValue) -> {
+            LOGGER.debug("Thread changed from {} to {}", oldValue, newValue);
             fetchWorklogButton.setDisable(newValue == Worker.State.RUNNING || newValue == Worker.State.SCHEDULED);
-        });
-
-        // success handler
-        worklogTaskForUser.setOnSucceeded(event -> {
-            UserWorklogResult result = (UserWorklogResult) event.getSource().getValue();
-            displayResult(result, timerange, settings);
         });
 
         // error handler
         worklogTaskForUser.setOnFailed(event -> {
             Throwable throwable = event.getSource().getException();
+            LOGGER.warn("Fetching worklogs failed", throwable);
+            displayError(throwable);
+        });
 
-            progressBar.progressProperty().unbind();
-            progressText.textProperty().unbind();
-            progressBar.progressProperty().set(0);
-
-            if (throwable != null) {
-                progressText.setText(throwable.getMessage());
-                throwable.printStackTrace();
-            } else {
-                progressText.setText(resources.getString("exceptions.main.worker.unknown"));
-            }
+        // success handler
+        worklogTaskForUser.setOnSucceeded(event -> {
+            LOGGER.info("Fetching worklogs succeeded");
+            WorklogResult result = (WorklogResult) event.getSource().getValue();
+            displayResult(result, timerange, settings);
         });
 
         // bind progressbar and -text property to task
@@ -166,12 +210,30 @@ public class MainViewController implements Initializable {
         progressBar.progressProperty().bind(worklogTaskForUser.progressProperty());
 
         // start task
-        Thread thread = new Thread(worklogTaskForUser);
+        Thread thread = new Thread(worklogTaskForUser, "FetchWorklogsThread-" + timerange.name());
         thread.setDaemon(true);
         thread.start();
     }
 
-    private void displayResult(UserWorklogResult result, ReportTimerange timerange, SettingsUtil.Settings settings) {
+    /**
+     * Display the throwable to the user
+     * @param throwable
+     */
+    private void displayError(Throwable throwable) {
+        progressBar.progressProperty().unbind();
+        progressText.textProperty().unbind();
+        progressBar.progressProperty().set(0);
+
+        if (throwable != null) {
+            progressText.setText(throwable.getMessage());
+            throwable.printStackTrace();
+        } else {
+            progressText.setText(resources.getString("exceptions.main.worker.unknown"));
+        }
+    }
+
+    private void displayResult(WorklogResult result, ReportTimerange timerange, SettingsUtil.Settings settings) {
+        LOGGER.info("Displaying WorklogResult to the user");
         // clear tableview columns since they
         // might have changed, depending on the set timerange
         worklogTableView.getColumns().clear();

@@ -8,6 +8,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 
@@ -16,6 +19,8 @@ import java.nio.charset.Charset;
  * @since 01.04.15
  */
 public class WorklogViewer extends Application {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorklogViewer.class);
 
     private static WorklogViewer instance;
 
@@ -30,6 +35,8 @@ public class WorklogViewer extends Application {
         launch(args);
     }
 
+    private Stage primaryStage;
+
     @Override
     public void stop() throws Exception {
         SettingsUtil.saveSettings();
@@ -38,6 +45,7 @@ public class WorklogViewer extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         instance = this;
+        this.primaryStage = primaryStage;
 
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
@@ -58,6 +66,11 @@ public class WorklogViewer extends Application {
         primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> settings.setWindowHeight(newValue.intValue()));
         mainScene.getWindow().xProperty().addListener((observable, oldValue, newValue) -> settings.setWindowX(newValue.intValue()));
         mainScene.getWindow().yProperty().addListener((observable, oldValue, newValue) -> settings.setWindowY(newValue.intValue()));
+    }
+
+    public void requestShutdown() {
+        LOGGER.debug("Shutdown requested");
+        primaryStage.fireEvent(new WindowEvent(primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
 }

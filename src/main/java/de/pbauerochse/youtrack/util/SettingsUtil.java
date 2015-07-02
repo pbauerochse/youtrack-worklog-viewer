@@ -1,6 +1,8 @@
 package de.pbauerochse.youtrack.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +16,8 @@ import java.util.Properties;
  * @since 01.04.15
  */
 public class SettingsUtil {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsUtil.class);
 
     private static final File CONFIG_FILE_LOCATION = new File(System.getProperty("user.home"), "youtrack-worklog.properties");
 
@@ -38,11 +42,13 @@ public class SettingsUtil {
             settings = new Settings();
 
             if (CONFIG_FILE_LOCATION.exists()) {
+                LOGGER.debug("Loading configuration from {}", CONFIG_FILE_LOCATION.getAbsolutePath());
                 Properties properties = new Properties();
                 try {
                     properties.load(new FileInputStream(CONFIG_FILE_LOCATION));
                     applyFromPropertiesToSettings(settings, properties);
                 } catch (IOException e) {
+                    LOGGER.error("Could not read settings from {}", CONFIG_FILE_LOCATION.getAbsolutePath(), e);
                     throw ExceptionUtil.getRuntimeException("exceptions.settings.read", e, CONFIG_FILE_LOCATION.getAbsolutePath());
                 }
             }
@@ -58,16 +64,20 @@ public class SettingsUtil {
     public static void saveSettings() {
         if (!CONFIG_FILE_LOCATION.exists()) {
             try {
+                LOGGER.debug("Trying to create new settings file at {}", CONFIG_FILE_LOCATION.getAbsolutePath());
                 CONFIG_FILE_LOCATION.createNewFile();
             } catch (IOException e) {
+                LOGGER.error("Could not create settings file at {}", CONFIG_FILE_LOCATION.getAbsolutePath(), e);
                 throw ExceptionUtil.getRuntimeException("exceptions.settings.create", e, CONFIG_FILE_LOCATION.getAbsolutePath());
             }
         }
 
         Properties properties = getAsProperties(settings);
         try {
+            LOGGER.debug("Saving properties to settings file");
             properties.store(new FileOutputStream(CONFIG_FILE_LOCATION), "Settings file for YouTrack worklog viewer");
         } catch (IOException e) {
+            LOGGER.error("Could not save settings to {}", CONFIG_FILE_LOCATION.getAbsolutePath(), e);
             throw ExceptionUtil.getRuntimeException("exceptions.settings.write", e, CONFIG_FILE_LOCATION.getAbsolutePath());
         }
     }
@@ -79,6 +89,7 @@ public class SettingsUtil {
                 settings.setWindowX(Integer.parseInt(windowXAsString));
             } catch (NumberFormatException e) {
                 // ignore
+                LOGGER.warn("Could not convert {} to Integer for setting {}", windowXAsString, WINDOW_X_PROPERTY);
             }
         }
 
@@ -88,6 +99,7 @@ public class SettingsUtil {
                 settings.setWindowY(Integer.parseInt(windowYAsString));
             } catch (NumberFormatException e) {
                 // ignore
+                LOGGER.warn("Could not convert {} to Integer for setting {}", windowYAsString, WINDOW_Y_PROPERTY);
             }
         }
 
@@ -97,6 +109,7 @@ public class SettingsUtil {
                 settings.setWindowWidth(Integer.parseInt(windowWidthAsString));
             } catch (NumberFormatException e) {
                 // ignore
+                LOGGER.warn("Could not convert {} to Integer for setting {}", windowWidthAsString, WINDOW_WIDTH_PROPERTY);
             }
         }
 
@@ -106,6 +119,7 @@ public class SettingsUtil {
                 settings.setWindowHeight(Integer.parseInt(windowHeightAsString));
             } catch (NumberFormatException e) {
                 // ignore
+                LOGGER.warn("Could not convert {} to Integer for setting {}", windowHeightAsString, WINDOW_HEIGHT_PROPERTY);
             }
         }
 
@@ -115,6 +129,7 @@ public class SettingsUtil {
                 settings.setWorkHoursADay(Integer.parseInt(workHoursAsString));
             } catch (NumberFormatException e) {
                 // ignore
+                LOGGER.warn("Could not convert {} to Integer for setting {}", workHoursAsString, WORK_HOURS_PROPERTY);
             }
         }
 
@@ -125,6 +140,7 @@ public class SettingsUtil {
             try {
                 settings.setYoutrackPassword(PasswordUtil.decryptEncryptedPassword(encryptedPassword));
             } catch (GeneralSecurityException e) {
+                LOGGER.error("Could not decrypt password from settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.decrypt", e);
             }
         }
@@ -151,6 +167,7 @@ public class SettingsUtil {
             try {
                 properties.setProperty(YOUTRACK_PASSWORD_PROPERTY, PasswordUtil.encryptCleartextPassword(settings.getYoutrackPassword()));
             } catch (GeneralSecurityException e) {
+                LOGGER.error("Could not encrypt password for settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.encrypt", e);
             }
         }
@@ -238,6 +255,12 @@ public class SettingsUtil {
 
         public void setYoutrackPassword(String youtrackPassword) {
             this.youtrackPassword = youtrackPassword;
+        }
+
+        public boolean hasMissingConnectionParameters() {
+            return StringUtils.isBlank(settings.getYoutrackUrl()) ||
+                   StringUtils.isBlank(settings.getYoutrackUsername()) ||
+                   StringUtils.isBlank(settings.getYoutrackPassword());
         }
     }
 

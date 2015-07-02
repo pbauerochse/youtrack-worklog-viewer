@@ -5,13 +5,6 @@
     -fx-background-size: auto;
 }
 
-#settingsButton {
-    -fx-background-image: url(../img/cog.png);
-    -fx-background-position: center;
-    -fx-background-repeat: no-repeat;
-    -fx-background-size: auto;
-}
-
 .weekend {
     -fx-background-color: rgba(189, 255, 209, 0.5);
 }

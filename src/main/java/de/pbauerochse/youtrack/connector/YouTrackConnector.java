@@ -4,7 +4,7 @@ import de.pbauerochse.youtrack.connector.createreport.request.CreateReportReques
 import de.pbauerochse.youtrack.connector.createreport.response.ReportDetailsResponse;
 import de.pbauerochse.youtrack.csv.YouTrackCsvReportProcessor;
 import de.pbauerochse.youtrack.domain.ReportTimerange;
-import de.pbauerochse.youtrack.domain.UserWorklogResult;
+import de.pbauerochse.youtrack.domain.WorklogResult;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.JacksonUtil;
@@ -23,6 +23,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -36,9 +38,9 @@ import java.util.List;
  */
 public class YouTrackConnector {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackConnector.class);
 
-
-    public static final int MAX_REPORT_STATUS_POLLS = 5;
+    private static final int MAX_REPORT_STATUS_POLLS = 5;
 
     private static YouTrackConnector instance;
 
@@ -57,6 +59,7 @@ public class YouTrackConnector {
 
     private void initClient() {
         if (client == null) {
+            LOGGER.debug("Initializing HttpClient");
             List<Header> headerList = new ArrayList<>();
             headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"));
             headerList.add(new BasicHeader("Accept-Encoding", "gzip, deflate, sdch"));
@@ -76,19 +79,21 @@ public class YouTrackConnector {
         }
     }
 
-    public Task<UserWorklogResult> getWorklogTaskForUser(String youtrackUrl, String username, String password, ReportTimerange reportTimerange) {
+    public Task<WorklogResult> getWorklogTaskForUser(String youtrackUrl, String username, String password, ReportTimerange reportTimerange) {
         if (StringUtils.isBlank(youtrackUrl)) throw ExceptionUtil.getIllegalArgumentException("exceptions.main.worker.youtrackurl");
         if (StringUtils.isBlank(username)) throw ExceptionUtil.getIllegalArgumentException("exceptions.main.worker.youtrackuser");
         if (StringUtils.isBlank(password)) throw ExceptionUtil.getIllegalArgumentException("exceptions.main.worker.youtrackpassword");
         if (reportTimerange == null) throw ExceptionUtil.getIllegalArgumentException("exceptions.main.worker.reportingrange");
 
-        return new Task<UserWorklogResult>() {
+        LOGGER.debug("Creating WorklogTask for user {} and timerange {}", username, reportTimerange);
+        return new Task<WorklogResult>() {
             @Override
-            protected UserWorklogResult call() throws Exception {
+            protected WorklogResult call() throws Exception {
                 updateProgress(0, 100);
                 updateMessage(FormattingUtil.getFormatted("worker.progress.login", username));
 
                 // login to the youtrack api
+                LOGGER.debug("Logging in to YouTrack at {} as {}", youtrackUrl, username);
                 login(youtrackUrl, username, password);
                 updateProgress(10, 100);
 
@@ -101,9 +106,10 @@ public class YouTrackConnector {
                 // giant try block to finally delete the report again even
                 // in error cases to prevent polluted user report view
                 try {
-                    // wait for regeneration
                     updateMessage(FormattingUtil.getFormatted("worker.progress.waitingforrecalculation"));
 
+                    // poll report status every second
+                    // until report generation is finished or MAX_REPORT_STATUS_POLLS reached
                     int currentRetry = 0;
                     while (!StringUtils.equals(ReportDetailsResponse.READY_STATE, reportDetailsResponse.getState()) && currentRetry++ < MAX_REPORT_STATUS_POLLS) {
                         Thread.sleep(1000);
@@ -114,16 +120,14 @@ public class YouTrackConnector {
                         throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.recalculation", MAX_REPORT_STATUS_POLLS);
                     }
 
-                    // download report
+                    // download the generated report
                     updateMessage(FormattingUtil.getFormatted("worker.progress.downloadingreport", reportDetailsResponse.getId()));
 
                     String downloadReportUrlTemplate = buildYoutrackApiUrl(youtrackUrl, "current/reports/%s/export");
-
                     HttpGet request = new HttpGet(String.format(downloadReportUrlTemplate, reportDetailsResponse.getId()));
 
-                    UserWorklogResult worklogResult = client.execute(request, response -> {
-                        UserWorklogResult result = new UserWorklogResult();
-                        result.setUsername(username);
+                    WorklogResult worklogResult = client.execute(request, response -> {
+                        WorklogResult result = new WorklogResult();
 
                         HttpEntity entity = response.getEntity();
                         ByteArrayInputStream reportDataInputStream = null;
@@ -184,7 +188,15 @@ public class YouTrackConnector {
         }
     }
 
+    /**
+     * Creates the temporary worklog report using the given url and timerange
+     * @param youtrackUrl The target url of the youtrack api
+     * @param timerange The timerange to generate the report for
+     * @return
+     * @throws Exception
+     */
     private ReportDetailsResponse createReport(String youtrackUrl, ReportTimerange timerange) throws Exception {
+        LOGGER.debug("Creating temporary timereport");
         String createReportUrl = buildYoutrackApiUrl(youtrackUrl, "current/reports");
 
         HttpPost createReportRequest = new HttpPost(createReportUrl);
@@ -197,59 +209,56 @@ public class YouTrackConnector {
         createReportRequest.addHeader("Content-Type", "application/json;charset=UTF-8");
 
         // create report
-        CloseableHttpResponse response = client.execute(createReportRequest);
 
-        try {
+        try (CloseableHttpResponse response = client.execute(createReportRequest)) {
             if (!isValidResponseCode(response.getStatusLine())) {
+                LOGGER.error("Creating temporary timereport failed: {}", response.getStatusLine().getReasonPhrase());
                 throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.creatingreport", response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode());
             }
 
             String responseJson = EntityUtils.toString(response.getEntity());
 
             if (StringUtils.isBlank(responseJson)) {
+                LOGGER.warn("Response from youtrack was blank");
                 throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.blankresponse");
             }
 
             return JacksonUtil.parseValue(new StringReader(responseJson), ReportDetailsResponse.class);
-        } finally {
-            response.close();
         }
     }
 
     private ReportDetailsResponse getReportDetails(String youtrackUrl, String reportId) throws Exception {
         String reportUrlTemplate = buildYoutrackApiUrl(youtrackUrl, "current/reports/%s");
+        LOGGER.debug("Fetching report details from {}", reportUrlTemplate);
 
         HttpGet reportDetailsRequest = new HttpGet(String.format(reportUrlTemplate, reportId));
-        CloseableHttpResponse httpResponse = client.execute(reportDetailsRequest);
 
-        try {
+        try (CloseableHttpResponse httpResponse = client.execute(reportDetailsRequest)) {
             if (!isValidResponseCode(httpResponse.getStatusLine())) {
+                LOGGER.warn("Fetching report details from {} failed: {}", reportUrlTemplate, httpResponse.getStatusLine().getReasonPhrase());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
-                ExceptionUtil.getIllegalStateException("exceptions.main.worker.reportstatus", httpResponse.getStatusLine().getReasonPhrase(), httpResponse.getStatusLine().getStatusCode());
+                throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.reportstatus", httpResponse.getStatusLine().getReasonPhrase(), httpResponse.getStatusLine().getStatusCode());
             }
 
             String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
+            LOGGER.debug("Received JSON response {}", jsonResponse);
             return JacksonUtil.parseValue(new StringReader(jsonResponse), ReportDetailsResponse.class);
-        } finally {
-            httpResponse.close();
         }
     }
 
     private void deleteReport(String youtrackUrl, String reportId) throws IOException {
         String reportUrlTemplate = buildYoutrackApiUrl(youtrackUrl, "current/reports/%s");
+        LOGGER.debug("Deleting temporary report using url {}", reportUrlTemplate);
 
         HttpDelete deleteRequest = new HttpDelete(String.format(reportUrlTemplate, reportId));
 
-        CloseableHttpResponse response = client.execute(deleteRequest);
-
-        try {
+        try (CloseableHttpResponse response = client.execute(deleteRequest)) {
             EntityUtils.consumeQuietly(response.getEntity());
 
             if (!isValidResponseCode(response.getStatusLine())) {
+                LOGGER.warn("Could not delete temporary report using url {}: {}", reportUrlTemplate, response.getStatusLine().getReasonPhrase());
                 throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.deletereport", response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode());
             }
-        } finally {
-            response.close();
         }
     }
 
