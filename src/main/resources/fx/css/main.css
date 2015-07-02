@@ -5,6 +5,10 @@
     -fx-background-size: auto;
 }
 
+#modalOverlaySpinner .progress-indicator {
+    -fx-progress-color: #a5cdff;
+}
+
 .weekend {
     -fx-background-color: rgba(189, 255, 209, 0.5);
 }

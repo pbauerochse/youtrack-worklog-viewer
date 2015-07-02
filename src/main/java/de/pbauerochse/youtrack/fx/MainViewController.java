@@ -7,6 +7,7 @@ import de.pbauerochse.youtrack.domain.WorklogResult;
 import de.pbauerochse.youtrack.fx.tabs.AllWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.OwnWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.ProjectWorklogTab;
+import de.pbauerochse.youtrack.fx.tabs.WorklogTab;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.application.Platform;
@@ -18,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -38,6 +40,8 @@ import java.util.ResourceBundle;
 public class MainViewController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainViewController.class);
+
+    private static final int AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS = 2;  // two fixed tabs (own and all)
 
     @FXML
     private ComboBox<ReportTimerange> timerangeComboBox;
@@ -63,12 +67,17 @@ public class MainViewController implements Initializable {
     @FXML
     private TabPane resultTabPane;
 
+    @FXML
+    private StackPane modalOverlaySpinner;
+
     private ResourceBundle resources;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
         LOGGER.debug("Initializing main view");
+
+        modalOverlaySpinner.setVisible(false);
 
         // prepopulate timerange dropdown
         timerangeComboBox.setConverter(getTimerangeComboBoxConverter(resources));
@@ -170,6 +179,8 @@ public class MainViewController implements Initializable {
 
     private void fetchWorklogs(SettingsUtil.Settings settings, ReportTimerange timerange) {
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
+        modalOverlaySpinner.setVisible(true);
+
         Task<WorklogResult> worklogTaskForUser = YouTrackConnector.getInstance()
                 .getWorklogTaskForUser(settings.getYoutrackUrl(), settings.getYoutrackUsername(), settings.getYoutrackPassword(), timerange);
 
@@ -184,6 +195,7 @@ public class MainViewController implements Initializable {
             Throwable throwable = event.getSource().getException();
             LOGGER.warn("Fetching worklogs failed", throwable);
             displayError(throwable);
+            modalOverlaySpinner.setVisible(false);
         });
 
         // success handler
@@ -191,6 +203,7 @@ public class MainViewController implements Initializable {
             LOGGER.info("Fetching worklogs succeeded");
             WorklogResult result = (WorklogResult) event.getSource().getValue();
             displayResult(result, timerange, settings);
+            modalOverlaySpinner.setVisible(false);
         });
 
         // bind progressbar and -text property to task
@@ -225,10 +238,42 @@ public class MainViewController implements Initializable {
     private void displayResult(WorklogResult result, ReportTimerange timerange, SettingsUtil.Settings settings) {
         LOGGER.info("Displaying WorklogResult to the user");
 
-        resultTabPane.getTabs().clear();
+        Platform.runLater(() -> {
+            if (resultTabPane.getTabs().size() == 0) {
+                LOGGER.debug("Adding default tabs");
+                resultTabPane.getTabs().add(new OwnWorklogsTab(resources, settings));
+                resultTabPane.getTabs().add(new AllWorklogsTab(resources, settings));
+            }
 
-        resultTabPane.getTabs().add(new OwnWorklogsTab(result.getOwnSummary(), timerange, resources, settings));
-        resultTabPane.getTabs().add(new AllWorklogsTab(result.getAll(), timerange, resources, settings));
-        result.getDistinctProjects().forEach(project -> resultTabPane.getTabs().add(new ProjectWorklogTab(project, result.getProjectSummary(project), timerange, resources, settings)));
+            WorklogTab ownWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(0);
+            ownWorklogsTab.updateItems(result.getOwnSummary(), timerange);
+
+            WorklogTab allWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(1);
+            allWorklogsTab.updateItems(result.getAll(), timerange);
+
+            for (int i = 0; i < result.getDistinctProjects().size(); i++) {
+                int tabIndex = AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS + i;
+                String newTabLabel = result.getDistinctProjects().get(i);
+                WorklogTab tab;
+                if (resultTabPane.getTabs().size() > tabIndex) {
+                    // there is a tab we can reuse
+                    tab = (WorklogTab) resultTabPane.getTabs().get(tabIndex);
+                    LOGGER.debug("Reusing Tab {} for project {}", tab.getText(), newTabLabel);
+                } else {
+                    LOGGER.debug("Adding new project tab for project {}", newTabLabel);
+                    tab = new ProjectWorklogTab(newTabLabel, resources, settings);
+                    resultTabPane.getTabs().add(tab);
+                }
+
+                tab.setText(newTabLabel);
+                tab.updateItems(result.getProjectSummary(newTabLabel), timerange);
+            }
+
+            // remove any redundant tabs
+            for (int tabIndexToRemove = result.getDistinctProjects().size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
+                Tab removedTab = resultTabPane.getTabs().remove(tabIndexToRemove);
+                LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
+            }
+        });
     }
 }

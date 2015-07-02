@@ -105,6 +105,8 @@ public class YouTrackConnector {
                 // report generation succeeded and is in progress right now
                 // giant try block to finally delete the report again even
                 // in error cases to prevent polluted user report view
+                WorklogResult returnResult;
+
                 try {
                     updateMessage(FormattingUtil.getFormatted("worker.progress.waitingforrecalculation"));
 
@@ -126,7 +128,7 @@ public class YouTrackConnector {
                     String downloadReportUrlTemplate = buildYoutrackApiUrl(youtrackUrl, "current/reports/%s/export");
                     HttpGet request = new HttpGet(String.format(downloadReportUrlTemplate, reportDetailsResponse.getId()));
 
-                    WorklogResult worklogResult = client.execute(request, response -> {
+                    returnResult = client.execute(request, response -> {
                         WorklogResult result = new WorklogResult(username);
 
                         HttpEntity entity = response.getEntity();
@@ -142,7 +144,7 @@ public class YouTrackConnector {
                         if (!isValidResponseCode(response.getStatusLine())) {
                             // invalid response code
                             int statusCode = response.getStatusLine().getStatusCode();
-                            throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.statuscode",response.getStatusLine().getReasonPhrase(), statusCode);
+                            throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.statuscode", response.getStatusLine().getReasonPhrase(), statusCode);
                         }
 
                         // success
@@ -152,15 +154,18 @@ public class YouTrackConnector {
 
                         return result;
                     });
+                } finally {
+                    // delete the report again
+                    updateProgress(90, 100);
+                    updateMessage(FormattingUtil.getFormatted("worker.progress.deletingreport"));
+
+                    deleteReport(youtrackUrl, reportDetailsResponse.getId());
 
                     updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
                     updateProgress(100, 100);
-
-                    return worklogResult;
-                } finally {
-                    // delete the report again
-                    deleteReport(youtrackUrl, reportDetailsResponse.getId());
                 }
+
+                return returnResult;
             }
         };
     }

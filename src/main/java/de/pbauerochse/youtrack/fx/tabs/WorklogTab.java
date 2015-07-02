@@ -33,18 +33,13 @@ public abstract class WorklogTab extends Tab {
     protected static final String WEEKEND_COLUMN_OR_CELL_CSS_CLASS = "weekend";
     protected static final String ISSUE_CELL_CSS_CLASS = "issue-cell";
 
-    protected List<TaskWithWorklogs> worklogsList;
-    
-    protected ReportTimerange timerange;
-
     protected ResourceBundle resourceBundle;
 
     protected SettingsUtil.Settings settings;
+    protected TableView<TaskWithWorklogs> taskTableView;
 
-    public WorklogTab(String name, List<TaskWithWorklogs> worklogsList, ReportTimerange timerange, ResourceBundle resourceBundle, SettingsUtil.Settings settings) {
+    public WorklogTab(String name, ResourceBundle resourceBundle, SettingsUtil.Settings settings) {
         super(name);
-        this.worklogsList = worklogsList;
-        this.timerange = timerange;
         this.resourceBundle = resourceBundle;
         this.settings = settings;
 
@@ -70,28 +65,21 @@ public abstract class WorklogTab extends Tab {
     }
 
     protected Node getTaskView() {
-        TableView<TaskWithWorklogs> tableView = new TableView<>();
-        tableView.getColumns().add(getDescriptionColumn(tableView));
-        addDetailColumns(tableView);
+        taskTableView = new TableView<>();
+        taskTableView.getColumns().add(getDescriptionColumn());
 
-        tableView.getItems().addAll(worklogsList);
-
-        AnchorPane anchorPane = new AnchorPane(tableView);
+        AnchorPane anchorPane = new AnchorPane(taskTableView);
         anchorPane.setPadding(new Insets(6));
 
-        AnchorPane.setTopAnchor(tableView, 0d);
-        AnchorPane.setRightAnchor(tableView, 0d);
-        AnchorPane.setBottomAnchor(tableView, 0d);
-        AnchorPane.setLeftAnchor(tableView, 0d);
+        AnchorPane.setTopAnchor(taskTableView, 0d);
+        AnchorPane.setRightAnchor(taskTableView, 0d);
+        AnchorPane.setBottomAnchor(taskTableView, 0d);
+        AnchorPane.setLeftAnchor(taskTableView, 0d);
 
         return anchorPane;
     }
 
-    protected Node getStatisticsView() {
-        return null;
-    }
-    
-    protected void addDetailColumns(TableView<TaskWithWorklogs> tableView) {
+    public void updateItems(List<TaskWithWorklogs> worklogList, ReportTimerange timerange) {
         // render tables for all days in the timerange
         TimerangeProvider timerangeProvider = timerange.getTimerangeProvider();
         long daysToDisplay = ChronoUnit.DAYS.between(timerangeProvider.getStartDate(), timerangeProvider.getEndDate());
@@ -141,7 +129,9 @@ public abstract class WorklogTab extends Tab {
                 column.setPrefWidth(100);
             }
 
-            tableView.getColumns().add(column);
+            taskTableView.getColumns().add(column);
+            taskTableView.getItems().clear();
+            taskTableView.getItems().addAll(worklogList);
         }
 
         // also add another summary per task column
@@ -161,10 +151,14 @@ public abstract class WorklogTab extends Tab {
             return summaryCell;
         });
         summaryPerTaskColumn.setPrefWidth(120);
-        tableView.getColumns().add(summaryPerTaskColumn);
+        taskTableView.getColumns().add(summaryPerTaskColumn);
     }
 
-    protected TableColumn<TaskWithWorklogs, TaskWithWorklogs> getDescriptionColumn(TableView<TaskWithWorklogs> tableView) {
+    protected Node getStatisticsView() {
+        return null;
+    }
+
+    protected TableColumn<TaskWithWorklogs, TaskWithWorklogs> getDescriptionColumn() {
         TableColumn<TaskWithWorklogs, TaskWithWorklogs> descriptionColumn = new TableColumn<>(resourceBundle.getString("view.main.issue"));
         descriptionColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue()));
         descriptionColumn.setCellFactory(param -> {
@@ -198,8 +192,8 @@ public abstract class WorklogTab extends Tab {
                 TableCell<TaskWithWorklogs, TaskWithWorklogs> cell = (TableCell<TaskWithWorklogs, TaskWithWorklogs>) event.getSource();
                 int index = cell.getIndex();
 
-                if (index < tableView.getItems().size()) {
-                    TaskWithWorklogs clickedWorklogItem = tableView.getItems().get(index);
+                if (index < taskTableView.getItems().size()) {
+                    TaskWithWorklogs clickedWorklogItem = taskTableView.getItems().get(index);
                     if (!clickedWorklogItem.isSummaryRow()) {
                         String issueUrl = String.format("%s/issue/%s", StringUtils.stripEnd(settings.getYoutrackUrl(), "/"), clickedWorklogItem.getIssue());
                         Platform.runLater(() -> WorklogViewer.getInstance().getHostServices().showDocument(issueUrl));
