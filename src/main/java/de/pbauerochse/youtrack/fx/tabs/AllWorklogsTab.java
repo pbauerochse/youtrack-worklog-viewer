@@ -1,24 +1,28 @@
 package de.pbauerochse.youtrack.fx.tabs;
 
+import de.pbauerochse.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.youtrack.domain.WorklogItem;
 import de.pbauerochse.youtrack.domain.WorklogResult;
 import de.pbauerochse.youtrack.util.FormattingUtil;
-import javafx.collections.FXCollections;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.chart.*;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.text.Format;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * @author Patrick Bauerochse
@@ -26,7 +30,13 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class AllWorklogsTab extends WorklogTab {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AllWorklogsTab.class);
+
+    private static final int HEIGHT_PER_PROJECT = 50;
+
     private VBox statisticsView;
+
+    private Optional<List<TaskWithWorklogs>> resultItemsToDisplay = Optional.empty();
 
     public AllWorklogsTab() {
         super(FormattingUtil.getFormatted("view.main.tabs.all"));
@@ -41,6 +51,32 @@ public class AllWorklogsTab extends WorklogTab {
         scrollPane.setFitToWidth(true);
         scrollPane.setPadding(new Insets(7));
         return scrollPane;
+    }
+
+    @Override
+    protected List<TaskWithWorklogs> getDisplayResult(WorklogResult result) {
+
+        if (!resultItemsToDisplay.isPresent() || resultToDisplayChangedSinceLastRender) {
+            LOGGER.debug("Extracting TaskWithWorklogs from WorklogResult");
+
+            TaskWithWorklogs summary = new TaskWithWorklogs(true);
+
+            List<TaskWithWorklogs> totalSummary = result.getWorklogSummaryMap()
+                    .values().stream()
+                    .sorted((o1, o2) -> COLLATOR.compare(o1.getIssue(), o2.getIssue()))
+                    .peek(userTaskWorklogs -> {
+                        userTaskWorklogs
+                                .getWorklogItemList()
+                                .stream()
+                                .forEach(worklogItem -> summary.getWorklogItemList().add(worklogItem));
+                    })
+                    .collect(Collectors.toList());
+
+            totalSummary.add(summary);
+            resultItemsToDisplay = Optional.of(totalSummary);
+        }
+
+        return resultItemsToDisplay.get();
     }
 
     @Override
@@ -66,14 +102,14 @@ public class AllWorklogsTab extends WorklogTab {
 
     private void renderData(GridPane pane, StackedBarChart barChart) {
 
-        if (resultToDisplay.isPresent()) {
+        if (resultItemsToDisplay.isPresent()) {
             Map<String, Map<String, AtomicLong>> employeeToProjectToWorktime = new HashMap<>();
             AtomicLong totalTimeSpent = new AtomicLong(0);
 
             barChart.getXAxis().setLabel(FormattingUtil.getFormatted("view.statistics.timespentinminutes"));
             barChart.getXAxis().setTickLabelRotation(90);
 
-            resultToDisplay.get().forEach(taskWithWorklogs -> {
+            resultItemsToDisplay.get().forEach(taskWithWorklogs -> {
                 if (!taskWithWorklogs.isSummaryRow()) {
                     totalTimeSpent.addAndGet(taskWithWorklogs.getTotalInMinutes());
 
@@ -98,7 +134,7 @@ public class AllWorklogsTab extends WorklogTab {
 
             final AtomicInteger gridRow = new AtomicInteger(0);
             employeeToProjectToWorktime.keySet().stream()
-                    .sorted((o1, o2) -> WorklogResult.COLLATOR.compare(o1, o2))
+                    .sorted((o1, o2) -> COLLATOR.compare(o1, o2))
                     .forEach(employee -> {
 
                         // grid pane
@@ -116,7 +152,7 @@ public class AllWorklogsTab extends WorklogTab {
 
                         Map<String, AtomicLong> projectToWorktime = employeeToProjectToWorktime.get(employee);
                         projectToWorktime.keySet().stream()
-                                .sorted((o1, o2) -> WorklogResult.COLLATOR.compare(o1, o2))
+                                .sorted((o1, o2) -> COLLATOR.compare(o1, o2))
                                 .forEach(projectName -> {
                                     long timespentInMinutes = projectToWorktime.get(projectName).longValue();
 
@@ -138,7 +174,7 @@ public class AllWorklogsTab extends WorklogTab {
                         barChart.getData().add(series);
                     });
 
-//            barChart.setPrefHeight(50 * 30); TODO set height by amount of distinct projects
+            barChart.setPrefHeight(HEIGHT_PER_PROJECT * worklogResult.get().getDistinctProjectNames().size());
         }
     }
 }

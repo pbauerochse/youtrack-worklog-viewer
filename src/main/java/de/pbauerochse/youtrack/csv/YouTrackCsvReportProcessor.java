@@ -59,8 +59,6 @@ public class YouTrackCsvReportProcessor {
                 WorklogItem worklogItem = getWorklogItem(line);
                 taskWithWorklogs.getWorklogItemList().add(worklogItem);
             }
-
-            result.finalize();
         } catch (IOException e) {
             LOGGER.warn("Could not parse csv report", e);
             throw ExceptionUtil.getRuntimeException("exceptions.report.csvparser.io", e);
@@ -95,7 +93,7 @@ public class YouTrackCsvReportProcessor {
                 }
             }
 
-            result.addWorklogSummary(taskId, taskWithWorklogs);
+            result.addWorklogSummary(taskWithWorklogs);
         }
 
         return taskWithWorklogs;

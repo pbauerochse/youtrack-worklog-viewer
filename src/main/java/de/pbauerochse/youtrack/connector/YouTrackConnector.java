@@ -129,7 +129,7 @@ public class YouTrackConnector {
                     HttpGet request = new HttpGet(String.format(downloadReportUrlTemplate, reportDetailsResponse.getId()));
 
                     returnResult = client.execute(request, response -> {
-                        WorklogResult result = new WorklogResult(username);
+                        WorklogResult result = new WorklogResult(reportTimerange);
 
                         HttpEntity entity = response.getEntity();
                         ByteArrayInputStream reportDataInputStream = null;

@@ -4,6 +4,7 @@ import de.pbauerochse.youtrack.WorklogViewer;
 import de.pbauerochse.youtrack.domain.ReportTimerange;
 import de.pbauerochse.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.youtrack.domain.TimerangeProvider;
+import de.pbauerochse.youtrack.domain.WorklogResult;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.application.Platform;
@@ -21,10 +22,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.Collator;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -32,6 +36,8 @@ import java.util.Optional;
  * @since 02.07.15
  */
 public abstract class WorklogTab extends Tab {
+
+    protected static final Collator COLLATOR = Collator.getInstance(Locale.GERMANY);
 
     protected static final String SUMMARY_COLUMN_OR_CELL_CSS_CLASS = "summary";
     protected static final String WEEKEND_COLUMN_OR_CELL_CSS_CLASS = "weekend";
@@ -43,10 +49,16 @@ public abstract class WorklogTab extends Tab {
 
     protected Optional<ReportTimerange> lastUsedTimerange = Optional.empty();
 
-    protected Optional<List<TaskWithWorklogs>> resultToDisplay = Optional.empty();
-    protected Optional<ReportTimerange> timerangeToDisplay = Optional.empty();
+    protected Optional<WorklogResult> worklogResult = Optional.empty();
 
     protected boolean resultToDisplayChangedSinceLastRender;
+
+    /**
+     * Extract the appropriate TaskWithWorklogs from the WorklogResult item
+     * @param result
+     * @return
+     */
+    protected abstract List<TaskWithWorklogs> getDisplayResult(WorklogResult result);
 
     public WorklogTab(String name) {
         super(name);
@@ -69,11 +81,9 @@ public abstract class WorklogTab extends Tab {
      * this tab becomes active
      *
      * @param worklogList The TaskWithWorklogs to show in this tab
-     * @param timerange The selected ReportingTimerange
      */
-    public void updateItems(List<TaskWithWorklogs> worklogList, ReportTimerange timerange) {
-        resultToDisplay = Optional.of(worklogList);
-        timerangeToDisplay = Optional.of(timerange);
+    public void updateItems(WorklogResult worklogResult) {
+        this.worklogResult = Optional.of(worklogResult);
         resultToDisplayChangedSinceLastRender = true;
 
         if (isSelected()) {
@@ -122,22 +132,23 @@ public abstract class WorklogTab extends Tab {
 
         // return early if no data present or still the same data
         // as the last time this tab was active
-        if (!timerangeToDisplay.isPresent() || !resultToDisplay.isPresent() || !resultToDisplayChangedSinceLastRender) {
+        if (!worklogResult.isPresent() || !resultToDisplayChangedSinceLastRender) {
             LOGGER.debug("[{}] No results to display or data not changed. Not refreshing TableView and data", getText());
             return;
         }
 
         // render the table columns if the timerange changed from last result
-        if (!lastUsedTimerange.isPresent() || lastUsedTimerange.get() != timerangeToDisplay.get()) {
+        WorklogResult worklogResult = this.worklogResult.get();
+        if (!lastUsedTimerange.isPresent() || lastUsedTimerange.get() != worklogResult.getTimerange()) {
 
-            LOGGER.debug("[{}] Regenerating columns for timerange {}", getText(), timerangeToDisplay.get().name());
+            LOGGER.debug("[{}] Regenerating columns for timerange {}", getText(), worklogResult.getTimerange().name());
             taskTableView.getColumns().clear();
             taskTableView.getColumns().add(getDescriptionColumn());
 
             // render tables for all days in the selected timerange
             // e.g. timerange current month renders a column for
             // each day of the current month
-            TimerangeProvider timerangeProvider = timerangeToDisplay.get().getTimerangeProvider();
+            TimerangeProvider timerangeProvider = worklogResult.getTimerange().getTimerangeProvider();
             long amountOfDaysToDisplay = ChronoUnit.DAYS.between(timerangeProvider.getStartDate(), timerangeProvider.getEndDate());
 
             for (int days = 0; days <= amountOfDaysToDisplay; days++) {
@@ -210,14 +221,22 @@ public abstract class WorklogTab extends Tab {
             summaryPerTaskColumn.setPrefWidth(120);
             taskTableView.getColumns().add(summaryPerTaskColumn);
 
-            lastUsedTimerange = Optional.of(timerangeToDisplay.get());
+            lastUsedTimerange = Optional.of(worklogResult.getTimerange());
         }
 
         // only refresh items if changed from last time
         if (resultToDisplayChangedSinceLastRender) {
             LOGGER.debug("[{}] Refreshing items in TableView", getText());
             taskTableView.getItems().clear();
-            taskTableView.getItems().addAll(resultToDisplay.get());
+
+
+            List<TaskWithWorklogs> displayResult = getDisplayResult(worklogResult);
+            if (displayResult == null) {
+                LOGGER.warn("[{}] returned a null resultset", getText());
+                displayResult = new ArrayList<>();
+            }
+
+            taskTableView.getItems().addAll(displayResult);
 
             updateStatisticsData();
 

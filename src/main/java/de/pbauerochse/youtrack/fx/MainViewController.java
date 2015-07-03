@@ -243,15 +243,9 @@ public class MainViewController implements Initializable {
             resultTabPane.getTabs().addAll(new OwnWorklogsTab(), new AllWorklogsTab());
         }
 
-        WorklogTab ownWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(0);
-        ownWorklogsTab.updateItems(result.getOwnSummary(), timerange);
-
-        WorklogTab allWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(1);
-        allWorklogsTab.updateItems(result.getAll(), timerange);
-
-        for (int i = 0; i < result.getDistinctProjects().size(); i++) {
+        for (int i = 0; i < result.getDistinctProjectNames().size(); i++) {
             int tabIndex = AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS + i;
-            String newTabLabel = result.getDistinctProjects().get(i);
+            String newTabLabel = result.getDistinctProjectNames().get(i);
             WorklogTab tab;
             if (resultTabPane.getTabs().size() > tabIndex) {
                 // there is a tab we can reuse
@@ -264,14 +258,17 @@ public class MainViewController implements Initializable {
             }
 
             tab.setText(newTabLabel);
-            tab.updateItems(result.getProjectSummary(newTabLabel), timerange);
         }
 
         // remove any redundant tabs
-        for (int tabIndexToRemove = result.getDistinctProjects().size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
+        for (int tabIndexToRemove = result.getDistinctProjectNames().size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
             WorklogTab removedTab = (WorklogTab) resultTabPane.getTabs().remove(tabIndexToRemove);
             LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
         }
+
+        resultTabPane.getTabs().forEach(tab -> {
+            ((WorklogTab) tab).updateItems(result);
+        });
     }
 
     private void showWaitScreen() {
