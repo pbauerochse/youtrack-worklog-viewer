@@ -111,10 +111,4 @@ public class OwnWorklogsTab extends WorklogTab {
         }
     }
 
-    private Label getBoldLabel(String text) {
-        Label label = new Label(text);
-        label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize()));
-        return label;
-    }
-
 }

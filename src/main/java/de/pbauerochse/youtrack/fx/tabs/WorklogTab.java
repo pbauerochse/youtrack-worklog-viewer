@@ -15,6 +15,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -291,6 +293,12 @@ public abstract class WorklogTab extends Tab {
         }
 
         return descriptionColumnOptional.get();
+    }
+
+    protected Label getBoldLabel(String text) {
+        Label label = new Label(text);
+        label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize()));
+        return label;
     }
 
 }
