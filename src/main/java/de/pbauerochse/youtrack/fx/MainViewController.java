@@ -9,6 +9,7 @@ import de.pbauerochse.youtrack.fx.tabs.OwnWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.ProjectWorklogTab;
 import de.pbauerochse.youtrack.fx.tabs.WorklogTab;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
+import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -74,13 +75,13 @@ public class MainViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.resources = resources;
         LOGGER.debug("Initializing main view");
+        this.resources = resources;
 
         modalOverlaySpinner.setVisible(false);
 
         // prepopulate timerange dropdown
-        timerangeComboBox.setConverter(getTimerangeComboBoxConverter(resources));
+        timerangeComboBox.setConverter(getTimerangeComboBoxConverter());
         timerangeComboBox.getItems().addAll(ReportTimerange.values());
         timerangeComboBox.getSelectionModel().select(ReportTimerange.THIS_WEEK);    // preselect "this week"
 
@@ -105,7 +106,7 @@ public class MainViewController implements Initializable {
         if (settings.hasMissingConnectionParameters()) {
             // connection data missing hence trigger settings button click and show warning
             LOGGER.info("No settings present yet, redirecting user to settings dialogue");
-            progressText.setText(resources.getString("view.main.warning.settingsblank"));
+            progressText.setText(FormattingUtil.getFormatted("view.main.warning.settingsblank"));
             settingsMenuItem.fire();
         } else {
             // settings present, fetch worklogs
@@ -116,20 +117,19 @@ public class MainViewController implements Initializable {
     /**
      * Get the converter for the ReportTimerange ComboBox
      *
-     * @param resources the resource bundle to retrieve the display label from
      * @return a converter from {@link ReportTimerange} to {@link String} and back
      */
-    private static StringConverter<ReportTimerange> getTimerangeComboBoxConverter(ResourceBundle resources) {
+    private static StringConverter<ReportTimerange> getTimerangeComboBoxConverter() {
         return new StringConverter<ReportTimerange>() {
             @Override
             public String toString(ReportTimerange object) {
-                return resources.getString(object.getLabelKey());
+                return FormattingUtil.getFormatted(object.getLabelKey());
             }
 
             @Override
             public ReportTimerange fromString(String string) {
                 for (ReportTimerange timerange : ReportTimerange.values()) {
-                    if (StringUtils.equals(resources.getString(timerange.getLabelKey()), string)) {
+                    if (StringUtils.equals(FormattingUtil.getFormatted(timerange.getLabelKey()), string)) {
                         return timerange;
                     }
                 }
@@ -167,7 +167,7 @@ public class MainViewController implements Initializable {
                     settingsStage.setResizable(false);
                 }
 
-                settingsStage.setTitle(resources.getString(titleResourceKey));
+                settingsStage.setTitle(FormattingUtil.getFormatted(titleResourceKey));
                 settingsStage.setScene(settingsScene);
                 settingsStage.showAndWait();
             } catch (IOException e) {
@@ -229,9 +229,9 @@ public class MainViewController implements Initializable {
 
         if (throwable != null) {
             progressText.setText(throwable.getMessage());
-            throwable.printStackTrace();
+            LOGGER.warn("Showing error to user", throwable);
         } else {
-            progressText.setText(resources.getString("exceptions.main.worker.unknown"));
+            progressText.setText(FormattingUtil.getFormatted("exceptions.main.worker.unknown"));
         }
     }
 
@@ -240,10 +240,7 @@ public class MainViewController implements Initializable {
 
         if (resultTabPane.getTabs().size() == 0) {
             LOGGER.debug("Adding default tabs");
-            OwnWorklogsTab ownWorklogsTab = new OwnWorklogsTab(resources, settings);
-            AllWorklogsTab allWorklogsTab = new AllWorklogsTab(resources, settings);
-
-            resultTabPane.getTabs().addAll(ownWorklogsTab, allWorklogsTab);
+            resultTabPane.getTabs().addAll(new OwnWorklogsTab(), new AllWorklogsTab());
         }
 
         WorklogTab ownWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(0);
@@ -262,7 +259,7 @@ public class MainViewController implements Initializable {
                 LOGGER.debug("Reusing Tab {} for project {}", tab.getText(), newTabLabel);
             } else {
                 LOGGER.debug("Adding new project tab for project {}", newTabLabel);
-                tab = new ProjectWorklogTab(newTabLabel, resources, settings);
+                tab = new ProjectWorklogTab(newTabLabel);
                 resultTabPane.getTabs().add(tab);
             }
 

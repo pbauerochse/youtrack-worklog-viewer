@@ -17,6 +17,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Patrick Bauerochse
@@ -25,6 +27,8 @@ import java.time.ZoneId;
 public class YouTrackCsvReportProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackCsvReportProcessor.class);
+
+    private static final Pattern PROJECT_ID_PATTERN = Pattern.compile("^(.+)-\\d+$");
 
     private static final int DESCRIPTION_COLUMN_INDEX = 0;
     private static final int DATE_COLUMN_INDEX = 1;
@@ -75,6 +79,11 @@ public class YouTrackCsvReportProcessor {
             taskWithWorklogs = new TaskWithWorklogs(false);
             taskWithWorklogs.setIssue(taskId);
             taskWithWorklogs.setSummary(csvLine[ISSUE_SUMMARY_COLUMN_INDEX]);
+
+            Matcher matcher = PROJECT_ID_PATTERN.matcher(taskId);
+            if (matcher.matches()) {
+                taskWithWorklogs.setProject(matcher.group(1));
+            }
 
             String timeEstimationAsString = csvLine[TIMEESTIMATION_COLUMN_INDEX];
 

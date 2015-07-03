@@ -10,6 +10,7 @@ import java.util.List;
  */
 public class TaskWithWorklogs {
 
+    private String project;
     private String issue;
     private String summary;
     private long estimatedWorktimeInMinutes;
@@ -20,6 +21,14 @@ public class TaskWithWorklogs {
 
     public TaskWithWorklogs(boolean isSummaryRow) {
         this.isSummaryRow = isSummaryRow;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        this.project = project;
     }
 
     public String getIssue() {
@@ -76,4 +85,15 @@ public class TaskWithWorklogs {
         return sum;
     }
 
+    public TaskWithWorklogs createCopy() {
+        TaskWithWorklogs copy = new TaskWithWorklogs(isSummaryRow);
+        copy.setProject(getProject());
+        copy.setIssue(getIssue());
+        copy.setSummary(getSummary());
+        copy.setEstimatedWorktimeInMinutes(getEstimatedWorktimeInMinutes());
+
+        worklogItemList.forEach(worklogItem -> copy.worklogItemList.add(worklogItem.createCopy()));
+
+        return copy;
+    }
 }

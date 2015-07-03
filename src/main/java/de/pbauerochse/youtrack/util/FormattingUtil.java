@@ -18,13 +18,18 @@ public class FormattingUtil {
     private static DateTimeFormatter dateTimeFormatter;
     private static final int MINUTES_PER_HOUR = 60;
 
+
+    public static String formatMinutes(long minutes) {
+        return formatMinutes(minutes, false);
+    }
+
     /**
      * Formats the given amount of minutes in Jira Style format
      *
      * @param minutes
      * @return
      */
-    public static String formatMinutes(long minutes) {
+    public static String formatMinutes(long minutes, boolean full) {
         StringBuilder worklogFormatted = new StringBuilder();
 
         int workhours = SettingsUtil.loadSettings().getWorkHoursADay();
@@ -41,11 +46,11 @@ public class FormattingUtil {
         long hours = remainingMinutes / MINUTES_PER_HOUR;
         remainingMinutes = remainingMinutes % MINUTES_PER_HOUR;
 
-        if (days > 0) {
+        if (days > 0 || full) {
             worklogFormatted.append(days).append('d');
         }
 
-        if (hours > 0) {
+        if (hours > 0 || full) {
             if (worklogFormatted.length() > 0) {
                 worklogFormatted.append(' ');
             }
@@ -53,7 +58,7 @@ public class FormattingUtil {
             worklogFormatted.append(hours).append('h');
         }
 
-        if (remainingMinutes > 0) {
+        if (remainingMinutes > 0 || full) {
             if (worklogFormatted.length() > 0) {
                 worklogFormatted.append(' ');
             }

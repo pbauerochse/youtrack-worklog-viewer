@@ -62,4 +62,16 @@ public class WorklogItem {
     public void setWorkType(String workType) {
         this.workType = workType;
     }
+
+    public WorklogItem createCopy() {
+        WorklogItem copy = new WorklogItem();
+        copy.setWorkDescription(getWorkDescription());
+        copy.setDate(getDate());
+        copy.setDurationInMinutes(getDurationInMinutes());
+        copy.setUsername(getUsername());
+        copy.setUserDisplayname(getUserDisplayname());
+        copy.setWorkType(getWorkType());
+
+        return copy;
+    }
 }

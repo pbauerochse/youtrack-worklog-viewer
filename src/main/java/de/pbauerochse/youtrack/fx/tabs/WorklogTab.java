@@ -24,7 +24,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 /**
  * @author Patrick Bauerochse
@@ -38,9 +37,6 @@ public abstract class WorklogTab extends Tab {
 
     private Logger LOGGER = LoggerFactory.getLogger(WorklogTab.class);
 
-    protected ResourceBundle resourceBundle;
-
-    protected SettingsUtil.Settings settings;
     protected TableView<TaskWithWorklogs> taskTableView;
 
     protected Optional<ReportTimerange> lastUsedTimerange = Optional.empty();
@@ -50,10 +46,8 @@ public abstract class WorklogTab extends Tab {
 
     protected boolean resultToDisplayChangedSinceLastRender;
 
-    public WorklogTab(String name, ResourceBundle resourceBundle, SettingsUtil.Settings settings) {
+    public WorklogTab(String name) {
         super(name);
-        this.resourceBundle = resourceBundle;
-        this.settings = settings;
 
         setContent(getContentNode());
 
@@ -196,7 +190,7 @@ public abstract class WorklogTab extends Tab {
             }
 
             // also add another summary per task column
-            TableColumn<TaskWithWorklogs, String> summaryPerTaskColumn = new TableColumn<>(resourceBundle.getString("view.main.summary"));
+            TableColumn<TaskWithWorklogs, String> summaryPerTaskColumn = new TableColumn<>(FormattingUtil.getFormatted("view.main.summary"));
             summaryPerTaskColumn.setSortable(false);
             summaryPerTaskColumn.setCellValueFactory(param -> new SimpleStringProperty(FormattingUtil.formatMinutes(param.getValue().getTotalInMinutes())));
             summaryPerTaskColumn.setCellFactory(param -> {
@@ -223,12 +217,18 @@ public abstract class WorklogTab extends Tab {
             taskTableView.getItems().clear();
             taskTableView.getItems().addAll(resultToDisplay.get());
 
+            updateStatisticsData();
+
             resultToDisplayChangedSinceLastRender = false;
         }
     }
 
     protected Node getStatisticsView() {
         return null;
+    }
+
+    protected void updateStatisticsData() {
+
     }
 
     private Optional<TableColumn<TaskWithWorklogs, TaskWithWorklogs>> descriptionColumnOptional = Optional.empty();
@@ -238,7 +238,7 @@ public abstract class WorklogTab extends Tab {
 
             LOGGER.debug("[{}] Generating description column", getText());
 
-            TableColumn<TaskWithWorklogs, TaskWithWorklogs> descriptionColumn = new TableColumn<>(resourceBundle.getString("view.main.issue"));
+            TableColumn<TaskWithWorklogs, TaskWithWorklogs> descriptionColumn = new TableColumn<>(FormattingUtil.getFormatted("view.main.issue"));
             descriptionColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue()));
             descriptionColumn.setCellFactory(param -> {
                 TableCell<TaskWithWorklogs, TaskWithWorklogs> tableCell = new TableCell<TaskWithWorklogs, TaskWithWorklogs>() {
@@ -251,7 +251,7 @@ public abstract class WorklogTab extends Tab {
                         } else {
 
                             if (item.isSummaryRow()) {
-                                setText(resourceBundle.getString("view.main.summary"));
+                                setText(FormattingUtil.getFormatted("view.main.summary"));
                                 setTooltip(null);
                                 getStyleClass().add(SUMMARY_COLUMN_OR_CELL_CSS_CLASS);
                                 getStyleClass().remove(ISSUE_CELL_CSS_CLASS);
@@ -274,6 +274,7 @@ public abstract class WorklogTab extends Tab {
                     if (index < taskTableView.getItems().size()) {
                         TaskWithWorklogs clickedWorklogItem = taskTableView.getItems().get(index);
                         if (!clickedWorklogItem.isSummaryRow()) {
+                            SettingsUtil.Settings settings = SettingsUtil.loadSettings();
                             String issueUrl = String.format("%s/issue/%s", StringUtils.stripEnd(settings.getYoutrackUrl(), "/"), clickedWorklogItem.getIssue());
                             Platform.runLater(() -> WorklogViewer.getInstance().getHostServices().showDocument(issueUrl));
                         }
