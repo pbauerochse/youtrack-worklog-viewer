@@ -179,7 +179,7 @@ public class MainViewController implements Initializable {
 
     private void fetchWorklogs(SettingsUtil.Settings settings, ReportTimerange timerange) {
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
-        modalOverlaySpinner.setVisible(true);
+        showWaitScreen();
 
         Task<WorklogResult> worklogTaskForUser = YouTrackConnector.getInstance()
                 .getWorklogTaskForUser(settings.getYoutrackUrl(), settings.getYoutrackUsername(), settings.getYoutrackPassword(), timerange);
@@ -195,7 +195,7 @@ public class MainViewController implements Initializable {
             Throwable throwable = event.getSource().getException();
             LOGGER.warn("Fetching worklogs failed", throwable);
             displayError(throwable);
-            modalOverlaySpinner.setVisible(false);
+            hideWaitScreen();
         });
 
         // success handler
@@ -203,7 +203,7 @@ public class MainViewController implements Initializable {
             LOGGER.info("Fetching worklogs succeeded");
             WorklogResult result = (WorklogResult) event.getSource().getValue();
             displayResult(result, timerange, settings);
-            modalOverlaySpinner.setVisible(false);
+            hideWaitScreen();
         });
 
         // bind progressbar and -text property to task
@@ -238,42 +238,50 @@ public class MainViewController implements Initializable {
     private void displayResult(WorklogResult result, ReportTimerange timerange, SettingsUtil.Settings settings) {
         LOGGER.info("Displaying WorklogResult to the user");
 
-        Platform.runLater(() -> {
-            if (resultTabPane.getTabs().size() == 0) {
-                LOGGER.debug("Adding default tabs");
-                resultTabPane.getTabs().add(new OwnWorklogsTab(resources, settings));
-                resultTabPane.getTabs().add(new AllWorklogsTab(resources, settings));
+        if (resultTabPane.getTabs().size() == 0) {
+            LOGGER.debug("Adding default tabs");
+            OwnWorklogsTab ownWorklogsTab = new OwnWorklogsTab(resources, settings);
+            AllWorklogsTab allWorklogsTab = new AllWorklogsTab(resources, settings);
+
+            resultTabPane.getTabs().addAll(ownWorklogsTab, allWorklogsTab);
+        }
+
+        WorklogTab ownWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(0);
+        ownWorklogsTab.updateItems(result.getOwnSummary(), timerange);
+
+        WorklogTab allWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(1);
+        allWorklogsTab.updateItems(result.getAll(), timerange);
+
+        for (int i = 0; i < result.getDistinctProjects().size(); i++) {
+            int tabIndex = AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS + i;
+            String newTabLabel = result.getDistinctProjects().get(i);
+            WorklogTab tab;
+            if (resultTabPane.getTabs().size() > tabIndex) {
+                // there is a tab we can reuse
+                tab = (WorklogTab) resultTabPane.getTabs().get(tabIndex);
+                LOGGER.debug("Reusing Tab {} for project {}", tab.getText(), newTabLabel);
+            } else {
+                LOGGER.debug("Adding new project tab for project {}", newTabLabel);
+                tab = new ProjectWorklogTab(newTabLabel, resources, settings);
+                resultTabPane.getTabs().add(tab);
             }
 
-            WorklogTab ownWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(0);
-            ownWorklogsTab.updateItems(result.getOwnSummary(), timerange);
+            tab.setText(newTabLabel);
+            tab.updateItems(result.getProjectSummary(newTabLabel), timerange);
+        }
 
-            WorklogTab allWorklogsTab = (WorklogTab) resultTabPane.getTabs().get(1);
-            allWorklogsTab.updateItems(result.getAll(), timerange);
+        // remove any redundant tabs
+        for (int tabIndexToRemove = result.getDistinctProjects().size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
+            WorklogTab removedTab = (WorklogTab) resultTabPane.getTabs().remove(tabIndexToRemove);
+            LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
+        }
+    }
 
-            for (int i = 0; i < result.getDistinctProjects().size(); i++) {
-                int tabIndex = AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS + i;
-                String newTabLabel = result.getDistinctProjects().get(i);
-                WorklogTab tab;
-                if (resultTabPane.getTabs().size() > tabIndex) {
-                    // there is a tab we can reuse
-                    tab = (WorklogTab) resultTabPane.getTabs().get(tabIndex);
-                    LOGGER.debug("Reusing Tab {} for project {}", tab.getText(), newTabLabel);
-                } else {
-                    LOGGER.debug("Adding new project tab for project {}", newTabLabel);
-                    tab = new ProjectWorklogTab(newTabLabel, resources, settings);
-                    resultTabPane.getTabs().add(tab);
-                }
+    private void showWaitScreen() {
+        modalOverlaySpinner.setVisible(true);
+    }
 
-                tab.setText(newTabLabel);
-                tab.updateItems(result.getProjectSummary(newTabLabel), timerange);
-            }
-
-            // remove any redundant tabs
-            for (int tabIndexToRemove = result.getDistinctProjects().size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
-                Tab removedTab = resultTabPane.getTabs().remove(tabIndexToRemove);
-                LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
-            }
-        });
+    private void hideWaitScreen() {
+        modalOverlaySpinner.setVisible(false);
     }
 }
