@@ -49,7 +49,7 @@ public abstract class WorklogTab extends Tab {
     protected static final String ISSUE_CELL_CSS_CLASS = "issue-cell";
 
     // height in pixel for the bargraph, gets multiplied by the amount of distinct projects
-    private static final int HEIGHT_PER_PROJECT = 50;
+    private static final int HEIGHT_PER_PROJECT = 20;
 
     private Logger LOGGER = LoggerFactory.getLogger(WorklogTab.class);
 

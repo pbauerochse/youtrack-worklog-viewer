@@ -51,10 +51,16 @@ public class MainViewController implements Initializable {
     private Button fetchWorklogButton;
 
     @FXML
+    private MenuItem exportToExcelMenuItem;
+
+    @FXML
     private MenuItem settingsMenuItem;
 
     @FXML
     private MenuItem logMessagesMenuItem;
+
+    @FXML
+    private MenuItem aboutMenuItem;
 
     @FXML
     private MenuItem exitMenuItem;
@@ -100,6 +106,7 @@ public class MainViewController implements Initializable {
         settingsMenuItem.setOnAction(event -> showSettingsDialogue());
         exitMenuItem.setOnAction(event -> WorklogViewer.getInstance().requestShutdown());
         logMessagesMenuItem.setOnAction(event -> showLogMessagesDialogue());
+        aboutMenuItem.setOnAction(event -> showAboutDialogue());
 
         // fetch worklog button click
         fetchWorklogButton.setOnAction(clickEvent -> {
@@ -167,6 +174,11 @@ public class MainViewController implements Initializable {
     private void showLogMessagesDialogue() {
         LOGGER.debug("Showing log messages dialogue");
         openDialogue("/fx/views/logMessagesView.fxml", "view.menu.help.logs", false);
+    }
+
+    private void showAboutDialogue() {
+        LOGGER.debug("Showing log messages dialogue");
+        openDialogue("/fx/views/about.fxml", "view.menu.help.about", true);
     }
 
     private void openDialogue(String view, String titleResourceKey, boolean modal) {

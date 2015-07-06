@@ -56,7 +56,7 @@ public class WorklogViewer extends Application {
         Scene mainScene = new Scene(root, settings.getWindowWidth(), settings.getWindowHeight());
         mainScene.getStylesheets().add("/fx/css/main.css");
 
-        primaryStage.setTitle("YouTrack Worklog Viewer");
+        primaryStage.setTitle("YouTrack Worklog Viewer " + FormattingUtil.getFormatted("release.version"));
         primaryStage.setScene(mainScene);
         primaryStage.setX(settings.getWindowX());
         primaryStage.setY(settings.getWindowY());
