@@ -32,6 +32,7 @@ public class AllWorklogsTab extends WorklogTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllWorklogsTab.class);
 
+    // height in pixel for the bargraph, gets multiplied by the amount of distinct projects
     private static final int HEIGHT_PER_PROJECT = 50;
 
     private VBox statisticsView;
@@ -104,6 +105,8 @@ public class AllWorklogsTab extends WorklogTab {
 
         if (resultItemsToDisplay.isPresent()) {
             Map<String, Map<String, AtomicLong>> employeeToProjectToWorktime = new HashMap<>();
+            Map<String, Map<String, Set<String>>> employeeToProjectToDistinctTasks = new HashMap<>();
+
             AtomicLong totalTimeSpent = new AtomicLong(0);
 
             barChart.getXAxis().setLabel(FormattingUtil.getFormatted("view.statistics.timespentinminutes"));
@@ -115,10 +118,28 @@ public class AllWorklogsTab extends WorklogTab {
 
                     for (WorklogItem worklogItem : taskWithWorklogs.getWorklogItemList()) {
 
-                        Map<String, AtomicLong> projectToTimespent = employeeToProjectToWorktime.get(worklogItem.getUserDisplayname());
+                        String employee = worklogItem.getUserDisplayname();
+
+                        // amount of tasks within project
+                        Map<String, Set<String>> projectToDistinctTasks = employeeToProjectToDistinctTasks.get(employee);
+                        if (projectToDistinctTasks == null) {
+                            projectToDistinctTasks = new HashMap<>();
+                            employeeToProjectToDistinctTasks.put(employee, projectToDistinctTasks);
+                        }
+
+                        Set<String> distinctTasks = projectToDistinctTasks.get(taskWithWorklogs.getProject());
+                        if (distinctTasks == null) {
+                            distinctTasks = new HashSet<>();
+                            projectToDistinctTasks.put(taskWithWorklogs.getProject(), distinctTasks);
+                        }
+
+                        distinctTasks.add(taskWithWorklogs.getIssue());
+
+                        // time spent
+                        Map<String, AtomicLong> projectToTimespent = employeeToProjectToWorktime.get(employee);
                         if (projectToTimespent == null) {
                             projectToTimespent = new HashMap<>();
-                            employeeToProjectToWorktime.put(worklogItem.getUserDisplayname(), projectToTimespent);
+                            employeeToProjectToWorktime.put(employee, projectToTimespent);
                         }
 
                         AtomicLong timespentOnProject = projectToTimespent.get(taskWithWorklogs.getProject());
@@ -137,8 +158,9 @@ public class AllWorklogsTab extends WorklogTab {
                     .sorted((o1, o2) -> COLLATOR.compare(o1, o2))
                     .forEach(employee -> {
 
-                        // grid pane
-                        Label employeeLabel = getBoldLabel(employee);
+                        // add label for current employee and list
+                        // his/her projects and time spent
+                        Label employeeLabel = getBoldLabel(null);
                         employeeLabel.setPadding(new Insets(20, 0, 0, 0));
                         GridPane.setConstraints(employeeLabel, 0, gridRow.get());
                         GridPane.setColumnSpan(employeeLabel, 3);
@@ -146,17 +168,28 @@ public class AllWorklogsTab extends WorklogTab {
 
                         gridRow.incrementAndGet();
 
-                        // bargraph
+                        // bargraph series to hold the data
                         XYChart.Series series = new XYChart.Series();
                         series.setName(employee);
+
+                        AtomicLong employeeTotalTimeSpent = new AtomicLong(0);
+                        AtomicInteger totalAmountOfTasks = new AtomicInteger(0);
 
                         Map<String, AtomicLong> projectToWorktime = employeeToProjectToWorktime.get(employee);
                         projectToWorktime.keySet().stream()
                                 .sorted((o1, o2) -> COLLATOR.compare(o1, o2))
                                 .forEach(projectName -> {
-                                    long timespentInMinutes = projectToWorktime.get(projectName).longValue();
 
-                                    Label projectLabel = getBoldLabel(projectName);
+                                    // amount of tasks
+                                    Map<String, Set<String>> projectToDistinctTasks = employeeToProjectToDistinctTasks.get(employee);
+                                    Set<String> distinctTasks = projectToDistinctTasks.get(projectName);
+                                    totalAmountOfTasks.addAndGet(distinctTasks.size());
+
+                                    // time spent
+                                    long timespentInMinutes = projectToWorktime.get(projectName).longValue();
+                                    employeeTotalTimeSpent.addAndGet(timespentInMinutes);
+
+                                    Label projectLabel = getBoldLabel(FormattingUtil.getFormatted("view.statistics.somethingtoamountoftickets", projectName, distinctTasks.size()));
                                     projectLabel.setPadding(new Insets(0, 0, 0, 20));
                                     GridPane.setConstraints(projectLabel, 1, gridRow.get());
 
@@ -170,6 +203,21 @@ public class AllWorklogsTab extends WorklogTab {
 
                                     gridRow.incrementAndGet();
                                 });
+
+                        // total by employee
+                        Label totalLabel = getBoldLabel(FormattingUtil.getFormatted("view.statistics.totaltimespent"));
+                        GridPane.setConstraints(totalLabel, 0, gridRow.get());
+                        GridPane.setColumnSpan(totalLabel, 3);
+
+                        Label timespentLabel = new Label(FormattingUtil.formatMinutes(employeeTotalTimeSpent.get(), true));
+                        GridPane.setConstraints(timespentLabel, 2, gridRow.get());
+                        GridPane.setHgrow(timespentLabel, Priority.ALWAYS);
+                        GridPane.setHalignment(timespentLabel, HPos.RIGHT);
+                        pane.getChildren().addAll(totalLabel, timespentLabel);
+                        gridRow.incrementAndGet();
+
+                        // add amount of tasks to employee label
+                        employeeLabel.setText(FormattingUtil.getFormatted("view.statistics.somethingtoamountoftickets", employee, totalAmountOfTasks.get()));
 
                         barChart.getData().add(series);
                     });

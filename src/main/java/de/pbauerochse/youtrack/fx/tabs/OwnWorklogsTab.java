@@ -10,6 +10,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -41,8 +42,13 @@ public class OwnWorklogsTab extends WorklogTab {
     @Override
     protected Node getStatisticsView() {
         statisticsView = new VBox(20);
-        statisticsView.setPadding(new Insets(20, 5, 5, 5));
-        return statisticsView;
+
+        ScrollPane scrollPane = new ScrollPane(statisticsView);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPadding(new Insets(7));
+
+        return scrollPane;
     }
 
     @Override
@@ -121,15 +127,30 @@ public class OwnWorklogsTab extends WorklogTab {
 
         if (resultItemsToDisplay.isPresent()) {
             Map<String, AtomicLong> projectToTimespent = new HashMap<>();
+            Map<String, Set<String>> projectToDistinctTickets = new HashMap<>();
+
             AtomicLong totalTimeSpent = new AtomicLong(0);
 
             resultItemsToDisplay.get().forEach(taskWithWorklogs -> {
 
                 if (!taskWithWorklogs.isSummaryRow()) {
-                    AtomicLong timeSpentInMinutes = projectToTimespent.get(taskWithWorklogs.getProject());
+
+                    String project = taskWithWorklogs.getProject();
+
+                    // amount of tickets
+                    Set<String> distinctTickets = projectToDistinctTickets.get(project);
+                    if (distinctTickets == null) {
+                        distinctTickets = new HashSet<>();
+                        projectToDistinctTickets.put(project, distinctTickets);
+                    }
+
+                    distinctTickets.add(taskWithWorklogs.getIssue());
+
+                    // spent time
+                    AtomicLong timeSpentInMinutes = projectToTimespent.get(project);
                     if (timeSpentInMinutes == null) {
                         timeSpentInMinutes = new AtomicLong(0);
-                        projectToTimespent.put(taskWithWorklogs.getProject(), timeSpentInMinutes);
+                        projectToTimespent.put(project, timeSpentInMinutes);
                     }
 
                     timeSpentInMinutes.addAndGet(taskWithWorklogs.getTotalInMinutes());
@@ -146,7 +167,9 @@ public class OwnWorklogsTab extends WorklogTab {
                         AtomicLong timespentForThisProject = projectToTimespent.get(project);
 
                         // add grid labels
-                        Label label = getBoldLabel(project);
+
+                        Set<String> distinctTickets = projectToDistinctTickets.get(project);
+                        Label label = getBoldLabel(FormattingUtil.getFormatted("view.statistics.somethingtoamountoftickets", project, distinctTickets.size()));
                         GridPane.setConstraints(label, 0, currentRow.get());
 
                         Label value = new Label(FormattingUtil.formatMinutes(timespentForThisProject.longValue(), true));
