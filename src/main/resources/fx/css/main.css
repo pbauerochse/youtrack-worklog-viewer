@@ -13,6 +13,10 @@
     -fx-background-color: rgba(189, 255, 209, 0.5);
 }
 
+.today {
+    -fx-background-color: rgba(178, 233, 255, 0.5);
+}
+
 .summary {
     -fx-font-weight: bold;
 }

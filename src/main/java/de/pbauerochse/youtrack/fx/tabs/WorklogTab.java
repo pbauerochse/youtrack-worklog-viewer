@@ -45,6 +45,7 @@ public abstract class WorklogTab extends Tab {
 
     protected static final String SUMMARY_COLUMN_OR_CELL_CSS_CLASS = "summary";
     protected static final String WEEKEND_COLUMN_OR_CELL_CSS_CLASS = "weekend";
+    protected static final String TODAY_COLUMN_OR_CELL_CSS_CLASS = "today";
     protected static final String ISSUE_CELL_CSS_CLASS = "issue-cell";
 
     // height in pixel for the bargraph, gets multiplied by the amount of distinct projects
@@ -202,6 +203,11 @@ public abstract class WorklogTab extends Tab {
                     column.setPrefWidth(20);
                 } else {
                     column.setPrefWidth(100);
+                }
+
+                // today
+                if (currentColumnDate.isEqual(LocalDate.now())) {
+                    column.getStyleClass().add(TODAY_COLUMN_OR_CELL_CSS_CLASS);
                 }
 
                 taskTableView.getColumns().add(column);
