@@ -469,7 +469,7 @@ public abstract class WorklogTab extends Tab {
                         TaskWithWorklogs clickedWorklogItem = taskTableView.getItems().get(index);
                         if (!clickedWorklogItem.isSummaryRow()) {
                             SettingsUtil.Settings settings = SettingsUtil.loadSettings();
-                            String issueUrl = String.format("%s/issue/%s", StringUtils.stripEnd(settings.getYoutrackUrl(), "/"), clickedWorklogItem.getIssue());
+                            String issueUrl = String.format("%s/issue/%s#tab=Time%%20Tracking", StringUtils.stripEnd(settings.getYoutrackUrl(), "/"), clickedWorklogItem.getIssue());
                             Platform.runLater(() -> WorklogViewer.getInstance().getHostServices().showDocument(issueUrl));
                         }
                     }
