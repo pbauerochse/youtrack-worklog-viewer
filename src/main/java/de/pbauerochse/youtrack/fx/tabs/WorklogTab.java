@@ -103,25 +103,35 @@ public abstract class WorklogTab extends Tab {
 
     protected Node getContentNode() {
         Node taskView = getTaskView();
-        statisticsView = new VBox(20);
 
-        // wrap statistics in scrollpane
-        ScrollPane scrollPane = new ScrollPane(statisticsView);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPadding(new Insets(7));
+        if (SettingsUtil.loadSettings().isShowStatistics()) {
+            LOGGER.debug("Statistics enabled in settings");
+            statisticsView = new VBox(20);
 
-        // both statistics and task view present
-        // show both in a split pane
-        SplitPane splitPane = new SplitPane();
-        splitPane.setOrientation(Orientation.HORIZONTAL);
-        splitPane.setDividerPosition(0, 0.8);
-        splitPane.getItems().addAll(taskView, scrollPane);
-        return splitPane;
+            // wrap statistics in scrollpane
+            ScrollPane scrollPane = new ScrollPane(statisticsView);
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setPadding(new Insets(7));
+
+            // both statistics and task view present
+            // show both in a split pane
+            SplitPane splitPane = new SplitPane();
+            splitPane.setOrientation(Orientation.HORIZONTAL);
+            splitPane.setDividerPosition(0, 0.8);
+            splitPane.getItems().addAll(taskView, scrollPane);
+            return splitPane;
+        } else {
+            LOGGER.debug("Statistics disabled in settings");
+            return taskView;
+        }
     }
 
     protected Node getTaskView() {
-        taskTableView = new TableView<>();
+
+        if (taskTableView == null) {
+            taskTableView = new TableView<>();
+        }
 
         AnchorPane anchorPane = new AnchorPane(taskTableView);
         anchorPane.setPadding(new Insets(6));
@@ -130,7 +140,6 @@ public abstract class WorklogTab extends Tab {
         AnchorPane.setRightAnchor(taskTableView, 0d);
         AnchorPane.setBottomAnchor(taskTableView, 0d);
         AnchorPane.setLeftAnchor(taskTableView, 0d);
-
         return anchorPane;
     }
 
@@ -141,6 +150,15 @@ public abstract class WorklogTab extends Tab {
         if (!worklogResult.isPresent() || !resultToDisplayChangedSinceLastRender) {
             LOGGER.debug("[{}] No results to display or data not changed. Not refreshing TableView and data", getText());
             return;
+        }
+
+        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        if (settings.isShowStatistics() && statisticsView == null || !settings.isShowStatistics() && statisticsView != null) {
+            // statistics are disabled and were previously rendered
+            // or statistics are enabled and weren't rendered before
+            // update content view
+            LOGGER.debug("Updating contentView since settings for statistics seemed to have changed");
+            setContent(getContentNode());
         }
 
         // render the table columns if the timerange changed from last result
@@ -256,6 +274,11 @@ public abstract class WorklogTab extends Tab {
     }
 
     private void updateStatisticsData(List<TaskWithWorklogs> displayResult) {
+
+        if (!SettingsUtil.loadSettings().isShowStatistics()) {
+            return;
+        }
+
         statisticsView.getChildren().clear();
 
         WorklogStatistics statistics = new WorklogStatistics();

@@ -77,13 +77,24 @@ public class MainViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.debug("Initializing main view");
         this.resources = resources;
+        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
         modalOverlaySpinner.setVisible(false);
 
         // prepopulate timerange dropdown
         timerangeComboBox.setConverter(getTimerangeComboBoxConverter());
         timerangeComboBox.getItems().addAll(ReportTimerange.values());
-        timerangeComboBox.getSelectionModel().select(ReportTimerange.THIS_WEEK);    // preselect "this week"
+        if (settings.getLastUsedReportTimerange() != null) {
+            timerangeComboBox.getSelectionModel().select(settings.getLastUsedReportTimerange());
+        } else {
+            timerangeComboBox.getSelectionModel().select(ReportTimerange.THIS_WEEK);    // preselect "this week"
+        }
+
+        timerangeComboBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                settings.setLastUsedReportTimerange(timerangeComboBox.getSelectionModel().getSelectedItem());
+            }
+        });
 
         // menu items click
         settingsMenuItem.setOnAction(event -> showSettingsDialogue());
@@ -91,8 +102,14 @@ public class MainViewController implements Initializable {
         logMessagesMenuItem.setOnAction(event -> showLogMessagesDialogue());
 
         // fetch worklog button click
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
-        fetchWorklogButton.setOnAction(clickEvent -> handleFetchWorklogButtonClick(settings));
+        fetchWorklogButton.setOnAction(clickEvent -> {
+            handleFetchWorklogButtonClick(settings);
+        });
+
+        if (settings.isLoadDataAtStartup()) {
+            LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.getSelectionModel().getSelectedItem().name());
+            fetchWorklogButton.fire();
+        }
     }
 
     /**
@@ -240,35 +257,46 @@ public class MainViewController implements Initializable {
 
         if (resultTabPane.getTabs().size() == 0) {
             LOGGER.debug("Adding default tabs");
-            resultTabPane.getTabs().addAll(new OwnWorklogsTab(), new AllWorklogsTab());
+            resultTabPane.getTabs().add(new OwnWorklogsTab());
         }
 
-        for (int i = 0; i < result.getDistinctProjectNames().size(); i++) {
-            int tabIndex = AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS + i;
-            String newTabLabel = result.getDistinctProjectNames().get(i);
-            WorklogTab tab;
-            if (resultTabPane.getTabs().size() > tabIndex) {
-                // there is a tab we can reuse
-                tab = (WorklogTab) resultTabPane.getTabs().get(tabIndex);
-                LOGGER.debug("Reusing Tab {} for project {}", tab.getText(), newTabLabel);
-            } else {
-                LOGGER.debug("Adding new project tab for project {}", newTabLabel);
-                tab = new ProjectWorklogTab(newTabLabel);
-                resultTabPane.getTabs().add(tab);
+        if (settings.isShowAllWorklogs()) {
+
+            if (resultTabPane.getTabs().size() < 2 || !(resultTabPane.getTabs().get(1) instanceof AllWorklogsTab)) {
+                resultTabPane.getTabs().add(new AllWorklogsTab());
             }
 
-            tab.setText(newTabLabel);
+            for (int i = 0; i < result.getDistinctProjectNames().size(); i++) {
+                int tabIndex = AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS + i;
+
+                String newTabLabel = result.getDistinctProjectNames().get(i);
+                WorklogTab tab;
+                if (resultTabPane.getTabs().size() > tabIndex) {
+                    // there is a tab we can reuse
+                    tab = (WorklogTab) resultTabPane.getTabs().get(tabIndex);
+                    LOGGER.debug("Reusing Tab {} for project {}", tab.getText(), newTabLabel);
+                } else {
+                    LOGGER.debug("Adding new project tab for project {}", newTabLabel);
+                    tab = new ProjectWorklogTab(newTabLabel);
+                    resultTabPane.getTabs().add(tab);
+                }
+
+                tab.setText(newTabLabel);
+            }
+
+            // remove any redundant tabs
+            for (int tabIndexToRemove = result.getDistinctProjectNames().size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
+                WorklogTab removedTab = (WorklogTab) resultTabPane.getTabs().remove(tabIndexToRemove);
+                LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
+            }
+        } else if (resultTabPane.getTabs().size() > 1) {
+            // remove all other tabs when settings changed from showAll to showOnlyOwnWorklogs
+            LOGGER.debug("Removing all and project tabs since user switched to showOnlyOwnWorklogs mode");
+            resultTabPane.getTabs().remove(1, resultTabPane.getTabs().size());
+            resultTabPane.getSelectionModel().select(0);
         }
 
-        // remove any redundant tabs
-        for (int tabIndexToRemove = result.getDistinctProjectNames().size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
-            WorklogTab removedTab = (WorklogTab) resultTabPane.getTabs().remove(tabIndexToRemove);
-            LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
-        }
-
-        resultTabPane.getTabs().forEach(tab -> {
-            ((WorklogTab) tab).updateItems(result);
-        });
+        resultTabPane.getTabs().forEach(tab -> ((WorklogTab) tab).updateItems(result));
     }
 
     private void showWaitScreen() {

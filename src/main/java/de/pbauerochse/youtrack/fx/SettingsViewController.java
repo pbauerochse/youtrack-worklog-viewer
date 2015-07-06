@@ -4,10 +4,7 @@ import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +32,15 @@ public class SettingsViewController implements Initializable {
     private ComboBox<Integer> workhoursComboBox;
 
     @FXML
+    private CheckBox showAllWorklogsCheckBox;
+
+    @FXML
+    private CheckBox showStatisticsCheckBox;
+
+    @FXML
+    private CheckBox autoloadLastTimerangeCheckBox;
+
+    @FXML
     private Button saveSettingsButton;
 
     @FXML
@@ -57,6 +63,10 @@ public class SettingsViewController implements Initializable {
             settings.setYoutrackUsername(youtrackUsernameField.getText());
             settings.setYoutrackPassword(youtrackPasswordField.getText());
             settings.setWorkHoursADay(workhoursComboBox.getSelectionModel().getSelectedItem());
+            settings.setShowAllWorklogs(showAllWorklogsCheckBox.isSelected());
+            settings.setShowStatistics(showStatisticsCheckBox.isSelected());
+            settings.setLoadDataAtStartup(autoloadLastTimerangeCheckBox.isSelected());
+
             ((Node) event.getSource()).getScene().getWindow().hide();
         });
 
@@ -65,5 +75,8 @@ public class SettingsViewController implements Initializable {
         youtrackUsernameField.setText(settings.getYoutrackUsername());
         youtrackPasswordField.setText(settings.getYoutrackPassword());
         workhoursComboBox.getSelectionModel().select((Integer) settings.getWorkHoursADay());
+        showAllWorklogsCheckBox.setSelected(settings.isShowAllWorklogs());
+        showStatisticsCheckBox.setSelected(settings.isShowStatistics());
+        autoloadLastTimerangeCheckBox.setSelected(settings.isLoadDataAtStartup());
     }
 }

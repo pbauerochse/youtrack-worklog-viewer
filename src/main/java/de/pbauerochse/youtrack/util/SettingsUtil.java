@@ -1,5 +1,6 @@
 package de.pbauerochse.youtrack.util;
 
+import de.pbauerochse.youtrack.domain.ReportTimerange;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,11 @@ public class SettingsUtil {
     private static final String YOUTRACK_PASSWORD_PROPERTY = "password";
     private static final String YOUTRACK_URL_PROPERTY = "youtrackurl";
     private static final String WORK_HOURS_PROPERTY = "workhours";
+
+    private static final String SHOW_ALL_WORKLOGS_PROPERTY = "showonlyowntimelogs.enabled";
+    private static final String SHOW_STATISTICS_PROPERTY = "statistics.enabled";
+    private static final String AUTOLOAD_DATA_PROPERTY = "autoload.enabled";
+    private static final String AUTOLOAD_DATA_TIMERANGE_PROPERTY = "autoload.timerange";
 
     private static Settings settings;
 
@@ -144,6 +150,31 @@ public class SettingsUtil {
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.decrypt", e);
             }
         }
+
+        String showOnlyOwnWorklogsAsString = properties.getProperty(SHOW_ALL_WORKLOGS_PROPERTY);
+        if (StringUtils.isNotBlank(showOnlyOwnWorklogsAsString)) {
+            settings.setShowAllWorklogs(Boolean.valueOf(showOnlyOwnWorklogsAsString));
+        }
+
+        String showStatisticsAsString = properties.getProperty(SHOW_STATISTICS_PROPERTY);
+        if (StringUtils.isNotBlank(showStatisticsAsString)) {
+            settings.setShowStatistics(Boolean.valueOf(showStatisticsAsString));
+        }
+
+        String autoloadDataAsString = properties.getProperty(AUTOLOAD_DATA_PROPERTY);
+        if (StringUtils.isNotBlank(autoloadDataAsString)) {
+            settings.setLoadDataAtStartup(Boolean.valueOf(autoloadDataAsString));
+        }
+
+        String autoloadDataTimerangeAsString = properties.getProperty(AUTOLOAD_DATA_TIMERANGE_PROPERTY);
+        if (StringUtils.isNotBlank(autoloadDataTimerangeAsString)) {
+            try {
+                ReportTimerange reportTimerange = ReportTimerange.valueOf(autoloadDataTimerangeAsString);
+                settings.setLastUsedReportTimerange(reportTimerange);
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Could not determine ReportTimerange by settings value {}", autoloadDataTimerangeAsString);
+            }
+        }
     }
 
     private static Properties getAsProperties(Settings settings) {
@@ -154,6 +185,9 @@ public class SettingsUtil {
         properties.setProperty(WINDOW_WIDTH_PROPERTY, String.valueOf(settings.getWindowWidth()));
         properties.setProperty(WINDOW_HEIGHT_PROPERTY, String.valueOf(settings.getWindowHeight()));
         properties.setProperty(WORK_HOURS_PROPERTY, String.valueOf(settings.getWorkHoursADay()));
+        properties.setProperty(SHOW_ALL_WORKLOGS_PROPERTY, String.valueOf(settings.isShowAllWorklogs()));
+        properties.setProperty(SHOW_STATISTICS_PROPERTY, String.valueOf(settings.isShowStatistics()));
+        properties.setProperty(AUTOLOAD_DATA_PROPERTY, String.valueOf(settings.isLoadDataAtStartup()));
 
         if (StringUtils.isNotBlank(settings.getYoutrackUrl())) {
             properties.setProperty(YOUTRACK_URL_PROPERTY, settings.getYoutrackUrl());
@@ -170,6 +204,10 @@ public class SettingsUtil {
                 LOGGER.error("Could not encrypt password for settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.encrypt", e);
             }
+        }
+
+        if (settings.getLastUsedReportTimerange() != null) {
+            properties.setProperty(AUTOLOAD_DATA_TIMERANGE_PROPERTY, settings.getLastUsedReportTimerange().name());
         }
 
         return properties;
@@ -192,6 +230,14 @@ public class SettingsUtil {
         private String youtrackUsername;
 
         private String youtrackPassword;
+
+        private boolean loadDataAtStartup;
+
+        private ReportTimerange lastUsedReportTimerange;
+
+        private boolean showStatistics = true;
+
+        private boolean showAllWorklogs = true;
 
         public int getWindowWidth() {
             return windowWidth;
@@ -255,6 +301,38 @@ public class SettingsUtil {
 
         public void setYoutrackPassword(String youtrackPassword) {
             this.youtrackPassword = youtrackPassword;
+        }
+
+        public boolean isLoadDataAtStartup() {
+            return loadDataAtStartup;
+        }
+
+        public void setLoadDataAtStartup(boolean loadDataAtStartup) {
+            this.loadDataAtStartup = loadDataAtStartup;
+        }
+
+        public ReportTimerange getLastUsedReportTimerange() {
+            return lastUsedReportTimerange;
+        }
+
+        public void setLastUsedReportTimerange(ReportTimerange lastUsedReportTimerange) {
+            this.lastUsedReportTimerange = lastUsedReportTimerange;
+        }
+
+        public boolean isShowStatistics() {
+            return showStatistics;
+        }
+
+        public void setShowStatistics(boolean showStatistics) {
+            this.showStatistics = showStatistics;
+        }
+
+        public boolean isShowAllWorklogs() {
+            return showAllWorklogs;
+        }
+
+        public void setShowAllWorklogs(boolean showAllWorklogs) {
+            this.showAllWorklogs = showAllWorklogs;
         }
 
         public boolean hasMissingConnectionParameters() {
