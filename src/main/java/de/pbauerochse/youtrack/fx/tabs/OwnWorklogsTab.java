@@ -5,21 +5,16 @@ import de.pbauerochse.youtrack.domain.WorklogItem;
 import de.pbauerochse.youtrack.domain.WorklogResult;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -31,41 +26,10 @@ public class OwnWorklogsTab extends WorklogTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OwnWorklogsTab.class);
 
-    private VBox statisticsView;
-
     private Optional<List<TaskWithWorklogs>> resultItemsToDisplay = Optional.empty();
 
     public OwnWorklogsTab() {
         super(FormattingUtil.getFormatted("view.main.tabs.own"));
-    }
-
-    @Override
-    protected Node getStatisticsView() {
-        statisticsView = new VBox(20);
-
-        ScrollPane scrollPane = new ScrollPane(statisticsView);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPadding(new Insets(7));
-
-        return scrollPane;
-    }
-
-    @Override
-    protected void updateStatisticsData() {
-        statisticsView.getChildren().clear();
-
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(5);
-        gridPane.setVgap(5);
-
-        PieChart pieChart = new PieChart();
-        pieChart.setLabelsVisible(false);
-        pieChart.setTitle(FormattingUtil.getFormatted("view.statistics.byproject"));
-
-        renderData(gridPane, pieChart);
-
-        statisticsView.getChildren().addAll(gridPane, pieChart);
     }
 
     @Override
@@ -123,77 +87,24 @@ public class OwnWorklogsTab extends WorklogTab {
         return resultItemsToDisplay.get();
     }
 
-    private void renderData(GridPane pane, PieChart chart) {
+    @Override
+    protected void addAdditionalStatistics(VBox statisticsView, WorklogStatistics statistics, List<TaskWithWorklogs> displayResult) {
+        super.addAdditionalStatistics(statisticsView, statistics, displayResult);
 
-        if (resultItemsToDisplay.isPresent()) {
-            Map<String, AtomicLong> projectToTimespent = new HashMap<>();
-            Map<String, Set<String>> projectToDistinctTickets = new HashMap<>();
+        PieChart pieChart = new PieChart();
+        pieChart.setLabelsVisible(false);
+        pieChart.setTitle(FormattingUtil.getFormatted("view.statistics.byproject"));
+        statisticsView.getChildren().add(pieChart);
 
-            AtomicLong totalTimeSpent = new AtomicLong(0);
-
-            resultItemsToDisplay.get().forEach(taskWithWorklogs -> {
-
-                if (!taskWithWorklogs.isSummaryRow()) {
-
-                    String project = taskWithWorklogs.getProject();
-
-                    // amount of tickets
-                    Set<String> distinctTickets = projectToDistinctTickets.get(project);
-                    if (distinctTickets == null) {
-                        distinctTickets = new HashSet<>();
-                        projectToDistinctTickets.put(project, distinctTickets);
-                    }
-
-                    distinctTickets.add(taskWithWorklogs.getIssue());
-
-                    // spent time
-                    AtomicLong timeSpentInMinutes = projectToTimespent.get(project);
-                    if (timeSpentInMinutes == null) {
-                        timeSpentInMinutes = new AtomicLong(0);
-                        projectToTimespent.put(project, timeSpentInMinutes);
-                    }
-
-                    timeSpentInMinutes.addAndGet(taskWithWorklogs.getTotalInMinutes());
-                    totalTimeSpent.addAndGet(taskWithWorklogs.getTotalInMinutes());
-                }
-            });
-
-            final AtomicInteger currentRow = new AtomicInteger(0);
-
-            // add labels and chart data
-            projectToTimespent.keySet().stream()
-                    .sorted((o1, o2) -> COLLATOR.compare(o1, o2))
-                    .forEach(project -> {
-                        AtomicLong timespentForThisProject = projectToTimespent.get(project);
-
-                        // add grid labels
-
-                        Set<String> distinctTickets = projectToDistinctTickets.get(project);
-                        Label label = getBoldLabel(FormattingUtil.getFormatted("view.statistics.somethingtoamountoftickets", project, distinctTickets.size()));
-                        GridPane.setConstraints(label, 0, currentRow.get());
-
-                        Label value = new Label(FormattingUtil.formatMinutes(timespentForThisProject.longValue(), true));
-                        GridPane.setConstraints(value, 1, currentRow.get());
-                        GridPane.setHgrow(value, Priority.ALWAYS);
-                        GridPane.setHalignment(value, HPos.RIGHT);
-
-                        pane.getChildren().addAll(label, value);
-
-                        // add chart data
-                        chart.getData().add(new PieChart.Data(project, timespentForThisProject.doubleValue()));
-                        currentRow.incrementAndGet();
-                    });
-
-            Label totalTimeSpentLabel = getBoldLabel(FormattingUtil.getFormatted("view.statistics.totaltimespent"));
-            GridPane.setConstraints(totalTimeSpentLabel, 0, currentRow.get());
-
-            Label totalTimeSpentValue = getBoldLabel(FormattingUtil.formatMinutes(totalTimeSpent.longValue(), true));
-            GridPane.setConstraints(totalTimeSpentValue, 1, currentRow.get());
-            GridPane.setHgrow(totalTimeSpentValue, Priority.ALWAYS);
-            GridPane.setHalignment(totalTimeSpentValue, HPos.RIGHT);
-
-            pane.getChildren().addAll(totalTimeSpentLabel, totalTimeSpentValue);
-        }
+        // since getDisplayResult only returns own data
+        // we can safely assume the employee map only contains
+        // one username
+        Map.Entry<String, Map<String, AtomicLong>> projectToWorktime = statistics.getEmployeeToProjectToWorktime().entrySet().iterator().next();
+        projectToWorktime.getValue().keySet().stream()
+                .sorted(COLLATOR::compare)
+                .forEach(project -> {
+                    AtomicLong timespentForThisProject = projectToWorktime.getValue().get(project);
+                    pieChart.getData().add(new PieChart.Data(project, timespentForThisProject.doubleValue()));
+                });
     }
-
 }

@@ -2,7 +2,6 @@ package de.pbauerochse.youtrack.fx.tabs;
 
 import de.pbauerochse.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.youtrack.domain.WorklogResult;
-import javafx.scene.Node;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -43,11 +42,5 @@ public class ProjectWorklogTab extends WorklogTab {
         }
 
         return resultItemsToDisplay.get();
-    }
-
-    @Override
-    protected Node getStatisticsView() {
-        // TODO macht et!
-        return super.getStatisticsView();
     }
 }

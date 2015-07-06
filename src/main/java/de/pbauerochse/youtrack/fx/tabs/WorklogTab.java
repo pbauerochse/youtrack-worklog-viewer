@@ -1,21 +1,26 @@
 package de.pbauerochse.youtrack.fx.tabs;
 
 import de.pbauerochse.youtrack.WorklogViewer;
-import de.pbauerochse.youtrack.domain.ReportTimerange;
-import de.pbauerochse.youtrack.domain.TaskWithWorklogs;
-import de.pbauerochse.youtrack.domain.TimerangeProvider;
-import de.pbauerochse.youtrack.domain.WorklogResult;
+import de.pbauerochse.youtrack.domain.*;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.apache.commons.lang3.StringUtils;
@@ -26,10 +31,9 @@ import java.text.Collator;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Patrick Bauerochse
@@ -43,6 +47,9 @@ public abstract class WorklogTab extends Tab {
     protected static final String WEEKEND_COLUMN_OR_CELL_CSS_CLASS = "weekend";
     protected static final String ISSUE_CELL_CSS_CLASS = "issue-cell";
 
+    // height in pixel for the bargraph, gets multiplied by the amount of distinct projects
+    private static final int HEIGHT_PER_PROJECT = 50;
+
     private Logger LOGGER = LoggerFactory.getLogger(WorklogTab.class);
 
     protected TableView<TaskWithWorklogs> taskTableView;
@@ -52,6 +59,8 @@ public abstract class WorklogTab extends Tab {
     protected Optional<WorklogResult> worklogResult = Optional.empty();
 
     protected boolean resultToDisplayChangedSinceLastRender;
+
+    protected VBox statisticsView;
 
     /**
      * Extract the appropriate TaskWithWorklogs from the WorklogResult item
@@ -92,25 +101,21 @@ public abstract class WorklogTab extends Tab {
     }
 
     protected Node getContentNode() {
-
         Node taskView = getTaskView();
-        Node statisticsView = getStatisticsView();
+        statisticsView = new VBox(20);
 
-        if (taskView == null && statisticsView == null) {
-            // both views were null so this tab is not implemented yet
-            // should actually not happen
-            return new Label("Nothing implemented yet");
-        } else if (statisticsView == null) {
-            // only task view is present so only use that one
-            return taskView;
-        }
+        // wrap statistics in scrollpane
+        ScrollPane scrollPane = new ScrollPane(statisticsView);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPadding(new Insets(7));
 
         // both statistics and task view present
         // show both in a split pane
         SplitPane splitPane = new SplitPane();
         splitPane.setOrientation(Orientation.HORIZONTAL);
         splitPane.setDividerPosition(0, 0.8);
-        splitPane.getItems().addAll(taskView, statisticsView);
+        splitPane.getItems().addAll(taskView, scrollPane);
         return splitPane;
     }
 
@@ -238,18 +243,157 @@ public abstract class WorklogTab extends Tab {
 
             taskTableView.getItems().addAll(displayResult);
 
-            updateStatisticsData();
+            updateStatisticsData(displayResult);
 
             resultToDisplayChangedSinceLastRender = false;
         }
     }
 
-    protected Node getStatisticsView() {
-        return null;
+    private void updateStatisticsData(List<TaskWithWorklogs> displayResult) {
+        statisticsView.getChildren().clear();
+
+        WorklogStatistics statistics = new WorklogStatistics();
+
+        // generic statistics
+        displayResult.forEach(taskWithWorklogs -> {
+            if (!taskWithWorklogs.isSummaryRow()) {
+                statistics.getTotalTimeSpent().addAndGet(taskWithWorklogs.getTotalInMinutes());
+
+                for (WorklogItem worklogItem : taskWithWorklogs.getWorklogItemList()) {
+                    String employee = worklogItem.getUserDisplayname();
+
+                    // employee total time spent
+                    AtomicLong totalTimeSpent = statistics.getEmployeeToTotaltimeSpent().get(employee);
+                    if (totalTimeSpent == null) {
+                        totalTimeSpent = new AtomicLong(0);
+                        statistics.getEmployeeToTotaltimeSpent().put(employee, totalTimeSpent);
+                    }
+                    totalTimeSpent.addAndGet(worklogItem.getDurationInMinutes());
+
+                    // distinct tasks per employee
+                    Set<String> totalDistinctTasks = statistics.getEmployeeToTotalDistinctTasks().get(employee);
+                    if (totalDistinctTasks == null) {
+                        totalDistinctTasks = new HashSet<>();
+                        statistics.getEmployeeToTotalDistinctTasks().put(employee, totalDistinctTasks);
+                    }
+                    totalDistinctTasks.add(taskWithWorklogs.getIssue());
+
+                    // distinct tasks per employee per project
+                    Map<String, Set<String>> projectToDistinctTasks = statistics.getEmployeeToProjectToDistinctTasks().get(employee);
+                    if (projectToDistinctTasks == null) {
+                        projectToDistinctTasks = new HashMap<>();
+                        statistics.getEmployeeToProjectToDistinctTasks().put(employee, projectToDistinctTasks);
+                    }
+
+                    Set<String> distinctTasks = projectToDistinctTasks.get(taskWithWorklogs.getProject());
+                    if (distinctTasks == null) {
+                        distinctTasks = new HashSet<>();
+                        projectToDistinctTasks.put(taskWithWorklogs.getProject(), distinctTasks);
+                    }
+
+                    distinctTasks.add(taskWithWorklogs.getIssue());
+
+                    // time spent per project
+                    Map<String, AtomicLong> projectToTimespent = statistics.getEmployeeToProjectToWorktime().get(employee);
+                    if (projectToTimespent == null) {
+                        projectToTimespent = new HashMap<>();
+                        statistics.getEmployeeToProjectToWorktime().put(employee, projectToTimespent);
+                    }
+
+                    AtomicLong timespentOnProject = projectToTimespent.get(taskWithWorklogs.getProject());
+                    if (timespentOnProject == null) {
+                        timespentOnProject = new AtomicLong(0);
+                        projectToTimespent.put(taskWithWorklogs.getProject(), timespentOnProject);
+                    }
+
+                    timespentOnProject.addAndGet(worklogItem.getDurationInMinutes());
+                }
+
+            }
+        });
+
+        // render grid and bar graph
+        final AtomicInteger currentGridRow = new AtomicInteger(0);
+
+        GridPane employeeProjectSummaryGrid = new GridPane();
+        employeeProjectSummaryGrid.setHgap(5);
+        employeeProjectSummaryGrid.setVgap(5);
+
+        NumberAxis xAxis = new NumberAxis();
+        xAxis.setLabel(FormattingUtil.getFormatted("view.statistics.timespentinminutes"));
+        xAxis.setTickLabelRotation(90);
+
+        CategoryAxis yAxis = new CategoryAxis();
+
+        StackedBarChart<Number, String> projectEmployeeBargraph = new StackedBarChart<>(xAxis, yAxis);
+        projectEmployeeBargraph.setTitle(FormattingUtil.getFormatted("view.statistics.byprojectandemployee"));
+        projectEmployeeBargraph.setPrefHeight(HEIGHT_PER_PROJECT * worklogResult.get().getDistinctProjectNames().size());
+        VBox.setVgrow(projectEmployeeBargraph, Priority.ALWAYS);
+
+        statistics.getEmployeeToProjectToWorktime().keySet().stream()
+                .sorted(COLLATOR::compare)
+                .forEach(employee -> {
+
+                    // employee headline label
+                    Set<String> totalDistinctTasksOfEmployee = statistics.getEmployeeToTotalDistinctTasks().get(employee);
+                    Label employeeLabel = getBoldLabel(FormattingUtil.getFormatted("view.statistics.somethingtoamountoftickets", employee, totalDistinctTasksOfEmployee.size()));
+                    employeeLabel.setPadding(new Insets(20, 0, 0, 0));
+                    GridPane.setConstraints(employeeLabel, 0, currentGridRow.getAndIncrement());
+                    GridPane.setColumnSpan(employeeLabel, 3);
+                    employeeProjectSummaryGrid.getChildren().addAll(employeeLabel);
+
+                    // bar graph data container
+                    XYChart.Series<Number, String> series = new XYChart.Series<>();
+                    series.setName(employee);
+                    projectEmployeeBargraph.getData().add(series);
+
+                    // time spent per project
+                    Map<String, AtomicLong> projectToWorktime = statistics.getEmployeeToProjectToWorktime().get(employee);
+                    projectToWorktime.keySet().stream()
+                            .sorted(COLLATOR::compare)
+                            .forEach(projectName -> {
+
+                                // project label
+                                Set<String> distinctTasksPerProject = statistics.getEmployeeToProjectToDistinctTasks().get(employee).get(projectName);
+                                Label projectLabel = getBoldLabel(FormattingUtil.getFormatted("view.statistics.somethingtoamountoftickets", projectName, distinctTasksPerProject.size()));
+                                projectLabel.setPadding(new Insets(0, 0, 0, 20));
+                                GridPane.setConstraints(projectLabel, 1, currentGridRow.get());
+
+                                // time spent for project label
+                                long timespentInMinutes = projectToWorktime.get(projectName).longValue();
+                                Label timespentLabel = new Label(FormattingUtil.formatMinutes(timespentInMinutes, true));
+                                GridPane.setConstraints(timespentLabel, 2, currentGridRow.get());
+                                GridPane.setHgrow(timespentLabel, Priority.ALWAYS);
+                                GridPane.setHalignment(timespentLabel, HPos.RIGHT);
+
+                                employeeProjectSummaryGrid.getChildren().addAll(projectLabel, timespentLabel);
+                                currentGridRow.incrementAndGet();
+
+                                // bargraph data
+                                series.getData().add(new XYChart.Data<>(timespentInMinutes, projectName));
+                            });
+
+                    // total time spent
+                    Label totalLabel = getBoldLabel(FormattingUtil.getFormatted("view.statistics.totaltimespent"));
+                    GridPane.setConstraints(totalLabel, 0, currentGridRow.get());
+                    GridPane.setColumnSpan(totalLabel, 3);
+
+                    Label timespentLabel = new Label(FormattingUtil.formatMinutes(statistics.getEmployeeToTotaltimeSpent().get(employee).get(), true));
+                    GridPane.setConstraints(timespentLabel, 2, currentGridRow.get());
+                    GridPane.setHgrow(timespentLabel, Priority.ALWAYS);
+                    GridPane.setHalignment(timespentLabel, HPos.RIGHT);
+                    employeeProjectSummaryGrid.getChildren().addAll(totalLabel, timespentLabel);
+
+                    currentGridRow.incrementAndGet();
+                });
+        statisticsView.getChildren().addAll(employeeProjectSummaryGrid, projectEmployeeBargraph);
+
+        // custom view statistics
+        addAdditionalStatistics(statisticsView, statistics, displayResult);
     }
 
-    protected void updateStatisticsData() {
-
+    protected void addAdditionalStatistics(VBox statisticsView, WorklogStatistics statistics, List<TaskWithWorklogs> displayResult) {
+        // for you to override
     }
 
     private Optional<TableColumn<TaskWithWorklogs, TaskWithWorklogs>> descriptionColumnOptional = Optional.empty();
@@ -318,6 +462,35 @@ public abstract class WorklogTab extends Tab {
         Label label = new Label(text);
         label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize()));
         return label;
+    }
+
+    protected class WorklogStatistics {
+
+        private Map<String, Map<String, AtomicLong>> employeeToProjectToWorktime = new HashMap<>();
+        private Map<String, Map<String, Set<String>>> employeeToProjectToDistinctTasks = new HashMap<>();
+        private Map<String, Set<String>> employeeToTotalDistinctTasks = new HashMap<>();
+        private AtomicLong totalTimeSpent = new AtomicLong(0);
+        private Map<String, AtomicLong> employeeToTotaltimeSpent = new HashMap<>();
+
+        public Map<String, Map<String, AtomicLong>> getEmployeeToProjectToWorktime() {
+            return employeeToProjectToWorktime;
+        }
+
+        public Map<String, Map<String, Set<String>>> getEmployeeToProjectToDistinctTasks() {
+            return employeeToProjectToDistinctTasks;
+        }
+
+        public Map<String, Set<String>> getEmployeeToTotalDistinctTasks() {
+            return employeeToTotalDistinctTasks;
+        }
+
+        public AtomicLong getTotalTimeSpent() {
+            return totalTimeSpent;
+        }
+
+        public Map<String, AtomicLong> getEmployeeToTotaltimeSpent() {
+            return employeeToTotaltimeSpent;
+        }
     }
 
 }
