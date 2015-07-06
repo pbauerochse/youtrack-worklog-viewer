@@ -91,20 +91,22 @@ public class OwnWorklogsTab extends WorklogTab {
     protected void addAdditionalStatistics(VBox statisticsView, WorklogStatistics statistics, List<TaskWithWorklogs> displayResult) {
         super.addAdditionalStatistics(statisticsView, statistics, displayResult);
 
-        PieChart pieChart = new PieChart();
-        pieChart.setLabelsVisible(false);
-        pieChart.setTitle(FormattingUtil.getFormatted("view.statistics.byproject"));
-        statisticsView.getChildren().add(pieChart);
+        if (statistics.getEmployeeToProjectToWorktime().size() > 0) {
+            PieChart pieChart = new PieChart();
+            pieChart.setLabelsVisible(false);
+            pieChart.setTitle(FormattingUtil.getFormatted("view.statistics.byproject"));
+            statisticsView.getChildren().add(pieChart);
 
-        // since getDisplayResult only returns own data
-        // we can safely assume the employee map only contains
-        // one username
-        Map.Entry<String, Map<String, AtomicLong>> projectToWorktime = statistics.getEmployeeToProjectToWorktime().entrySet().iterator().next();
-        projectToWorktime.getValue().keySet().stream()
-                .sorted(COLLATOR::compare)
-                .forEach(project -> {
-                    AtomicLong timespentForThisProject = projectToWorktime.getValue().get(project);
-                    pieChart.getData().add(new PieChart.Data(project, timespentForThisProject.doubleValue()));
-                });
+            // since getDisplayResult only returns own data
+            // we can safely assume the employee map only contains
+            // one username
+            Map.Entry<String, Map<String, AtomicLong>> projectToWorktime = statistics.getEmployeeToProjectToWorktime().entrySet().iterator().next();
+            projectToWorktime.getValue().keySet().stream()
+                    .sorted(COLLATOR::compare)
+                    .forEach(project -> {
+                        AtomicLong timespentForThisProject = projectToWorktime.getValue().get(project);
+                        pieChart.getData().add(new PieChart.Data(project, timespentForThisProject.doubleValue()));
+                    });
+        }
     }
 }
