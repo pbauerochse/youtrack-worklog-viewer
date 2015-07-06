@@ -46,11 +46,11 @@ public class FormattingUtil {
         long hours = remainingMinutes / MINUTES_PER_HOUR;
         remainingMinutes = remainingMinutes % MINUTES_PER_HOUR;
 
-        if (days > 0 || full) {
+        if (days > 0) {
             worklogFormatted.append(days).append('d');
         }
 
-        if (hours > 0 || full) {
+        if (hours > 0 || (full && days > 0)) {
             if (worklogFormatted.length() > 0) {
                 worklogFormatted.append(' ');
             }
@@ -58,7 +58,7 @@ public class FormattingUtil {
             worklogFormatted.append(hours).append('h');
         }
 
-        if (remainingMinutes > 0 || full) {
+        if (remainingMinutes > 0 || (full && (hours > 0 || days > 0))) {
             if (worklogFormatted.length() > 0) {
                 worklogFormatted.append(' ');
             }
