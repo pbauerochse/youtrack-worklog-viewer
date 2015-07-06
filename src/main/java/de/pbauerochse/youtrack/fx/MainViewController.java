@@ -4,6 +4,7 @@ import de.pbauerochse.youtrack.WorklogViewer;
 import de.pbauerochse.youtrack.connector.YouTrackConnector;
 import de.pbauerochse.youtrack.domain.ReportTimerange;
 import de.pbauerochse.youtrack.domain.WorklogResult;
+import de.pbauerochse.youtrack.excel.ExcelExporter;
 import de.pbauerochse.youtrack.fx.tabs.AllWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.OwnWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.ProjectWorklogTab;
@@ -22,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -30,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -87,6 +90,9 @@ public class MainViewController implements Initializable {
 
         modalOverlaySpinner.setVisible(false);
 
+        exportToExcelMenuItem.disableProperty().bind(resultTabPane.getSelectionModel().selectedItemProperty().isNull());
+        exportToExcelMenuItem.setOnAction(event -> startExportToExcelTask((WorklogTab) resultTabPane.getSelectionModel().getSelectedItem()));
+
         // prepopulate timerange dropdown
         timerangeComboBox.setConverter(getTimerangeComboBoxConverter());
         timerangeComboBox.getItems().addAll(ReportTimerange.values());
@@ -109,9 +115,7 @@ public class MainViewController implements Initializable {
         aboutMenuItem.setOnAction(event -> showAboutDialogue());
 
         // fetch worklog button click
-        fetchWorklogButton.setOnAction(clickEvent -> {
-            handleFetchWorklogButtonClick(settings);
-        });
+        fetchWorklogButton.setOnAction(clickEvent -> handleFetchWorklogButtonClick(settings));
 
         if (settings.isLoadDataAtStartup()) {
             LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.getSelectionModel().getSelectedItem().name());
@@ -164,7 +168,6 @@ public class MainViewController implements Initializable {
 
     /**
      * Opens the settings dialogue
-     * @param window The main window to attach the scene to
      */
     private void showSettingsDialogue() {
         LOGGER.debug("Showing settings dialogue");
@@ -206,6 +209,54 @@ public class MainViewController implements Initializable {
         });
     }
 
+    private void startExportToExcelTask(WorklogTab tab) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(FormattingUtil.getFormatted("view.menu.file.exportexcel"));
+        fileChooser.setInitialFileName(tab.getExcelDownloadSuggestedFilename());
+        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Microsoft Excel", "*.xls"));
+
+        File targetFile = fileChooser.showSaveDialog(progressBar.getScene().getWindow());
+        if (targetFile != null) {
+            LOGGER.debug("Exporting tab {} to excel {}", tab.getText(), targetFile.getAbsoluteFile());
+            showWaitScreen();
+
+            Task<File> worker = ExcelExporter.exportToExcel(tab, targetFile);
+
+            worker.stateProperty().addListener((observable, oldValue, newValue) -> {
+                LOGGER.debug("Thread changed from {} to {}", oldValue, newValue);
+            });
+
+            // error handler
+            worker.setOnFailed(event -> {
+                Throwable throwable = event.getSource().getException();
+                LOGGER.warn("Creating excel failed", throwable);
+                displayError(throwable);
+                hideWaitScreen();
+            });
+
+            // success handler
+            worker.setOnSucceeded(event -> {
+                LOGGER.info("Excel creation succeeded");
+                File result = (File) event.getSource().getValue();
+                progressText.textProperty().unbind();
+                progressBar.progressProperty().unbind();
+                progressText.setText(FormattingUtil.getFormatted("exceptions.excel.success", result.getAbsoluteFile()));
+                hideWaitScreen();
+            });
+
+            // bind progressbar and -text property to task
+            progressText.textProperty().unbind();
+            progressBar.progressProperty().unbind();
+            progressText.textProperty().bind(worker.messageProperty());
+            progressBar.progressProperty().bind(worker.progressProperty());
+
+            // start task
+            Thread thread = new Thread(worker, "ExcelReportGenerator");
+            thread.setDaemon(true);
+            thread.start();
+        }
+    }
+
     private void fetchWorklogs(SettingsUtil.Settings settings, ReportTimerange timerange) {
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
         showWaitScreen();
@@ -213,10 +264,8 @@ public class MainViewController implements Initializable {
         Task<WorklogResult> worklogTaskForUser = YouTrackConnector.getInstance()
                 .getWorklogTaskForUser(settings.getYoutrackUrl(), settings.getYoutrackUsername(), settings.getYoutrackPassword(), timerange);
 
-        // disabled worklog button while still waiting for response
         worklogTaskForUser.stateProperty().addListener((observable, oldValue, newValue) -> {
             LOGGER.debug("Thread changed from {} to {}", oldValue, newValue);
-            fetchWorklogButton.setDisable(newValue == Worker.State.RUNNING || newValue == Worker.State.SCHEDULED);
         });
 
         // error handler

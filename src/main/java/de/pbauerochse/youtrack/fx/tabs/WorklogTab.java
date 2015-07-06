@@ -2,11 +2,13 @@ package de.pbauerochse.youtrack.fx.tabs;
 
 import de.pbauerochse.youtrack.WorklogViewer;
 import de.pbauerochse.youtrack.domain.*;
+import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -23,7 +25,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +53,10 @@ public abstract class WorklogTab extends Tab {
     protected static final String TODAY_COLUMN_OR_CELL_CSS_CLASS = "today";
     protected static final String ISSUE_CELL_CSS_CLASS = "issue-cell";
 
-    // height in pixel for the bargraph, gets multiplied by the amount of distinct projects
-    private static final int HEIGHT_PER_PROJECT = 20;
+    // height adjustment parameters for bargraph
+    private static final int HEIGHT_PER_PROJECT = 40;
+    private static final int HEIGHT_PER_USER = 35;
+    private static final int ADDITIONAL_HEIGHT = 150;
 
     private Logger LOGGER = LoggerFactory.getLogger(WorklogTab.class);
 
@@ -356,7 +363,17 @@ public abstract class WorklogTab extends Tab {
 
         StackedBarChart<Number, String> projectEmployeeBargraph = new StackedBarChart<>(xAxis, yAxis);
         projectEmployeeBargraph.setTitle(FormattingUtil.getFormatted("view.statistics.byprojectandemployee"));
-        projectEmployeeBargraph.setPrefHeight(HEIGHT_PER_PROJECT * worklogResult.get().getDistinctProjectNames().size());
+
+        Set<String> projectsToDisplay = new HashSet<>();
+        displayResult.forEach(taskWithWorklogs -> {
+            if (!taskWithWorklogs.isSummaryRow()) {
+                projectsToDisplay.add(taskWithWorklogs.getProject());
+            }
+        });
+        int prefHeight = HEIGHT_PER_PROJECT * projectsToDisplay.size() + HEIGHT_PER_USER * statistics.getEmployeeToTotaltimeSpent().keySet().size() + ADDITIONAL_HEIGHT;
+        LOGGER.debug("Setting bargraph height to {} * {} + {} * {} + {} = {}", HEIGHT_PER_PROJECT, projectsToDisplay.size(), HEIGHT_PER_USER, statistics.getEmployeeToTotaltimeSpent().keySet().size(), ADDITIONAL_HEIGHT, prefHeight);
+
+        projectEmployeeBargraph.setPrefHeight(prefHeight);
         VBox.setVgrow(projectEmployeeBargraph, Priority.ALWAYS);
 
         statistics.getEmployeeToProjectToWorktime().keySet().stream()
@@ -491,6 +508,77 @@ public abstract class WorklogTab extends Tab {
         Label label = new Label(text);
         label.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize()));
         return label;
+    }
+
+    public String getExcelDownloadSuggestedFilename() {
+        if (!lastUsedTimerange.isPresent()) throw ExceptionUtil.getIllegalStateException("exceptions.excel.nodata");
+
+        ReportTimerange reportTimerange = lastUsedTimerange.get();
+        TimerangeProvider timerangeProvider = reportTimerange.getTimerangeProvider();
+
+        return new StringBuilder(getText())
+                .append('_')
+                .append(FormattingUtil.formatDate(timerangeProvider.getStartDate()))
+                .append('-')
+                .append(FormattingUtil.formatDate(timerangeProvider.getEndDate()))
+                .append(".xls")
+                .toString();
+    }
+
+    public void writeDataToExcel(Sheet sheet) {
+        LOGGER.debug("[{}] Exporting data to excel", getText());
+
+        org.apache.poi.ss.usermodel.Font font = sheet.getWorkbook().createFont();
+        font.setBold(true);
+
+        CellStyle rightAlignedStyle = sheet.getWorkbook().createCellStyle();
+        rightAlignedStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+
+        CellStyle boldCellStyle = sheet.getWorkbook().createCellStyle();
+        boldCellStyle.setFont(font);
+
+        CellStyle boldAndRightAlignedStyle = sheet.getWorkbook().createCellStyle();
+        boldAndRightAlignedStyle.setFont(font);
+        boldAndRightAlignedStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+
+        Row row = sheet.createRow(0);
+
+        for (TableColumn<TaskWithWorklogs, ?> tableColumn : taskTableView.getColumns()) {
+            Cell cell = row.createCell(Math.max(0, row.getLastCellNum()));
+            cell.setCellStyle(boldCellStyle);
+            cell.setCellValue(tableColumn.getText());
+            LOGGER.debug("[{}] Rendering headline row cell '{}'", getText(), tableColumn.getText());
+        }
+
+        int rowIndex = 1;
+
+        // TODO this does not work as lookupAll only returns nodes visible in viewport, cells available after scrolling are not included...bummer!
+        for (Node tableRow : taskTableView.lookupAll(".table-row-cell")) {
+            int columnIndex = 0;
+
+            LOGGER.debug("[{}] Creating data row {}", getText(), rowIndex);
+            row = sheet.createRow(rowIndex++);
+            for (Node tableCell : tableRow.lookupAll(".table-cell")) {
+                TableCell castTableCell = (TableCell) tableCell;
+
+                Cell cell = row.createCell(columnIndex++);
+                LOGGER.debug("[{}] Setting cell value row:{}, column:{}, value:'{}'", getText(), row.getRowNum(), cell.getColumnIndex(), castTableCell.getText());
+                cell.setCellValue(castTableCell.getText());
+
+                if (castTableCell.getStyleClass().contains(SUMMARY_COLUMN_OR_CELL_CSS_CLASS)) {
+                    cell.setCellStyle(boldAndRightAlignedStyle);
+                } else if (castTableCell.getStyleClass().contains(ISSUE_CELL_CSS_CLASS)) {
+                    cell.setCellStyle(boldCellStyle);
+                } else {
+                    cell.setCellStyle(rightAlignedStyle);
+                }
+            }
+        }
+
+        // autosize column widths
+        for (int i = 0; i < taskTableView.getColumns().size(); i++) {
+            sheet.autoSizeColumn(i);
+        }
     }
 
     protected class WorklogStatistics {
