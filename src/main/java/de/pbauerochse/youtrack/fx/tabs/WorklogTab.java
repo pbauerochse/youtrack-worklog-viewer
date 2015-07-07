@@ -1,11 +1,15 @@
 package de.pbauerochse.youtrack.fx.tabs;
 
 import de.pbauerochse.youtrack.WorklogViewer;
-import de.pbauerochse.youtrack.domain.*;
+import de.pbauerochse.youtrack.domain.TaskWithWorklogs;
+import de.pbauerochse.youtrack.domain.TimerangeProvider;
+import de.pbauerochse.youtrack.domain.WorklogItem;
+import de.pbauerochse.youtrack.domain.WorklogResult;
 import de.pbauerochse.youtrack.excel.ExcelColumnRenderer;
 import de.pbauerochse.youtrack.excel.columns.TaskColumn;
 import de.pbauerochse.youtrack.excel.columns.TaskSummaryColumn;
 import de.pbauerochse.youtrack.excel.columns.WorkdayColumn;
+import de.pbauerochse.youtrack.fx.tasks.FetchTimereportContext;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
@@ -63,9 +67,11 @@ public abstract class WorklogTab extends Tab {
 
     protected TableView<TaskWithWorklogs> taskTableView;
 
-    protected Optional<ReportTimerange> lastUsedTimerange = Optional.empty();
+    protected Optional<TimerangeProvider> lastUsedTimerangeProvider = Optional.empty();
 
     protected Optional<WorklogResult> worklogResult = Optional.empty();
+
+    protected Optional<FetchTimereportContext> fetchTimereportContext = Optional.empty();
 
     protected boolean resultToDisplayChangedSinceLastRender;
 
@@ -100,8 +106,10 @@ public abstract class WorklogTab extends Tab {
      *
      * @param worklogList The TaskWithWorklogs to show in this tab
      */
-    public void updateItems(WorklogResult worklogResult) {
+    public void updateItems(WorklogResult worklogResult, FetchTimereportContext timereportContext) {
         this.worklogResult = Optional.of(worklogResult);
+        this.fetchTimereportContext = Optional.of(timereportContext);
+
         resultToDisplayChangedSinceLastRender = true;
 
         if (isSelected()) {
@@ -171,7 +179,7 @@ public abstract class WorklogTab extends Tab {
 
         // render the table columns if the timerange changed from last result
         WorklogResult worklogResult = this.worklogResult.get();
-        if (!lastUsedTimerange.isPresent() || lastUsedTimerange.get() != worklogResult.getTimerange()) {
+        if (!lastUsedTimerangeProvider.isPresent() || lastUsedTimerangeProvider.get().getReportTimerange() != worklogResult.getTimerange()) {
 
             LOGGER.debug("[{}] Regenerating columns for timerange {}", getText(), worklogResult.getTimerange().name());
             taskTableView.getColumns().clear();
@@ -180,7 +188,7 @@ public abstract class WorklogTab extends Tab {
             // render tables for all days in the selected timerange
             // e.g. timerange current month renders a column for
             // each day of the current month
-            TimerangeProvider timerangeProvider = worklogResult.getTimerange().getTimerangeProvider();
+            TimerangeProvider timerangeProvider = fetchTimereportContext.get().getTimerangeProvider();
             long amountOfDaysToDisplay = ChronoUnit.DAYS.between(timerangeProvider.getStartDate(), timerangeProvider.getEndDate());
 
             for (int days = 0; days <= amountOfDaysToDisplay; days++) {
@@ -258,7 +266,7 @@ public abstract class WorklogTab extends Tab {
             summaryPerTaskColumn.setPrefWidth(120);
             taskTableView.getColumns().add(summaryPerTaskColumn);
 
-            lastUsedTimerange = Optional.of(worklogResult.getTimerange());
+            lastUsedTimerangeProvider = Optional.of(fetchTimereportContext.get().getTimerangeProvider());
         }
 
         // only refresh items if changed from last time
@@ -511,10 +519,9 @@ public abstract class WorklogTab extends Tab {
     }
 
     public String getExcelDownloadSuggestedFilename() {
-        if (!lastUsedTimerange.isPresent()) throw ExceptionUtil.getIllegalStateException("exceptions.excel.nodata");
+        if (!lastUsedTimerangeProvider.isPresent()) throw ExceptionUtil.getIllegalStateException("exceptions.excel.nodata");
 
-        ReportTimerange reportTimerange = lastUsedTimerange.get();
-        TimerangeProvider timerangeProvider = reportTimerange.getTimerangeProvider();
+        TimerangeProvider timerangeProvider = lastUsedTimerangeProvider.get();
 
         return new StringBuilder(getText())
                 .append('_')
@@ -531,7 +538,7 @@ public abstract class WorklogTab extends Tab {
         List<ExcelColumnRenderer> columnRendererList = new ArrayList<>();
         columnRendererList.add(new TaskColumn());
 
-        TimerangeProvider timerangeProvider = worklogResult.get().getTimerange().getTimerangeProvider();
+        TimerangeProvider timerangeProvider = fetchTimereportContext.get().getTimerangeProvider();
         LocalDate startDate = timerangeProvider.getStartDate();
         LocalDate endDate = timerangeProvider.getEndDate();
 

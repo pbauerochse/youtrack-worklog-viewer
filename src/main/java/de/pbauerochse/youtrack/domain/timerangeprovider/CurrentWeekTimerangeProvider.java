@@ -1,5 +1,7 @@
 package de.pbauerochse.youtrack.domain.timerangeprovider;
 
+import de.pbauerochse.youtrack.domain.ReportTimerange;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -11,11 +13,15 @@ import java.time.temporal.ChronoField;
  */
 public class CurrentWeekTimerangeProvider extends BaseTimerangeProvider {
 
-    @Override
-    protected void initialize() {
+    CurrentWeekTimerangeProvider() {
         LocalDate now = LocalDate.now(ZoneId.systemDefault());
 
         startDate = now.with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
         endDate = now.with(ChronoField.DAY_OF_WEEK, DayOfWeek.SUNDAY.getValue());
+    }
+
+    @Override
+    public ReportTimerange getReportTimerange() {
+        return ReportTimerange.THIS_WEEK;
     }
 }

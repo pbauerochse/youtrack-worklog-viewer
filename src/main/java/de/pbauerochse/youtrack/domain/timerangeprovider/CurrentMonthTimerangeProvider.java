@@ -1,5 +1,7 @@
 package de.pbauerochse.youtrack.domain.timerangeprovider;
 
+import de.pbauerochse.youtrack.domain.ReportTimerange;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -9,10 +11,14 @@ import java.time.ZoneId;
  */
 public class CurrentMonthTimerangeProvider extends BaseTimerangeProvider {
 
-    @Override
-    protected void initialize() {
+    CurrentMonthTimerangeProvider() {
         LocalDate now = LocalDate.now(ZoneId.systemDefault());
         startDate = now.withDayOfMonth(1);
         endDate = now.withDayOfMonth(now.getMonth().length(now.isLeapYear()));
+    }
+
+    @Override
+    public ReportTimerange getReportTimerange() {
+        return ReportTimerange.THIS_MONTH;
     }
 }

@@ -13,12 +13,6 @@ public abstract class BaseTimerangeProvider implements TimerangeProvider {
     protected LocalDate startDate;
     protected LocalDate endDate;
 
-    protected abstract void initialize();
-
-    public BaseTimerangeProvider() {
-        initialize();
-    }
-
     @Override
     public LocalDate getStartDate() {
         return startDate;

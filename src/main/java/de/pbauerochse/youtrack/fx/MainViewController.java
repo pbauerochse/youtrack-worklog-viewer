@@ -1,20 +1,21 @@
 package de.pbauerochse.youtrack.fx;
 
 import de.pbauerochse.youtrack.WorklogViewer;
-import de.pbauerochse.youtrack.connector.YouTrackConnector;
 import de.pbauerochse.youtrack.domain.ReportTimerange;
+import de.pbauerochse.youtrack.domain.TimerangeProvider;
 import de.pbauerochse.youtrack.domain.WorklogResult;
-import de.pbauerochse.youtrack.excel.ExcelExporter;
+import de.pbauerochse.youtrack.domain.timerangeprovider.TimerangeProviderFactory;
 import de.pbauerochse.youtrack.fx.tabs.AllWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.OwnWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.ProjectWorklogTab;
 import de.pbauerochse.youtrack.fx.tabs.WorklogTab;
+import de.pbauerochse.youtrack.fx.tasks.ExcelExporterTask;
+import de.pbauerochse.youtrack.fx.tasks.FetchTimereportContext;
+import de.pbauerochse.youtrack.fx.tasks.FetchTimereportTask;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
-import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -46,6 +47,7 @@ public class MainViewController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainViewController.class);
 
     private static final int AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS = 2;  // two fixed tabs (own and all)
+    public static final String REQUIRED_FIELD_CLASS = "required";
 
     @FXML
     private ComboBox<ReportTimerange> timerangeComboBox;
@@ -80,6 +82,12 @@ public class MainViewController implements Initializable {
     @FXML
     private StackPane modalOverlaySpinner;
 
+    @FXML
+    private DatePicker startDatePicker;
+
+    @FXML
+    private DatePicker endDatePicker;
+
     private ResourceBundle resources;
 
     @Override
@@ -90,23 +98,34 @@ public class MainViewController implements Initializable {
 
         modalOverlaySpinner.setVisible(false);
 
+        startDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
+        endDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
+
         exportToExcelMenuItem.disableProperty().bind(resultTabPane.getSelectionModel().selectedItemProperty().isNull());
         exportToExcelMenuItem.setOnAction(event -> startExportToExcelTask((WorklogTab) resultTabPane.getSelectionModel().getSelectedItem()));
 
         // prepopulate timerange dropdown
         timerangeComboBox.setConverter(getTimerangeComboBoxConverter());
         timerangeComboBox.getItems().addAll(ReportTimerange.values());
+        timerangeComboBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                ReportTimerange timerange = timerangeComboBox.getSelectionModel().getSelectedItem();
+                settings.setLastUsedReportTimerange(timerange);
+
+                TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, null, null);
+                startDatePicker.setValue(timerangeProvider.getStartDate());
+                endDatePicker.setValue(timerangeProvider.getEndDate());
+
+                startDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
+                endDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
+            }
+        });
+
         if (settings.getLastUsedReportTimerange() != null) {
             timerangeComboBox.getSelectionModel().select(settings.getLastUsedReportTimerange());
         } else {
             timerangeComboBox.getSelectionModel().select(ReportTimerange.THIS_WEEK);    // preselect "this week"
         }
-
-        timerangeComboBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                settings.setLastUsedReportTimerange(timerangeComboBox.getSelectionModel().getSelectedItem());
-            }
-        });
 
         // menu items click
         settingsMenuItem.setOnAction(event -> showSettingsDialogue());
@@ -117,7 +136,9 @@ public class MainViewController implements Initializable {
         // fetch worklog button click
         fetchWorklogButton.setOnAction(clickEvent -> handleFetchWorklogButtonClick(settings));
 
-        if (settings.isLoadDataAtStartup()) {
+        // auto load data if a named timerange was selected
+        // and the user chose to load data at startup
+        if (timerangeComboBox.getSelectionModel().getSelectedItem() != ReportTimerange.CUSTOM && settings.isLoadDataAtStartup()) {
             LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.getSelectionModel().getSelectedItem().name());
             fetchWorklogButton.fire();
         }
@@ -220,14 +241,14 @@ public class MainViewController implements Initializable {
             LOGGER.debug("Exporting tab {} to excel {}", tab.getText(), targetFile.getAbsoluteFile());
             showWaitScreen();
 
-            Task<File> worker = ExcelExporter.exportToExcel(tab, targetFile);
+            ExcelExporterTask excelExporterTask = new ExcelExporterTask(tab, targetFile);
 
-            worker.stateProperty().addListener((observable, oldValue, newValue) -> {
+            excelExporterTask.stateProperty().addListener((observable, oldValue, newValue) -> {
                 LOGGER.debug("Thread changed from {} to {}", oldValue, newValue);
             });
 
             // error handler
-            worker.setOnFailed(event -> {
+            excelExporterTask.setOnFailed(event -> {
                 Throwable throwable = event.getSource().getException();
                 LOGGER.warn("Creating excel failed", throwable);
                 displayError(throwable);
@@ -235,7 +256,7 @@ public class MainViewController implements Initializable {
             });
 
             // success handler
-            worker.setOnSucceeded(event -> {
+            excelExporterTask.setOnSucceeded(event -> {
                 LOGGER.info("Excel creation succeeded");
                 File result = (File) event.getSource().getValue();
                 progressText.textProperty().unbind();
@@ -247,11 +268,11 @@ public class MainViewController implements Initializable {
             // bind progressbar and -text property to task
             progressText.textProperty().unbind();
             progressBar.progressProperty().unbind();
-            progressText.textProperty().bind(worker.messageProperty());
-            progressBar.progressProperty().bind(worker.progressProperty());
+            progressText.textProperty().bind(excelExporterTask.messageProperty());
+            progressBar.progressProperty().bind(excelExporterTask.progressProperty());
 
             // start task
-            Thread thread = new Thread(worker, "ExcelReportGenerator");
+            Thread thread = new Thread(excelExporterTask, "ExcelReportGenerator");
             thread.setDaemon(true);
             thread.start();
         }
@@ -259,10 +280,36 @@ public class MainViewController implements Initializable {
 
     private void fetchWorklogs(SettingsUtil.Settings settings, ReportTimerange timerange) {
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
+
+        progressText.textProperty().unbind();
+        progressBar.progressProperty().unbind();
+
+        if (startDatePicker.getValue() == null) {
+            startDatePicker.getStyleClass().add(REQUIRED_FIELD_CLASS);
+        } else {
+            startDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
+        }
+
+        if (endDatePicker.getValue() == null) {
+            endDatePicker.getStyleClass().add(REQUIRED_FIELD_CLASS);
+        } else {
+            endDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
+        }
+
+        // sanity checks if ReportTimerange == CUSTOM
+        if (timerange == ReportTimerange.CUSTOM && (startDatePicker.getValue() == null || endDatePicker.getValue() == null)) {
+            progressText.setText(FormattingUtil.getFormatted("exceptions.customrange.datesrequired"));
+            return;
+        } else if (startDatePicker.getValue().isAfter(endDatePicker.getValue())) {
+            progressText.setText(FormattingUtil.getFormatted("exceptions.customrange.startafterend"));
+            return;
+        }
+
         showWaitScreen();
 
-        Task<WorklogResult> worklogTaskForUser = YouTrackConnector.getInstance()
-                .getWorklogTaskForUser(settings.getYoutrackUrl(), settings.getYoutrackUsername(), settings.getYoutrackPassword(), timerange);
+        TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, startDatePicker.getValue(), endDatePicker.getValue());
+        FetchTimereportContext context = new FetchTimereportContext(timerangeProvider);
+        FetchTimereportTask worklogTaskForUser = new FetchTimereportTask(context);
 
         worklogTaskForUser.stateProperty().addListener((observable, oldValue, newValue) -> {
             LOGGER.debug("Thread changed from {} to {}", oldValue, newValue);
@@ -280,13 +327,11 @@ public class MainViewController implements Initializable {
         worklogTaskForUser.setOnSucceeded(event -> {
             LOGGER.info("Fetching worklogs succeeded");
             WorklogResult result = (WorklogResult) event.getSource().getValue();
-            displayResult(result, timerange, settings);
+            displayResult(result, context, settings);
             hideWaitScreen();
         });
 
         // bind progressbar and -text property to task
-        progressText.textProperty().unbind();
-        progressBar.progressProperty().unbind();
         progressText.textProperty().bind(worklogTaskForUser.messageProperty());
         progressBar.progressProperty().bind(worklogTaskForUser.progressProperty());
 
@@ -313,7 +358,7 @@ public class MainViewController implements Initializable {
         }
     }
 
-    private void displayResult(WorklogResult result, ReportTimerange timerange, SettingsUtil.Settings settings) {
+    private void displayResult(WorklogResult result, FetchTimereportContext context, SettingsUtil.Settings settings) {
         LOGGER.info("Displaying WorklogResult to the user");
 
         if (resultTabPane.getTabs().size() == 0) {
@@ -357,7 +402,7 @@ public class MainViewController implements Initializable {
             resultTabPane.getSelectionModel().select(0);
         }
 
-        resultTabPane.getTabs().forEach(tab -> ((WorklogTab) tab).updateItems(result));
+        resultTabPane.getTabs().forEach(tab -> ((WorklogTab) tab).updateItems(result, context));
     }
 
     private void showWaitScreen() {

@@ -12,4 +12,6 @@ public interface TimerangeProvider {
 
     LocalDate getEndDate();
 
+    ReportTimerange getReportTimerange();
+
 }

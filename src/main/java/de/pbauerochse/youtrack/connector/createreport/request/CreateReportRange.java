@@ -1,27 +1,21 @@
 package de.pbauerochse.youtrack.connector.createreport.request;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * @author Patrick Bauerochse
  * @since 14.04.15
  */
-public class CreateReportRange {
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = FixedReportRange.class, name = "fixed"),
+        @JsonSubTypes.Type(value = NamedReportRange.class, name = "named")
+})
+public interface CreateReportRange {
 
-    private String type;
-    private String name;
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

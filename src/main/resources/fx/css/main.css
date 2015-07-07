@@ -9,6 +9,10 @@
     -fx-progress-color: #a5cdff;
 }
 
+.required {
+    -fx-border-color: red;
+}
+
 .weekend {
     -fx-background-color: rgba(189, 255, 209, 0.5);
 }
