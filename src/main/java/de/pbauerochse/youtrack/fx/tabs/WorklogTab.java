@@ -2,13 +2,16 @@ package de.pbauerochse.youtrack.fx.tabs;
 
 import de.pbauerochse.youtrack.WorklogViewer;
 import de.pbauerochse.youtrack.domain.*;
+import de.pbauerochse.youtrack.excel.ExcelColumnRenderer;
+import de.pbauerochse.youtrack.excel.columns.TaskColumn;
+import de.pbauerochse.youtrack.excel.columns.TaskSummaryColumn;
+import de.pbauerochse.youtrack.excel.columns.WorkdayColumn;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -25,10 +28,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.util.Callback;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -460,7 +461,6 @@ public abstract class WorklogTab extends Tab {
                             setText(StringUtils.EMPTY);
                             setTooltip(null);
                         } else {
-
                             if (item.isSummaryRow()) {
                                 setText(FormattingUtil.getFormatted("view.main.summary"));
                                 setTooltip(null);
@@ -528,55 +528,26 @@ public abstract class WorklogTab extends Tab {
     public void writeDataToExcel(Sheet sheet) {
         LOGGER.debug("[{}] Exporting data to excel", getText());
 
-        org.apache.poi.ss.usermodel.Font font = sheet.getWorkbook().createFont();
-        font.setBold(true);
+        List<ExcelColumnRenderer> columnRendererList = new ArrayList<>();
+        columnRendererList.add(new TaskColumn());
 
-        CellStyle rightAlignedStyle = sheet.getWorkbook().createCellStyle();
-        rightAlignedStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+        TimerangeProvider timerangeProvider = worklogResult.get().getTimerange().getTimerangeProvider();
+        LocalDate startDate = timerangeProvider.getStartDate();
+        LocalDate endDate = timerangeProvider.getEndDate();
 
-        CellStyle boldCellStyle = sheet.getWorkbook().createCellStyle();
-        boldCellStyle.setFont(font);
-
-        CellStyle boldAndRightAlignedStyle = sheet.getWorkbook().createCellStyle();
-        boldAndRightAlignedStyle.setFont(font);
-        boldAndRightAlignedStyle.setAlignment(CellStyle.ALIGN_RIGHT);
-
-        Row row = sheet.createRow(0);
-
-        for (TableColumn<TaskWithWorklogs, ?> tableColumn : taskTableView.getColumns()) {
-            Cell cell = row.createCell(Math.max(0, row.getLastCellNum()));
-            cell.setCellStyle(boldCellStyle);
-            cell.setCellValue(tableColumn.getText());
-            LOGGER.debug("[{}] Rendering headline row cell '{}'", getText(), tableColumn.getText());
+        long amountOfDaysToDisplay = ChronoUnit.DAYS.between(startDate, endDate);
+        for (int days = 0; days <= amountOfDaysToDisplay; days++) {
+            LocalDate currentColumnDate = timerangeProvider.getStartDate().plus(days, ChronoUnit.DAYS);
+            DayOfWeek currentColumnDayOfWeek = currentColumnDate.getDayOfWeek();
+            String displayDate = FormattingUtil.formatDate(currentColumnDate);
+            columnRendererList.add(new WorkdayColumn(displayDate, currentColumnDate));
         }
 
-        int rowIndex = 1;
-
-        // TODO this does not work as lookupAll only returns nodes visible in viewport, cells available after scrolling are not included...bummer!
-        for (Node tableRow : taskTableView.lookupAll(".table-row-cell")) {
-            int columnIndex = 0;
-
-            LOGGER.debug("[{}] Creating data row {}", getText(), rowIndex);
-            row = sheet.createRow(rowIndex++);
-            for (Node tableCell : tableRow.lookupAll(".table-cell")) {
-                TableCell castTableCell = (TableCell) tableCell;
-
-                Cell cell = row.createCell(columnIndex++);
-                LOGGER.debug("[{}] Setting cell value row:{}, column:{}, value:'{}'", getText(), row.getRowNum(), cell.getColumnIndex(), castTableCell.getText());
-                cell.setCellValue(castTableCell.getText());
-
-                if (castTableCell.getStyleClass().contains(SUMMARY_COLUMN_OR_CELL_CSS_CLASS)) {
-                    cell.setCellStyle(boldAndRightAlignedStyle);
-                } else if (castTableCell.getStyleClass().contains(ISSUE_CELL_CSS_CLASS)) {
-                    cell.setCellStyle(boldCellStyle);
-                } else {
-                    cell.setCellStyle(rightAlignedStyle);
-                }
-            }
-        }
+        columnRendererList.add(new TaskSummaryColumn());
+        columnRendererList.forEach(excelColumnRenderer -> excelColumnRenderer.renderCells(columnRendererList.indexOf(excelColumnRenderer), sheet, worklogResult.get(), getDisplayResult(worklogResult.get())));
 
         // autosize column widths
-        for (int i = 0; i < taskTableView.getColumns().size(); i++) {
+        for (int i = 0; i < columnRendererList.size(); i++) {
             sheet.autoSizeColumn(i);
         }
     }
