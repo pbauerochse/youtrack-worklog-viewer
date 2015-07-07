@@ -8,6 +8,7 @@ import de.pbauerochse.youtrack.domain.WorklogResult;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.JacksonUtil;
+import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -42,8 +43,6 @@ import java.util.function.Supplier;
 public class YouTrackConnector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackConnector.class);
-
-
 
     private static YouTrackConnector instance;
 
@@ -82,14 +81,16 @@ public class YouTrackConnector {
         }
     }
 
-    public void login(String youtrackUrl, String username, String password) throws Exception {
-        String loginUrl = buildYoutrackApiUrl(youtrackUrl, "user/login");
+    public void login() throws Exception {
+        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+
+        String loginUrl = buildYoutrackApiUrl("user/login");
 
         HttpPost request = new HttpPost(loginUrl);
 
         List<NameValuePair> requestParameters = new ArrayList<>();
-        requestParameters.add(new BasicNameValuePair("login", username));
-        requestParameters.add(new BasicNameValuePair("password", password));
+        requestParameters.add(new BasicNameValuePair("login", settings.getYoutrackUsername()));
+        requestParameters.add(new BasicNameValuePair("password", settings.getYoutrackPassword()));
         request.setEntity(new UrlEncodedFormEntity(requestParameters, "utf-8"));
 
         CloseableHttpResponse response = client.execute(request);
@@ -105,16 +106,37 @@ public class YouTrackConnector {
         }
     }
 
+    public void getPossibleGroupByCategories() throws IOException {
+        String getGroupByCategoriesUrl = buildYoutrackApiUrl("reports/timeReports/possibleGroupByCategories");
+
+        HttpGet request = new HttpGet(getGroupByCategoriesUrl);
+        request.addHeader("Accept", "application/json, text/plain, */*");
+
+        try (CloseableHttpResponse httpResponse = client.execute(request)) {
+            if (!isValidResponseCode(httpResponse.getStatusLine())) {
+                LOGGER.warn("Fetching groupBy categories from {} failed: {}", getGroupByCategoriesUrl, httpResponse.getStatusLine().getReasonPhrase());
+                EntityUtils.consumeQuietly(httpResponse.getEntity());
+                throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.groupbycategories", httpResponse.getStatusLine().getReasonPhrase(), httpResponse.getStatusLine().getStatusCode());
+            }
+
+            String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
+            LOGGER.debug("Received JSON groupByCategories response {}", jsonResponse);
+
+            // example response [{"name":"Work author","id":"WORK_AUTHOR"},{"name":"Work type","id":"WORK_TYPE"},{"name":"Priorität","id":"__CUSTOM_FIELD__Priority_1"},{"name":"Typ","id":"__CUSTOM_FIELD__Type_0"},{"name":"Status","id":"__CUSTOM_FIELD__State_2"},{"name":"Bearbeiter","id":"__CUSTOM_FIELD__Assignee_5"},{"name":"Komponente","id":"__CUSTOM_FIELD__components_9"},{"name":"Lösungsversion","id":"__CUSTOM_FIELD__Fix versions_7"},{"name":"Sprint","id":"__CUSTOM_FIELD__Sprint_21"},{"name":"Zeitschätzung","id":"__CUSTOM_FIELD__Estimation_12"},{"name":"Zeitaufwand","id":"__CUSTOM_FIELD__Spent time_17"},{"name":"Abrechnung","id":"__CUSTOM_FIELD__Abrechnung_19"},{"name":"Abnahme","id":"__CUSTOM_FIELD__Abnahme_20"},{"name":"Verlag","id":"__CUSTOM_FIELD__Verlag_18"},{"name":"bis wann","id":"__CUSTOM_FIELD__bis wann_23"},{"name":"Behoben in Build","id":"__CUSTOM_FIELD__Fixed in build_4"}]
+            // TODO parse and return response
+//            return JacksonUtil.parseValue(new StringReader(jsonResponse), ReportDetailsResponse.class);
+        }
+    }
+
     /**
      * Creates the temporary worklog report using the given url and timerange
-     * @param youtrackUrl The target url of the youtrack api
      * @param requestEntity The request entity for the report
      * @return
      * @throws Exception
      */
-    public ReportDetailsResponse createReport(String youtrackUrl, CreateReportRequestEntity requestEntity) throws Exception {
+    public ReportDetailsResponse createReport(CreateReportRequestEntity requestEntity) throws Exception {
         LOGGER.debug("Creating temporary timereport");
-        String createReportUrl = buildYoutrackApiUrl(youtrackUrl, "current/reports");
+        String createReportUrl = buildYoutrackApiUrl("current/reports");
 
         HttpPost createReportRequest = new HttpPost(createReportUrl);
 
@@ -143,8 +165,8 @@ public class YouTrackConnector {
         }
     }
 
-    public ReportDetailsResponse getReportDetails(String youtrackUrl, String reportId) throws Exception {
-        String reportUrlTemplate = buildYoutrackApiUrl(youtrackUrl, "current/reports/%s");
+    public ReportDetailsResponse getReportDetails(String reportId) throws Exception {
+        String reportUrlTemplate = buildYoutrackApiUrl("current/reports/%s");
         LOGGER.debug("Fetching report details from {}", reportUrlTemplate);
 
         HttpGet reportDetailsRequest = new HttpGet(String.format(reportUrlTemplate, reportId));
@@ -162,8 +184,8 @@ public class YouTrackConnector {
         }
     }
 
-    public void deleteReport(String youtrackUrl, String reportId) throws IOException {
-        String reportUrlTemplate = buildYoutrackApiUrl(youtrackUrl, "current/reports/%s");
+    public void deleteReport(String reportId) throws IOException {
+        String reportUrlTemplate = buildYoutrackApiUrl("current/reports/%s");
         LOGGER.debug("Deleting temporary report using url {}", reportUrlTemplate);
 
         HttpDelete deleteRequest = new HttpDelete(String.format(reportUrlTemplate, reportId));
@@ -178,8 +200,8 @@ public class YouTrackConnector {
         }
     }
 
-    public ByteArrayInputStream downloadReport(String youtrackUrl, String reportId) throws IOException {
-        String downloadReportUrlTemplate = YouTrackConnector.buildYoutrackApiUrl(youtrackUrl, "current/reports/%s/export");
+    public ByteArrayInputStream downloadReport(String reportId) throws IOException {
+        String downloadReportUrlTemplate = buildYoutrackApiUrl("current/reports/%s/export");
         HttpGet request = new HttpGet(String.format(downloadReportUrlTemplate, reportId));
         return client.execute(request, response -> {
             HttpEntity entity = response.getEntity();
@@ -202,10 +224,11 @@ public class YouTrackConnector {
         });
     }
 
-    public static String buildYoutrackApiUrl(String userDefinedUrl, String path) {
-        StringBuilder finalUrl = new StringBuilder(StringUtils.trim(userDefinedUrl));
+    public String buildYoutrackApiUrl(String path) {
+        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        StringBuilder finalUrl = new StringBuilder(StringUtils.trim(settings.getYoutrackUrl()));
 
-        if (!StringUtils.endsWith(userDefinedUrl, "/") && !StringUtils.startsWith(path, "/")) {
+        if (!StringUtils.endsWith(settings.getYoutrackUrl(), "/") && !StringUtils.startsWith(path, "/")) {
             finalUrl.append('/');
         }
 

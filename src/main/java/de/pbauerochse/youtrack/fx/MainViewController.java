@@ -12,6 +12,7 @@ import de.pbauerochse.youtrack.fx.tabs.WorklogTab;
 import de.pbauerochse.youtrack.fx.tasks.ExcelExporterTask;
 import de.pbauerochse.youtrack.fx.tasks.FetchTimereportContext;
 import de.pbauerochse.youtrack.fx.tasks.FetchTimereportTask;
+import de.pbauerochse.youtrack.fx.tasks.GetGroupByCategoriesTask;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
@@ -96,6 +97,10 @@ public class MainViewController implements Initializable {
         this.resources = resources;
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
+        if (!settings.hasMissingConnectionParameters()) {
+            loadGroupByCategories();
+        }
+
         modalOverlaySpinner.setVisible(false);
 
         startDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
@@ -142,6 +147,14 @@ public class MainViewController implements Initializable {
             LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.getSelectionModel().getSelectedItem().name());
             fetchWorklogButton.fire();
         }
+    }
+
+    private void loadGroupByCategories() {
+        GetGroupByCategoriesTask task = new GetGroupByCategoriesTask();
+
+        Thread thread = new Thread(task, "GroupByCategory Task");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     /**

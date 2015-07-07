@@ -7,9 +7,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.pbauerochse.youtrack.fx.MainViewController">
+<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.youtrack.fx.MainViewController">
 
     <top>
         <VBox>
@@ -18,19 +16,17 @@
                     <menus>
                         <Menu mnemonicParsing="false" text="%view.menu.file">
                             <items>
-                                <MenuItem fx:id="exportToExcelMenuItem" mnemonicParsing="false"
-                                          text="%view.menu.file.exportexcel"/>
-                                <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="%view.settings.title"/>
-                                <SeparatorMenuItem mnemonicParsing="false"/>
-                                <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" text="%view.menu.file.exit"/>
+                                <MenuItem fx:id="exportToExcelMenuItem" mnemonicParsing="false" text="%view.menu.file.exportexcel" />
+                                <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="%view.settings.title" />
+                                <SeparatorMenuItem mnemonicParsing="false" />
+                                <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" text="%view.menu.file.exit" />
                             </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="%view.menu.help">
                             <items>
-                                <MenuItem fx:id="logMessagesMenuItem" mnemonicParsing="false"
-                                          text="%view.menu.help.logs"/>
-                                <SeparatorMenuItem mnemonicParsing="false"/>
-                                <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="%view.menu.help.about"/>
+                                <MenuItem fx:id="logMessagesMenuItem" mnemonicParsing="false" text="%view.menu.help.logs" />
+                                <SeparatorMenuItem mnemonicParsing="false" />
+                                <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="%view.menu.help.about" />
                             </items>
                         </Menu>
                     </menus>
@@ -42,44 +38,40 @@
     <bottom>
         <StackPane BorderPane.alignment="CENTER">
             <children>
-                <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0"/>
+                <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
                 <Text fx:id="progressText" strokeType="OUTSIDE" strokeWidth="0.0" text="">
                     <font>
-                        <Font size="10.0"/>
+                        <Font size="10.0" />
                     </font>
                 </Text>
             </children>
         </StackPane>
     </bottom>
     <center>
-        <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
-                   BorderPane.alignment="TOP_LEFT">
+        <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="TOP_LEFT">
             <children>
                 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                     <children>
                         <ToolBar maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                             <items>
-                                <Label text="%view.main.timerange"/>
-                                <ComboBox fx:id="timerangeComboBox" prefWidth="150.0"/>
-                                <DatePicker prefWidth="120.0" fx:id="startDatePicker"/>
-                                <DatePicker prefWidth="120.0" fx:id="endDatePicker"/>
-                                <Button fx:id="fetchWorklogButton" mnemonicParsing="false" prefHeight="26.0"
-                                        prefWidth="26.0">
+                                <Label text="%view.main.timerange" />
+                                <ComboBox fx:id="timerangeComboBox" prefWidth="150.0" />
+                                <DatePicker fx:id="startDatePicker" prefWidth="120.0" promptText="Start Date" />
+                                <DatePicker fx:id="endDatePicker" prefWidth="120.0" promptText="End Date" />
+                        <ComboBox prefWidth="150.0" promptText="Group By" />
+                                <Button fx:id="fetchWorklogButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0">
                                     <tooltip>
-                                        <Tooltip text="%view.main.download"/>
+                                        <Tooltip text="%view.main.download" />
                                     </tooltip>
                                 </Button>
                             </items>
                         </ToolBar>
-                        <TabPane fx:id="resultTabPane" maxHeight="1.7976931348623157E308"
-                                 maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE"
-                                 BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS"/>
+                        <TabPane fx:id="resultTabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS" />
                     </children>
                 </VBox>
-                <StackPane fx:id="modalOverlaySpinner" style="-fx-background-color: rgba(0, 0, 0, 0.5);"
-                           visible="false">
+                <StackPane fx:id="modalOverlaySpinner" style="-fx-background-color: rgba(0, 0, 0, 0.5);" visible="false">
                     <children>
-                        <ProgressIndicator maxHeight="60.0" maxWidth="60.0" StackPane.alignment="CENTER"/>
+                        <ProgressIndicator maxHeight="60.0" maxWidth="60.0" StackPane.alignment="CENTER" />
                     </children>
                 </StackPane>
             </children>
