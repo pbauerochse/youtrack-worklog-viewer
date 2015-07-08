@@ -1,8 +1,6 @@
 package de.pbauerochse.youtrack.connector.createreport;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import de.pbauerochse.youtrack.connector.createreport.request.CreateReportRange;
 
 import java.util.ArrayList;

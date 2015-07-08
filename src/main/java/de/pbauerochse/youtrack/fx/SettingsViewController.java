@@ -3,7 +3,6 @@ package de.pbauerochse.youtrack.fx;
 import de.pbauerochse.youtrack.util.SettingsUtil;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
