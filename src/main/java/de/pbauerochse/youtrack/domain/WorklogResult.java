@@ -53,6 +53,10 @@ public class WorklogResult {
         return distinctProjectNames;
     }
 
+    public List<String> getDistinctGroupValues() {
+        return distinctGroupValues;
+    }
+
     public ReportTimerange getTimerange() {
         return timerange;
     }

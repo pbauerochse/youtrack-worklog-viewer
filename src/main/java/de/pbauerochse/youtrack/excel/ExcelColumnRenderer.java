@@ -2,10 +2,8 @@ package de.pbauerochse.youtrack.excel;
 
 import de.pbauerochse.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.youtrack.domain.WorklogResult;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import javafx.scene.control.TreeItem;
+import org.apache.poi.ss.usermodel.*;
 
 import java.util.List;
 
@@ -15,12 +13,24 @@ import java.util.List;
  */
 public abstract class ExcelColumnRenderer {
 
-    public abstract void renderCells(int columnIndex, Sheet sheet, WorklogResult result, List<TaskWithWorklogs> displayResult);
+    private static final int ADDITIONAL_ROW_HEIGHT = 5;
+
+    public abstract void renderCells(int columnIndex, Sheet sheet, WorklogResult result, List<TreeItem<TaskWithWorklogs>> treeItemList);
 
     private Font boldFont;
+    private Font biggerBoldFont;
     private CellStyle boldCellStyle;
     private CellStyle boldRightAlignedCellStyle;
     private CellStyle regularRightAlignedCellStyle;
+    private CellStyle groupHeadlineCellStyle;
+    private CellStyle groupHeadlineWorklogCellStyle;
+
+    protected void adjustRowHeight(Cell cellWithStyles) {
+        Font font = cellWithStyles.getSheet().getWorkbook().getFontAt(cellWithStyles.getCellStyle().getFontIndex());
+        short fontHeightInPoints = font.getFontHeightInPoints();
+        Row row = cellWithStyles.getRow();
+        row.setHeightInPoints(Math.max(fontHeightInPoints + ADDITIONAL_ROW_HEIGHT, row.getHeightInPoints()));
+    }
 
     protected Row getOrCreateRow(int rowIndex, Sheet sheet) {
         Row row = sheet.getRow(rowIndex);
@@ -35,6 +45,7 @@ public abstract class ExcelColumnRenderer {
             boldCellStyle = sheet.getWorkbook().createCellStyle();
             boldCellStyle.setFont(getBoldFont(sheet));
             boldCellStyle.setAlignment(CellStyle.ALIGN_CENTER);
+            boldCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
         }
         return boldCellStyle;
     }
@@ -43,6 +54,7 @@ public abstract class ExcelColumnRenderer {
         if (regularRightAlignedCellStyle == null) {
             regularRightAlignedCellStyle = sheet.getWorkbook().createCellStyle();
             regularRightAlignedCellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+            regularRightAlignedCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
         }
         return regularRightAlignedCellStyle;
     }
@@ -52,15 +64,45 @@ public abstract class ExcelColumnRenderer {
             boldRightAlignedCellStyle = sheet.getWorkbook().createCellStyle();
             boldRightAlignedCellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
             boldRightAlignedCellStyle.setFont(getBoldFont(sheet));
+            boldRightAlignedCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
         }
         return boldRightAlignedCellStyle;
+    }
+
+    protected CellStyle getGroupHeadlineCellStyle(Sheet sheet) {
+        if (groupHeadlineCellStyle == null) {
+            groupHeadlineCellStyle = sheet.getWorkbook().createCellStyle();
+            groupHeadlineCellStyle.setFont(getBiggerBoldFont(sheet));
+            groupHeadlineCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+        }
+        return groupHeadlineCellStyle;
+    }
+
+    protected CellStyle getGroupHeadlineWorklogCellStyle(Sheet sheet) {
+        if (groupHeadlineWorklogCellStyle == null) {
+            groupHeadlineWorklogCellStyle = sheet.getWorkbook().createCellStyle();
+            groupHeadlineWorklogCellStyle.setFont(getBiggerBoldFont(sheet));
+            groupHeadlineWorklogCellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+            groupHeadlineWorklogCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+        }
+        return groupHeadlineWorklogCellStyle;
     }
 
     private Font getBoldFont(Sheet sheet) {
         if (boldFont == null) {
             boldFont = sheet.getWorkbook().createFont();
+            boldFont.setFontHeightInPoints((short) 12);
             boldFont.setBold(true);
         }
         return boldFont;
+    }
+
+    private Font getBiggerBoldFont(Sheet sheet) {
+        if (biggerBoldFont == null) {
+            biggerBoldFont = sheet.getWorkbook().createFont();
+            biggerBoldFont.setBold(true);
+            biggerBoldFont.setFontHeightInPoints((short) 14);
+        }
+        return biggerBoldFont;
     }
 }

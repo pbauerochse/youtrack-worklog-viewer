@@ -5,9 +5,9 @@ import de.pbauerochse.youtrack.domain.TimerangeProvider;
 import de.pbauerochse.youtrack.domain.WorklogItem;
 import de.pbauerochse.youtrack.domain.WorklogResult;
 import de.pbauerochse.youtrack.excel.ExcelColumnRenderer;
-import de.pbauerochse.youtrack.excel.columns.TaskColumn;
-import de.pbauerochse.youtrack.excel.columns.TaskSummaryColumn;
-import de.pbauerochse.youtrack.excel.columns.WorkdayColumn;
+import de.pbauerochse.youtrack.excel.columns.TaskDescriptionExcelColumn;
+import de.pbauerochse.youtrack.excel.columns.TaskWorklogSummaryExcelColumn;
+import de.pbauerochse.youtrack.excel.columns.WorklogExcelColumn;
 import de.pbauerochse.youtrack.fx.tablecolumns.TaskDescriptionTreeTableColumn;
 import de.pbauerochse.youtrack.fx.tablecolumns.TaskWorklogSummaryTreeTableColumn;
 import de.pbauerochse.youtrack.fx.tablecolumns.WorklogTreeTableColumn;
@@ -15,6 +15,7 @@ import de.pbauerochse.youtrack.fx.tasks.FetchTimereportContext;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -446,7 +447,7 @@ public abstract class WorklogTab extends Tab {
         LOGGER.debug("[{}] Exporting data to excel", getText());
 
         List<ExcelColumnRenderer> columnRendererList = new ArrayList<>();
-        columnRendererList.add(new TaskColumn());
+        columnRendererList.add(new TaskDescriptionExcelColumn());
 
         TimerangeProvider timerangeProvider = fetchTimereportContext.get().getTimerangeProvider();
         LocalDate startDate = timerangeProvider.getStartDate();
@@ -457,11 +458,18 @@ public abstract class WorklogTab extends Tab {
             LocalDate currentColumnDate = timerangeProvider.getStartDate().plus(days, ChronoUnit.DAYS);
             DayOfWeek currentColumnDayOfWeek = currentColumnDate.getDayOfWeek();
             String displayDate = FormattingUtil.formatDate(currentColumnDate);
-            columnRendererList.add(new WorkdayColumn(displayDate, currentColumnDate));
+            columnRendererList.add(new WorklogExcelColumn(displayDate, currentColumnDate));
         }
 
-        columnRendererList.add(new TaskSummaryColumn());
-        columnRendererList.forEach(excelColumnRenderer -> excelColumnRenderer.renderCells(columnRendererList.indexOf(excelColumnRenderer), sheet, worklogResult.get(), getDisplayResult(worklogResult.get())));
+        columnRendererList.add(new TaskWorklogSummaryExcelColumn());
+
+        TreeItem<TaskWithWorklogs> root = taskTableView.getRoot();
+        ObservableList<TreeItem<TaskWithWorklogs>> children = root.getChildren();
+
+        for (int columnIndex = 0; columnIndex < columnRendererList.size(); columnIndex++) {
+            ExcelColumnRenderer excelColumnRenderer = columnRendererList.get(columnIndex);
+            excelColumnRenderer.renderCells(columnIndex, sheet, worklogResult.get(), children);
+        }
 
         // autosize column widths
         for (int i = 0; i < columnRendererList.size(); i++) {
