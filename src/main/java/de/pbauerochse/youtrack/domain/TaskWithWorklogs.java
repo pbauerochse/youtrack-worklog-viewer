@@ -13,6 +13,7 @@ public class TaskWithWorklogs {
     private String project;
     private String issue;
     private String summary;
+    private String group;
     private long estimatedWorktimeInMinutes;
 
     private List<WorklogItem> worklogItemList = new ArrayList<>(50);
@@ -45,6 +46,14 @@ public class TaskWithWorklogs {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 
     public long getEstimatedWorktimeInMinutes() {

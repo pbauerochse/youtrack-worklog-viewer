@@ -46,7 +46,7 @@ public class FetchTimereportTask extends Task<WorklogResult> {
         updateProgress(10, 100);
 
         // create report
-        CreateReportRequestEntity reportRequestEntity = new CreateReportRequestEntity(context.getTimerangeProvider());
+        CreateReportRequestEntity reportRequestEntity = new CreateReportRequestEntity(context);
         updateMessage(FormattingUtil.getFormatted("worker.progress.creatingreport", FormattingUtil.getFormatted(context.getTimerangeProvider().getReportTimerange().getLabelKey())));
         ReportDetailsResponse reportDetailsResponse = connector.createReport(reportRequestEntity);
         updateProgress(50, 100);

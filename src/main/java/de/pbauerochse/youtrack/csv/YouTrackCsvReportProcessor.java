@@ -77,6 +77,7 @@ public class YouTrackCsvReportProcessor {
             taskWithWorklogs = new TaskWithWorklogs(false);
             taskWithWorklogs.setIssue(taskId);
             taskWithWorklogs.setSummary(csvLine[ISSUE_SUMMARY_COLUMN_INDEX]);
+            taskWithWorklogs.setGroup(csvLine[GROUPNAME_SUMMARY_COLUMN_INDEX]);
 
             Matcher matcher = PROJECT_ID_PATTERN.matcher(taskId);
             if (matcher.matches()) {

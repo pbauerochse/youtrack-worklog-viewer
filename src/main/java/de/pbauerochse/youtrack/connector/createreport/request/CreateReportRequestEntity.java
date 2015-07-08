@@ -1,8 +1,10 @@
 package de.pbauerochse.youtrack.connector.createreport.request;
 
 import de.pbauerochse.youtrack.connector.createreport.BasicReportDetails;
+import de.pbauerochse.youtrack.domain.GroupByCategory;
 import de.pbauerochse.youtrack.domain.ReportTimerange;
 import de.pbauerochse.youtrack.domain.TimerangeProvider;
+import de.pbauerochse.youtrack.fx.tasks.FetchTimereportContext;
 
 /**
  * @author Patrick Bauerochse
@@ -10,13 +12,19 @@ import de.pbauerochse.youtrack.domain.TimerangeProvider;
  */
 public class CreateReportRequestEntity extends BasicReportDetails {
 
-    public static final String REPORT_TYPE_TIME = "time";
+    private static final String REPORT_TYPE_TIME = "time";
 
-    public CreateReportRequestEntity(TimerangeProvider timerangeProvider) {
+    public CreateReportRequestEntity(FetchTimereportContext fetchTimereportContext) {
+        TimerangeProvider timerangeProvider = fetchTimereportContext.getTimerangeProvider();
         if (timerangeProvider.getReportTimerange() == ReportTimerange.CUSTOM) {
             init(new FixedReportRange(timerangeProvider.getStartDate(), timerangeProvider.getEndDate()));
         } else {
             init(new NamedReportRange(timerangeProvider.getReportTimerange()));
+        }
+
+        GroupByCategory groupByCategory = fetchTimereportContext.getGroupByCategory();
+        if (groupByCategory != null && !groupByCategory.isNoGroupByCriteria()) {
+            getParameters().setGroupById(groupByCategory.getId());
         }
     }
 

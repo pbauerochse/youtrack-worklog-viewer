@@ -7,6 +7,7 @@ import de.pbauerochse.youtrack.domain.GroupByCategory;
 import de.pbauerochse.youtrack.domain.ReportTimerange;
 import de.pbauerochse.youtrack.domain.TimerangeProvider;
 import de.pbauerochse.youtrack.domain.timerangeprovider.TimerangeProviderFactory;
+import de.pbauerochse.youtrack.fx.tasks.FetchTimereportContext;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +29,10 @@ public class JacksonSerializerTest {
     @Test
     public void testCreateReportParameters() throws Exception {
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(ReportTimerange.THIS_WEEK, null, null);
-        CreateReportRequestEntity entity = new CreateReportRequestEntity(timerangeProvider);
+        GroupByCategory groupByCategory = new GroupByCategory();
+        groupByCategory.setId("__CUSTOM_FIELD_12312313");
+        groupByCategory.setName("Category");
+        CreateReportRequestEntity entity = new CreateReportRequestEntity(new FetchTimereportContext(timerangeProvider, groupByCategory));
         String asString = JacksonUtil.writeObject(entity);
         Assert.assertEquals(EXPECTED_SERIALIZATION_RESULT, asString);
     }

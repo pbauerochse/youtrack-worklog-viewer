@@ -263,7 +263,8 @@ public class MainViewController implements Initializable {
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
 
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, selectedStartDate, selectedEndDate);
-        FetchTimereportContext context = new FetchTimereportContext(timerangeProvider);
+        FetchTimereportContext context = new FetchTimereportContext(timerangeProvider, groupByCategoryComboBox.getSelectionModel().getSelectedItem());
+
         FetchTimereportTask fetchTimereportTask = new FetchTimereportTask(context);
 
         // success handler

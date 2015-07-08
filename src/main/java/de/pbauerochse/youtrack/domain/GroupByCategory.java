@@ -1,5 +1,7 @@
 package de.pbauerochse.youtrack.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Patrick Bauerochse
  * @since 08.07.15
@@ -24,4 +26,10 @@ public class GroupByCategory {
     public void setName(String name) {
         this.name = name;
     }
+
+    @JsonIgnore
+    public boolean isNoGroupByCriteria() {
+        return id == null;
+    }
+
 }

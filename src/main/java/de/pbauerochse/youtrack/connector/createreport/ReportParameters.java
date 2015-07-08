@@ -18,6 +18,7 @@ public class ReportParameters {
     private List<String> projects = new ArrayList<>(0);
     private String queryUrl;
     private CreateReportRange range;
+    private String groupById;
 
     public List<String> getProjects() {
         return projects;
@@ -41,5 +42,13 @@ public class ReportParameters {
 
     public void setRange(CreateReportRange range) {
         this.range = range;
+    }
+
+    public String getGroupById() {
+        return groupById;
+    }
+
+    public void setGroupById(String groupById) {
+        this.groupById = groupById;
     }
 }
