@@ -1,10 +1,10 @@
 package de.pbauerochse.youtrack.fx;
 
 import de.pbauerochse.youtrack.WorklogViewer;
-import de.pbauerochse.youtrack.domain.ReportTimerange;
-import de.pbauerochse.youtrack.domain.TimerangeProvider;
-import de.pbauerochse.youtrack.domain.WorklogResult;
+import de.pbauerochse.youtrack.domain.*;
 import de.pbauerochse.youtrack.domain.timerangeprovider.TimerangeProviderFactory;
+import de.pbauerochse.youtrack.fx.converter.GroupByCategoryStringConverter;
+import de.pbauerochse.youtrack.fx.converter.ReportTimerangeStringConverter;
 import de.pbauerochse.youtrack.fx.tabs.AllWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.OwnWorklogsTab;
 import de.pbauerochse.youtrack.fx.tabs.ProjectWorklogTab;
@@ -16,7 +16,9 @@ import de.pbauerochse.youtrack.fx.tasks.GetGroupByCategoriesTask;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
-import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -29,14 +31,15 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.StringConverter;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -48,10 +51,13 @@ public class MainViewController implements Initializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainViewController.class);
 
     private static final int AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS = 2;  // two fixed tabs (own and all)
-    public static final String REQUIRED_FIELD_CLASS = "required";
+    private static final String REQUIRED_FIELD_CLASS = "required";
 
     @FXML
     private ComboBox<ReportTimerange> timerangeComboBox;
+
+    @FXML
+    private ComboBox<GroupByCategory> groupByCategoryComboBox;
 
     @FXML
     private Button fetchWorklogButton;
@@ -81,7 +87,7 @@ public class MainViewController implements Initializable {
     private TabPane resultTabPane;
 
     @FXML
-    private StackPane modalOverlaySpinner;
+    private StackPane waitScreenOverlay;
 
     @FXML
     private DatePicker startDatePicker;
@@ -90,160 +96,129 @@ public class MainViewController implements Initializable {
     private DatePicker endDatePicker;
 
     private ResourceBundle resources;
+    private SettingsUtil.Settings settings;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.debug("Initializing main view");
         this.resources = resources;
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
-        if (!settings.hasMissingConnectionParameters()) {
-            loadGroupByCategories();
-        }
-
-        modalOverlaySpinner.setVisible(false);
-
-        startDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
-        endDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
-
-        exportToExcelMenuItem.disableProperty().bind(resultTabPane.getSelectionModel().selectedItemProperty().isNull());
-        exportToExcelMenuItem.setOnAction(event -> startExportToExcelTask((WorklogTab) resultTabPane.getSelectionModel().getSelectedItem()));
+        settings = SettingsUtil.loadSettings();
 
         // prepopulate timerange dropdown
-        timerangeComboBox.setConverter(getTimerangeComboBoxConverter());
+        timerangeComboBox.setConverter(new ReportTimerangeStringConverter());
         timerangeComboBox.getItems().addAll(ReportTimerange.values());
-        timerangeComboBox.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+        timerangeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                ReportTimerange timerange = timerangeComboBox.getSelectionModel().getSelectedItem();
-                settings.setLastUsedReportTimerange(timerange);
+                // update settings
+                settings.lastUsedReportTimerangeProperty().setValue(newValue);
 
-                TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, null, null);
+                // prepopulate start and end datepickers and remove error labels
+                TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, null, null);
                 startDatePicker.setValue(timerangeProvider.getStartDate());
                 endDatePicker.setValue(timerangeProvider.getEndDate());
+            }
+        });
 
+        // prepopulate report timerange combobox with last used value
+        timerangeComboBox.getSelectionModel().select(settings.getLastUsedReportTimerange());
+
+        // group by combobox converter
+        groupByCategoryComboBox.disableProperty().bind(groupByCategoryComboBox.itemsProperty().isNull());
+        groupByCategoryComboBox.setConverter(new GroupByCategoryStringConverter(groupByCategoryComboBox));
+
+        // start and end datepicker are only editable if report timerange is CUSTOM
+        startDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
+        startDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                startDatePicker.getStyleClass().add(REQUIRED_FIELD_CLASS);
+            } else {
                 startDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
+            }
+        });
+        endDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
+        endDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                endDatePicker.getStyleClass().add(REQUIRED_FIELD_CLASS);
+            } else {
                 endDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
             }
         });
 
-        if (settings.getLastUsedReportTimerange() != null) {
-            timerangeComboBox.getSelectionModel().select(settings.getLastUsedReportTimerange());
-        } else {
-            timerangeComboBox.getSelectionModel().select(ReportTimerange.THIS_WEEK);    // preselect "this week"
-        }
+        // fetch worklog button click
+        fetchWorklogButton.disableProperty().bind(settings.hasMissingConnectionParameters());
+        fetchWorklogButton.setOnAction(clickEvent -> startFetchWorklogsTask());
 
-        // menu items click
+        // export to excel only possible if resultTabPane is not empty and therefore seems to contain data
+        exportToExcelMenuItem.disableProperty().bind(resultTabPane.getSelectionModel().selectedItemProperty().isNull());
+
+        // menu items click actions
+        exportToExcelMenuItem.setOnAction(event -> startExportToExcelTask());
         settingsMenuItem.setOnAction(event -> showSettingsDialogue());
         exitMenuItem.setOnAction(event -> WorklogViewer.getInstance().requestShutdown());
         logMessagesMenuItem.setOnAction(event -> showLogMessagesDialogue());
         aboutMenuItem.setOnAction(event -> showAboutDialogue());
 
-        // fetch worklog button click
-        fetchWorklogButton.setOnAction(clickEvent -> handleFetchWorklogButtonClick(settings));
+        // workaround to detect whether the whole form has been rendered to screen yet
+        progressBar.sceneProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue == null && newValue != null) {
+                onFormShown();
+            }
+        });
+
+        // load group by criteria when connection parameters are present
+        if (!settings.hasMissingConnectionParameters().get()) {
+            startGetGroupByCategoriesTask();
+        }
+    }
+
+    private void onFormShown() {
+        LOGGER.debug("MainForm shown");
+
+        if (settings.hasMissingConnectionParameters().get()) {
+            LOGGER.info("No YouTrack connection settings defined yet. Opening settings dialogue");
+            showSettingsDialogue();
+        }
 
         // auto load data if a named timerange was selected
         // and the user chose to load data at startup
-        if (timerangeComboBox.getSelectionModel().getSelectedItem() != ReportTimerange.CUSTOM && settings.isLoadDataAtStartup()) {
+        if (timerangeComboBox.getSelectionModel().getSelectedItem() != ReportTimerange.CUSTOM && settings.getLoadDataAtStartup()) {
             LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.getSelectionModel().getSelectedItem().name());
             fetchWorklogButton.fire();
         }
     }
 
-    private void loadGroupByCategories() {
+    /**
+     * Fetches groupBy criteria from YouTrack
+     */
+    private void startGetGroupByCategoriesTask() {
+        LOGGER.info("Fetching GroupByCategories");
         GetGroupByCategoriesTask task = new GetGroupByCategoriesTask();
+        task.setOnSucceeded(event -> {
+            List<GroupByCategory> categoryList = (List<GroupByCategory>) event.getSource().getValue();
+            LOGGER.info("{} succeeded with {} GroupByCategories", task.getTitle(), categoryList.size());
 
-        Thread thread = new Thread(task, "GroupByCategory Task");
-        thread.setDaemon(true);
-        thread.start();
-    }
+            GroupByCategory noGroupByCategory = new GroupByCategory();
+            noGroupByCategory.setId(null);
+            noGroupByCategory.setName(FormattingUtil.getFormatted("view.main.groupby.nogroupby"));
+            categoryList.add(0, noGroupByCategory);
 
-    /**
-     * Fetch worklogs if all settings are set,
-     * otherwise trigger the "open settings" button
-     *
-     * @param settings The settings object from the SettingsManager
-     */
-    private void handleFetchWorklogButtonClick(SettingsUtil.Settings settings) {
-        LOGGER.debug("Fetch worklogs button clicked");
-        if (settings.hasMissingConnectionParameters()) {
-            // connection data missing hence trigger settings button click and show warning
-            LOGGER.info("No settings present yet, redirecting user to settings dialogue");
-            progressText.setText(FormattingUtil.getFormatted("view.main.warning.settingsblank"));
-            settingsMenuItem.fire();
-        } else {
-            // settings present, fetch worklogs
-            fetchWorklogs(settings, timerangeComboBox.getSelectionModel().getSelectedItem());
-        }
-    }
-
-    /**
-     * Get the converter for the ReportTimerange ComboBox
-     *
-     * @return a converter from {@link ReportTimerange} to {@link String} and back
-     */
-    private static StringConverter<ReportTimerange> getTimerangeComboBoxConverter() {
-        return new StringConverter<ReportTimerange>() {
-            @Override
-            public String toString(ReportTimerange object) {
-                return FormattingUtil.getFormatted(object.getLabelKey());
-            }
-
-            @Override
-            public ReportTimerange fromString(String string) {
-                for (ReportTimerange timerange : ReportTimerange.values()) {
-                    if (StringUtils.equals(FormattingUtil.getFormatted(timerange.getLabelKey()), string)) {
-                        return timerange;
-                    }
-                }
-                return null;
-            }
-        };
-    }
-
-    /**
-     * Opens the settings dialogue
-     */
-    private void showSettingsDialogue() {
-        LOGGER.debug("Showing settings dialogue");
-        openDialogue("/fx/views/settings.fxml", "view.settings.title", true);
-    }
-
-    private void showLogMessagesDialogue() {
-        LOGGER.debug("Showing log messages dialogue");
-        openDialogue("/fx/views/logMessagesView.fxml", "view.menu.help.logs", false);
-    }
-
-    private void showAboutDialogue() {
-        LOGGER.debug("Showing log messages dialogue");
-        openDialogue("/fx/views/about.fxml", "view.menu.help.about", true);
-    }
-
-    private void openDialogue(String view, String titleResourceKey, boolean modal) {
-        Platform.runLater(() -> {
-            try {
-                Parent settingsContent = FXMLLoader.load(MainViewController.class.getResource(view), resources);
-
-                Scene settingsScene = new Scene(settingsContent);
-                Stage settingsStage = new Stage();
-                settingsStage.initOwner(progressBar.getScene().getWindow());
-
-                if (modal) {
-                    settingsStage.initStyle(StageStyle.UTILITY);
-                    settingsStage.initModality(Modality.APPLICATION_MODAL);
-                    settingsStage.setResizable(false);
-                }
-
-                settingsStage.setTitle(FormattingUtil.getFormatted(titleResourceKey));
-                settingsStage.setScene(settingsScene);
-                settingsStage.showAndWait();
-            } catch (IOException e) {
-                LOGGER.error("Could not open dialogue {}", view, e);
-                throw ExceptionUtil.getRuntimeException("exceptions.view.io", e, view);
-            }
+            groupByCategoryComboBox.getItems().addAll(categoryList);
+            groupByCategoryComboBox.getSelectionModel().select(noGroupByCategory);
         });
+
+        startTask(task);
     }
 
-    private void startExportToExcelTask(WorklogTab tab) {
+    /**
+     * Exports the currently visible data to an excel spreadsheet
+     */
+    private void startExportToExcelTask() {
+
+        // currently visible tab
+        WorklogTab tab = (WorklogTab) resultTabPane.getSelectionModel().getSelectedItem();
+
+        // ask the user where to save the excel to
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(FormattingUtil.getFormatted("view.menu.file.exportexcel"));
         fileChooser.setInitialFileName(tab.getExcelDownloadSuggestedFilename());
@@ -252,126 +227,124 @@ public class MainViewController implements Initializable {
         File targetFile = fileChooser.showSaveDialog(progressBar.getScene().getWindow());
         if (targetFile != null) {
             LOGGER.debug("Exporting tab {} to excel {}", tab.getText(), targetFile.getAbsoluteFile());
-            showWaitScreen();
 
             ExcelExporterTask excelExporterTask = new ExcelExporterTask(tab, targetFile);
-
-            excelExporterTask.stateProperty().addListener((observable, oldValue, newValue) -> {
-                LOGGER.debug("Thread changed from {} to {}", oldValue, newValue);
-            });
-
-            // error handler
-            excelExporterTask.setOnFailed(event -> {
-                Throwable throwable = event.getSource().getException();
-                LOGGER.warn("Creating excel failed", throwable);
-                displayError(throwable);
-                hideWaitScreen();
-            });
-
-            // success handler
             excelExporterTask.setOnSucceeded(event -> {
                 LOGGER.info("Excel creation succeeded");
                 File result = (File) event.getSource().getValue();
-                progressText.textProperty().unbind();
-                progressBar.progressProperty().unbind();
                 progressText.setText(FormattingUtil.getFormatted("exceptions.excel.success", result.getAbsoluteFile()));
-                hideWaitScreen();
             });
 
-            // bind progressbar and -text property to task
-            progressText.textProperty().unbind();
-            progressBar.progressProperty().unbind();
-            progressText.textProperty().bind(excelExporterTask.messageProperty());
-            progressBar.progressProperty().bind(excelExporterTask.progressProperty());
-
-            // start task
-            Thread thread = new Thread(excelExporterTask, "ExcelReportGenerator");
-            thread.setDaemon(true);
-            thread.start();
+            startTask(excelExporterTask);
         }
     }
 
-    private void fetchWorklogs(SettingsUtil.Settings settings, ReportTimerange timerange) {
+    /**
+     * Fetches the worklogs for the currently defined settings from YouTrack
+     */
+    private void startFetchWorklogsTask() {
+
+        // sanity checks
+        LocalDate selectedStartDate = startDatePicker.getValue();
+        LocalDate selectedEndDate = endDatePicker.getValue();
+
+        if (selectedStartDate == null || selectedEndDate == null) {
+            LOGGER.warn("Startdate or enddate were null");
+            progressText.setText(FormattingUtil.getFormatted("exceptions.timerange.datesrequired"));
+            return;
+        } else if (selectedStartDate.isAfter(selectedEndDate)) {
+            LOGGER.warn("Startdate was after enddate");
+            progressText.setText(FormattingUtil.getFormatted("exceptions.timerange.startafterend"));
+            return;
+        }
+
+        // start the task
+        ReportTimerange timerange = timerangeComboBox.getSelectionModel().getSelectedItem();
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
 
-        progressText.textProperty().unbind();
-        progressBar.progressProperty().unbind();
-
-        if (startDatePicker.getValue() == null) {
-            startDatePicker.getStyleClass().add(REQUIRED_FIELD_CLASS);
-        } else {
-            startDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
-        }
-
-        if (endDatePicker.getValue() == null) {
-            endDatePicker.getStyleClass().add(REQUIRED_FIELD_CLASS);
-        } else {
-            endDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
-        }
-
-        // sanity checks if ReportTimerange == CUSTOM
-        if (timerange == ReportTimerange.CUSTOM && (startDatePicker.getValue() == null || endDatePicker.getValue() == null)) {
-            progressText.setText(FormattingUtil.getFormatted("exceptions.customrange.datesrequired"));
-            return;
-        } else if (startDatePicker.getValue().isAfter(endDatePicker.getValue())) {
-            progressText.setText(FormattingUtil.getFormatted("exceptions.customrange.startafterend"));
-            return;
-        }
-
-        showWaitScreen();
-
-        TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, startDatePicker.getValue(), endDatePicker.getValue());
+        TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, selectedStartDate, selectedEndDate);
         FetchTimereportContext context = new FetchTimereportContext(timerangeProvider);
-        FetchTimereportTask worklogTaskForUser = new FetchTimereportTask(context);
+        FetchTimereportTask fetchTimereportTask = new FetchTimereportTask(context);
 
-        worklogTaskForUser.stateProperty().addListener((observable, oldValue, newValue) -> {
-            LOGGER.debug("Thread changed from {} to {}", oldValue, newValue);
+        // success handler
+        fetchTimereportTask.setOnSucceeded(event -> {
+            LOGGER.info("Fetching worklogs succeeded");
+            WorklogResult result = (WorklogResult) event.getSource().getValue();
+            displayWorklogResult(result, context, settings);
+        });
+
+        startTask(fetchTimereportTask);
+    }
+
+    /**
+     * Starts a thread performing the given task
+     * @param task The task to perform
+     */
+    private void startTask(Task task) {
+        LOGGER.info("Starting task {}", task.getTitle());
+        waitScreenOverlay.setVisible(true);
+
+        // success handler
+        EventHandler<WorkerStateEvent> onSucceededEventHandler = task.getOnSucceeded();
+        task.setOnSucceeded(event -> {
+            LOGGER.info("Task {} succeeded", task.getTitle());
+            WorkerStateEvent asWorkerstateEvent = (WorkerStateEvent) event; // stupid compiler sometimes gets confused in lambdas
+
+            // unbind progress indicators
+            progressText.textProperty().unbind();
+            progressBar.progressProperty().unbind();
+
+            if (onSucceededEventHandler != null) {
+                LOGGER.debug("Delegating Event to previous onSucceeded event handler");
+                onSucceededEventHandler.handle(asWorkerstateEvent);
+            }
+
+            waitScreenOverlay.setVisible(false);
         });
 
         // error handler
-        worklogTaskForUser.setOnFailed(event -> {
-            Throwable throwable = event.getSource().getException();
-            LOGGER.warn("Fetching worklogs failed", throwable);
-            displayError(throwable);
-            hideWaitScreen();
+        EventHandler<WorkerStateEvent> onFailedEventHandler = task.getOnFailed();
+        task.setOnFailed(event -> {
+            LOGGER.warn("Task {} failed", task.getTitle());
+            WorkerStateEvent asWorkerstateEvent = (WorkerStateEvent) event; // stupid compiler sometimes gets confused in lambdas
+
+            // unbind progress indicators
+            progressText.textProperty().unbind();
+            progressBar.progressProperty().unbind();
+
+            if (onFailedEventHandler != null) {
+                LOGGER.debug("Delegating Event to previous onFailed event handler");
+                onFailedEventHandler.handle(asWorkerstateEvent);
+            }
+
+            Throwable throwable = asWorkerstateEvent.getSource().getException();
+            if (throwable != null) {
+                LOGGER.warn("Showing error to user", throwable);
+                progressText.setText(throwable.getMessage());
+            } else {
+                progressText.setText(FormattingUtil.getFormatted("exceptions.main.worker.unknown"));
+            }
+
+            waitScreenOverlay.setVisible(false);
         });
 
-        // success handler
-        worklogTaskForUser.setOnSucceeded(event -> {
-            LOGGER.info("Fetching worklogs succeeded");
-            WorklogResult result = (WorklogResult) event.getSource().getValue();
-            displayResult(result, context, settings);
-            hideWaitScreen();
-        });
+        // state change listener just for logging purposes
+        task.stateProperty().addListener((observable, oldValue, newValue) -> LOGGER.debug("Task {} changed from {} to {}", task.getTitle(), oldValue, newValue));
 
-        // bind progressbar and -text property to task
-        progressText.textProperty().bind(worklogTaskForUser.messageProperty());
-        progressBar.progressProperty().bind(worklogTaskForUser.progressProperty());
+        // bind progress indicators
+        progressText.textProperty().unbind();
+        progressBar.progressProperty().unbind();
 
-        // start task
-        Thread thread = new Thread(worklogTaskForUser, "FetchWorklogsThread-" + timerange.name());
+        progressText.textProperty().bind(task.messageProperty());
+        progressBar.progressProperty().bind(task.progressProperty());
+
+        // start the task in a thread
+        Thread thread = new Thread(task, task.getTitle());
         thread.setDaemon(true);
         thread.start();
     }
 
-    /**
-     * Display the throwable to the user
-     * @param throwable
-     */
-    private void displayError(Throwable throwable) {
-        progressBar.progressProperty().unbind();
-        progressText.textProperty().unbind();
-        progressBar.progressProperty().set(0);
-
-        if (throwable != null) {
-            progressText.setText(throwable.getMessage());
-            LOGGER.warn("Showing error to user", throwable);
-        } else {
-            progressText.setText(FormattingUtil.getFormatted("exceptions.main.worker.unknown"));
-        }
-    }
-
-    private void displayResult(WorklogResult result, FetchTimereportContext context, SettingsUtil.Settings settings) {
+    private void displayWorklogResult(WorklogResult result, FetchTimereportContext context, SettingsUtil.Settings settings) {
         LOGGER.info("Displaying WorklogResult to the user");
 
         if (resultTabPane.getTabs().size() == 0) {
@@ -379,7 +352,7 @@ public class MainViewController implements Initializable {
             resultTabPane.getTabs().add(new OwnWorklogsTab());
         }
 
-        if (settings.isShowAllWorklogs()) {
+        if (settings.getShowAllWorklogs()) {
 
             if (resultTabPane.getTabs().size() < 2 || !(resultTabPane.getTabs().get(1) instanceof AllWorklogsTab)) {
                 resultTabPane.getTabs().add(new AllWorklogsTab());
@@ -418,11 +391,61 @@ public class MainViewController implements Initializable {
         resultTabPane.getTabs().forEach(tab -> ((WorklogTab) tab).updateItems(result, context));
     }
 
-    private void showWaitScreen() {
-        modalOverlaySpinner.setVisible(true);
+    private void showSettingsDialogue() {
+        LOGGER.debug("Showing settings dialogue");
+
+        // pass in a handler to fetch the group by categories if connection
+        // parameters get set
+        openDialogue("/fx/views/settings.fxml", "view.settings.title", true, Optional.of(() -> {
+            if (!settings.hasMissingConnectionParameters().get() && groupByCategoryComboBox.getItems().size() == 0) {
+                LOGGER.debug("Settings window closed, connection settings set and groupBy combobox empty -> trying to fetch groupByCategories");
+                startGetGroupByCategoriesTask();
+            }
+        }));
     }
 
-    private void hideWaitScreen() {
-        modalOverlaySpinner.setVisible(false);
+    private void showLogMessagesDialogue() {
+        LOGGER.debug("Showing log messages dialogue");
+        openDialogue("/fx/views/logMessagesView.fxml", "view.menu.help.logs", false);
+    }
+
+    private void showAboutDialogue() {
+        LOGGER.debug("Showing log messages dialogue");
+        openDialogue("/fx/views/about.fxml", "view.menu.help.about", true);
+    }
+
+    private void openDialogue(String view, String titleResourceKey, boolean modal) {
+        openDialogue(view, titleResourceKey, modal, Optional.empty());
+    }
+
+    private void openDialogue(String view, String titleResourceKey, boolean modal, Optional<Callback> onCloseCallback) {
+        try {
+            Parent content = FXMLLoader.load(MainViewController.class.getResource(view), resources);
+
+            Scene scene = new Scene(content);
+            Stage stage = new Stage();
+            stage.initOwner(progressBar.getScene().getWindow());
+
+            if (modal) {
+                stage.initStyle(StageStyle.UTILITY);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setResizable(false);
+            }
+
+            stage.setTitle(FormattingUtil.getFormatted(titleResourceKey));
+            stage.setScene(scene);
+
+            if (onCloseCallback.isPresent()) {
+                stage.setOnCloseRequest(event -> {
+                    LOGGER.debug("View {} got close request. Notifying callback", view);
+                    onCloseCallback.get().invoke();
+                });
+            }
+
+            stage.showAndWait();
+        } catch (IOException e) {
+            LOGGER.error("Could not open dialogue {}", view, e);
+            throw ExceptionUtil.getRuntimeException("exceptions.view.io", e, view);
+        }
     }
 }

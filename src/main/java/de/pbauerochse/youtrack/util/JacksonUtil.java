@@ -1,6 +1,7 @@
 package de.pbauerochse.youtrack.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -20,5 +21,9 @@ public class JacksonUtil {
 
     public static <T> T parseValue(Reader contentReader, Class<T> tClass) throws IOException {
         return objectMapper.readValue(contentReader, tClass);
+    }
+
+    public static <T> T parseValue(Reader contentReader, TypeReference<T> typeReference) throws IOException {
+        return objectMapper.readValue(contentReader, typeReference);
     }
 }

@@ -1,6 +1,8 @@
 package de.pbauerochse.youtrack.util;
 
 import de.pbauerochse.youtrack.domain.ReportTimerange;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ public class SettingsUtil {
     /**
      * Loads the user settings for the config file if present
      * if not it returns the default settings
+     *
      * @return the loaded Settings object
      */
     public static Settings loadSettings() {
@@ -92,7 +95,7 @@ public class SettingsUtil {
         String windowXAsString = properties.getProperty(WINDOW_X_PROPERTY);
         if (StringUtils.isNotBlank(windowXAsString)) {
             try {
-                settings.setWindowX(Integer.parseInt(windowXAsString));
+                settings.windowXProperty().setValue(Integer.parseInt(windowXAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", windowXAsString, WINDOW_X_PROPERTY);
@@ -102,7 +105,7 @@ public class SettingsUtil {
         String windowYAsString = properties.getProperty(WINDOW_Y_PROPERTY);
         if (StringUtils.isNotBlank(windowYAsString)) {
             try {
-                settings.setWindowY(Integer.parseInt(windowYAsString));
+                settings.windowYProperty().setValue(Integer.parseInt(windowYAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", windowYAsString, WINDOW_Y_PROPERTY);
@@ -112,7 +115,7 @@ public class SettingsUtil {
         String windowWidthAsString = properties.getProperty(WINDOW_WIDTH_PROPERTY);
         if (StringUtils.isNotBlank(windowWidthAsString)) {
             try {
-                settings.setWindowWidth(Integer.parseInt(windowWidthAsString));
+                settings.windowWidthProperty().setValue(Integer.parseInt(windowWidthAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", windowWidthAsString, WINDOW_WIDTH_PROPERTY);
@@ -122,7 +125,7 @@ public class SettingsUtil {
         String windowHeightAsString = properties.getProperty(WINDOW_HEIGHT_PROPERTY);
         if (StringUtils.isNotBlank(windowHeightAsString)) {
             try {
-                settings.setWindowHeight(Integer.parseInt(windowHeightAsString));
+                settings.windowHeightProperty().setValue(Integer.parseInt(windowHeightAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", windowHeightAsString, WINDOW_HEIGHT_PROPERTY);
@@ -132,19 +135,19 @@ public class SettingsUtil {
         String workHoursAsString = properties.getProperty(WORK_HOURS_PROPERTY);
         if (StringUtils.isNotBlank(workHoursAsString)) {
             try {
-                settings.setWorkHoursADay(Integer.parseInt(workHoursAsString));
+                settings.workHoursADayProperty().setValue(Integer.parseInt(workHoursAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", workHoursAsString, WORK_HOURS_PROPERTY);
             }
         }
 
-        settings.setYoutrackUrl(properties.getProperty(YOUTRACK_URL_PROPERTY));
-        settings.setYoutrackUsername(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
+        settings.youtrackUrlProperty().setValue(properties.getProperty(YOUTRACK_URL_PROPERTY));
+        settings.youtrackUsernameProperty().setValue(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
         String encryptedPassword = properties.getProperty(YOUTRACK_PASSWORD_PROPERTY);
         if (StringUtils.isNotBlank(encryptedPassword)) {
             try {
-                settings.setYoutrackPassword(PasswordUtil.decryptEncryptedPassword(encryptedPassword));
+                settings.youtrackPasswordProperty().setValue(PasswordUtil.decryptEncryptedPassword(encryptedPassword));
             } catch (GeneralSecurityException e) {
                 LOGGER.error("Could not decrypt password from settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.decrypt", e);
@@ -153,24 +156,24 @@ public class SettingsUtil {
 
         String showOnlyOwnWorklogsAsString = properties.getProperty(SHOW_ALL_WORKLOGS_PROPERTY);
         if (StringUtils.isNotBlank(showOnlyOwnWorklogsAsString)) {
-            settings.setShowAllWorklogs(Boolean.valueOf(showOnlyOwnWorklogsAsString));
+            settings.showAllWorklogsProperty().setValue(Boolean.valueOf(showOnlyOwnWorklogsAsString));
         }
 
         String showStatisticsAsString = properties.getProperty(SHOW_STATISTICS_PROPERTY);
         if (StringUtils.isNotBlank(showStatisticsAsString)) {
-            settings.setShowStatistics(Boolean.valueOf(showStatisticsAsString));
+            settings.showStatisticsProperty().setValue(Boolean.valueOf(showStatisticsAsString));
         }
 
         String autoloadDataAsString = properties.getProperty(AUTOLOAD_DATA_PROPERTY);
         if (StringUtils.isNotBlank(autoloadDataAsString)) {
-            settings.setLoadDataAtStartup(Boolean.valueOf(autoloadDataAsString));
+            settings.loadDataAtStartupProperty().setValue(Boolean.valueOf(autoloadDataAsString));
         }
 
         String autoloadDataTimerangeAsString = properties.getProperty(AUTOLOAD_DATA_TIMERANGE_PROPERTY);
         if (StringUtils.isNotBlank(autoloadDataTimerangeAsString)) {
             try {
                 ReportTimerange reportTimerange = ReportTimerange.valueOf(autoloadDataTimerangeAsString);
-                settings.setLastUsedReportTimerange(reportTimerange);
+                settings.lastUsedReportTimerangeProperty().setValue(reportTimerange);
             } catch (IllegalArgumentException e) {
                 LOGGER.warn("Could not determine ReportTimerange by settings value {}", autoloadDataTimerangeAsString);
             }
@@ -185,9 +188,9 @@ public class SettingsUtil {
         properties.setProperty(WINDOW_WIDTH_PROPERTY, String.valueOf(settings.getWindowWidth()));
         properties.setProperty(WINDOW_HEIGHT_PROPERTY, String.valueOf(settings.getWindowHeight()));
         properties.setProperty(WORK_HOURS_PROPERTY, String.valueOf(settings.getWorkHoursADay()));
-        properties.setProperty(SHOW_ALL_WORKLOGS_PROPERTY, String.valueOf(settings.isShowAllWorklogs()));
-        properties.setProperty(SHOW_STATISTICS_PROPERTY, String.valueOf(settings.isShowStatistics()));
-        properties.setProperty(AUTOLOAD_DATA_PROPERTY, String.valueOf(settings.isLoadDataAtStartup()));
+        properties.setProperty(SHOW_ALL_WORKLOGS_PROPERTY, String.valueOf(settings.getShowAllWorklogs()));
+        properties.setProperty(SHOW_STATISTICS_PROPERTY, String.valueOf(settings.getShowStatistics()));
+        properties.setProperty(AUTOLOAD_DATA_PROPERTY, String.valueOf(settings.getLoadDataAtStartup()));
 
         if (StringUtils.isNotBlank(settings.getYoutrackUrl())) {
             properties.setProperty(YOUTRACK_URL_PROPERTY, settings.getYoutrackUrl());
@@ -215,130 +218,132 @@ public class SettingsUtil {
 
     public static class Settings {
 
-        private int windowWidth = 800;
+        private IntegerProperty windowWidth = new SimpleIntegerProperty(800);
 
-        private int windowHeight = 600;
+        private IntegerProperty windowHeight = new SimpleIntegerProperty(600);
 
-        private int windowX = 0;
+        private IntegerProperty windowX = new SimpleIntegerProperty(0);
 
-        private int windowY = 0;
+        private IntegerProperty windowY = new SimpleIntegerProperty(0);
 
-        private int workHoursADay = 8;
+        private IntegerProperty workHoursADay = new SimpleIntegerProperty(8);
 
-        private String youtrackUrl;
+        private StringProperty youtrackUrl = new SimpleStringProperty();
 
-        private String youtrackUsername;
+        private StringProperty youtrackUsername = new SimpleStringProperty();
 
-        private String youtrackPassword;
+        private StringProperty youtrackPassword = new SimpleStringProperty();
 
-        private boolean loadDataAtStartup;
+        private BooleanProperty loadDataAtStartup = new SimpleBooleanProperty(false);
 
-        private ReportTimerange lastUsedReportTimerange;
+        private SimpleObjectProperty<ReportTimerange> lastUsedReportTimerange = new SimpleObjectProperty<>(ReportTimerange.THIS_WEEK);
 
-        private boolean showStatistics = true;
+        private BooleanProperty showStatistics = new SimpleBooleanProperty(true);
 
-        private boolean showAllWorklogs = true;
+        private BooleanProperty showAllWorklogs = new SimpleBooleanProperty(true);
+
+        private BooleanBinding hasMissingConnectionParametersBinding = youtrackUrlProperty().isEmpty()
+                .or(youtrackUsernameProperty().isEmpty())
+                .or(youtrackPasswordProperty().isEmpty());
 
         public int getWindowWidth() {
+            return windowWidth.get();
+        }
+
+        public IntegerProperty windowWidthProperty() {
             return windowWidth;
         }
 
-        public void setWindowWidth(int windowWidth) {
-            this.windowWidth = windowWidth;
+        public int getWindowHeight() {
+            return windowHeight.get();
         }
 
-        public int getWindowHeight() {
+        public IntegerProperty windowHeightProperty() {
             return windowHeight;
         }
 
-        public void setWindowHeight(int windowHeight) {
-            this.windowHeight = windowHeight;
+        public int getWindowX() {
+            return windowX.get();
         }
 
-        public int getWindowX() {
+        public IntegerProperty windowXProperty() {
             return windowX;
         }
 
-        public void setWindowX(int windowX) {
-            this.windowX = windowX;
+        public int getWindowY() {
+            return windowY.get();
         }
 
-        public int getWindowY() {
+        public IntegerProperty windowYProperty() {
             return windowY;
         }
 
-        public void setWindowY(int windowY) {
-            this.windowY = windowY;
+        public int getWorkHoursADay() {
+            return workHoursADay.get();
         }
 
-        public int getWorkHoursADay() {
+        public IntegerProperty workHoursADayProperty() {
             return workHoursADay;
         }
 
-        public void setWorkHoursADay(int workHoursADay) {
-            this.workHoursADay = workHoursADay;
+        public String getYoutrackUrl() {
+            return youtrackUrl.get();
         }
 
-        public String getYoutrackUrl() {
+        public StringProperty youtrackUrlProperty() {
             return youtrackUrl;
         }
 
-        public void setYoutrackUrl(String youtrackUrl) {
-            this.youtrackUrl = youtrackUrl;
+        public String getYoutrackUsername() {
+            return youtrackUsername.get();
         }
 
-        public String getYoutrackUsername() {
+        public StringProperty youtrackUsernameProperty() {
             return youtrackUsername;
         }
 
-        public void setYoutrackUsername(String youtrackUsername) {
-            this.youtrackUsername = youtrackUsername;
+        public String getYoutrackPassword() {
+            return youtrackPassword.get();
         }
 
-        public String getYoutrackPassword() {
+        public StringProperty youtrackPasswordProperty() {
             return youtrackPassword;
         }
 
-        public void setYoutrackPassword(String youtrackPassword) {
-            this.youtrackPassword = youtrackPassword;
+        public boolean getLoadDataAtStartup() {
+            return loadDataAtStartup.get();
         }
 
-        public boolean isLoadDataAtStartup() {
+        public BooleanProperty loadDataAtStartupProperty() {
             return loadDataAtStartup;
         }
 
-        public void setLoadDataAtStartup(boolean loadDataAtStartup) {
-            this.loadDataAtStartup = loadDataAtStartup;
+        public ReportTimerange getLastUsedReportTimerange() {
+            return lastUsedReportTimerange.get();
         }
 
-        public ReportTimerange getLastUsedReportTimerange() {
+        public SimpleObjectProperty<ReportTimerange> lastUsedReportTimerangeProperty() {
             return lastUsedReportTimerange;
         }
 
-        public void setLastUsedReportTimerange(ReportTimerange lastUsedReportTimerange) {
-            this.lastUsedReportTimerange = lastUsedReportTimerange;
+        public boolean getShowStatistics() {
+            return showStatistics.get();
         }
 
-        public boolean isShowStatistics() {
+        public BooleanProperty showStatisticsProperty() {
             return showStatistics;
         }
 
-        public void setShowStatistics(boolean showStatistics) {
-            this.showStatistics = showStatistics;
+        public boolean getShowAllWorklogs() {
+            return showAllWorklogs.get();
         }
 
-        public boolean isShowAllWorklogs() {
+        public BooleanProperty showAllWorklogsProperty() {
             return showAllWorklogs;
         }
 
-        public void setShowAllWorklogs(boolean showAllWorklogs) {
-            this.showAllWorklogs = showAllWorklogs;
-        }
-
-        public boolean hasMissingConnectionParameters() {
-            return StringUtils.isBlank(settings.getYoutrackUrl()) ||
-                   StringUtils.isBlank(settings.getYoutrackUsername()) ||
-                   StringUtils.isBlank(settings.getYoutrackPassword());
+        public BooleanBinding hasMissingConnectionParameters() {
+            return hasMissingConnectionParametersBinding;
         }
     }
 

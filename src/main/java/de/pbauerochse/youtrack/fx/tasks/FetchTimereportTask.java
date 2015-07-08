@@ -28,6 +28,7 @@ public class FetchTimereportTask extends Task<WorklogResult> {
     private final FetchTimereportContext context;
 
     public FetchTimereportTask(FetchTimereportContext context) {
+        updateTitle("FetchWorklogs-Task");
         this.context = context;
     }
 

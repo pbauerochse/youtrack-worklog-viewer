@@ -60,7 +60,7 @@
                           GridPane.rowIndex="5"/>
 
                 <Label text="%view.settings.autoload" GridPane.rowIndex="6"/>
-                <CheckBox fx:id="autoloadLastTimerangeCheckBox" mnemonicParsing="false" GridPane.columnIndex="1"
+                <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1"
                           GridPane.rowIndex="6"/>
 
             </children>

@@ -120,7 +120,7 @@ public abstract class WorklogTab extends Tab {
     protected Node getContentNode() {
         Node taskView = getTaskView();
 
-        if (SettingsUtil.loadSettings().isShowStatistics()) {
+        if (SettingsUtil.loadSettings().getShowStatistics()) {
             LOGGER.debug("Statistics enabled in settings");
             statisticsView = new VBox(20);
 
@@ -169,7 +169,7 @@ public abstract class WorklogTab extends Tab {
         }
 
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
-        if (settings.isShowStatistics() && statisticsView == null || !settings.isShowStatistics() && statisticsView != null) {
+        if (settings.getShowStatistics() && statisticsView == null || !settings.getShowStatistics() && statisticsView != null) {
             // statistics are disabled and were previously rendered
             // or statistics are enabled and weren't rendered before
             // update content view
@@ -291,7 +291,7 @@ public abstract class WorklogTab extends Tab {
 
     private void updateStatisticsData(List<TaskWithWorklogs> displayResult) {
 
-        if (!SettingsUtil.loadSettings().isShowStatistics()) {
+        if (!SettingsUtil.loadSettings().getShowStatistics()) {
             return;
         }
 

@@ -5,7 +5,7 @@
     -fx-background-size: auto;
 }
 
-#modalOverlaySpinner .progress-indicator {
+#waitScreenOverlay .progress-indicator {
     -fx-progress-color: #a5cdff;
 }
 

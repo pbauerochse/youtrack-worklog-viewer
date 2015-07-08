@@ -7,7 +7,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.youtrack.fx.MainViewController">
+<BorderPane fx:id="mainView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.youtrack.fx.MainViewController">
 
     <top>
         <VBox>
@@ -56,9 +56,9 @@
                             <items>
                                 <Label text="%view.main.timerange" />
                                 <ComboBox fx:id="timerangeComboBox" prefWidth="150.0" />
-                                <DatePicker fx:id="startDatePicker" prefWidth="120.0" promptText="Start Date" />
-                                <DatePicker fx:id="endDatePicker" prefWidth="120.0" promptText="End Date" />
-                        <ComboBox prefWidth="150.0" promptText="Group By" />
+                                <DatePicker fx:id="startDatePicker" prefWidth="120.0" promptText="%view.main.startdate.prompt" />
+                                <DatePicker fx:id="endDatePicker" prefWidth="120.0" promptText="%view.main.enddate.prompt" />
+                                <ComboBox fx:id="groupByCategoryComboBox" prefWidth="220.0" promptText="%view.main.groupby.prompt" />
                                 <Button fx:id="fetchWorklogButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0">
                                     <tooltip>
                                         <Tooltip text="%view.main.download" />
@@ -69,7 +69,7 @@
                         <TabPane fx:id="resultTabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS" />
                     </children>
                 </VBox>
-                <StackPane fx:id="modalOverlaySpinner" style="-fx-background-color: rgba(0, 0, 0, 0.5);" visible="false">
+                <StackPane fx:id="waitScreenOverlay" style="-fx-background-color: rgba(0, 0, 0, 0.5);" visible="false">
                     <children>
                         <ProgressIndicator maxHeight="60.0" maxWidth="60.0" StackPane.alignment="CENTER" />
                     </children>

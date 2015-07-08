@@ -1,15 +1,12 @@
 package de.pbauerochse.youtrack.connector;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import de.pbauerochse.youtrack.connector.createreport.request.CreateReportRequestEntity;
 import de.pbauerochse.youtrack.connector.createreport.response.ReportDetailsResponse;
-import de.pbauerochse.youtrack.csv.YouTrackCsvReportProcessor;
-import de.pbauerochse.youtrack.domain.ReportTimerange;
-import de.pbauerochse.youtrack.domain.WorklogResult;
+import de.pbauerochse.youtrack.domain.GroupByCategory;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
-import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.JacksonUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
-import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
@@ -28,13 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * @author Patrick Bauerochse
@@ -106,7 +100,7 @@ public class YouTrackConnector {
         }
     }
 
-    public void getPossibleGroupByCategories() throws IOException {
+    public List<GroupByCategory> getPossibleGroupByCategories() throws IOException {
         String getGroupByCategoriesUrl = buildYoutrackApiUrl("reports/timeReports/possibleGroupByCategories");
 
         HttpGet request = new HttpGet(getGroupByCategoriesUrl);
@@ -122,9 +116,7 @@ public class YouTrackConnector {
             String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
             LOGGER.debug("Received JSON groupByCategories response {}", jsonResponse);
 
-            // example response [{"name":"Work author","id":"WORK_AUTHOR"},{"name":"Work type","id":"WORK_TYPE"},{"name":"Priorität","id":"__CUSTOM_FIELD__Priority_1"},{"name":"Typ","id":"__CUSTOM_FIELD__Type_0"},{"name":"Status","id":"__CUSTOM_FIELD__State_2"},{"name":"Bearbeiter","id":"__CUSTOM_FIELD__Assignee_5"},{"name":"Komponente","id":"__CUSTOM_FIELD__components_9"},{"name":"Lösungsversion","id":"__CUSTOM_FIELD__Fix versions_7"},{"name":"Sprint","id":"__CUSTOM_FIELD__Sprint_21"},{"name":"Zeitschätzung","id":"__CUSTOM_FIELD__Estimation_12"},{"name":"Zeitaufwand","id":"__CUSTOM_FIELD__Spent time_17"},{"name":"Abrechnung","id":"__CUSTOM_FIELD__Abrechnung_19"},{"name":"Abnahme","id":"__CUSTOM_FIELD__Abnahme_20"},{"name":"Verlag","id":"__CUSTOM_FIELD__Verlag_18"},{"name":"bis wann","id":"__CUSTOM_FIELD__bis wann_23"},{"name":"Behoben in Build","id":"__CUSTOM_FIELD__Fixed in build_4"}]
-            // TODO parse and return response
-//            return JacksonUtil.parseValue(new StringReader(jsonResponse), ReportDetailsResponse.class);
+            return JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<GroupByCategory>>() {});
         }
     }
 

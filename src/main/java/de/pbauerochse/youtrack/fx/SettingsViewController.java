@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +40,7 @@ public class SettingsViewController implements Initializable {
     private CheckBox showStatisticsCheckBox;
 
     @FXML
-    private CheckBox autoloadLastTimerangeCheckBox;
+    private CheckBox loadDataAtStartupCheckBox;
 
     @FXML
     private Button saveSettingsButton;
@@ -54,29 +56,28 @@ public class SettingsViewController implements Initializable {
         for (int i = 1; i <= 24; i++) {
             workhoursComboBox.getItems().add(i);
         }
+        workhoursComboBox.getSelectionModel().select((Integer) settings.getWorkHoursADay());
+
+        youtrackUrlField.textProperty().bindBidirectional(settings.youtrackUrlProperty());
+        youtrackUsernameField.textProperty().bindBidirectional(settings.youtrackUsernameProperty());
+        youtrackPasswordField.textProperty().bindBidirectional(settings.youtrackPasswordProperty());
+        showAllWorklogsCheckBox.selectedProperty().bindBidirectional(settings.showAllWorklogsProperty());
+        showStatisticsCheckBox.selectedProperty().bindBidirectional(settings.showStatisticsProperty());
+        loadDataAtStartupCheckBox.selectedProperty().bindBidirectional(settings.loadDataAtStartupProperty());
+
+        settings.workHoursADayProperty().bind(workhoursComboBox.getSelectionModel().selectedItemProperty());
 
         // button clicks
-        cancelSettingsButton.setOnAction(event -> ((Node) event.getSource()).getScene().getWindow().hide());
+        cancelSettingsButton.setOnAction(event -> closeSettingsDialogue());
         saveSettingsButton.setOnAction(event -> {
             LOGGER.debug("Save settings clicked");
-            settings.setYoutrackUrl(youtrackUrlField.getText());
-            settings.setYoutrackUsername(youtrackUsernameField.getText());
-            settings.setYoutrackPassword(youtrackPasswordField.getText());
-            settings.setWorkHoursADay(workhoursComboBox.getSelectionModel().getSelectedItem());
-            settings.setShowAllWorklogs(showAllWorklogsCheckBox.isSelected());
-            settings.setShowStatistics(showStatisticsCheckBox.isSelected());
-            settings.setLoadDataAtStartup(autoloadLastTimerangeCheckBox.isSelected());
-
-            ((Node) event.getSource()).getScene().getWindow().hide();
+            closeSettingsDialogue();
         });
+    }
 
-        // prepopulate fields from settings
-        youtrackUrlField.setText(settings.getYoutrackUrl());
-        youtrackUsernameField.setText(settings.getYoutrackUsername());
-        youtrackPasswordField.setText(settings.getYoutrackPassword());
-        workhoursComboBox.getSelectionModel().select((Integer) settings.getWorkHoursADay());
-        showAllWorklogsCheckBox.setSelected(settings.isShowAllWorklogs());
-        showStatisticsCheckBox.setSelected(settings.isShowStatistics());
-        autoloadLastTimerangeCheckBox.setSelected(settings.isLoadDataAtStartup());
+    private void closeSettingsDialogue() {
+        LOGGER.debug("Closing settings dialogue");
+        Window window = saveSettingsButton.getScene().getWindow();
+        window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 }

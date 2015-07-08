@@ -20,6 +20,7 @@ public class ExcelExporterTask extends Task<File> {
     private final File targetFile;
 
     public ExcelExporterTask(WorklogTab tab, File targetFile) {
+        updateTitle(tab.getText() + "-ExcelExport-Task");
         this.tab = tab;
         this.targetFile = targetFile;
     }
