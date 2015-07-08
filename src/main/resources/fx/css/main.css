@@ -21,16 +21,34 @@
     -fx-background-color: rgba(178, 233, 255, 0.5);
 }
 
-.summary {
-    -fx-font-weight: bold;
-}
-
-.table-view .column-header {
+.tree-table-view .column-header {
     -fx-font-size: 11px;
 }
 
-.table-cell {
+.tree-table-cell {
     -fx-font-size: 11px;
+}
+
+.tree-table-row-cell {
+    -fx-background-color: -fx-table-cell-border-color, -fx-control-inner-background;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.tree-table-row-cell:selected {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-focus-color;
+    -fx-background-insets: 0, 1, 2;
+}
+
+.tree-table-row-cell:odd {
+    -fx-background-color: -fx-table-cell-border-color, derive(-fx-control-inner-background, -5%);
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.tree-table-row-cell:selected:odd {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-focus-color;
+    -fx-background-insets: 0, 1, 2;
 }
 
 .scroll-bar {
@@ -38,7 +56,7 @@
     -fx-block-increment: 500.0;
 }
 
-.table-view:focused .table-row-cell:filled:focused:selected .issue-cell {
+.tree-table-view:focused .tree-table-row-cell:filled:focused:selected .issue-cell {
     -fx-text-fill: #ffffff;
 }
 
@@ -51,3 +69,15 @@
 .issue-cell:hover {
     -fx-cursor: hand;
 }
+
+.summary {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.group {
+    -fx-background-color: #c8ddff;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+

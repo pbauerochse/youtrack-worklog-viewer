@@ -19,6 +19,7 @@ public class TaskWithWorklogs {
     private List<WorklogItem> worklogItemList = new ArrayList<>(50);
 
     private boolean isSummaryRow;
+    private boolean isGroupRow;
 
     public TaskWithWorklogs(boolean isSummaryRow) {
         this.isSummaryRow = isSummaryRow;
@@ -72,6 +73,14 @@ public class TaskWithWorklogs {
         return isSummaryRow;
     }
 
+    public boolean isGroupRow() {
+        return isGroupRow;
+    }
+
+    public void setIsGroupRow(boolean isGroupRow) {
+        this.isGroupRow = isGroupRow;
+    }
+
     public long getTotalInMinutes() {
         long sum = 0;
 
@@ -100,6 +109,8 @@ public class TaskWithWorklogs {
         copy.setIssue(getIssue());
         copy.setSummary(getSummary());
         copy.setEstimatedWorktimeInMinutes(getEstimatedWorktimeInMinutes());
+        copy.setGroup(getGroup());
+        copy.setIsGroupRow(isGroupRow);
 
         worklogItemList.forEach(worklogItem -> copy.worklogItemList.add(worklogItem.createCopy()));
 

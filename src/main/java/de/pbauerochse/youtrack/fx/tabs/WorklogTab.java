@@ -1,6 +1,5 @@
 package de.pbauerochse.youtrack.fx.tabs;
 
-import de.pbauerochse.youtrack.WorklogViewer;
 import de.pbauerochse.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.youtrack.domain.TimerangeProvider;
 import de.pbauerochse.youtrack.domain.WorklogItem;
@@ -9,17 +8,16 @@ import de.pbauerochse.youtrack.excel.ExcelColumnRenderer;
 import de.pbauerochse.youtrack.excel.columns.TaskColumn;
 import de.pbauerochse.youtrack.excel.columns.TaskSummaryColumn;
 import de.pbauerochse.youtrack.excel.columns.WorkdayColumn;
+import de.pbauerochse.youtrack.fx.tablecolumns.TaskDescriptionTreeTableColumn;
+import de.pbauerochse.youtrack.fx.tablecolumns.TaskWorklogSummaryTreeTableColumn;
+import de.pbauerochse.youtrack.fx.tablecolumns.WorklogTreeTableColumn;
 import de.pbauerochse.youtrack.fx.tasks.FetchTimereportContext;
 import de.pbauerochse.youtrack.util.ExceptionUtil;
 import de.pbauerochse.youtrack.util.FormattingUtil;
 import de.pbauerochse.youtrack.util.SettingsUtil;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
@@ -53,11 +51,6 @@ public abstract class WorklogTab extends Tab {
 
     protected static final Collator COLLATOR = Collator.getInstance(Locale.GERMANY);
 
-    protected static final String SUMMARY_COLUMN_OR_CELL_CSS_CLASS = "summary";
-    protected static final String WEEKEND_COLUMN_OR_CELL_CSS_CLASS = "weekend";
-    protected static final String TODAY_COLUMN_OR_CELL_CSS_CLASS = "today";
-    protected static final String ISSUE_CELL_CSS_CLASS = "issue-cell";
-
     // height adjustment parameters for bargraph
     private static final int HEIGHT_PER_PROJECT = 40;
     private static final int HEIGHT_PER_USER = 35;
@@ -65,7 +58,7 @@ public abstract class WorklogTab extends Tab {
 
     private Logger LOGGER = LoggerFactory.getLogger(WorklogTab.class);
 
-    protected TableView<TaskWithWorklogs> taskTableView;
+    protected TreeTableView<TaskWithWorklogs> taskTableView;
 
     protected Optional<TimerangeProvider> lastUsedTimerangeProvider = Optional.empty();
 
@@ -76,6 +69,7 @@ public abstract class WorklogTab extends Tab {
     protected boolean resultToDisplayChangedSinceLastRender;
 
     protected VBox statisticsView;
+    private TaskDescriptionTreeTableColumn taskDescriptionTreeTableColumn;
 
     /**
      * Extract the appropriate TaskWithWorklogs from the WorklogResult item
@@ -146,7 +140,14 @@ public abstract class WorklogTab extends Tab {
     protected Node getTaskView() {
 
         if (taskTableView == null) {
-            taskTableView = new TableView<>();
+            taskTableView = new TreeTableView<>(new TreeItem<>());
+            taskTableView.setShowRoot(false);
+        }
+
+        if (taskDescriptionTreeTableColumn == null) {
+            taskDescriptionTreeTableColumn = new TaskDescriptionTreeTableColumn();
+            taskDescriptionTreeTableColumn.setPrefWidth(300);
+            taskDescriptionTreeTableColumn.setMinWidth(300);
         }
 
         AnchorPane anchorPane = new AnchorPane(taskTableView);
@@ -183,7 +184,7 @@ public abstract class WorklogTab extends Tab {
 
             LOGGER.debug("[{}] Regenerating columns for timerange {}", getText(), worklogResult.getTimerange().name());
             taskTableView.getColumns().clear();
-            taskTableView.getColumns().add(getDescriptionColumn());
+            taskTableView.getColumns().add(taskDescriptionTreeTableColumn);
 
             // render tables for all days in the selected timerange
             // e.g. timerange current month renders a column for
@@ -193,78 +194,14 @@ public abstract class WorklogTab extends Tab {
 
             for (int days = 0; days <= amountOfDaysToDisplay; days++) {
                 LocalDate currentColumnDate = timerangeProvider.getStartDate().plus(days, ChronoUnit.DAYS);
-                DayOfWeek currentColumnDayOfWeek = currentColumnDate.getDayOfWeek();
                 String displayDate = FormattingUtil.formatDate(currentColumnDate);
 
-                // create column
-                TableColumn<TaskWithWorklogs, TaskWithWorklogs> column = new TableColumn<>(displayDate);
-                column.setSortable(false);
-                column.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue()));
-                column.setCellFactory(param -> {
-                    TableCell<TaskWithWorklogs, TaskWithWorklogs> cell = new TableCell<TaskWithWorklogs, TaskWithWorklogs>() {
-                        @Override
-                        protected void updateItem(TaskWithWorklogs item, boolean empty) {
-                            super.updateItem(item, empty);
-
-                            if (empty) {
-                                // clear cell and tooltip
-                                setText(StringUtils.EMPTY);
-                                setTooltip(null);
-                                getStyleClass().remove(SUMMARY_COLUMN_OR_CELL_CSS_CLASS);
-                            } else {
-                                // display the spent time as cell value
-                                // and the date with the spent time as tooltip
-                                String worklogTimeFormatted = FormattingUtil.formatMinutes(item.getTotalInMinutes(currentColumnDate));
-
-                                setText(worklogTimeFormatted);
-                                setTooltip(new Tooltip(displayDate + " - " + worklogTimeFormatted));
-
-                                if (item.isSummaryRow()) {
-                                    getStyleClass().add(SUMMARY_COLUMN_OR_CELL_CSS_CLASS);
-                                }
-                            }
-                        }
-                    };
-
-                    cell.setAlignment(Pos.CENTER_RIGHT);
-
-                    return cell;
-                });
-
-                // add class for weekend columns
-                if (currentColumnDayOfWeek == DayOfWeek.SATURDAY || currentColumnDayOfWeek == DayOfWeek.SUNDAY) {
-                    column.getStyleClass().add(WEEKEND_COLUMN_OR_CELL_CSS_CLASS);
-                    column.setPrefWidth(20);
-                } else {
-                    column.setPrefWidth(100);
-                }
-
-                // today
-                if (currentColumnDate.isEqual(LocalDate.now())) {
-                    column.getStyleClass().add(TODAY_COLUMN_OR_CELL_CSS_CLASS);
-                }
-
-                taskTableView.getColumns().add(column);
+                // worklog column
+                taskTableView.getColumns().add(new WorklogTreeTableColumn(displayDate, currentColumnDate));
             }
 
             // also add another summary per task column
-            TableColumn<TaskWithWorklogs, String> summaryPerTaskColumn = new TableColumn<>(FormattingUtil.getFormatted("view.main.summary"));
-            summaryPerTaskColumn.setSortable(false);
-            summaryPerTaskColumn.setCellValueFactory(param -> new SimpleStringProperty(FormattingUtil.formatMinutes(param.getValue().getTotalInMinutes())));
-            summaryPerTaskColumn.setCellFactory(param -> {
-                TableCell<TaskWithWorklogs, String> summaryCell = new TableCell<TaskWithWorklogs, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        super.updateItem(item, empty);
-                        setText(StringUtils.defaultIfBlank(item, StringUtils.EMPTY));
-                    }
-                };
-                summaryCell.getStyleClass().add(SUMMARY_COLUMN_OR_CELL_CSS_CLASS);
-                summaryCell.setAlignment(Pos.CENTER_RIGHT);
-                return summaryCell;
-            });
-            summaryPerTaskColumn.setPrefWidth(120);
-            taskTableView.getColumns().add(summaryPerTaskColumn);
+            taskTableView.getColumns().add(new TaskWorklogSummaryTreeTableColumn());
 
             lastUsedTimerangeProvider = Optional.of(fetchTimereportContext.get().getTimerangeProvider());
         }
@@ -272,8 +209,9 @@ public abstract class WorklogTab extends Tab {
         // only refresh items if changed from last time
         if (resultToDisplayChangedSinceLastRender) {
             LOGGER.debug("[{}] Refreshing items in TableView", getText());
-            taskTableView.getItems().clear();
 
+            TreeItem<TaskWithWorklogs> root = taskTableView.getRoot();
+            root.getChildren().clear();
 
             List<TaskWithWorklogs> displayResult = getDisplayResult(worklogResult);
             if (displayResult == null) {
@@ -281,7 +219,40 @@ public abstract class WorklogTab extends Tab {
                 displayResult = new ArrayList<>();
             }
 
-            taskTableView.getItems().addAll(displayResult);
+            Map<String, TreeItem<TaskWithWorklogs>> groupCriteriaToNode = new HashMap<>();
+            for (TaskWithWorklogs taskWithWorklogs : displayResult) {
+
+                TreeItem<TaskWithWorklogs> addChildToThisTreeItem = root;
+
+                if (StringUtils.isNotBlank(taskWithWorklogs.getGroup())) {
+                    addChildToThisTreeItem = groupCriteriaToNode.get(taskWithWorklogs.getGroup());
+                    if (addChildToThisTreeItem == null) {
+                        TaskWithWorklogs groupItem = new TaskWithWorklogs(false);
+                        groupItem.setIsGroupRow(true);
+                        groupItem.setIssue(taskWithWorklogs.getGroup());
+
+                        addChildToThisTreeItem = new TreeItem<>(groupItem);
+                        addChildToThisTreeItem.setExpanded(true);
+
+                        groupCriteriaToNode.put(taskWithWorklogs.getGroup(), addChildToThisTreeItem);
+                        root.getChildren().add(addChildToThisTreeItem);
+                    }
+                }
+
+                addChildToThisTreeItem.getChildren().add(new TreeItem<>(taskWithWorklogs));
+            }
+
+            // add another summary by group criteria
+            if (groupCriteriaToNode.size() > 1) {
+                groupCriteriaToNode.values().forEach(groupedTreeItem -> {
+                    TaskWithWorklogs groupNode = groupedTreeItem.getValue();
+                    groupedTreeItem.getChildren().forEach(childTaskWithWorklogsTreeItem -> {
+                        childTaskWithWorklogsTreeItem.getValue().getWorklogItemList().forEach(worklogItem -> {
+                            groupNode.getWorklogItemList().add(worklogItem);
+                        });
+                    });
+                });
+            }
 
             updateStatisticsData(displayResult);
 
@@ -449,67 +420,6 @@ public abstract class WorklogTab extends Tab {
 
     protected void addAdditionalStatistics(VBox statisticsView, WorklogStatistics statistics, List<TaskWithWorklogs> displayResult) {
         // for you to override
-    }
-
-    private Optional<TableColumn<TaskWithWorklogs, TaskWithWorklogs>> descriptionColumnOptional = Optional.empty();
-    protected TableColumn<TaskWithWorklogs, TaskWithWorklogs> getDescriptionColumn() {
-
-        if (!descriptionColumnOptional.isPresent()) {
-
-            LOGGER.debug("[{}] Generating description column", getText());
-
-            TableColumn<TaskWithWorklogs, TaskWithWorklogs> descriptionColumn = new TableColumn<>(FormattingUtil.getFormatted("view.main.issue"));
-            descriptionColumn.setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue()));
-            descriptionColumn.setCellFactory(param -> {
-                TableCell<TaskWithWorklogs, TaskWithWorklogs> tableCell = new TableCell<TaskWithWorklogs, TaskWithWorklogs>() {
-
-                    @Override
-                    protected void updateItem(TaskWithWorklogs item, boolean empty) {
-                        if (empty) {
-                            setText(StringUtils.EMPTY);
-                            setTooltip(null);
-                        } else {
-                            if (item.isSummaryRow()) {
-                                setText(FormattingUtil.getFormatted("view.main.summary"));
-                                setTooltip(null);
-                                getStyleClass().add(SUMMARY_COLUMN_OR_CELL_CSS_CLASS);
-                                getStyleClass().remove(ISSUE_CELL_CSS_CLASS);
-                                setAlignment(Pos.CENTER_RIGHT);
-                            } else {
-                                setText(item.getIssue() + " - " + item.getSummary());
-                                setTooltip(new Tooltip(getText()));
-                                getStyleClass().remove(SUMMARY_COLUMN_OR_CELL_CSS_CLASS);
-                                getStyleClass().add(ISSUE_CELL_CSS_CLASS);
-                                setAlignment(Pos.CENTER_LEFT);
-                            }
-                        }
-                    }
-                };
-
-                tableCell.setOnMouseClicked(event -> {
-                    TableCell<TaskWithWorklogs, TaskWithWorklogs> cell = (TableCell<TaskWithWorklogs, TaskWithWorklogs>) event.getSource();
-                    int index = cell.getIndex();
-
-                    if (index < taskTableView.getItems().size()) {
-                        TaskWithWorklogs clickedWorklogItem = taskTableView.getItems().get(index);
-                        if (!clickedWorklogItem.isSummaryRow()) {
-                            SettingsUtil.Settings settings = SettingsUtil.loadSettings();
-                            String issueUrl = String.format("%s/issue/%s#tab=Time%%20Tracking", StringUtils.stripEnd(settings.getYoutrackUrl(), "/"), clickedWorklogItem.getIssue());
-                            Platform.runLater(() -> WorklogViewer.getInstance().getHostServices().showDocument(issueUrl));
-                        }
-                    }
-                });
-
-                return tableCell;
-            });
-
-            descriptionColumn.setPrefWidth(300);
-            descriptionColumn.setMinWidth(300);
-
-            descriptionColumnOptional = Optional.of(descriptionColumn);
-        }
-
-        return descriptionColumnOptional.get();
     }
 
     protected Label getBoldLabel(String text) {
