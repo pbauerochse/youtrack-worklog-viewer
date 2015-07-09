@@ -1,6 +1,8 @@
 package de.pbauerochse.youtrack.connector.createreport;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.pbauerochse.youtrack.connector.createreport.request.CreateReportRange;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ public class ReportParameters {
     private List<String> projects = new ArrayList<>(0);
     private String queryUrl;
     private CreateReportRange range;
+
+    @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
     private String groupById;
 
     public List<String> getProjects() {

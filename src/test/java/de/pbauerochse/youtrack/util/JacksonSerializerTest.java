@@ -29,17 +29,14 @@ public class JacksonSerializerTest {
     @Test
     public void testCreateReportParameters() throws Exception {
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(ReportTimerange.THIS_WEEK, null, null);
-        GroupByCategory groupByCategory = new GroupByCategory();
-        groupByCategory.setId("__CUSTOM_FIELD_12312313");
-        groupByCategory.setName("Category");
-        CreateReportRequestEntity entity = new CreateReportRequestEntity(new FetchTimereportContext(timerangeProvider, groupByCategory));
+        CreateReportRequestEntity entity = new CreateReportRequestEntity(new FetchTimereportContext(timerangeProvider, null));
         String asString = JacksonUtil.writeObject(entity);
         Assert.assertEquals(EXPECTED_SERIALIZATION_RESULT, asString);
     }
 
     @Test
     public void testDeserialization() throws IOException {
-        ReportDetailsResponse response = JacksonUtil.parseValue(new StringReader(GROUP_BY_DESERIALIZATION_TEST_DATA), ReportDetailsResponse.class);
+        ReportDetailsResponse response = JacksonUtil.parseValue(new StringReader(DESERIALIZATION_TEST_DATA), ReportDetailsResponse.class);
 
         Assert.assertEquals("id", "116-892", response.getId());
         Assert.assertEquals("name", "Timetracker: THIS_WEEK", response.getName());
