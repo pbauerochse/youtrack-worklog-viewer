@@ -15,7 +15,6 @@ public class WorklogResult {
 
     private Map<String, TaskWithWorklogs> worklogSummaryMap = new HashMap<>(100);
     private List<String> distinctProjectNames = new ArrayList<>(100);
-    private List<String> distinctGroupValues = new ArrayList<>(100);
 
     private ReportTimerange timerange;
 
@@ -37,11 +36,6 @@ public class WorklogResult {
             distinctProjectNames.add(summary.getProject());
         }
 
-        String summaryGroup = summary.getGroup();
-        if (StringUtils.isNotBlank(summaryGroup) && !distinctGroupValues.contains(summaryGroup)) {
-            distinctGroupValues.add(summaryGroup);
-        }
-
         worklogSummaryMap.put(summary.getIssue(), summary);
     }
 
@@ -51,10 +45,6 @@ public class WorklogResult {
 
     public List<String> getDistinctProjectNames() {
         return distinctProjectNames;
-    }
-
-    public List<String> getDistinctGroupValues() {
-        return distinctGroupValues;
     }
 
     public ReportTimerange getTimerange() {

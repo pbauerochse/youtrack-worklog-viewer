@@ -33,7 +33,7 @@ public class ProjectWorklogTab extends WorklogTab {
                     .peek(userTaskWorklogs -> userTaskWorklogs
                             .getWorklogItemList()
                             .stream()
-                            .forEach(worklogItem -> projectSummary.getWorklogItemList().add(worklogItem)))
+                            .forEach(worklogItem -> projectSummary.addWorklogItem(worklogItem)))
                     .collect(Collectors.toList());
 
             projectWorklogs.add(projectSummary);

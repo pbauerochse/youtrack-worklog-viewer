@@ -14,6 +14,7 @@ public class WorklogItem {
     private String username;
     private String userDisplayname;
     private String workType;
+    private String group;
 
     public String getWorkDescription() {
         return workDescription;
@@ -63,6 +64,14 @@ public class WorklogItem {
         this.workType = workType;
     }
 
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
     public WorklogItem createCopy() {
         WorklogItem copy = new WorklogItem();
         copy.setWorkDescription(getWorkDescription());
@@ -71,6 +80,7 @@ public class WorklogItem {
         copy.setUsername(getUsername());
         copy.setUserDisplayname(getUserDisplayname());
         copy.setWorkType(getWorkType());
+        copy.setGroup(getGroup());
 
         return copy;
     }

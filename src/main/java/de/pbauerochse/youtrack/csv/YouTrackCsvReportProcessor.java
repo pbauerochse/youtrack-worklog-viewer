@@ -57,7 +57,7 @@ public class YouTrackCsvReportProcessor {
 
                 TaskWithWorklogs taskWithWorklogs = getTaskWithWorklogs(result, line);
                 WorklogItem worklogItem = getWorklogItem(line);
-                taskWithWorklogs.getWorklogItemList().add(worklogItem);
+                taskWithWorklogs.addWorklogItem(worklogItem);
             }
         } catch (IOException e) {
             LOGGER.warn("Could not parse csv report", e);
@@ -77,7 +77,6 @@ public class YouTrackCsvReportProcessor {
             taskWithWorklogs = new TaskWithWorklogs(false);
             taskWithWorklogs.setIssue(taskId);
             taskWithWorklogs.setSummary(csvLine[ISSUE_SUMMARY_COLUMN_INDEX]);
-            taskWithWorklogs.setGroup(csvLine[GROUPNAME_SUMMARY_COLUMN_INDEX]);
 
             Matcher matcher = PROJECT_ID_PATTERN.matcher(taskId);
             if (matcher.matches()) {
@@ -111,6 +110,7 @@ public class YouTrackCsvReportProcessor {
         worklogItem.setUsername(csvLine[USER_LOGINNAME_COLUMN_INDEX]);
         worklogItem.setUserDisplayname(csvLine[USER_DISPLAYNAME_COLUMN_INDEX]);
         worklogItem.setWorkType(csvLine[WORKLOGTYPE_SUMMARY_COLUMN_INDEX]);
+        worklogItem.setGroup(csvLine[GROUPNAME_SUMMARY_COLUMN_INDEX]);
 
         return worklogItem;
     }

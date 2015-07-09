@@ -61,7 +61,7 @@ public class OwnWorklogsTab extends WorklogTab {
                             .stream()
                             .forEach(worklogItem -> {
                                 if (StringUtils.equals(worklogItem.getUsername(), youtrackUsername)) {
-                                    summary.getWorklogItemList().add(worklogItem);
+                                    summary.addWorklogItem(worklogItem);
                                 }
                             }))
                     .collect(Collectors.toList());

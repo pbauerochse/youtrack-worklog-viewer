@@ -1,5 +1,7 @@
 package de.pbauerochse.youtrack.domain;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +15,10 @@ public class TaskWithWorklogs {
     private String project;
     private String issue;
     private String summary;
-    private String group;
     private long estimatedWorktimeInMinutes;
 
     private List<WorklogItem> worklogItemList = new ArrayList<>(50);
+    private List<String> distinctGroupCriteria = new ArrayList<>(50);
 
     private boolean isSummaryRow;
     private boolean isGroupRow;
@@ -49,14 +51,6 @@ public class TaskWithWorklogs {
         this.summary = summary;
     }
 
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
-    }
-
     public long getEstimatedWorktimeInMinutes() {
         return estimatedWorktimeInMinutes;
     }
@@ -71,14 +65,6 @@ public class TaskWithWorklogs {
 
     public boolean isSummaryRow() {
         return isSummaryRow;
-    }
-
-    public boolean isGroupRow() {
-        return isGroupRow;
-    }
-
-    public void setIsGroupRow(boolean isGroupRow) {
-        this.isGroupRow = isGroupRow;
     }
 
     public long getTotalInMinutes() {
@@ -103,16 +89,40 @@ public class TaskWithWorklogs {
         return sum;
     }
 
+    public void addWorklogItem(WorklogItem item) {
+        if (item == null) throw new IllegalArgumentException("WorklogItem must not be null");
+
+        if (!getWorklogItemList().contains(item)) {
+            getWorklogItemList().add(item);
+
+            if (StringUtils.isNotBlank(item.getGroup()) && !distinctGroupCriteria.contains(item.getGroup())) {
+                distinctGroupCriteria.add(item.getGroup());
+            }
+        }
+    }
+
+    public void setIsGroupRow(boolean isGroupRow) {
+        this.isGroupRow = isGroupRow;
+    }
+
+    public boolean isGroupRow() {
+        return isGroupRow;
+    }
+
+    public List<String> getDistinctGroupCriteria() {
+        return distinctGroupCriteria;
+    }
+
     public TaskWithWorklogs createCopy() {
         TaskWithWorklogs copy = new TaskWithWorklogs(isSummaryRow);
         copy.setProject(getProject());
         copy.setIssue(getIssue());
         copy.setSummary(getSummary());
         copy.setEstimatedWorktimeInMinutes(getEstimatedWorktimeInMinutes());
-        copy.setGroup(getGroup());
-        copy.setIsGroupRow(isGroupRow);
+        copy.setIsGroupRow(isGroupRow());
+        copy.getDistinctGroupCriteria().addAll(getDistinctGroupCriteria());
 
-        worklogItemList.forEach(worklogItem -> copy.worklogItemList.add(worklogItem.createCopy()));
+        getWorklogItemList().forEach(worklogItem -> copy.addWorklogItem(worklogItem.createCopy()));
 
         return copy;
     }

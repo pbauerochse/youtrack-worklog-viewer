@@ -220,22 +220,29 @@ public abstract class WorklogTab extends Tab {
                 displayResult = new ArrayList<>();
             }
 
-            Map<String, TreeItem<TaskWithWorklogs>> groupCriteriaToNode = new HashMap<>();
-            for (TaskWithWorklogs taskWithWorklogs : displayResult) {
+            List<TaskWithWorklogs> groupingResolvedDisplayResult = checkGroups(displayResult);
 
+            Map<String, TreeItem<TaskWithWorklogs>> groupCriteriaToNode = new HashMap<>();
+            for (TaskWithWorklogs taskWithWorklogs : groupingResolvedDisplayResult) {
                 TreeItem<TaskWithWorklogs> addChildToThisTreeItem = root;
 
-                if (StringUtils.isNotBlank(taskWithWorklogs.getGroup())) {
-                    addChildToThisTreeItem = groupCriteriaToNode.get(taskWithWorklogs.getGroup());
+                if (taskWithWorklogs.getDistinctGroupCriteria().size() > 0) {
+                    // checkGroups should have resolved this to only one distinct group
+                    if (taskWithWorklogs.getDistinctGroupCriteria().size() > 1) {
+                        throw new RuntimeException("This should not have happened");
+                    }
+
+                    String group = taskWithWorklogs.getDistinctGroupCriteria().get(0);
+                    addChildToThisTreeItem = groupCriteriaToNode.get(group);
                     if (addChildToThisTreeItem == null) {
                         TaskWithWorklogs groupItem = new TaskWithWorklogs(false);
                         groupItem.setIsGroupRow(true);
-                        groupItem.setIssue(taskWithWorklogs.getGroup());
+                        groupItem.setIssue(group);
 
                         addChildToThisTreeItem = new TreeItem<>(groupItem);
                         addChildToThisTreeItem.setExpanded(true);
 
-                        groupCriteriaToNode.put(taskWithWorklogs.getGroup(), addChildToThisTreeItem);
+                        groupCriteriaToNode.put(group, addChildToThisTreeItem);
                         root.getChildren().add(addChildToThisTreeItem);
                     }
                 }
@@ -247,11 +254,9 @@ public abstract class WorklogTab extends Tab {
             if (groupCriteriaToNode.size() > 1) {
                 groupCriteriaToNode.values().forEach(groupedTreeItem -> {
                     TaskWithWorklogs groupNode = groupedTreeItem.getValue();
-                    groupedTreeItem.getChildren().forEach(childTaskWithWorklogsTreeItem -> {
-                        childTaskWithWorklogsTreeItem.getValue().getWorklogItemList().forEach(worklogItem -> {
-                            groupNode.getWorklogItemList().add(worklogItem);
-                        });
-                    });
+                    groupedTreeItem.getChildren().forEach(childTaskWithWorklogsTreeItem -> childTaskWithWorklogsTreeItem.getValue().getWorklogItemList().forEach(worklogItem -> {
+                        groupNode.addWorklogItem(worklogItem);
+                    }));
                 });
             }
 
@@ -259,6 +264,53 @@ public abstract class WorklogTab extends Tab {
 
             resultToDisplayChangedSinceLastRender = false;
         }
+    }
+
+    private List<TaskWithWorklogs> checkGroups(List<TaskWithWorklogs> displayResult) {
+        List<TaskWithWorklogs> resolvedByGroups = new ArrayList<>();
+
+        TaskWithWorklogs summaryRow = null;
+
+        for (TaskWithWorklogs taskWithWorklogs : displayResult) {
+
+            if (taskWithWorklogs.isSummaryRow()) {
+                summaryRow = taskWithWorklogs;
+                summaryRow.getDistinctGroupCriteria().clear();
+                continue;
+            }
+
+            if (taskWithWorklogs.getDistinctGroupCriteria().size() > 0) {
+                // group criteria present
+
+                // create a copy for each group criteria
+                Map<String, TaskWithWorklogs> groupToTaskWithworklogs = new HashMap<>(taskWithWorklogs.getDistinctGroupCriteria().size());
+                taskWithWorklogs.getDistinctGroupCriteria().forEach(groupCriteria -> groupToTaskWithworklogs.put(groupCriteria, taskWithWorklogs.createCopy()));
+
+                // remove worklogs not belonging to the group
+                groupToTaskWithworklogs.entrySet().forEach(entry -> {
+                    String requiredGroup = entry.getKey();
+                    TaskWithWorklogs groupedTask = entry.getValue();
+                    groupedTask.getDistinctGroupCriteria().removeIf(group -> !StringUtils.equals(group, requiredGroup));
+
+                    for (Iterator<WorklogItem> iterator = groupedTask.getWorklogItemList().iterator(); iterator.hasNext(); ) {
+                        WorklogItem item = iterator.next();
+                        if (!StringUtils.equals(item.getGroup(), requiredGroup)) {
+                            iterator.remove();
+                        }
+                    }
+
+                    resolvedByGroups.add(groupedTask);
+                });
+            } else  {
+                resolvedByGroups.add(taskWithWorklogs.createCopy());
+            }
+        }
+
+        if (summaryRow != null) {
+            resolvedByGroups.add(summaryRow);
+        }
+
+        return resolvedByGroups;
     }
 
     private void updateStatisticsData(List<TaskWithWorklogs> displayResult) {

@@ -39,7 +39,7 @@ public class AllWorklogsTab extends WorklogTab {
                         userTaskWorklogs
                                 .getWorklogItemList()
                                 .stream()
-                                .forEach(worklogItem -> summary.getWorklogItemList().add(worklogItem));
+                                .forEach(worklogItem -> summary.addWorklogItem(worklogItem));
                     })
                     .collect(Collectors.toList());
 
