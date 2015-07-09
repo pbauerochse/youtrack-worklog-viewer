@@ -19,7 +19,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **How do I start the application?**
 
-*Simply open up your terminal/console and start the application with `java -jar youtrack-worklog-viewer-1.1.jar` or right click the file and select `Open with...` and then select the path to your java executable*
+*Simply open up your terminal/console and start the application with `java -jar youtrack-worklog-viewer-[version].jar` or right click the file and select `Open with...` and then select the path to your java executable*
 
 **Where are the settings stored?**
 
