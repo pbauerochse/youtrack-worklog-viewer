@@ -35,7 +35,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **What reporting options are available?**
 
-*You can create a report for the current week, previous week, current month and previous month. You can also enter your daily work hours to adjust the time format (e.g. 9 booked hours will be presented in an 8 hour workday with `1d 1h` and in an 9 hour workday with `1d`)*  
+*You can create a report for the current week, previous week, current month and previous month or a free time range. You can also enter your daily work hours to adjust the time format (e.g. 9 booked hours will be presented in an 8 hour workday with `1d 1h` and in an 9 hour workday with `1d`)*  
 
 **I just get a blank report. What's wrong?**
 
@@ -44,3 +44,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 **Why are worklogs for subtasks not taken into calculation?**
 
 *This seems to be a bug in YouTrack with the generation of the time report. See https://youtrack.jetbrains.com/issue/JT-29447 . Unfortunately I can't do anything about this :disappointed:*
+
+**I'm seeing a lot question marks where umlauts should be**
+
+*Unfortunately this also is a YouTrack issue: The report itself already contains the broken characters so I have no chance to fix that. If you want to get this fixed vote on the issue at https://youtrack.jetbrains.com/issue/JT-29234*
