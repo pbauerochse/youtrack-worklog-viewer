@@ -15,6 +15,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Patrick Bauerochse
@@ -29,7 +30,7 @@ public class JacksonSerializerTest {
     @Test
     public void testCreateReportParameters() throws Exception {
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(ReportTimerange.THIS_WEEK, null, null);
-        CreateReportRequestEntity entity = new CreateReportRequestEntity(new FetchTimereportContext(timerangeProvider, null));
+        CreateReportRequestEntity entity = new CreateReportRequestEntity(new FetchTimereportContext(timerangeProvider, Optional.empty()));
         String asString = JacksonUtil.writeObject(entity);
         Assert.assertEquals(EXPECTED_SERIALIZATION_RESULT, asString);
     }
