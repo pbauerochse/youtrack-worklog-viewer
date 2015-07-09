@@ -9,7 +9,7 @@
         </encoder>
     </appender>
     
-    <appender name="logWindowAppender" class="de.pbauerochse.youtrack.logging.ListenableLimitedLogMessagesAppender">
+    <appender name="logWindowAppender" class="de.pbauerochse.worklogviewer.logging.ListenableLimitedLogMessagesAppender">
         <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         <maxLogLines>2500</maxLogLines>
     </appender>
