@@ -24,8 +24,8 @@ public class FixedReportRange implements CreateReportRange {
         ZonedDateTime zonedStartDateTime = startDate.atStartOfDay(defaultZone);
         ZonedDateTime zonedEndDateTime = endDate.atStartOfDay(defaultZone);
 
-        from = zonedStartDateTime.toEpochSecond();
-        to = zonedEndDateTime.toEpochSecond();
+        from = zonedStartDateTime.toInstant().toEpochMilli();
+        to = zonedEndDateTime.toInstant().toEpochMilli();
 
         name = FormattingUtil.formatDate(startDate) + " - " + FormattingUtil.formatDate(endDate);
     }
