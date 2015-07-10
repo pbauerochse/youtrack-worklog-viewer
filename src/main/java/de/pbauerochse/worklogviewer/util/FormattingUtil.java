@@ -2,7 +2,9 @@ package de.pbauerochse.worklogviewer.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
@@ -16,6 +18,7 @@ public class FormattingUtil {
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("i18n/ytwv");
 
     private static DateTimeFormatter dateTimeFormatter;
+    private static NumberFormat percentageFormatter;
     private static final int MINUTES_PER_HOUR = 60;
 
 
@@ -75,6 +78,14 @@ public class FormattingUtil {
 
     public static String getFormatted(String messageKey, Object... parameters) {
         return MessageFormat.format(RESOURCE_BUNDLE.getString(messageKey), parameters);
+    }
+
+    public static String formatPercentage(double percentage) {
+        if (percentageFormatter == null) {
+            percentageFormatter = new DecimalFormat("#0.0%");
+        }
+
+        return percentageFormatter.format(percentage);
     }
 
     public static String formatDate(LocalDate date) {
