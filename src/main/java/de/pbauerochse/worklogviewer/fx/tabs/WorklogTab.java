@@ -461,11 +461,11 @@ public abstract class WorklogTab extends Tab {
         employeeProjectSummaryGrid.setVgap(5);
 
         NumberAxis projectEmployeeXAxis = new NumberAxis();
-        projectEmployeeXAxis.setLabel(FormattingUtil.getFormatted("view.statistics.timespentinminutes"));
+        projectEmployeeXAxis.setLabel(FormattingUtil.getFormatted("view.statistics.timespentinhours"));
         projectEmployeeXAxis.setTickLabelRotation(90);
 
         NumberAxis employeeProjectXAxis = new NumberAxis();
-        employeeProjectXAxis.setLabel(FormattingUtil.getFormatted("view.statistics.timespentinminutes"));
+        employeeProjectXAxis.setLabel(FormattingUtil.getFormatted("view.statistics.timespentinhours"));
         employeeProjectXAxis.setTickLabelRotation(90);
 
         CategoryAxis projectEmployeeYAxis = new CategoryAxis();
@@ -548,8 +548,8 @@ public abstract class WorklogTab extends Tab {
                                 currentGridRow.incrementAndGet();
 
                                 // bargraph data
-                                projectEmployeeSeries.getData().add(new XYChart.Data<>(timespentInMinutes, projectName));
-                                employeeProjectSeries.getData().addAll(new XYChart.Data<>(timespentInMinutes, employee));
+                                projectEmployeeSeries.getData().add(new XYChart.Data<>(timespentInMinutes / 60, projectName));
+                                employeeProjectSeries.getData().addAll(new XYChart.Data<>(timespentInMinutes / 60, employee));
                             });
 
                     // total time spent
