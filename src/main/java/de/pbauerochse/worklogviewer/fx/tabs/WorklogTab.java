@@ -548,8 +548,8 @@ public abstract class WorklogTab extends Tab {
                                 currentGridRow.incrementAndGet();
 
                                 // bargraph data
-                                projectEmployeeSeries.getData().add(new XYChart.Data<>(timespentInMinutes / 60, projectName));
-                                employeeProjectSeries.getData().addAll(new XYChart.Data<>(timespentInMinutes / 60, employee));
+                                projectEmployeeSeries.getData().add(new XYChart.Data<>(timespentInMinutes / 60d, projectName));
+                                employeeProjectSeries.getData().addAll(new XYChart.Data<>(timespentInMinutes / 60d, employee));
                             });
 
                     // total time spent
