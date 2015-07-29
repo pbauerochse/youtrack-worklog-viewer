@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.excel.columns;
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import javafx.scene.control.TreeItem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -29,12 +30,13 @@ public class TaskWorklogSummaryExcelColumn extends ExcelColumnRenderer {
             renderHeadline(currentRowIndex, sheet, columnIndex);
         }
 
+        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
         for (TreeItem<DisplayRow> taskWithWorklogsTreeItem : displayResult) {
-            renderTreeItem(taskWithWorklogsTreeItem, sheet, currentRowIndex, columnIndex);
+            renderTreeItem(taskWithWorklogsTreeItem, sheet, currentRowIndex, columnIndex, settings);
         }
     }
 
-    private void renderTreeItem(TreeItem<DisplayRow> item, Sheet sheet, AtomicInteger rowIndex, int columnIndex) {
+    private void renderTreeItem(TreeItem<DisplayRow> item, Sheet sheet, AtomicInteger rowIndex, int columnIndex, SettingsUtil.Settings settings) {
         DisplayRow displayRow = item.getValue();
 
         Row row = getOrCreateRow(rowIndex.getAndIncrement(), sheet);
@@ -49,7 +51,7 @@ public class TaskWorklogSummaryExcelColumn extends ExcelColumnRenderer {
             // headline
             renderHeadline(rowIndex, sheet, columnIndex);
 
-            item.getChildren().forEach(Child -> renderTreeItem(Child, sheet, rowIndex, columnIndex));
+            item.getChildren().forEach(Child -> renderTreeItem(Child, sheet, rowIndex, columnIndex, settings));
 
             // summary at the end
             row = getOrCreateRow(rowIndex.getAndIncrement(), sheet);
@@ -64,7 +66,12 @@ public class TaskWorklogSummaryExcelColumn extends ExcelColumnRenderer {
             cell.setCellStyle(getWorklogSummaryCellStyle(sheet));
         }
 
-        cell.setCellValue(FormattingUtil.formatMinutes(displayRow.getTotaltimeSpent()));
+        if (settings.getShowDecimalHourTimesInExcelReport()) {
+            cell.setCellValue(displayRow.getTotaltimeSpent() / 60d);
+        } else {
+            cell.setCellValue(FormattingUtil.formatMinutes(displayRow.getTotaltimeSpent()));
+        }
+
         adjustRowHeight(cell);
     }
 

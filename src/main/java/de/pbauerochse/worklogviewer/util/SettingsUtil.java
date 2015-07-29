@@ -37,6 +37,7 @@ public class SettingsUtil {
     private static final String SHOW_STATISTICS_PROPERTY = "statistics.enabled";
     private static final String AUTOLOAD_DATA_PROPERTY = "autoload.enabled";
     private static final String AUTOLOAD_DATA_TIMERANGE_PROPERTY = "autoload.timerange";
+    private static final String SHOW_DECIMAL_HOURS_IN_EXCEL_REPORT = "excel.decimaltimes";
 
     private static Settings settings;
 
@@ -169,6 +170,11 @@ public class SettingsUtil {
             settings.loadDataAtStartupProperty().setValue(Boolean.valueOf(autoloadDataAsString));
         }
 
+        String showDecimalHoursInExcel = properties.getProperty(SHOW_DECIMAL_HOURS_IN_EXCEL_REPORT);
+        if (StringUtils.isNotBlank(showDecimalHoursInExcel)) {
+            settings.showDecimalHourTimesInExcelReportProperty().setValue(Boolean.valueOf(showDecimalHoursInExcel));
+        }
+
         String autoloadDataTimerangeAsString = properties.getProperty(AUTOLOAD_DATA_TIMERANGE_PROPERTY);
         if (StringUtils.isNotBlank(autoloadDataTimerangeAsString)) {
             try {
@@ -191,6 +197,7 @@ public class SettingsUtil {
         properties.setProperty(SHOW_ALL_WORKLOGS_PROPERTY, String.valueOf(settings.getShowAllWorklogs()));
         properties.setProperty(SHOW_STATISTICS_PROPERTY, String.valueOf(settings.getShowStatistics()));
         properties.setProperty(AUTOLOAD_DATA_PROPERTY, String.valueOf(settings.getLoadDataAtStartup()));
+        properties.setProperty(SHOW_DECIMAL_HOURS_IN_EXCEL_REPORT, String.valueOf(settings.getShowDecimalHourTimesInExcelReport()));
 
         if (StringUtils.isNotBlank(settings.getYoutrackUrl())) {
             properties.setProperty(YOUTRACK_URL_PROPERTY, settings.getYoutrackUrl());
@@ -241,6 +248,8 @@ public class SettingsUtil {
         private BooleanProperty showStatistics = new SimpleBooleanProperty(true);
 
         private BooleanProperty showAllWorklogs = new SimpleBooleanProperty(true);
+
+        private BooleanProperty showDecimalHourTimesInExcelReport = new SimpleBooleanProperty(false);
 
         private BooleanBinding hasMissingConnectionParametersBinding = youtrackUrlProperty().isEmpty()
                 .or(youtrackUsernameProperty().isEmpty())
@@ -340,6 +349,14 @@ public class SettingsUtil {
 
         public BooleanProperty showAllWorklogsProperty() {
             return showAllWorklogs;
+        }
+
+        public boolean getShowDecimalHourTimesInExcelReport() {
+            return showDecimalHourTimesInExcelReport.get();
+        }
+
+        public BooleanProperty showDecimalHourTimesInExcelReportProperty() {
+            return showDecimalHourTimesInExcelReport;
         }
 
         public BooleanBinding hasMissingConnectionParameters() {

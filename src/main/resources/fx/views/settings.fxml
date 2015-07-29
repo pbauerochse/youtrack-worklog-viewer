@@ -33,6 +33,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
             </rowConstraints>
             <children>
                 <Label text="%view.settings.youtrackurl"/>
@@ -59,6 +60,10 @@
                 <Label text="%view.settings.autoload" GridPane.rowIndex="6"/>
                 <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1"
                           GridPane.rowIndex="6"/>
+
+                <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="7"/>
+                <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1"
+                          GridPane.rowIndex="7"/>
 
             </children>
             <padding>

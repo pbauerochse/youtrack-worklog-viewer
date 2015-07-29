@@ -42,6 +42,9 @@ public class SettingsViewController implements Initializable {
     private CheckBox loadDataAtStartupCheckBox;
 
     @FXML
+    private CheckBox showDecimalsInExcel;
+
+    @FXML
     private Button saveSettingsButton;
 
     @FXML
@@ -63,6 +66,7 @@ public class SettingsViewController implements Initializable {
         showAllWorklogsCheckBox.selectedProperty().bindBidirectional(settings.showAllWorklogsProperty());
         showStatisticsCheckBox.selectedProperty().bindBidirectional(settings.showStatisticsProperty());
         loadDataAtStartupCheckBox.selectedProperty().bindBidirectional(settings.loadDataAtStartupProperty());
+        showDecimalsInExcel.selectedProperty().bindBidirectional(settings.showDecimalHourTimesInExcelReportProperty());
 
         settings.workHoursADayProperty().bind(workhoursComboBox.getSelectionModel().selectedItemProperty());
 
