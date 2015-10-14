@@ -26,7 +26,15 @@
         <google-oauth-client.version>1.20.0</google-oauth-client.version>
         <google-http.version>1.19.0</google-http.version>
         <jersey-client.version>2.22.1</jersey-client.version>
+        <jetbrains-hub.version>1.0.41</jetbrains-hub.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>youtrack-dependencies-local-repo</id>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
@@ -165,27 +173,27 @@
         </dependency>
 
         <dependency>
-            <groupId>jetbrains.jetpass</groupId>
-            <artifactId>hub-client</artifactId>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jetbrains.hub.client-1.0.41.jar</systemPath>
-            <version>1.0.41</version>
+            <groupId>jetbrains.hub</groupId>
+            <artifactId>client</artifactId>
+            <version>${jetbrains-hub.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>jetbrains.jetpass</groupId>
+            <groupId>jetbrains.hub</groupId>
             <artifactId>api</artifactId>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jetbrains.hub.api-1.0.41.jar</systemPath>
-            <version>1.0.41</version>
+            <version>${jetbrains-hub.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>jetbrains.jetpass</groupId>
+            <groupId>jetbrains.hub</groupId>
             <artifactId>api-impl</artifactId>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jetbrains.hub.api-impl-1.0.41.jar</systemPath>
-            <version>1.0.41</version>
+            <version>${jetbrains-hub.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jetbrains.hub</groupId>
+            <artifactId>api-impl</artifactId>
+            <version>${jetbrains-hub.version}</version>
         </dependency>
     </dependencies>
 
