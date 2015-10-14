@@ -1,12 +1,12 @@
-package de.pbauerochse.worklogviewer.youtrack;
+package de.pbauerochse.worklogviewer.youtrack.connector;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
-import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
-import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
+import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
+import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
@@ -25,31 +25,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Patrick Bauerochse
- * @since 01.04.15
+ * @since 14.10.15
  */
-public class YouTrackConnector {
+class ApiLoginConnector implements YouTrackConnector {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackConnector.class);
-
-    private static YouTrackConnector instance;
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     private CloseableHttpClient client;
 
-    public static YouTrackConnector getInstance() {
-        if (instance == null) {
-            instance = new YouTrackConnector();
-        }
-        return instance;
-    }
+    private Integer connectionParameterHashCode;
 
-    private YouTrackConnector() {
+    ApiLoginConnector() {
         initClient();
     }
 
@@ -75,32 +67,44 @@ public class YouTrackConnector {
         }
     }
 
-    public void login() throws Exception {
+    protected void validateLoggedInState() throws Exception {
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
-        String loginUrl = buildYoutrackApiUrl("user/login");
+        if (connectionParameterHashCode == null || !connectionParameterHashCode.equals(settings.getConnectionParametersHashCode())) {
+            LOGGER.debug("Login parameters not loaded yet or changed. Performing login");
 
-        HttpPost request = new HttpPost(loginUrl);
+            String loginUrl = buildYoutrackApiUrl("user/login");
 
-        List<NameValuePair> requestParameters = new ArrayList<>();
-        requestParameters.add(new BasicNameValuePair("login", settings.getYoutrackUsername()));
-        requestParameters.add(new BasicNameValuePair("password", settings.getYoutrackPassword()));
-        request.setEntity(new UrlEncodedFormEntity(requestParameters, "utf-8"));
+            HttpPost request = new HttpPost(loginUrl);
 
-        CloseableHttpResponse response = client.execute(request);
+            List<NameValuePair> requestParameters = new ArrayList<>();
+            requestParameters.add(new BasicNameValuePair("login", settings.getYoutrackUsername()));
+            requestParameters.add(new BasicNameValuePair("password", settings.getYoutrackPassword()));
+            request.setEntity(new UrlEncodedFormEntity(requestParameters, "utf-8"));
 
-        try {
-            EntityUtils.consumeQuietly(response.getEntity());
-        } finally {
-            response.close();
-        }
+            CloseableHttpResponse response = client.execute(request);
 
-        if (!isValidResponseCode(response.getStatusLine())) {
-            throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.login", response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode());
+            try {
+                EntityUtils.consumeQuietly(response.getEntity());
+            } finally {
+                response.close();
+            }
+
+            if (!isValidResponseCode(response.getStatusLine())) {
+                throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.login", response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode());
+            }
+
+            // connection successfull with these settings
+            // hence store them
+            connectionParameterHashCode = settings.getConnectionParametersHashCode();
         }
     }
 
-    public List<GroupByCategory> getPossibleGroupByCategories() throws IOException {
+    @Override
+    public List<GroupByCategory> getPossibleGroupByCategories() throws Exception {
+
+        validateLoggedInState();
+
         String getGroupByCategoriesUrl = buildYoutrackApiUrl("reports/timeReports/possibleGroupByCategories");
 
         HttpGet request = new HttpGet(getGroupByCategoriesUrl);
@@ -122,11 +126,16 @@ public class YouTrackConnector {
 
     /**
      * Creates the temporary worklog report using the given url and timerange
+     *
      * @param requestEntity The request entity for the report
      * @return
      * @throws Exception
      */
+    @Override
     public ReportDetailsResponse createReport(CreateReportRequestEntity requestEntity) throws Exception {
+
+        validateLoggedInState();
+
         LOGGER.debug("Creating temporary timereport");
         String createReportUrl = buildYoutrackApiUrl("current/reports");
 
@@ -157,7 +166,11 @@ public class YouTrackConnector {
         }
     }
 
+    @Override
     public ReportDetailsResponse getReportDetails(String reportId) throws Exception {
+
+        validateLoggedInState();
+
         String reportUrlTemplate = buildYoutrackApiUrl("current/reports/%s");
         LOGGER.debug("Fetching report details from {}", reportUrlTemplate);
 
@@ -176,7 +189,11 @@ public class YouTrackConnector {
         }
     }
 
-    public void deleteReport(String reportId) throws IOException {
+    @Override
+    public void deleteReport(String reportId) throws Exception {
+
+        validateLoggedInState();
+
         String reportUrlTemplate = buildYoutrackApiUrl("current/reports/%s");
         LOGGER.debug("Deleting temporary report using url {}", reportUrlTemplate);
 
@@ -192,7 +209,11 @@ public class YouTrackConnector {
         }
     }
 
-    public ByteArrayInputStream downloadReport(String reportId) throws IOException {
+    @Override
+    public ByteArrayInputStream downloadReport(String reportId) throws Exception {
+
+        validateLoggedInState();
+
         String downloadReportUrlTemplate = buildYoutrackApiUrl("current/reports/%s/export");
         HttpGet request = new HttpGet(String.format(downloadReportUrlTemplate, reportId));
         return client.execute(request, response -> {
@@ -216,7 +237,7 @@ public class YouTrackConnector {
         });
     }
 
-    public String buildYoutrackApiUrl(String path) {
+    private String buildYoutrackApiUrl(String path) {
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
         StringBuilder finalUrl = new StringBuilder(StringUtils.trim(settings.getYoutrackUrl()));
 
@@ -236,5 +257,10 @@ public class YouTrackConnector {
         int statusCode = statusLine.getStatusCode();
 
         return (statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_MULTIPLE_CHOICES);
+    }
+
+    @Override
+    public YouTrackAuthenticationMethod getAuthenticationMethod() {
+        return YouTrackAuthenticationMethod.HTTP_API;
     }
 }

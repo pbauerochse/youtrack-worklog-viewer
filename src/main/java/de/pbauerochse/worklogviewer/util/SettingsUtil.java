@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.util;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
+import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackAuthenticationMethod;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import org.apache.commons.lang3.StringUtils;
@@ -28,10 +29,14 @@ public class SettingsUtil {
     private static final String WINDOW_Y_PROPERTY = "window.y";
     private static final String WINDOW_WIDTH_PROPERTY = "window.width";
     private static final String WINDOW_HEIGHT_PROPERTY = "window.height";
+    private static final String WORK_HOURS_PROPERTY = "workhours";
+
+    private static final String YOUTRACK_AUTHENITCATION_METHOD_PROPERTY = "auth_method";
     private static final String YOUTRACK_USERNAME_PROPERTY = "username";
     private static final String YOUTRACK_PASSWORD_PROPERTY = "password";
     private static final String YOUTRACK_URL_PROPERTY = "youtrackurl";
-    private static final String WORK_HOURS_PROPERTY = "workhours";
+    private static final String YOUTRACK_OAUTH_SERVICE_ID_PROPERTY = "oauth_service_id";
+    private static final String YOUTRACK_OAUTH_SERVICE_SECRET = "oauth_service_secret";
 
     private static final String SHOW_ALL_WORKLOGS_PROPERTY = "showonlyowntimelogs.enabled";
     private static final String SHOW_STATISTICS_PROPERTY = "statistics.enabled";
@@ -143,15 +148,38 @@ public class SettingsUtil {
             }
         }
 
+        // youtrack authentication
+        String youtrackAuthenticationMethodAsString = properties.getProperty(YOUTRACK_AUTHENITCATION_METHOD_PROPERTY);
+        if (StringUtils.isNotBlank(youtrackAuthenticationMethodAsString)) {
+            try {
+                YouTrackAuthenticationMethod method = YouTrackAuthenticationMethod.valueOf(youtrackAuthenticationMethodAsString);
+                settings.youTrackAuthenticationMethod.set(method);
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Could not determine AuthenticationMethod by settings value {}", youtrackAuthenticationMethodAsString);
+            }
+        }
+
         settings.youtrackUrlProperty().setValue(properties.getProperty(YOUTRACK_URL_PROPERTY));
         settings.youtrackUsernameProperty().setValue(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
-        String encryptedPassword = properties.getProperty(YOUTRACK_PASSWORD_PROPERTY);
-        if (StringUtils.isNotBlank(encryptedPassword)) {
+        settings.youtrackOAuthServiceIdProperty().setValue(properties.getProperty(YOUTRACK_OAUTH_SERVICE_ID_PROPERTY));
+
+        String encryptedUserPassword = properties.getProperty(YOUTRACK_PASSWORD_PROPERTY);
+        if (StringUtils.isNotBlank(encryptedUserPassword)) {
             try {
-                settings.youtrackPasswordProperty().setValue(PasswordUtil.decryptEncryptedPassword(encryptedPassword));
+                settings.youtrackPasswordProperty().setValue(EncryptionUtil.decryptEncryptedString(encryptedUserPassword));
             } catch (GeneralSecurityException e) {
                 LOGGER.error("Could not decrypt password from settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.decrypt", e);
+            }
+        }
+
+        String encryptedOAuthServiceSecret = properties.getProperty(YOUTRACK_OAUTH_SERVICE_SECRET);
+        if (StringUtils.isNotBlank(encryptedOAuthServiceSecret)) {
+            try {
+                settings.youtrackOAuthServiceSecretProperty().setValue(EncryptionUtil.decryptEncryptedString(encryptedOAuthServiceSecret));
+            } catch (GeneralSecurityException e) {
+                LOGGER.error("Could not decrypt oauth secret from settings file", e);
+                throw ExceptionUtil.getIllegalStateException("exceptions.settings.oauthsecret.decrypt", e);
             }
         }
 
@@ -207,9 +235,24 @@ public class SettingsUtil {
             properties.setProperty(YOUTRACK_USERNAME_PROPERTY, settings.getYoutrackUsername());
         }
 
+        properties.setProperty(YOUTRACK_AUTHENITCATION_METHOD_PROPERTY, settings.getYouTrackAuthenticationMethod().name());
+
+        if (StringUtils.isNotBlank(settings.getYoutrackOAuthServiceId())) {
+            properties.setProperty(YOUTRACK_OAUTH_SERVICE_ID_PROPERTY, settings.getYoutrackOAuthServiceId());
+        }
+
+        if (StringUtils.isNotBlank(settings.getYoutrackOAuthServiceSecret())) {
+            try {
+                properties.setProperty(YOUTRACK_OAUTH_SERVICE_SECRET, EncryptionUtil.encryptCleartextString(settings.getYoutrackOAuthServiceSecret()));
+            } catch (GeneralSecurityException e) {
+                LOGGER.error("Could not encrypt oauth service secret for settings file", e);
+                throw ExceptionUtil.getIllegalStateException("exceptions.settings.oauthsecret.encrypt", e);
+            }
+        }
+
         if (StringUtils.isNotBlank(settings.getYoutrackPassword())) {
             try {
-                properties.setProperty(YOUTRACK_PASSWORD_PROPERTY, PasswordUtil.encryptCleartextPassword(settings.getYoutrackPassword()));
+                properties.setProperty(YOUTRACK_PASSWORD_PROPERTY, EncryptionUtil.encryptCleartextString(settings.getYoutrackPassword()));
             } catch (GeneralSecurityException e) {
                 LOGGER.error("Could not encrypt password for settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.encrypt", e);
@@ -235,6 +278,12 @@ public class SettingsUtil {
 
         private IntegerProperty workHoursADay = new SimpleIntegerProperty(8);
 
+        private SimpleObjectProperty<YouTrackAuthenticationMethod> youTrackAuthenticationMethod = new SimpleObjectProperty<>(YouTrackAuthenticationMethod.HTTP_API);
+
+        private StringProperty youtrackOAuthServiceId = new SimpleStringProperty();
+
+        private StringProperty youtrackOAuthServiceSecret = new SimpleStringProperty();
+
         private StringProperty youtrackUrl = new SimpleStringProperty();
 
         private StringProperty youtrackUsername = new SimpleStringProperty();
@@ -250,6 +299,7 @@ public class SettingsUtil {
         private BooleanProperty showAllWorklogs = new SimpleBooleanProperty(true);
 
         private BooleanProperty showDecimalHourTimesInExcelReport = new SimpleBooleanProperty(false);
+
 
         private BooleanBinding hasMissingConnectionParametersBinding = youtrackUrlProperty().isEmpty()
                 .or(youtrackUsernameProperty().isEmpty())
@@ -361,6 +411,40 @@ public class SettingsUtil {
 
         public BooleanBinding hasMissingConnectionParameters() {
             return hasMissingConnectionParametersBinding;
+        }
+
+        public YouTrackAuthenticationMethod getYouTrackAuthenticationMethod() {
+            return youTrackAuthenticationMethod.get();
+        }
+
+        public SimpleObjectProperty<YouTrackAuthenticationMethod> youTrackAuthenticationMethodProperty() {
+            return youTrackAuthenticationMethod;
+        }
+
+        public String getYoutrackOAuthServiceId() {
+            return youtrackOAuthServiceId.get();
+        }
+
+        public StringProperty youtrackOAuthServiceIdProperty() {
+            return youtrackOAuthServiceId;
+        }
+
+        public String getYoutrackOAuthServiceSecret() {
+            return youtrackOAuthServiceSecret.get();
+        }
+
+        public StringProperty youtrackOAuthServiceSecretProperty() {
+            return youtrackOAuthServiceSecret;
+        }
+
+        public int getConnectionParametersHashCode() {
+            int result = youtrackUrlProperty() != null ? youtrackUrlProperty().hashCode() : 0;
+            result = 31 * result + (youtrackUsernameProperty() != null ? youtrackUsernameProperty().hashCode() : 0);
+            result = 31 * result + (youtrackPasswordProperty() != null ? youtrackPasswordProperty().hashCode() : 0);
+            result = 31 * result + (youTrackAuthenticationMethodProperty() != null ? youTrackAuthenticationMethodProperty().hashCode() : 0);
+            result = 31 * result + (youtrackOAuthServiceIdProperty() != null ? youtrackOAuthServiceIdProperty().hashCode() : 0);
+            result = 31 * result + (youtrackOAuthServiceSecretProperty() != null ? youtrackOAuthServiceSecretProperty().hashCode() : 0);
+            return result;
         }
     }
 

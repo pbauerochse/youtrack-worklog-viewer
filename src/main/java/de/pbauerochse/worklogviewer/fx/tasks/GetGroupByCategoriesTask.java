@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
-import de.pbauerochse.worklogviewer.youtrack.YouTrackConnector;
+import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnector;
+import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnectorFactory;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import javafx.concurrent.Task;
 
@@ -17,11 +18,7 @@ public class GetGroupByCategoriesTask extends Task<List<GroupByCategory>> {
 
     @Override
     protected List<GroupByCategory> call() throws Exception {
-        YouTrackConnector connector = YouTrackConnector.getInstance();
-        updateMessage("Anmelden");
-        updateProgress(0, 1);
-
-        connector.login();
+        YouTrackConnector connector = YouTrackConnectorFactory.getInstance();
 
         updateProgress(0.5, 1);
         updateMessage("Hole Kategorien");
