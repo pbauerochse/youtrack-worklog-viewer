@@ -6,7 +6,7 @@
 
     <groupId>de.pbauerochse</groupId>
     <artifactId>youtrack-worklog-viewer</artifactId>
-    <version>2.0.4</version>
+    <version>2.1.0</version>
 
     <properties>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -186,7 +186,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/jetbrains.hub.api-impl-1.0.41.jar</systemPath>
             <version>1.0.41</version>
-            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

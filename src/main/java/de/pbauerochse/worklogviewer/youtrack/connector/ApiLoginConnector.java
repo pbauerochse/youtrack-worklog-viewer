@@ -35,39 +35,35 @@ import java.util.List;
  */
 class ApiLoginConnector implements YouTrackConnector {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
-    private CloseableHttpClient client;
+    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     private Integer connectionParameterHashCode;
 
-    ApiLoginConnector() {
-        initClient();
+    private CloseableHttpClient getClient() {
+        LOGGER.debug("Initializing HttpClient");
+        List<Header> headerList = new ArrayList<>();
+        addDefaultHeaders(headerList);
+
+        RequestConfig config = RequestConfig
+                .custom()
+                .setConnectTimeout(10 * 1000)                // 10s
+                .setConnectionRequestTimeout(10 * 1000)      // 10s
+                .build();
+
+        return HttpClients
+                .custom()
+                .setDefaultHeaders(headerList)
+                .setDefaultRequestConfig(config)
+                .build();
     }
 
-    private void initClient() {
-        if (client == null) {
-            LOGGER.debug("Initializing HttpClient");
-            List<Header> headerList = new ArrayList<>();
-            headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"));
-            headerList.add(new BasicHeader("Accept-Encoding", "gzip, deflate, sdch"));
-            headerList.add(new BasicHeader("Accept-Language", "de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4"));
-
-            RequestConfig config = RequestConfig
-                    .custom()
-                    .setConnectTimeout(10 * 1000)                // 10s
-                    .setConnectionRequestTimeout(10 * 1000)      // 10s
-                    .build();
-
-            client = HttpClients
-                    .custom()
-                    .setDefaultHeaders(headerList)
-                    .setDefaultRequestConfig(config)
-                    .build();
-        }
+    protected void addDefaultHeaders(List<Header> headerList) {
+        headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"));
+        headerList.add(new BasicHeader("Accept-Encoding", "gzip, deflate, sdch"));
+        headerList.add(new BasicHeader("Accept-Language", "de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4"));
     }
 
-    protected void validateLoggedInState() throws Exception {
+    private void validateLoggedInState() throws Exception {
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
         if (connectionParameterHashCode == null || !connectionParameterHashCode.equals(settings.getConnectionParametersHashCode())) {
@@ -82,7 +78,7 @@ class ApiLoginConnector implements YouTrackConnector {
             requestParameters.add(new BasicNameValuePair("password", settings.getYoutrackPassword()));
             request.setEntity(new UrlEncodedFormEntity(requestParameters, "utf-8"));
 
-            CloseableHttpResponse response = client.execute(request);
+            CloseableHttpResponse response = getClient().execute(request);
 
             try {
                 EntityUtils.consumeQuietly(response.getEntity());
@@ -110,7 +106,7 @@ class ApiLoginConnector implements YouTrackConnector {
         HttpGet request = new HttpGet(getGroupByCategoriesUrl);
         request.addHeader("Accept", "application/json, text/plain, */*");
 
-        try (CloseableHttpResponse httpResponse = client.execute(request)) {
+        try (CloseableHttpResponse httpResponse = getClient().execute(request)) {
             if (!isValidResponseCode(httpResponse.getStatusLine())) {
                 LOGGER.warn("Fetching groupBy categories from {} failed: {}", getGroupByCategoriesUrl, httpResponse.getStatusLine().getReasonPhrase());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
@@ -149,7 +145,7 @@ class ApiLoginConnector implements YouTrackConnector {
 
         // create report
 
-        try (CloseableHttpResponse response = client.execute(createReportRequest)) {
+        try (CloseableHttpResponse response = getClient().execute(createReportRequest)) {
             if (!isValidResponseCode(response.getStatusLine())) {
                 LOGGER.error("Creating temporary timereport failed: {}", response.getStatusLine().getReasonPhrase());
                 throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.creatingreport", response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode());
@@ -176,7 +172,7 @@ class ApiLoginConnector implements YouTrackConnector {
 
         HttpGet reportDetailsRequest = new HttpGet(String.format(reportUrlTemplate, reportId));
 
-        try (CloseableHttpResponse httpResponse = client.execute(reportDetailsRequest)) {
+        try (CloseableHttpResponse httpResponse = getClient().execute(reportDetailsRequest)) {
             if (!isValidResponseCode(httpResponse.getStatusLine())) {
                 LOGGER.warn("Fetching report details from {} failed: {}", reportUrlTemplate, httpResponse.getStatusLine().getReasonPhrase());
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
@@ -195,11 +191,12 @@ class ApiLoginConnector implements YouTrackConnector {
         validateLoggedInState();
 
         String reportUrlTemplate = buildYoutrackApiUrl("current/reports/%s");
-        LOGGER.debug("Deleting temporary report using url {}", reportUrlTemplate);
+        String deleteReportUrl = String.format(reportUrlTemplate, reportId);
 
-        HttpDelete deleteRequest = new HttpDelete(String.format(reportUrlTemplate, reportId));
+        LOGGER.debug("Deleting temporary report using url {}", deleteReportUrl);
+        HttpDelete deleteRequest = new HttpDelete(deleteReportUrl);
 
-        try (CloseableHttpResponse response = client.execute(deleteRequest)) {
+        try (CloseableHttpResponse response = getClient().execute(deleteRequest)) {
             EntityUtils.consumeQuietly(response.getEntity());
 
             if (!isValidResponseCode(response.getStatusLine())) {
@@ -216,7 +213,7 @@ class ApiLoginConnector implements YouTrackConnector {
 
         String downloadReportUrlTemplate = buildYoutrackApiUrl("current/reports/%s/export");
         HttpGet request = new HttpGet(String.format(downloadReportUrlTemplate, reportId));
-        return client.execute(request, response -> {
+        return getClient().execute(request, response -> {
             HttpEntity entity = response.getEntity();
             ByteArrayInputStream reportDataInputStream = null;
 

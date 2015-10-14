@@ -75,6 +75,7 @@ public class SettingsViewController implements Initializable {
         youtrackUsernameField.textProperty().bindBidirectional(settings.youtrackUsernameProperty());
         youtrackPasswordField.textProperty().bindBidirectional(settings.youtrackPasswordProperty());
 
+        youtrackOAuthServiceIdField.textProperty().bindBidirectional(settings.youtrackOAuthServiceIdProperty());
         youtrackOAuthServiceSecretField.textProperty().bindBidirectional(settings.youtrackOAuthServiceSecretProperty());
 
         youtrackAuthenticationMethodField.getItems().addAll(YouTrackAuthenticationMethod.values());
