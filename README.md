@@ -55,3 +55,38 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **Can I use OAuth2 authorization?**
 *Starting from version 2.1.0 you may now switch authentication from REST to OAuth2 in the settings dialogue. To get this working you will need to configure a service in the YouTrack Hub for the YouTrack Worklog Viewer and also provide the client id and client secret in the settings dialogue*
+
+## Setting up OAuth2
+To get OAuth2 authentication working you need to set up a Service in the YouTrack Hub for the YouTrack Worklog Viewer. This only needs to be done once by your YouTrack administrator. The following steps will guide you as an administrator through the process.
+ 
+### Step 1 - Setup the Service
+Login to the YouTrack Hub. This web-interface can be accessed by pointing your browser to `<YourYouTrackBaseUrl>/hub` (e.g. if your YouTrack dashboard can be accessed with `https://issues.mycompany.com/dashboard` then your Hub URL is `https://issues.mycompany.com/hub`). In the top navigation click on "More settings" and then "Services"
+
+![Step 1 - Create Service in Hub](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/oauth_step1_service.png)
+
+Then click on "Create Service..." and put in a name for the service (e.g. YouTrack Worklog Viewer). You may leave the Home URL blank or put in the link to the github page. Click "Create Service"
+
+### Step 2 - Set the service to trustworthy
+Once you created the service, you need to set this service to trusted by clicking the "Trust" button. 
+
+![Step 2 - Trust and Client ID](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/oauth_step2_trust_and_client_id.png)
+
+The generated ID later needs to be copied to every YouTrack Worklog Viewer client that accesses the data from this YouTrack instance.
+
+### Step 3 - Set or generate the service secret
+Now you need to obtain the secret token. YouTrack can generate a token for you or you may set a fixed token. This token and the client id from step 2 need to be copied to your YouTrack Worklog Viewer settings.
+ 
+![Step 3 - The service secret](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/oauth_step3_secret_token.png)
+
+Attention: The token presented to you in that popup window is *NOT* the current set token. It is a newly generate random token, that gets set once you click on "Change secret". Make sure you copy the token *before* changing it or you will never ever see that token again and have to generate a new one.
+
+### Step 4 - Set the client Id and secret token in YouTrack Worklog Viewer
+Now that you have obtained the client id and the secret service token, you must paste that information into your YouTrack Worklog Viewer settings dialogue
+
+![Step 4 - YouTrack Worklog Viewer settings](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/oauth_step4_ywlv_settings.png)
+
+Set the authentication method to OAuth2 and click on "Save". Now you should be good to go with OAuth2. The OAuth2 secret token will be encrypted in the same way the user password gets encrypted, before saving it to the `youtrack-worklog.properties` file. 
+
+### Optional Step 5 - Service for every single user
+To add even more security you could consider repeating all steps for every single user that uses the YouTrack Worklog Viewer, so they won't share a single service id and service secret.
+This is an optional step and is not required. The OAuth2 authentication works perfectly fine with a shared service id and secret.

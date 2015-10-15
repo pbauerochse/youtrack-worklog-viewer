@@ -8,6 +8,9 @@ import jetbrains.jetpass.client.oauth2.OAuth2Client;
 import jetbrains.jetpass.client.oauth2.token.OAuth2ResourceOwnerFlow;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
+import org.apache.http.NameValuePair;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 
 import java.net.MalformedURLException;
@@ -19,19 +22,23 @@ import java.util.List;
  * @author Patrick Bauerochse
  * @since 14.10.15
  */
-class OAuth2Connector extends ApiLoginConnector implements YouTrackConnector {
+class OAuth2Connector extends YouTrackConnectorBase {
 
     public static final String YOUTRACK_SCOPE = "YouTrack";
 
+    private Integer connectionParameterHashCode;
+
     private AccessToken accessToken;
 
-    @Override
-    protected void addDefaultHeaders(List<Header> headerList) {
-        super.addDefaultHeaders(headerList);
+    private CloseableHttpClient client;
 
-        if (accessToken == null || new Date().after(accessToken.getExpirationDate())) {
-            LOGGER.debug("Fetching new AccessToken");
-            SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+    @Override
+    protected CloseableHttpClient performLoginIfNecessary(HttpClientBuilder clientBuilder, List<Header> requestHeaders) throws Exception {
+
+        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+
+        if (client == null || accessToken == null || new Date().after(accessToken.getExpirationDate()) || (connectionParameterHashCode != null && !connectionParameterHashCode.equals(settings.getConnectionParametersHashCode()))) {
+            LOGGER.info("Fetching new access token");
 
             try {
                 URL hubUrl = getHubUrl(settings.getYoutrackUrl());
@@ -48,15 +55,28 @@ class OAuth2Connector extends ApiLoginConnector implements YouTrackConnector {
                         .build();
 
                 accessToken = flow.getToken();
+                if (accessToken == null) {
+                    throw ExceptionUtil.getIllegalStateException("exceptions.oauth.couldnotobtainaccesstoken");
+                }
+
+                LOGGER.debug("Setting AccessToken");
+
+                String requestHeaderValue = String.format("%s %s", accessToken.getType(), accessToken.encode());
+                requestHeaders.add(new BasicHeader("Authorization", requestHeaderValue));
+
+                // everythings fine
+                // set headers and initialize client
+                connectionParameterHashCode = settings.getConnectionParametersHashCode();
+                client = clientBuilder
+                        .setDefaultHeaders(requestHeaders)
+                        .build();
+
             } catch (MalformedURLException e) {
                 LOGGER.error("Malformed URL", e);
             }
         }
 
-        if (accessToken != null) {
-            LOGGER.debug("Setting AccessToken");
-            headerList.add(new BasicHeader("Authorization", String.format("%s %s", accessToken.getType(), accessToken.encode())));
-        }
+        return client;
     }
 
     private URL getHubUrl(String baseUrl) throws MalformedURLException {
