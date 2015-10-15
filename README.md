@@ -79,14 +79,14 @@ Now you need to obtain the secret token. YouTrack can generate a token for you o
  
 ![Step 3 - The service secret](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/oauth_step3_secret_token.png)
 
-Attention: The token presented to you in that popup window is *NOT* the current set token. It is a newly generate random token, that gets set once you click on "Change secret". Make sure you copy the token *before* changing it or you will never ever see that token again and have to generate a new one.
+Attention: The token presented to you in that popup window is **NOT** the currently set token. It is a newly generated random token that gets set once you click on "Change Secret". Make sure you copy the token *before* changing it or you will never ever see that token again and have to generate a new one.
 
 ### Step 4 - Set the client Id and secret token in YouTrack Worklog Viewer
-Now that you have obtained the client id and the secret service token, you must paste that information into your YouTrack Worklog Viewer settings dialogue
+Now that you have obtained the client id and the secret token, you need to paste that information into your YouTrack Worklog Viewer settings dialogue
 
 ![Step 4 - YouTrack Worklog Viewer settings](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/oauth_step4_ywlv_settings.png)
 
-Set the authentication method to OAuth2 and click on "Save". Now you should be good to go with OAuth2. The OAuth2 secret token will be encrypted in the same way the user password gets encrypted, before saving it to the `youtrack-worklog.properties` file. 
+Set the authentication method to OAuth2 and click on "Save". Now you should be good to go with OAuth2. The OAuth2 secret token will be encrypted in the same way the user password gets encrypted, before saving it to the `youtrack-worklog.properties` file.
 
 ### Optional Step 5 - Service for every single user
 To add even more security you could consider repeating all steps for every single user that uses the YouTrack Worklog Viewer, so they won't share a single service id and service secret.
