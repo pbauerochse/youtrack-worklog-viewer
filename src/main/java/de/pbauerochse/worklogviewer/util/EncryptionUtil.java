@@ -14,7 +14,7 @@ import java.util.Base64;
  * @author Patrick Bauerochse
  * @since 13.04.15
  */
-public class PasswordUtil {
+public class EncryptionUtil {
 
     private static final String ENCRYPTION = "PBEWithMD5AndDES";
     private static final Charset UTF8 = Charset.forName("utf-8");
@@ -25,12 +25,12 @@ public class PasswordUtil {
             (byte) 0x11, (byte) 0x10, (byte) 0x19, (byte) 0x82
     };
 
-    public static String encryptCleartextPassword(String cleartext) throws GeneralSecurityException {
+    public static String encryptCleartextString(String cleartext) throws GeneralSecurityException {
         Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
         return base64Encode(cipher.doFinal(cleartext.getBytes(UTF8)));
     }
 
-    public static String decryptEncryptedPassword(String encrypted) throws GeneralSecurityException {
+    public static String decryptEncryptedString(String encrypted) throws GeneralSecurityException {
         Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
         return new String(cipher.doFinal(base64Decode(encrypted)), UTF8);
     }

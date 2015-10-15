@@ -1,6 +1,8 @@
 package de.pbauerochse.worklogviewer.fx;
 
+import de.pbauerochse.worklogviewer.fx.converter.YouTrackAuthenticationMethodStringConverter;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackAuthenticationMethod;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -45,6 +47,15 @@ public class SettingsViewController implements Initializable {
     private CheckBox showDecimalsInExcel;
 
     @FXML
+    private ComboBox<YouTrackAuthenticationMethod> youtrackAuthenticationMethodField;
+
+    @FXML
+    private TextField youtrackOAuthServiceIdField;
+
+    @FXML
+    private PasswordField youtrackOAuthServiceSecretField;
+
+    @FXML
     private Button saveSettingsButton;
 
     @FXML
@@ -63,6 +74,15 @@ public class SettingsViewController implements Initializable {
         youtrackUrlField.textProperty().bindBidirectional(settings.youtrackUrlProperty());
         youtrackUsernameField.textProperty().bindBidirectional(settings.youtrackUsernameProperty());
         youtrackPasswordField.textProperty().bindBidirectional(settings.youtrackPasswordProperty());
+
+        youtrackOAuthServiceIdField.textProperty().bindBidirectional(settings.youtrackOAuthServiceIdProperty());
+        youtrackOAuthServiceSecretField.textProperty().bindBidirectional(settings.youtrackOAuthServiceSecretProperty());
+
+        youtrackAuthenticationMethodField.getItems().addAll(YouTrackAuthenticationMethod.values());
+        youtrackAuthenticationMethodField.setConverter(new YouTrackAuthenticationMethodStringConverter());
+        youtrackAuthenticationMethodField.getSelectionModel().select(settings.youTrackAuthenticationMethodProperty().get());
+        youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> settings.youTrackAuthenticationMethodProperty().set(newValue));
+
         showAllWorklogsCheckBox.selectedProperty().bindBidirectional(settings.showAllWorklogsProperty());
         showStatisticsCheckBox.selectedProperty().bindBidirectional(settings.showStatisticsProperty());
         loadDataAtStartupCheckBox.selectedProperty().bindBidirectional(settings.loadDataAtStartupProperty());

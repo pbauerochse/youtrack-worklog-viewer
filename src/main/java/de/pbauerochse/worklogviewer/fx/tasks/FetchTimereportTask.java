@@ -1,13 +1,14 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
-import de.pbauerochse.worklogviewer.youtrack.YouTrackConnector;
+import de.pbauerochse.worklogviewer.util.ExceptionUtil;
+import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnector;
+import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnectorFactory;
 import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
 import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
 import de.pbauerochse.worklogviewer.youtrack.csv.YouTrackCsvReportProcessor;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
-import de.pbauerochse.worklogviewer.util.ExceptionUtil;
-import de.pbauerochse.worklogviewer.util.FormattingUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,15 +36,10 @@ public class FetchTimereportTask extends Task<WorklogReport> {
     @Override
     protected WorklogReport call() throws Exception {
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
-        YouTrackConnector connector = YouTrackConnector.getInstance();
+        YouTrackConnector connector = YouTrackConnectorFactory.getInstance();
 
         updateProgress(0, 100);
         updateMessage(FormattingUtil.getFormatted("worker.progress.login", settings.getYoutrackUsername()));
-
-        // login to the youtrack api
-        LOGGER.debug("Logging in to YouTrack at {} as {}", settings.getYoutrackUrl(), settings.getYoutrackUsername());
-        connector.login();
-        updateProgress(10, 100);
 
         // create report
         CreateReportRequestEntity reportRequestEntity = new CreateReportRequestEntity(context);
