@@ -54,6 +54,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 *Unfortunately this also is a YouTrack issue: The report itself already contains the broken characters so I have no chance to fix that. If you want to get this fixed vote on the issue at https://youtrack.jetbrains.com/issue/JT-29234*
 
 **Can I use OAuth2 authorization?**
+
 *Starting from version 2.1.0 you may now switch authentication from REST to OAuth2 in the settings dialogue. To get this working you will need to configure a service in the YouTrack Hub for the YouTrack Worklog Viewer and also provide the client id and client secret in the settings dialogue*
 
 ## Setting up OAuth2
