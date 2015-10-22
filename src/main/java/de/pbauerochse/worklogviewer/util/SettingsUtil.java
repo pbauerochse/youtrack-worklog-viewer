@@ -37,6 +37,7 @@ public class SettingsUtil {
     private static final String YOUTRACK_URL_PROPERTY = "youtrackurl";
     private static final String YOUTRACK_OAUTH_SERVICE_ID_PROPERTY = "oauth_service_id";
     private static final String YOUTRACK_OAUTH_SERVICE_SECRET = "oauth_service_secret";
+    private static final String YOUTRACK_OAUTH_HUB_URL = "oauth_hub_url";
 
     private static final String SHOW_ALL_WORKLOGS_PROPERTY = "showonlyowntimelogs.enabled";
     private static final String SHOW_STATISTICS_PROPERTY = "statistics.enabled";
@@ -162,7 +163,7 @@ public class SettingsUtil {
         settings.youtrackUrlProperty().setValue(properties.getProperty(YOUTRACK_URL_PROPERTY));
         settings.youtrackUsernameProperty().setValue(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
         settings.youtrackOAuthServiceIdProperty().setValue(properties.getProperty(YOUTRACK_OAUTH_SERVICE_ID_PROPERTY));
-
+        settings.youtrackOAuthHubUrlProperty().setValue(properties.getProperty(YOUTRACK_OAUTH_HUB_URL));
         String encryptedUserPassword = properties.getProperty(YOUTRACK_PASSWORD_PROPERTY);
         if (StringUtils.isNotBlank(encryptedUserPassword)) {
             try {
@@ -231,6 +232,10 @@ public class SettingsUtil {
             properties.setProperty(YOUTRACK_URL_PROPERTY, settings.getYoutrackUrl());
         }
 
+        if (StringUtils.isNotBlank(settings.getYoutrackOAuthHubUrl())) {
+            properties.setProperty(YOUTRACK_OAUTH_HUB_URL, settings.getYoutrackOAuthHubUrl());
+        }
+
         if (StringUtils.isNotBlank(settings.getYoutrackUsername())) {
             properties.setProperty(YOUTRACK_USERNAME_PROPERTY, settings.getYoutrackUsername());
         }
@@ -279,6 +284,8 @@ public class SettingsUtil {
         private IntegerProperty workHoursADay = new SimpleIntegerProperty(8);
 
         private SimpleObjectProperty<YouTrackAuthenticationMethod> youTrackAuthenticationMethod = new SimpleObjectProperty<>(YouTrackAuthenticationMethod.HTTP_API);
+
+        private StringProperty youtrackOAuthHubUrl = new SimpleStringProperty();
 
         private StringProperty youtrackOAuthServiceId = new SimpleStringProperty();
 
@@ -437,6 +444,14 @@ public class SettingsUtil {
             return youtrackOAuthServiceSecret;
         }
 
+        public String getYoutrackOAuthHubUrl() {
+            return youtrackOAuthHubUrl.get();
+        }
+
+        public StringProperty youtrackOAuthHubUrlProperty() {
+            return youtrackOAuthHubUrl;
+        }
+
         public int getConnectionParametersHashCode() {
             int result = youtrackUrlProperty() != null ? youtrackUrlProperty().hashCode() : 0;
             result = 31 * result + (youtrackUsernameProperty() != null ? youtrackUsernameProperty().hashCode() : 0);
@@ -444,6 +459,7 @@ public class SettingsUtil {
             result = 31 * result + (youTrackAuthenticationMethodProperty() != null ? youTrackAuthenticationMethodProperty().hashCode() : 0);
             result = 31 * result + (youtrackOAuthServiceIdProperty() != null ? youtrackOAuthServiceIdProperty().hashCode() : 0);
             result = 31 * result + (youtrackOAuthServiceSecretProperty() != null ? youtrackOAuthServiceSecretProperty().hashCode() : 0);
+            result = 31 * result + (youtrackOAuthHubUrlProperty() != null ? youtrackOAuthHubUrlProperty().hashCode() : 0);
             return result;
         }
     }

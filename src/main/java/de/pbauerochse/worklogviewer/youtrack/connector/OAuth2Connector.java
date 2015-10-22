@@ -1,14 +1,13 @@
 package de.pbauerochse.worklogviewer.youtrack.connector;
 
 import com.intellij.hub.auth.oauth2.token.AccessToken;
+import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import jetbrains.jetpass.client.hub.HubClient;
 import jetbrains.jetpass.client.oauth2.OAuth2Client;
 import jetbrains.jetpass.client.oauth2.token.OAuth2ResourceOwnerFlow;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
-import org.apache.http.NameValuePair;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
@@ -24,7 +23,7 @@ import java.util.List;
  */
 class OAuth2Connector extends YouTrackConnectorBase {
 
-    public static final String YOUTRACK_SCOPE = "YouTrack";
+    private static final String YOUTRACK_SCOPE = "YouTrack";
 
     private Integer connectionParameterHashCode;
 
@@ -41,7 +40,7 @@ class OAuth2Connector extends YouTrackConnectorBase {
             LOGGER.info("Fetching new access token");
 
             try {
-                URL hubUrl = getHubUrl(settings.getYoutrackUrl());
+                URL hubUrl = new URL(settings.getYoutrackOAuthHubUrl());
 
                 HubClient hubClient = HubClient.builder().baseUrl(hubUrl).build();
 
@@ -73,26 +72,14 @@ class OAuth2Connector extends YouTrackConnectorBase {
 
             } catch (MalformedURLException e) {
                 LOGGER.error("Malformed URL", e);
+                throw ExceptionUtil.getIllegalArgumentException("exceptions.main.oauth2.huburl", e);
             }
         }
 
         return client;
     }
 
-    private URL getHubUrl(String baseUrl) throws MalformedURLException {
-        if (StringUtils.isBlank(baseUrl)) {
-            throw ExceptionUtil.getIllegalArgumentException("exceptions.main.worker.youtrackurl");
-        }
 
-        StringBuilder sb = new StringBuilder(baseUrl);
-        while (sb.charAt(sb.length() - 1) == '/') {
-            sb.deleteCharAt(sb.length() - 1);
-        }
-
-        sb.append("/hub");
-
-        return new URL(sb.toString());
-    }
 
     @Override
     public YouTrackAuthenticationMethod getAuthenticationMethod() {

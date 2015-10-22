@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.geometry.Insets?>
@@ -28,49 +29,68 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                <RowConstraints />
             </rowConstraints>
             <children>
-                <Label text="%view.settings.youtrackurl" />
-                <TextField fx:id="youtrackUrlField" GridPane.columnIndex="1" />
 
-                <Label text="%view.settings.youtrackuser" GridPane.rowIndex="1" />
-                <TextField fx:id="youtrackUsernameField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label text="%view.settings.authentication">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Label>
+                <Hyperlink text="%view.settings.authentication.help" GridPane.columnIndex="1" onAction="#showSettingsHelp" />
 
-                <Label text="%view.settings.youtrackpassword" GridPane.rowIndex="2" />
-                <PasswordField fx:id="youtrackPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label text="%view.settings.youtrackurl" GridPane.rowIndex="1" />
+                <TextField fx:id="youtrackUrlField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Label text="%view.settings.youtrackauthenticationmethod" GridPane.rowIndex="3"/>
-                <ComboBox fx:id="youtrackAuthenticationMethodField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <Label text="%view.settings.youtrackauthenticationmethod" GridPane.rowIndex="2" />
+                <ComboBox fx:id="youtrackAuthenticationMethodField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                <Label text="%view.settings.youtrackoauthserviceid" GridPane.rowIndex="4"/>
-                <TextField fx:id="youtrackOAuthServiceIdField" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                <Label text="%view.settings.youtrackuser" GridPane.rowIndex="3" />
+                <TextField fx:id="youtrackUsernameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                <Label text="%view.settings.youtrackoauthservicesecret" GridPane.rowIndex="5"/>
-                <PasswordField fx:id="youtrackOAuthServiceSecretField" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                <Label text="%view.settings.youtrackpassword" GridPane.rowIndex="4" />
+                <PasswordField fx:id="youtrackPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                <Label text="%view.settings.workhours" GridPane.rowIndex="6" />
-                <ComboBox fx:id="workhoursComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                <Label text="%view.settings.youtrackoauthhuburl" GridPane.rowIndex="5" />
+                <TextField fx:id="youtrackOAuthHubUrlField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-                <Label text="%view.settings.showall" GridPane.rowIndex="7" />
-                <CheckBox fx:id="showAllWorklogsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                <Label text="%view.settings.youtrackoauthserviceid" GridPane.rowIndex="6" />
+                <TextField fx:id="youtrackOAuthServiceIdField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
-                <Label text="%view.settings.showStatistics" GridPane.rowIndex="8" />
-                <CheckBox fx:id="showStatisticsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                <Label text="%view.settings.youtrackoauthservicesecret" GridPane.rowIndex="7" />
+                <PasswordField fx:id="youtrackOAuthServiceSecretField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
 
-                <Label text="%view.settings.autoload" GridPane.rowIndex="9" />
-                <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                <Label text="%view.settings.general" GridPane.rowIndex="8">
+                    <font>
+                        <Font name="System Bold" size="13.0" />
+                    </font>
+                </Label>
 
-                <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="10" />
-                <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                <Label text="%view.settings.workhours" GridPane.rowIndex="9" />
+                <ComboBox fx:id="workhoursComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="9" />
 
+                <Label text="%view.settings.showall" GridPane.rowIndex="10" />
+                <CheckBox fx:id="showAllWorklogsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+
+                <Label text="%view.settings.showStatistics" GridPane.rowIndex="11" />
+                <CheckBox fx:id="showStatisticsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+
+                <Label text="%view.settings.autoload" GridPane.rowIndex="12" />
+                <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+
+                <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="13" />
+                <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="13" />
 
 
             </children>
