@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
+import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnector;
 import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnectorFactory;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
@@ -21,12 +22,12 @@ public class GetGroupByCategoriesTask extends Task<List<GroupByCategory>> {
         YouTrackConnector connector = YouTrackConnectorFactory.getInstance();
 
         updateProgress(0.5, 1);
-        updateMessage("Hole Kategorien");
+        updateMessage(FormattingUtil.getFormatted("worker.progress.categories"));
 
         List<GroupByCategory> possibleGroupByCategories = connector.getPossibleGroupByCategories();
 
         updateProgress(1, 1);
-        updateMessage("Fertig");
+        updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
 
         return possibleGroupByCategories;
     }
