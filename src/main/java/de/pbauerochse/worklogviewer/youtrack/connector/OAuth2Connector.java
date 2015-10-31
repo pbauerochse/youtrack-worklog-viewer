@@ -79,8 +79,6 @@ class OAuth2Connector extends YouTrackConnectorBase {
         return client;
     }
 
-
-
     @Override
     public YouTrackAuthenticationMethod getAuthenticationMethod() {
         return YouTrackAuthenticationMethod.OAUTH2;

@@ -66,7 +66,7 @@ public class TaskWorklogSummaryExcelColumn extends ExcelColumnRenderer {
             cell.setCellStyle(getWorklogSummaryCellStyle(sheet));
         }
 
-        if (settings.getShowDecimalHourTimesInExcelReport()) {
+        if (settings.isShowDecimalHourTimesInExcelReport()) {
             cell.setCellValue(displayRow.getTotaltimeSpent() / 60d);
         } else {
             cell.setCellValue(FormattingUtil.formatMinutes(displayRow.getTotaltimeSpent()));

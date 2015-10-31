@@ -62,10 +62,10 @@ public class WorklogViewer extends Application {
         primaryStage.setY(settings.getWindowY());
         primaryStage.show();
 
-        settings.windowWidthProperty().bind(primaryStage.widthProperty());
-        settings.windowHeightProperty().bind(primaryStage.heightProperty());
-        settings.windowXProperty().bind(mainScene.getWindow().xProperty());
-        settings.windowYProperty().bind(mainScene.getWindow().yProperty());
+        primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> settings.setWindowWidth(newValue.intValue()));
+        primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> settings.setWindowHeight(newValue.intValue()));
+        primaryStage.xProperty().addListener((observable, oldValue, newValue) -> settings.setWindowX(newValue.intValue()));
+        primaryStage.yProperty().addListener((observable, oldValue, newValue) -> settings.setWindowY(newValue.intValue()));
     }
 
     public void requestShutdown() {

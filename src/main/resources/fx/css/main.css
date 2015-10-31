@@ -9,11 +9,17 @@
     -fx-progress-color: #a5cdff;
 }
 
+.ywlv-toolbar {
+    -fx-background-color: -fx-color;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1px;
+}
+
 .required {
     -fx-border-color: red;
 }
 
-.weekend {
+.highlight {
     -fx-background-color: rgba(189, 255, 209, 0.5);
 }
 

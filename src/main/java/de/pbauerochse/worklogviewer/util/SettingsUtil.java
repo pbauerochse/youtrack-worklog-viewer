@@ -2,8 +2,6 @@ package de.pbauerochse.worklogviewer.util;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackAuthenticationMethod;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.DayOfWeek;
 import java.util.Properties;
+
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
 
 /**
  * @author Patrick Bauerochse
@@ -44,6 +46,8 @@ public class SettingsUtil {
     private static final String AUTOLOAD_DATA_PROPERTY = "autoload.enabled";
     private static final String AUTOLOAD_DATA_TIMERANGE_PROPERTY = "autoload.timerange";
     private static final String SHOW_DECIMAL_HOURS_IN_EXCEL_REPORT = "excel.decimaltimes";
+    private static final String COLLAPSE_STATE_PROPERTY = "collapse.state";
+    private static final String HIGHLIGHT_STATE_PROPERTY = "highlight.state";
 
     private static Settings settings;
 
@@ -102,7 +106,7 @@ public class SettingsUtil {
         String windowXAsString = properties.getProperty(WINDOW_X_PROPERTY);
         if (StringUtils.isNotBlank(windowXAsString)) {
             try {
-                settings.windowXProperty().setValue(Integer.parseInt(windowXAsString));
+                settings.setWindowX(Integer.parseInt(windowXAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", windowXAsString, WINDOW_X_PROPERTY);
@@ -112,7 +116,7 @@ public class SettingsUtil {
         String windowYAsString = properties.getProperty(WINDOW_Y_PROPERTY);
         if (StringUtils.isNotBlank(windowYAsString)) {
             try {
-                settings.windowYProperty().setValue(Integer.parseInt(windowYAsString));
+                settings.setWindowY(Integer.parseInt(windowYAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", windowYAsString, WINDOW_Y_PROPERTY);
@@ -122,7 +126,7 @@ public class SettingsUtil {
         String windowWidthAsString = properties.getProperty(WINDOW_WIDTH_PROPERTY);
         if (StringUtils.isNotBlank(windowWidthAsString)) {
             try {
-                settings.windowWidthProperty().setValue(Integer.parseInt(windowWidthAsString));
+                settings.setWindowWidth(Integer.parseInt(windowWidthAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", windowWidthAsString, WINDOW_WIDTH_PROPERTY);
@@ -132,7 +136,7 @@ public class SettingsUtil {
         String windowHeightAsString = properties.getProperty(WINDOW_HEIGHT_PROPERTY);
         if (StringUtils.isNotBlank(windowHeightAsString)) {
             try {
-                settings.windowHeightProperty().setValue(Integer.parseInt(windowHeightAsString));
+                settings.setWindowHeight(Integer.parseInt(windowHeightAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", windowHeightAsString, WINDOW_HEIGHT_PROPERTY);
@@ -142,7 +146,7 @@ public class SettingsUtil {
         String workHoursAsString = properties.getProperty(WORK_HOURS_PROPERTY);
         if (StringUtils.isNotBlank(workHoursAsString)) {
             try {
-                settings.workHoursADayProperty().setValue(Integer.parseInt(workHoursAsString));
+                settings.setWorkHoursADay(Integer.parseInt(workHoursAsString));
             } catch (NumberFormatException e) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", workHoursAsString, WORK_HOURS_PROPERTY);
@@ -154,20 +158,20 @@ public class SettingsUtil {
         if (StringUtils.isNotBlank(youtrackAuthenticationMethodAsString)) {
             try {
                 YouTrackAuthenticationMethod method = YouTrackAuthenticationMethod.valueOf(youtrackAuthenticationMethodAsString);
-                settings.youTrackAuthenticationMethod.set(method);
+                settings.setYouTrackAuthenticationMethod(method);
             } catch (IllegalArgumentException e) {
                 LOGGER.warn("Could not determine AuthenticationMethod by settings value {}", youtrackAuthenticationMethodAsString);
             }
         }
 
-        settings.youtrackUrlProperty().setValue(properties.getProperty(YOUTRACK_URL_PROPERTY));
-        settings.youtrackUsernameProperty().setValue(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
-        settings.youtrackOAuthServiceIdProperty().setValue(properties.getProperty(YOUTRACK_OAUTH_SERVICE_ID_PROPERTY));
-        settings.youtrackOAuthHubUrlProperty().setValue(properties.getProperty(YOUTRACK_OAUTH_HUB_URL));
+        settings.setYoutrackUrl(properties.getProperty(YOUTRACK_URL_PROPERTY));
+        settings.setYoutrackUsername(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
+        settings.setYoutrackOAuthServiceId(properties.getProperty(YOUTRACK_OAUTH_SERVICE_ID_PROPERTY));
+        settings.setYoutrackOAuthHubUrl(properties.getProperty(YOUTRACK_OAUTH_HUB_URL));
         String encryptedUserPassword = properties.getProperty(YOUTRACK_PASSWORD_PROPERTY);
         if (StringUtils.isNotBlank(encryptedUserPassword)) {
             try {
-                settings.youtrackPasswordProperty().setValue(EncryptionUtil.decryptEncryptedString(encryptedUserPassword));
+                settings.setYoutrackPassword(EncryptionUtil.decryptEncryptedString(encryptedUserPassword));
             } catch (GeneralSecurityException e) {
                 LOGGER.error("Could not decrypt password from settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.decrypt", e);
@@ -177,7 +181,7 @@ public class SettingsUtil {
         String encryptedOAuthServiceSecret = properties.getProperty(YOUTRACK_OAUTH_SERVICE_SECRET);
         if (StringUtils.isNotBlank(encryptedOAuthServiceSecret)) {
             try {
-                settings.youtrackOAuthServiceSecretProperty().setValue(EncryptionUtil.decryptEncryptedString(encryptedOAuthServiceSecret));
+                settings.setYoutrackOAuthServiceSecret(EncryptionUtil.decryptEncryptedString(encryptedOAuthServiceSecret));
             } catch (GeneralSecurityException e) {
                 LOGGER.error("Could not decrypt oauth secret from settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.oauthsecret.decrypt", e);
@@ -186,31 +190,49 @@ public class SettingsUtil {
 
         String showOnlyOwnWorklogsAsString = properties.getProperty(SHOW_ALL_WORKLOGS_PROPERTY);
         if (StringUtils.isNotBlank(showOnlyOwnWorklogsAsString)) {
-            settings.showAllWorklogsProperty().setValue(Boolean.valueOf(showOnlyOwnWorklogsAsString));
+            settings.setShowAllWorklogs(Boolean.valueOf(showOnlyOwnWorklogsAsString));
         }
 
         String showStatisticsAsString = properties.getProperty(SHOW_STATISTICS_PROPERTY);
         if (StringUtils.isNotBlank(showStatisticsAsString)) {
-            settings.showStatisticsProperty().setValue(Boolean.valueOf(showStatisticsAsString));
+            settings.setShowStatistics(Boolean.valueOf(showStatisticsAsString));
         }
 
         String autoloadDataAsString = properties.getProperty(AUTOLOAD_DATA_PROPERTY);
         if (StringUtils.isNotBlank(autoloadDataAsString)) {
-            settings.loadDataAtStartupProperty().setValue(Boolean.valueOf(autoloadDataAsString));
+            settings.setLoadDataAtStartup(Boolean.valueOf(autoloadDataAsString));
         }
 
         String showDecimalHoursInExcel = properties.getProperty(SHOW_DECIMAL_HOURS_IN_EXCEL_REPORT);
         if (StringUtils.isNotBlank(showDecimalHoursInExcel)) {
-            settings.showDecimalHourTimesInExcelReportProperty().setValue(Boolean.valueOf(showDecimalHoursInExcel));
+            settings.setShowDecimalHourTimesInExcelReport(Boolean.valueOf(showDecimalHoursInExcel));
         }
 
         String autoloadDataTimerangeAsString = properties.getProperty(AUTOLOAD_DATA_TIMERANGE_PROPERTY);
         if (StringUtils.isNotBlank(autoloadDataTimerangeAsString)) {
             try {
                 ReportTimerange reportTimerange = ReportTimerange.valueOf(autoloadDataTimerangeAsString);
-                settings.lastUsedReportTimerangeProperty().setValue(reportTimerange);
+                settings.setLastUsedReportTimerange(reportTimerange);
             } catch (IllegalArgumentException e) {
                 LOGGER.warn("Could not determine ReportTimerange by settings value {}", autoloadDataTimerangeAsString);
+            }
+        }
+
+        String collapseStateAsString = properties.getProperty(COLLAPSE_STATE_PROPERTY);
+        if (StringUtils.isNotBlank(collapseStateAsString)) {
+            try {
+                settings.setCollapseState(Integer.parseInt(collapseStateAsString));
+            } catch (NumberFormatException e) {
+                LOGGER.warn("Could not get collapse state from {}", collapseStateAsString);
+            }
+        }
+
+        String highlightStateAsString = properties.getProperty(HIGHLIGHT_STATE_PROPERTY);
+        if (StringUtils.isNotBlank(highlightStateAsString)) {
+            try {
+                settings.setHighlightState(Integer.parseInt(highlightStateAsString));
+            } catch (NumberFormatException e) {
+                LOGGER.warn("Could not get highlight state from {}", highlightStateAsString);
             }
         }
     }
@@ -223,10 +245,10 @@ public class SettingsUtil {
         properties.setProperty(WINDOW_WIDTH_PROPERTY, String.valueOf(settings.getWindowWidth()));
         properties.setProperty(WINDOW_HEIGHT_PROPERTY, String.valueOf(settings.getWindowHeight()));
         properties.setProperty(WORK_HOURS_PROPERTY, String.valueOf(settings.getWorkHoursADay()));
-        properties.setProperty(SHOW_ALL_WORKLOGS_PROPERTY, String.valueOf(settings.getShowAllWorklogs()));
-        properties.setProperty(SHOW_STATISTICS_PROPERTY, String.valueOf(settings.getShowStatistics()));
-        properties.setProperty(AUTOLOAD_DATA_PROPERTY, String.valueOf(settings.getLoadDataAtStartup()));
-        properties.setProperty(SHOW_DECIMAL_HOURS_IN_EXCEL_REPORT, String.valueOf(settings.getShowDecimalHourTimesInExcelReport()));
+        properties.setProperty(SHOW_ALL_WORKLOGS_PROPERTY, String.valueOf(settings.isShowAllWorklogs()));
+        properties.setProperty(SHOW_STATISTICS_PROPERTY, String.valueOf(settings.isShowStatistics()));
+        properties.setProperty(AUTOLOAD_DATA_PROPERTY, String.valueOf(settings.isLoadDataAtStartup()));
+        properties.setProperty(SHOW_DECIMAL_HOURS_IN_EXCEL_REPORT, String.valueOf(settings.isShowDecimalHourTimesInExcelReport()));
 
         if (StringUtils.isNotBlank(settings.getYoutrackUrl())) {
             properties.setProperty(YOUTRACK_URL_PROPERTY, settings.getYoutrackUrl());
@@ -268,199 +290,267 @@ public class SettingsUtil {
             properties.setProperty(AUTOLOAD_DATA_TIMERANGE_PROPERTY, settings.getLastUsedReportTimerange().name());
         }
 
+        properties.setProperty(COLLAPSE_STATE_PROPERTY, String.valueOf(settings.collapseState));
+        properties.setProperty(HIGHLIGHT_STATE_PROPERTY, String.valueOf(settings.highlightState));
+
         return properties;
     }
 
     public static class Settings {
 
-        private IntegerProperty windowWidth = new SimpleIntegerProperty(800);
+        private int windowWidth = 800;
 
-        private IntegerProperty windowHeight = new SimpleIntegerProperty(600);
+        private int windowHeight = 600;
 
-        private IntegerProperty windowX = new SimpleIntegerProperty(0);
+        private int windowX = 0;
 
-        private IntegerProperty windowY = new SimpleIntegerProperty(0);
+        private int windowY = 0;
 
-        private IntegerProperty workHoursADay = new SimpleIntegerProperty(8);
+        private int workHoursADay = 8;
 
-        private SimpleObjectProperty<YouTrackAuthenticationMethod> youTrackAuthenticationMethod = new SimpleObjectProperty<>(YouTrackAuthenticationMethod.HTTP_API);
+        private YouTrackAuthenticationMethod youTrackAuthenticationMethod = YouTrackAuthenticationMethod.HTTP_API;
 
-        private StringProperty youtrackOAuthHubUrl = new SimpleStringProperty();
+        private String youtrackOAuthHubUrl;
 
-        private StringProperty youtrackOAuthServiceId = new SimpleStringProperty();
+        private String youtrackOAuthServiceId;
 
-        private StringProperty youtrackOAuthServiceSecret = new SimpleStringProperty();
+        private String youtrackOAuthServiceSecret;
 
-        private StringProperty youtrackUrl = new SimpleStringProperty();
+        private String youtrackUrl;
 
-        private StringProperty youtrackUsername = new SimpleStringProperty();
+        private String youtrackUsername;
 
-        private StringProperty youtrackPassword = new SimpleStringProperty();
+        private String youtrackPassword;
 
-        private BooleanProperty loadDataAtStartup = new SimpleBooleanProperty(false);
+        private boolean loadDataAtStartup = false;
 
-        private SimpleObjectProperty<ReportTimerange> lastUsedReportTimerange = new SimpleObjectProperty<>(ReportTimerange.THIS_WEEK);
+        private ReportTimerange lastUsedReportTimerange = ReportTimerange.THIS_WEEK;
 
-        private BooleanProperty showStatistics = new SimpleBooleanProperty(true);
+        private boolean showStatistics = true;
 
-        private BooleanProperty showAllWorklogs = new SimpleBooleanProperty(true);
+        private boolean showAllWorklogs = true;
 
-        private BooleanProperty showDecimalHourTimesInExcelReport = new SimpleBooleanProperty(false);
+        private boolean showDecimalHourTimesInExcelReport = false;
 
+        private int collapseState = createBitMaskState(SATURDAY, SUNDAY);
 
-        private BooleanBinding hasMissingConnectionParametersBinding = youtrackUrlProperty().isEmpty()
-                .or(youtrackUsernameProperty().isEmpty())
-                .or(youtrackPasswordProperty().isEmpty());
+        private int highlightState = createBitMaskState(SATURDAY, SUNDAY);
 
         public int getWindowWidth() {
-            return windowWidth.get();
-        }
-
-        public IntegerProperty windowWidthProperty() {
             return windowWidth;
         }
 
-        public int getWindowHeight() {
-            return windowHeight.get();
+        public void setWindowWidth(int windowWidth) {
+            this.windowWidth = windowWidth;
         }
 
-        public IntegerProperty windowHeightProperty() {
+        public int getWindowHeight() {
             return windowHeight;
         }
 
-        public int getWindowX() {
-            return windowX.get();
+        public void setWindowHeight(int windowHeight) {
+            this.windowHeight = windowHeight;
         }
 
-        public IntegerProperty windowXProperty() {
+        public int getWindowX() {
             return windowX;
         }
 
-        public int getWindowY() {
-            return windowY.get();
+        public void setWindowX(int windowX) {
+            this.windowX = windowX;
         }
 
-        public IntegerProperty windowYProperty() {
+        public int getWindowY() {
             return windowY;
         }
 
-        public int getWorkHoursADay() {
-            return workHoursADay.get();
+        public void setWindowY(int windowY) {
+            this.windowY = windowY;
         }
 
-        public IntegerProperty workHoursADayProperty() {
+        public int getWorkHoursADay() {
             return workHoursADay;
         }
 
-        public String getYoutrackUrl() {
-            return youtrackUrl.get();
-        }
-
-        public StringProperty youtrackUrlProperty() {
-            return youtrackUrl;
-        }
-
-        public String getYoutrackUsername() {
-            return youtrackUsername.get();
-        }
-
-        public StringProperty youtrackUsernameProperty() {
-            return youtrackUsername;
-        }
-
-        public String getYoutrackPassword() {
-            return youtrackPassword.get();
-        }
-
-        public StringProperty youtrackPasswordProperty() {
-            return youtrackPassword;
-        }
-
-        public boolean getLoadDataAtStartup() {
-            return loadDataAtStartup.get();
-        }
-
-        public BooleanProperty loadDataAtStartupProperty() {
-            return loadDataAtStartup;
-        }
-
-        public ReportTimerange getLastUsedReportTimerange() {
-            return lastUsedReportTimerange.get();
-        }
-
-        public SimpleObjectProperty<ReportTimerange> lastUsedReportTimerangeProperty() {
-            return lastUsedReportTimerange;
-        }
-
-        public boolean getShowStatistics() {
-            return showStatistics.get();
-        }
-
-        public BooleanProperty showStatisticsProperty() {
-            return showStatistics;
-        }
-
-        public boolean getShowAllWorklogs() {
-            return showAllWorklogs.get();
-        }
-
-        public BooleanProperty showAllWorklogsProperty() {
-            return showAllWorklogs;
-        }
-
-        public boolean getShowDecimalHourTimesInExcelReport() {
-            return showDecimalHourTimesInExcelReport.get();
-        }
-
-        public BooleanProperty showDecimalHourTimesInExcelReportProperty() {
-            return showDecimalHourTimesInExcelReport;
-        }
-
-        public BooleanBinding hasMissingConnectionParameters() {
-            return hasMissingConnectionParametersBinding;
+        public void setWorkHoursADay(int workHoursADay) {
+            this.workHoursADay = workHoursADay;
         }
 
         public YouTrackAuthenticationMethod getYouTrackAuthenticationMethod() {
-            return youTrackAuthenticationMethod.get();
-        }
-
-        public SimpleObjectProperty<YouTrackAuthenticationMethod> youTrackAuthenticationMethodProperty() {
             return youTrackAuthenticationMethod;
         }
 
-        public String getYoutrackOAuthServiceId() {
-            return youtrackOAuthServiceId.get();
-        }
-
-        public StringProperty youtrackOAuthServiceIdProperty() {
-            return youtrackOAuthServiceId;
-        }
-
-        public String getYoutrackOAuthServiceSecret() {
-            return youtrackOAuthServiceSecret.get();
-        }
-
-        public StringProperty youtrackOAuthServiceSecretProperty() {
-            return youtrackOAuthServiceSecret;
+        public void setYouTrackAuthenticationMethod(YouTrackAuthenticationMethod youTrackAuthenticationMethod) {
+            this.youTrackAuthenticationMethod = youTrackAuthenticationMethod;
         }
 
         public String getYoutrackOAuthHubUrl() {
-            return youtrackOAuthHubUrl.get();
-        }
-
-        public StringProperty youtrackOAuthHubUrlProperty() {
             return youtrackOAuthHubUrl;
         }
 
+        public void setYoutrackOAuthHubUrl(String youtrackOAuthHubUrl) {
+            this.youtrackOAuthHubUrl = youtrackOAuthHubUrl;
+        }
+
+        public String getYoutrackOAuthServiceId() {
+            return youtrackOAuthServiceId;
+        }
+
+        public void setYoutrackOAuthServiceId(String youtrackOAuthServiceId) {
+            this.youtrackOAuthServiceId = youtrackOAuthServiceId;
+        }
+
+        public String getYoutrackOAuthServiceSecret() {
+            return youtrackOAuthServiceSecret;
+        }
+
+        public void setYoutrackOAuthServiceSecret(String youtrackOAuthServiceSecret) {
+            this.youtrackOAuthServiceSecret = youtrackOAuthServiceSecret;
+        }
+
+        public String getYoutrackUrl() {
+            return youtrackUrl;
+        }
+
+        public void setYoutrackUrl(String youtrackUrl) {
+            this.youtrackUrl = youtrackUrl;
+        }
+
+        public String getYoutrackUsername() {
+            return youtrackUsername;
+        }
+
+        public void setYoutrackUsername(String youtrackUsername) {
+            this.youtrackUsername = youtrackUsername;
+        }
+
+        public String getYoutrackPassword() {
+            return youtrackPassword;
+        }
+
+        public void setYoutrackPassword(String youtrackPassword) {
+            this.youtrackPassword = youtrackPassword;
+        }
+
+        public boolean isLoadDataAtStartup() {
+            return loadDataAtStartup;
+        }
+
+        public void setLoadDataAtStartup(boolean loadDataAtStartup) {
+            this.loadDataAtStartup = loadDataAtStartup;
+        }
+
+        public ReportTimerange getLastUsedReportTimerange() {
+            return lastUsedReportTimerange;
+        }
+
+        public void setLastUsedReportTimerange(ReportTimerange lastUsedReportTimerange) {
+            this.lastUsedReportTimerange = lastUsedReportTimerange;
+        }
+
+        public boolean isShowStatistics() {
+            return showStatistics;
+        }
+
+        public void setShowStatistics(boolean showStatistics) {
+            this.showStatistics = showStatistics;
+        }
+
+        public boolean isShowAllWorklogs() {
+            return showAllWorklogs;
+        }
+
+        public void setShowAllWorklogs(boolean showAllWorklogs) {
+            this.showAllWorklogs = showAllWorklogs;
+        }
+
+        public boolean isShowDecimalHourTimesInExcelReport() {
+            return showDecimalHourTimesInExcelReport;
+        }
+
+        public void setShowDecimalHourTimesInExcelReport(boolean showDecimalHourTimesInExcelReport) {
+            this.showDecimalHourTimesInExcelReport = showDecimalHourTimesInExcelReport;
+        }
+
+        public int getCollapseState() {
+            return collapseState;
+        }
+
+        public void setCollapseState(int collapseState) {
+            this.collapseState = collapseState;
+        }
+
+        public int getHighlightState() {
+            return highlightState;
+        }
+
+        public void setHighlightState(int highlightState) {
+            this.highlightState = highlightState;
+        }
+
+        public boolean hasMissingConnectionParameters() {
+            return StringUtils.isEmpty(youtrackUrl) ||
+                   StringUtils.isEmpty(youtrackUsername) ||
+                   StringUtils.isEmpty(youtrackPassword) ||
+                    (
+                        youTrackAuthenticationMethod == YouTrackAuthenticationMethod.OAUTH2 &&
+                        (StringUtils.isEmpty(youtrackOAuthHubUrl) || StringUtils.isEmpty(youtrackOAuthServiceId) || StringUtils.isEmpty(youtrackOAuthServiceSecret))
+                    );
+        }
+
+        public boolean hasHighlightState(DayOfWeek day) {
+            return hasBitValue(highlightState, day);
+        }
+
+        public boolean hasCollapseState(DayOfWeek day) {
+            return hasBitValue(collapseState, day);
+        }
+
+        public void setHighlightState(DayOfWeek day, boolean selected) {
+            highlightState = setBitValue(highlightState, day, selected);
+        }
+
+        public void setCollapseState(DayOfWeek day, boolean selected) {
+            collapseState = setBitValue(collapseState, day, selected);
+        }
+
+        public int createBitMaskState(DayOfWeek... setDays) {
+            int bitmask = 0;
+
+            for (DayOfWeek day : setDays) {
+                bitmask = setBitValue(bitmask,day, true);
+            }
+
+            return bitmask;
+        }
+
+        public int setBitValue(int state, DayOfWeek day, boolean selected) {
+            if (selected) {
+                return state | (1 << day.ordinal());
+            } else {
+                return state & ~(1 << day.ordinal());
+            }
+        }
+
+        public boolean hasBitValue(int state, DayOfWeek day) {
+            int bitValue = (1 << day.ordinal());
+            return (state & bitValue) == bitValue;
+        }
+
         public int getConnectionParametersHashCode() {
-            int result = youtrackUrlProperty() != null ? youtrackUrlProperty().hashCode() : 0;
-            result = 31 * result + (youtrackUsernameProperty() != null ? youtrackUsernameProperty().hashCode() : 0);
-            result = 31 * result + (youtrackPasswordProperty() != null ? youtrackPasswordProperty().hashCode() : 0);
-            result = 31 * result + (youTrackAuthenticationMethodProperty() != null ? youTrackAuthenticationMethodProperty().hashCode() : 0);
-            result = 31 * result + (youtrackOAuthServiceIdProperty() != null ? youtrackOAuthServiceIdProperty().hashCode() : 0);
-            result = 31 * result + (youtrackOAuthServiceSecretProperty() != null ? youtrackOAuthServiceSecretProperty().hashCode() : 0);
-            result = 31 * result + (youtrackOAuthHubUrlProperty() != null ? youtrackOAuthHubUrlProperty().hashCode() : 0);
+            int result = getHashOrZero(youtrackUrl);
+            result = 31 * result + getHashOrZero(youtrackUsername);
+            result = 31 * result + getHashOrZero(youtrackPassword);
+            result = 31 * result + getHashOrZero(youTrackAuthenticationMethod);
+            result = 31 * result + getHashOrZero(youtrackOAuthServiceId);
+            result = 31 * result + getHashOrZero(youtrackOAuthServiceSecret);
+            result = 31 * result + getHashOrZero(youtrackOAuthHubUrl);
             return result;
+        }
+
+        private int getHashOrZero(Object o) {
+            if (o == null) return 0;
+            return o.hashCode();
         }
     }
 

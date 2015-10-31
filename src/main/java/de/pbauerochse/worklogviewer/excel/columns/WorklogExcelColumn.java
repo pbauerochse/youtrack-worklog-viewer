@@ -77,7 +77,7 @@ public class WorklogExcelColumn extends ExcelColumnRenderer {
         }
 
         if (workdayEntryOptional.isPresent()) {
-            if (settings.getShowDecimalHourTimesInExcelReport()) {
+            if (settings.isShowDecimalHourTimesInExcelReport()) {
                 cell.setCellValue(workdayEntryOptional.get().getSpentTime().get() / 60d);
             } else {
                 cell.setCellValue(FormattingUtil.formatMinutes(workdayEntryOptional.get().getSpentTime().get()));

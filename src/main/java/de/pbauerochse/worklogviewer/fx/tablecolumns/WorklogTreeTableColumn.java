@@ -2,14 +2,13 @@ package de.pbauerochse.worklogviewer.fx.tablecolumns;
 
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -22,10 +21,10 @@ import static de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.*;
  */
 public class WorklogTreeTableColumn extends TreeTableColumn<DisplayRow, DisplayRow> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorklogTreeTableColumn.class);
-
     public WorklogTreeTableColumn(String displayDate, LocalDate currentColumnDate) {
         super(displayDate);
+        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+
         setSortable(false);
         setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getValue()));
         setCellFactory(param -> {
@@ -47,15 +46,16 @@ public class WorklogTreeTableColumn extends TreeTableColumn<DisplayRow, DisplayR
                                 setTooltip(new Tooltip(displayDate + " - " + getText()));
                             });
 
-                        if (isWeekend(currentColumnDate)) {
-                            setPrefWidth(20);
-                            getStyleClass().add(WEEKEND_COLUMN_OR_CELL_CSS_CLASS);
-                        } else {
-                            setPrefWidth(100);
-                        }
+//                        if (isCollapsed(currentColumnDate, settings)) {
+//                            setPrefWidth(20);
+//                        } else {
+//                            setPrefWidth(100);
+//                        }
 
                         if (isToday(currentColumnDate)) {
                             getStyleClass().add(TODAY_COLUMN_OR_CELL_CSS_CLASS);
+                        } else if (isHighlighted(currentColumnDate, settings)) {
+                            getStyleClass().add(HIGHLIGHT_COLUMN_CSS_CLASS);
                         }
 
                         if (item.isGroupContainer()) {
@@ -71,21 +71,27 @@ public class WorklogTreeTableColumn extends TreeTableColumn<DisplayRow, DisplayR
             return cell;
         });
 
-        if (isWeekend(currentColumnDate)) {
+        if (isCollapsed(currentColumnDate, settings)) {
             setPrefWidth(20);
-            getStyleClass().add(WEEKEND_COLUMN_OR_CELL_CSS_CLASS);
         } else {
             setPrefWidth(100);
         }
 
         if (isToday(currentColumnDate)) {
             getStyleClass().add(TODAY_COLUMN_OR_CELL_CSS_CLASS);
+        } else if (isHighlighted(currentColumnDate, settings)) {
+            getStyleClass().add(HIGHLIGHT_COLUMN_CSS_CLASS);
         }
     }
 
-    private static boolean isWeekend(LocalDate date) {
+    private static boolean isCollapsed(LocalDate date, SettingsUtil.Settings settings) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
-        return dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY;
+        return settings.hasCollapseState(dayOfWeek);
+    }
+
+    private static boolean isHighlighted(LocalDate date, SettingsUtil.Settings settings) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return settings.hasHighlightState(dayOfWeek);
     }
 
     private static boolean isToday(LocalDate date) {

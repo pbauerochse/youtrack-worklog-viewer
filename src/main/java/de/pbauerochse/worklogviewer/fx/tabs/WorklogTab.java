@@ -32,7 +32,10 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.apache.commons.lang3.StringUtils;
@@ -68,6 +71,10 @@ public abstract class WorklogTab extends Tab {
 
     private Optional<TimerangeProvider> lastUsedTimerangeProvider = Optional.empty();
 
+    private Optional<Integer> lastHighlightState = Optional.empty();
+
+    private Optional<Integer> lastCollapseState = Optional.empty();
+
     private Optional<FetchTimereportContext> fetchTimereportContext = Optional.empty();
 
     private boolean resultToDisplayChangedSinceLastRender;
@@ -79,13 +86,6 @@ public abstract class WorklogTab extends Tab {
     private Optional<DisplayData> resultItemsToDisplay = Optional.empty();
 
     protected abstract List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks);
-
-    /**
-     * Extract the appropriate TaskWithWorklogs from the WorklogResult item
-     * @param result
-     * @return
-     */
-
 
     public WorklogTab(String name) {
         super(name);
@@ -107,7 +107,7 @@ public abstract class WorklogTab extends Tab {
      * the content will be refreshed. Else it will be refreshed whenever
      * this tab becomes active
      *
-     * @param worklogList The TaskWithWorklogs to show in this tab
+     * @param timereportContext The TaskWithWorklogs to show in this tab
      */
     public void updateItems(FetchTimereportContext timereportContext) {
         this.fetchTimereportContext = Optional.of(timereportContext);
@@ -122,7 +122,7 @@ public abstract class WorklogTab extends Tab {
     protected Node getContentNode() {
         Node taskView = getTaskView();
 
-        if (SettingsUtil.loadSettings().getShowStatistics()) {
+        if (SettingsUtil.loadSettings().isShowStatistics()) {
             LOGGER.debug("Statistics enabled in settings");
             statisticsView = new VBox(20);
 
@@ -179,7 +179,7 @@ public abstract class WorklogTab extends Tab {
         }
 
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
-        if (settings.getShowStatistics() && statisticsView == null || !settings.getShowStatistics() && statisticsView != null) {
+        if (settings.isShowStatistics() && statisticsView == null || !settings.isShowStatistics() && statisticsView != null) {
             // statistics are disabled and were previously rendered
             // or statistics are enabled and weren't rendered before
             // update content view
@@ -188,11 +188,10 @@ public abstract class WorklogTab extends Tab {
         }
 
         FetchTimereportContext timereportContext = reportContextOptional.get();
-        WorklogReport worklogReport = timereportContext.getResult().get();
         TimerangeProvider timerangeProvider = timereportContext.getTimerangeProvider();
 
         // render the table columns if the timerange changed from last result
-        if (!lastUsedTimerangeProvider.isPresent() || !lastUsedTimerangeProvider.get().equals(timerangeProvider)) {
+        if (!lastUsedTimerangeProvider.isPresent() || !lastUsedTimerangeProvider.get().equals(timerangeProvider) || (lastCollapseState.isPresent() && lastCollapseState.get() != settings.getCollapseState()) || (lastHighlightState.isPresent() && lastHighlightState.get() != settings.getHighlightState())) {
 
             LOGGER.debug("[{}] Regenerating columns for timerange {}", getText(), timerangeProvider.getReportTimerange().name());
             taskTableView.getColumns().clear();
@@ -215,6 +214,8 @@ public abstract class WorklogTab extends Tab {
             taskTableView.getColumns().add(new TaskWorklogSummaryTreeTableColumn());
 
             lastUsedTimerangeProvider = Optional.of(timerangeProvider);
+            lastCollapseState = Optional.of(settings.getCollapseState());
+            lastHighlightState = Optional.of(settings.getHighlightState());
         }
 
         // refresh data
@@ -389,7 +390,7 @@ public abstract class WorklogTab extends Tab {
 
     private void updateStatisticsData(List<TaskWithWorklogs> displayResult) {
 
-        if (!SettingsUtil.loadSettings().getShowStatistics()) {
+        if (!SettingsUtil.loadSettings().isShowStatistics()) {
             return;
         }
 

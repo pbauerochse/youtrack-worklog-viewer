@@ -20,6 +20,7 @@ import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
+import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -35,6 +36,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +117,7 @@ public class MainViewController implements Initializable {
         timerangeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 // update settings
-                settings.lastUsedReportTimerangeProperty().setValue(newValue);
+                settings.setLastUsedReportTimerange(newValue);
 
                 // prepopulate start and end datepickers and remove error labels
                 TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, null, null);
@@ -150,7 +152,12 @@ public class MainViewController implements Initializable {
         });
 
         // fetch worklog button click
-        fetchWorklogButton.disableProperty().bind(settings.hasMissingConnectionParameters());
+        fetchWorklogButton.disableProperty().bind(new BooleanBinding() {
+            @Override
+            protected boolean computeValue() {
+                return settings.hasMissingConnectionParameters();
+            }
+        });
         fetchWorklogButton.setOnAction(clickEvent -> startFetchWorklogsTask());
 
         // export to excel only possible if resultTabPane is not empty and therefore seems to contain data
@@ -171,7 +178,7 @@ public class MainViewController implements Initializable {
         });
 
         // load group by criteria when connection parameters are present
-        if (!settings.hasMissingConnectionParameters().get()) {
+        if (!settings.hasMissingConnectionParameters()) {
             startGetGroupByCategoriesTask();
         }
     }
@@ -179,14 +186,14 @@ public class MainViewController implements Initializable {
     private void onFormShown() {
         LOGGER.debug("MainForm shown");
 
-        if (settings.hasMissingConnectionParameters().get()) {
+        if (settings.hasMissingConnectionParameters()) {
             LOGGER.info("No YouTrack connection settings defined yet. Opening settings dialogue");
             showSettingsDialogue();
         }
 
         // auto load data if a named timerange was selected
         // and the user chose to load data at startup
-        if (timerangeComboBox.getSelectionModel().getSelectedItem() != ReportTimerange.CUSTOM && settings.getLoadDataAtStartup()) {
+        if (timerangeComboBox.getSelectionModel().getSelectedItem() != ReportTimerange.CUSTOM && settings.isLoadDataAtStartup()) {
             LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.getSelectionModel().getSelectedItem().name());
             fetchWorklogButton.fire();
         }
@@ -318,13 +325,18 @@ public class MainViewController implements Initializable {
             }
 
             Throwable throwable = asWorkerstateEvent.getSource().getException();
-            if (throwable != null) {
+            if (throwable != null && StringUtils.isNotBlank(throwable.getMessage())) {
                 LOGGER.warn("Showing error to user", throwable);
                 progressText.setText(throwable.getMessage());
             } else {
+                if (throwable != null) {
+                    LOGGER.warn("Error executing task {}", task.toString(), throwable);
+                }
+
                 progressText.setText(FormattingUtil.getFormatted("exceptions.main.worker.unknown"));
             }
 
+            progressBar.setProgress(1);
             waitScreenOverlay.setVisible(false);
         });
 
@@ -352,7 +364,7 @@ public class MainViewController implements Initializable {
             resultTabPane.getTabs().add(new OwnWorklogsTab());
         }
 
-        if (settings.getShowAllWorklogs()) {
+        if (settings.isShowAllWorklogs()) {
 
             if (resultTabPane.getTabs().size() < 2 || !(resultTabPane.getTabs().get(1) instanceof AllWorklogsTab)) {
                 resultTabPane.getTabs().add(new AllWorklogsTab());
@@ -398,7 +410,7 @@ public class MainViewController implements Initializable {
         // pass in a handler to fetch the group by categories if connection
         // parameters get set
         openDialogue("/fx/views/settings.fxml", "view.settings.title", true, Optional.of(() -> {
-            if (!settings.hasMissingConnectionParameters().get() && groupByCategoryComboBox.getItems().size() == 0) {
+            if (!settings.hasMissingConnectionParameters() && groupByCategoryComboBox.getItems().size() == 0) {
                 LOGGER.debug("Settings window closed, connection settings set and groupBy combobox empty -> trying to fetch groupByCategories");
                 startGetGroupByCategoriesTask();
             }
@@ -424,6 +436,7 @@ public class MainViewController implements Initializable {
             Parent content = FXMLLoader.load(MainViewController.class.getResource(view), resources);
 
             Scene scene = new Scene(content);
+            scene.getStylesheets().add("/fx/css/main.css");
             Stage stage = new Stage();
             stage.initOwner(progressBar.getScene().getWindow());
 

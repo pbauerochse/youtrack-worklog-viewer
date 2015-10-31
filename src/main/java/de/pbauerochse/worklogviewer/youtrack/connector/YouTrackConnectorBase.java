@@ -91,7 +91,8 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
             String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
             LOGGER.debug("Received JSON groupByCategories response {}", jsonResponse);
 
-            return JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<GroupByCategory>>() {});
+            StringReader response = new StringReader(jsonResponse);
+            return JacksonUtil.parseValue(response, new TypeReference<List<GroupByCategory>>() {});
         }
     }
 
