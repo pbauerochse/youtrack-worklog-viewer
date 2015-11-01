@@ -14,10 +14,10 @@ import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
 import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetails;
 import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetailsResponse;
-import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueField;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
-import org.apache.http.client.config.RequestConfig;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -26,9 +26,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -36,14 +33,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
-import java.net.ProxySelector;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
+
+import static de.pbauerochse.worklogviewer.util.HttpClientUtil.*;
 
 /**
  * @author Patrick Bauerochse
@@ -57,30 +53,7 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
 
     protected CloseableHttpClient getLoggedInClient() throws Exception {
         HttpClientBuilder defaultClientBuilder = getDefaultClientBuilder();
-        return performLoginIfNecessary(defaultClientBuilder, getDefaultHeaders());
-    }
-
-    protected HttpClientBuilder getDefaultClientBuilder() {
-        RequestConfig config = RequestConfig
-                .custom()
-                .setConnectTimeout(10 * 1000)               // 10 s
-                .setConnectionRequestTimeout(10 * 1000)     // 10 s
-                .build();
-
-        SystemDefaultRoutePlanner routePlanner = new SystemDefaultRoutePlanner(ProxySelector.getDefault());
-
-        return HttpClients
-                .custom()
-                .setDefaultRequestConfig(config)
-                .setRoutePlanner(routePlanner);
-    }
-
-    private List<Header> getDefaultHeaders() {
-        List<Header> headerList = new ArrayList<>();
-        headerList.add(new BasicHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"));
-        headerList.add(new BasicHeader("Accept-Encoding", "gzip, deflate, sdch"));
-        headerList.add(new BasicHeader("Accept-Language", "de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4"));
-        return headerList;
+        return performLoginIfNecessary(defaultClientBuilder, getRegularBrowserHeaders());
     }
 
     @Override
@@ -291,10 +264,4 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
         return finalUrl.append(path).toString();
     }
 
-    protected static boolean isValidResponseCode(StatusLine statusLine) {
-        if (statusLine == null) throw ExceptionUtil.getIllegalArgumentException("exceptions.main.worker.nullstatus");
-        int statusCode = statusLine.getStatusCode();
-
-        return (statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_MULTIPLE_CHOICES);
-    }
 }

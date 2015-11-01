@@ -2,6 +2,7 @@ package de.pbauerochse.worklogviewer.fx;
 
 import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.util.HyperlinkUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -38,16 +39,10 @@ public class AboutController implements Initializable {
 
         worklogViewerDescriptionContainer.getChildren().addAll(
                 description,
-                getLink("YouTrack by JetBrains", "https://www.jetbrains.com/youtrack/"),
-                getLink("YouTrack Worklog Viewer @github.com", "https://github.com/pbauerochse/youtrack-worklog-viewer"),
-                getLink(FormattingUtil.getFormatted("release.license"), "https://github.com/pbauerochse/youtrack-worklog-viewer/blob/master/LICENSE.txt"),
-                getLink(FormattingUtil.getFormatted("release.icons"), "http://www.famfamfam.com/lab/icons/silk/")
+                HyperlinkUtil.createLink("YouTrack by JetBrains", "https://www.jetbrains.com/youtrack/"),
+                HyperlinkUtil.createLink("YouTrack Worklog Viewer @github.com", "https://github.com/pbauerochse/youtrack-worklog-viewer"),
+                HyperlinkUtil.createLink(FormattingUtil.getFormatted("release.license"), "https://github.com/pbauerochse/youtrack-worklog-viewer/blob/master/LICENSE.txt"),
+                HyperlinkUtil.createLink(FormattingUtil.getFormatted("release.icons"), "http://www.famfamfam.com/lab/icons/silk/")
         );
-    }
-
-    private Hyperlink getLink(String title, String target) {
-        Hyperlink hyperlink = new Hyperlink(title);
-        hyperlink.setOnAction(event -> Platform.runLater(() -> WorklogViewer.getInstance().getHostServices().showDocument(target)));
-        return hyperlink;
     }
 }

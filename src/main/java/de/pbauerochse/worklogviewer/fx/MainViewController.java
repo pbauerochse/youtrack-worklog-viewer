@@ -12,13 +12,13 @@ import de.pbauerochse.worklogviewer.fx.tabs.AllWorklogsTab;
 import de.pbauerochse.worklogviewer.fx.tabs.OwnWorklogsTab;
 import de.pbauerochse.worklogviewer.fx.tabs.ProjectWorklogTab;
 import de.pbauerochse.worklogviewer.fx.tabs.WorklogTab;
-import de.pbauerochse.worklogviewer.fx.tasks.ExcelExporterTask;
-import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportContext;
-import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask;
-import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask;
+import de.pbauerochse.worklogviewer.fx.tasks.*;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.util.HyperlinkUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.version.GitHubVersion;
+import de.pbauerochse.worklogviewer.version.Version;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.Task;
@@ -47,6 +47,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.*;
 
 /**
  * @author Patrick Bauerochse
@@ -58,6 +59,8 @@ public class MainViewController implements Initializable {
 
     private static final int AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS = 2;  // two fixed tabs (own and all)
     private static final String REQUIRED_FIELD_CLASS = "required";
+
+    public static ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
 
     @FXML
     private ComboBox<ReportTimerange> timerangeComboBox;
@@ -100,6 +103,9 @@ public class MainViewController implements Initializable {
 
     @FXML
     private DatePicker endDatePicker;
+
+    @FXML
+    private ToolBar mainToolbar;
 
     private ResourceBundle resources;
     private SettingsUtil.Settings settings;
@@ -181,6 +187,28 @@ public class MainViewController implements Initializable {
         if (!settings.hasMissingConnectionParameters()) {
             startGetGroupByCategoriesTask();
         }
+
+        // check for update
+        VersionCheckerTask versionCheckTask = new VersionCheckerTask();
+        versionCheckTask.setOnSucceeded(event -> {
+            GitHubVersion gitHubVersion = ((VersionCheckerTask) event.getSource()).getValue();
+            if (gitHubVersion != null) {
+                Version currentVersion = new Version(resources.getString("release.version"));
+                Version mostRecentVersion = new Version(gitHubVersion.getVersion());
+
+                LOGGER.debug("Most recent github version is {}, this version is {}", mostRecentVersion, currentVersion);
+
+                if (mostRecentVersion.isNewerThan(currentVersion)) {
+                    Hyperlink link = HyperlinkUtil.createLink(
+                            FormattingUtil.getFormatted("worker.updatecheck.available", mostRecentVersion.toString()),
+                            gitHubVersion.getUrl()
+                        );
+                    mainToolbar.getItems().add(link);
+                }
+            }
+
+        });
+        startTask(versionCheckTask);
     }
 
     private void onFormShown() {
@@ -289,7 +317,16 @@ public class MainViewController implements Initializable {
      */
     private void startTask(Task task) {
         LOGGER.info("Starting task {}", task.getTitle());
-        waitScreenOverlay.setVisible(true);
+        EventHandler onRunningEventHandler = task.getOnRunning();
+        task.setOnRunning(event -> {
+            waitScreenOverlay.setVisible(true);
+            progressText.textProperty().bind(task.messageProperty());
+            progressBar.progressProperty().bind(task.progressProperty());
+
+            if (onRunningEventHandler != null) {
+                onRunningEventHandler.handle(event);
+            }
+        });
 
         // success handler
         EventHandler<WorkerStateEvent> onSucceededEventHandler = task.getOnSucceeded();
@@ -343,17 +380,7 @@ public class MainViewController implements Initializable {
         // state change listener just for logging purposes
         task.stateProperty().addListener((observable, oldValue, newValue) -> LOGGER.debug("Task {} changed from {} to {}", task.getTitle(), oldValue, newValue));
 
-        // bind progress indicators
-        progressText.textProperty().unbind();
-        progressBar.progressProperty().unbind();
-
-        progressText.textProperty().bind(task.messageProperty());
-        progressBar.progressProperty().bind(task.progressProperty());
-
-        // start the task in a thread
-        Thread thread = new Thread(task, task.getTitle());
-        thread.setDaemon(true);
-        thread.start();
+        EXECUTOR.submit(task);
     }
 
     private void displayWorklogResult(FetchTimereportContext context, SettingsUtil.Settings settings) {

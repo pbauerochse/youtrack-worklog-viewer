@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.youtrack.connector;
 
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
+import de.pbauerochse.worklogviewer.util.HttpClientUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import org.apache.http.Header;
 import org.apache.http.NameValuePair;
@@ -54,7 +55,7 @@ class ApiLoginConnector extends YouTrackConnectorBase {
                 response.close();
             }
 
-            if (!isValidResponseCode(response.getStatusLine())) {
+            if (!HttpClientUtil.isValidResponseCode(response.getStatusLine())) {
                 throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.login", response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode());
             }
 

@@ -49,7 +49,7 @@
             <children>
                 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                     <children>
-                        <ToolBar maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
+                        <ToolBar maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" fx:id="mainToolbar">
                             <items>
                                 <Label text="%view.main.timerange" />
                                 <ComboBox fx:id="timerangeComboBox" prefWidth="150.0" />

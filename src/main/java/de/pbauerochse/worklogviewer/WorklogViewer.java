@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer;
 
+import de.pbauerochse.worklogviewer.fx.MainViewController;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
@@ -40,6 +41,7 @@ public class WorklogViewer extends Application {
     @Override
     public void stop() throws Exception {
         SettingsUtil.saveSettings();
+        MainViewController.EXECUTOR.shutdownNow();
     }
 
     @Override
