@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ public class TaskWithWorklogs {
     private String issue;
     private String summary;
     private long estimatedWorktimeInMinutes;
+    private LocalDateTime resolved;
 
     private List<WorklogItem> worklogItemList = Lists.newArrayList();
 
@@ -51,6 +53,14 @@ public class TaskWithWorklogs {
 
     public void setEstimatedWorktimeInMinutes(long estimatedWorktimeInMinutes) {
         this.estimatedWorktimeInMinutes = estimatedWorktimeInMinutes;
+    }
+
+    public LocalDateTime getResolved() {
+        return resolved;
+    }
+
+    public void setResolved(LocalDateTime resolved) {
+        this.resolved = resolved;
     }
 
     public List<WorklogItem> getWorklogItemList() {
@@ -88,6 +98,7 @@ public class TaskWithWorklogs {
         copy.setIssue(getIssue());
         copy.setProject(getProject());
         copy.setSummary(getSummary());
+        copy.setResolved(getResolved());
 
         getWorklogItemList().forEach(worklogItem -> copy.getWorklogItemList().add(worklogItem.createDeepCopy()));
 

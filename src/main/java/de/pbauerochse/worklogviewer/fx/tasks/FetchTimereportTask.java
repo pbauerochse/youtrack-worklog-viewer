@@ -77,6 +77,9 @@ public class FetchTimereportTask extends Task<WorklogReport> {
             updateMessage(FormattingUtil.getFormatted("worker.progress.processingreport"));
 
             YouTrackCsvReportProcessor.processResponse(reportData, result);
+
+            // fetch issue details
+            connector.fetchTaskDetails(result);
         } finally {
             // delete the report again
             updateProgress(90, 100);

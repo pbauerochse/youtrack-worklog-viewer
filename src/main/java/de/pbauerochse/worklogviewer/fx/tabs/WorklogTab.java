@@ -6,9 +6,11 @@ import com.google.common.collect.Maps;
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer;
 import de.pbauerochse.worklogviewer.excel.columns.TaskDescriptionExcelColumn;
+import de.pbauerochse.worklogviewer.excel.columns.TaskStatusExcelColumn;
 import de.pbauerochse.worklogviewer.excel.columns.TaskWorklogSummaryExcelColumn;
 import de.pbauerochse.worklogviewer.excel.columns.WorklogExcelColumn;
 import de.pbauerochse.worklogviewer.fx.tablecolumns.TaskDescriptionTreeTableColumn;
+import de.pbauerochse.worklogviewer.fx.tablecolumns.TaskStatusTreeTableColumn;
 import de.pbauerochse.worklogviewer.fx.tablecolumns.TaskWorklogSummaryTreeTableColumn;
 import de.pbauerochse.worklogviewer.fx.tablecolumns.WorklogTreeTableColumn;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayData;
@@ -44,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.Collator;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -82,6 +83,8 @@ public abstract class WorklogTab extends Tab {
     private VBox statisticsView;
 
     private TaskDescriptionTreeTableColumn taskDescriptionTreeTableColumn;
+
+    private TaskStatusTreeTableColumn taskStatusTreeTableColumn;
 
     private Optional<DisplayData> resultItemsToDisplay = Optional.empty();
 
@@ -158,6 +161,12 @@ public abstract class WorklogTab extends Tab {
             taskDescriptionTreeTableColumn.setMinWidth(300);
         }
 
+        if (taskStatusTreeTableColumn == null) {
+            taskStatusTreeTableColumn = new TaskStatusTreeTableColumn();
+            taskStatusTreeTableColumn.setPrefWidth(30);
+            taskStatusTreeTableColumn.setMinWidth(30);
+        }
+
         AnchorPane anchorPane = new AnchorPane(taskTableView);
         anchorPane.setPadding(new Insets(6));
 
@@ -195,6 +204,7 @@ public abstract class WorklogTab extends Tab {
 
             LOGGER.debug("[{}] Regenerating columns for timerange {}", getText(), timerangeProvider.getReportTimerange().name());
             taskTableView.getColumns().clear();
+            taskTableView.getColumns().add(taskStatusTreeTableColumn);
             taskTableView.getColumns().add(taskDescriptionTreeTableColumn);
 
             // render tables for all days in the selected timerange
@@ -320,6 +330,7 @@ public abstract class WorklogTab extends Tab {
                             ticketRowWithinThisGroup = new DisplayRow();
                             ticketRowWithinThisGroup.setLabel(taskWithWorklogs.getSummary());
                             ticketRowWithinThisGroup.setIssueId(taskWithWorklogs.getIssue());
+                            ticketRowWithinThisGroup.setResolvedDate(taskWithWorklogs.getResolved());
                             groupRow.getChildren().add(new TreeItem<>(ticketRowWithinThisGroup));
                             ticketIdToDisplayRow.put(taskWithWorklogs.getIssue(), ticketRowWithinThisGroup);
                         }
@@ -370,6 +381,7 @@ public abstract class WorklogTab extends Tab {
                     DisplayRow row = new DisplayRow();
                     row.setIssueId(taskWithWorklogs.getIssue());
                     row.setLabel(taskWithWorklogs.getSummary());
+                    row.setResolvedDate(taskWithWorklogs.getResolved());
 
                     taskWithWorklogs.getWorklogItemList().forEach(worklogItem -> {
                         LocalDate date = worklogItem.getDate();
@@ -615,6 +627,7 @@ public abstract class WorklogTab extends Tab {
         LOGGER.debug("[{}] Exporting data to excel", getText());
 
         List<ExcelColumnRenderer> columnRendererList = new ArrayList<>();
+        columnRendererList.add(new TaskStatusExcelColumn());
         columnRendererList.add(new TaskDescriptionExcelColumn());
 
         TimerangeProvider timerangeProvider = fetchTimereportContext.get().getTimerangeProvider();
@@ -624,7 +637,6 @@ public abstract class WorklogTab extends Tab {
         long amountOfDaysToDisplay = ChronoUnit.DAYS.between(startDate, endDate);
         for (int days = 0; days <= amountOfDaysToDisplay; days++) {
             LocalDate currentColumnDate = timerangeProvider.getStartDate().plus(days, ChronoUnit.DAYS);
-            DayOfWeek currentColumnDayOfWeek = currentColumnDate.getDayOfWeek();
             String displayDate = FormattingUtil.formatDate(currentColumnDate);
             columnRendererList.add(new WorklogExcelColumn(displayDate, currentColumnDate));
         }

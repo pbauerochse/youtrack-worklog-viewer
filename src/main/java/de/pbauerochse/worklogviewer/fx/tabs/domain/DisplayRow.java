@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.fx.tabs.domain;
 import com.google.common.collect.Maps;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,6 +17,8 @@ public class DisplayRow {
     public String label;
 
     public Optional<String> issueId = Optional.empty();
+
+    public Optional<LocalDateTime> resolvedDate = Optional.empty();
 
     private Map<LocalDate, DisplayDayEntry> timespanEntries = Maps.newHashMap();
 
@@ -37,6 +40,14 @@ public class DisplayRow {
 
     public void setIssueId(String issueId) {
         this.issueId = Optional.of(issueId);
+    }
+
+    public Optional<LocalDateTime> getResolvedDate() {
+        return resolvedDate;
+    }
+
+    public void setResolvedDate(LocalDateTime resolvedDate) {
+        this.resolvedDate = Optional.ofNullable(resolvedDate);
     }
 
     public long getTotaltimeSpent() {

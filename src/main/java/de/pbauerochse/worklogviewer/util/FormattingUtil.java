@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
@@ -17,7 +18,9 @@ public class FormattingUtil {
 
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("i18n/ytwv");
 
+    private static DateTimeFormatter dateFormatter;
     private static DateTimeFormatter dateTimeFormatter;
+
     private static NumberFormat percentageFormatter;
     private static final int MINUTES_PER_HOUR = 60;
 
@@ -91,8 +94,17 @@ public class FormattingUtil {
     public static String formatDate(LocalDate date) {
         if (date == null) return StringUtils.EMPTY;
 
+        if (dateFormatter == null) {
+            dateFormatter = DateTimeFormatter.ofPattern(getFormatted("date.column.format"));
+        }
+        return dateFormatter.format(date);
+    }
+
+    public static String formatDateTime(LocalDateTime date) {
+        if (date == null) return StringUtils.EMPTY;
+
         if (dateTimeFormatter == null) {
-            dateTimeFormatter = DateTimeFormatter.ofPattern(getFormatted("date.column.format"));
+            dateTimeFormatter = DateTimeFormatter.ofPattern(getFormatted("datetime.column.format"));
         }
         return dateTimeFormatter.format(date);
     }

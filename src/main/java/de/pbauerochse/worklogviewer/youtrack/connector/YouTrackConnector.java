@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.youtrack.connector;
 import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
 import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
+import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
@@ -24,4 +25,6 @@ public interface YouTrackConnector {
     void deleteReport(String reportId) throws Exception;
 
     YouTrackAuthenticationMethod getAuthenticationMethod();
+
+    void fetchTaskDetails(WorklogReport report) throws Exception;
 }

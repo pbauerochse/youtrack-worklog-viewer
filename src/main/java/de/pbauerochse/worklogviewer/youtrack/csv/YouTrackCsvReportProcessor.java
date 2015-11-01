@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.youtrack.csv;
 
 import com.opencsv.CSVReader;
+import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem;
@@ -13,10 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,7 +102,7 @@ public class YouTrackCsvReportProcessor {
 
         WorklogItem worklogItem = new WorklogItem();
         worklogItem.setWorkDescription(csvLine[DESCRIPTION_COLUMN_INDEX]);
-        worklogItem.setDate(getDate(dateAsLong));
+        worklogItem.setDate(DateUtil.getDate(dateAsLong));
         worklogItem.setDurationInMinutes(durationInMinutes);
         worklogItem.setUsername(csvLine[USER_LOGINNAME_COLUMN_INDEX]);
         worklogItem.setUserDisplayname(csvLine[USER_DISPLAYNAME_COLUMN_INDEX]);
@@ -113,10 +110,6 @@ public class YouTrackCsvReportProcessor {
         worklogItem.setGroup(csvLine[GROUPNAME_SUMMARY_COLUMN_INDEX]);
 
         return worklogItem;
-    }
-
-    private static LocalDate getDate(long dateAsLong) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(dateAsLong), ZoneId.systemDefault()).toLocalDate();
     }
 
 }

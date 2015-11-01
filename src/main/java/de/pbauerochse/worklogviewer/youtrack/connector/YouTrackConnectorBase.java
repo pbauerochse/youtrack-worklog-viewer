@@ -1,28 +1,35 @@
 package de.pbauerochse.worklogviewer.youtrack.connector;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
 import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
+import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
+import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
+import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetails;
+import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetailsResponse;
+import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueField;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +37,13 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.net.ProxySelector;
+import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Patrick Bauerochse
@@ -199,6 +211,67 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
             if (!isValidResponseCode(response.getStatusLine())) {
                 LOGGER.warn("Could not delete temporary report using url {}: {}", reportUrlTemplate, response.getStatusLine().getReasonPhrase());
                 throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.deletereport", response.getStatusLine().getReasonPhrase(), response.getStatusLine().getStatusCode());
+            }
+        }
+    }
+
+    @Override
+    public void fetchTaskDetails(WorklogReport report) throws Exception {
+
+        Map<String, TaskWithWorklogs> taskIdToTask = report.getTasks().stream()
+                .collect(Collectors.toMap(task -> task.getIssue(), task -> task));
+
+        if (taskIdToTask.size() > 0) {
+
+            CloseableHttpClient client = getLoggedInClient();
+            String issueParameter = Joiner.on(',').skipNulls().join(taskIdToTask.keySet());
+
+            String detailUrl = buildYoutrackApiUrl("issue?%s");
+
+            List<NameValuePair> fetchIssuesParameters = ImmutableList.<NameValuePair>builder()
+                    .add(new BasicNameValuePair("q", "issue id:" + issueParameter))
+                    .add(new BasicNameValuePair("with", "id"))
+                    .add(new BasicNameValuePair("with", "resolved"))
+                    .add(new BasicNameValuePair("max", String.valueOf(taskIdToTask.size())))
+                    .build();
+
+            String issuesQuery = URLEncodedUtils.format(fetchIssuesParameters, Charset.forName("utf-8"));
+
+            String finalUrl = String.format(detailUrl, issuesQuery, taskIdToTask.size());
+            HttpGet request = new HttpGet(finalUrl);
+            request.addHeader("Accept", "application/json, text/plain, */*");
+
+            try (CloseableHttpResponse httpResponse = client.execute(request)) {
+                if (!isValidResponseCode(httpResponse.getStatusLine())) {
+                    LOGGER.warn("Fetching issue details from {} failed: {}", finalUrl, httpResponse.getStatusLine().getReasonPhrase());
+                    EntityUtils.consumeQuietly(httpResponse.getEntity());
+                    throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.issuedetails", httpResponse.getStatusLine().getReasonPhrase(), httpResponse.getStatusLine().getStatusCode());
+                }
+
+                String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
+                LOGGER.debug("Received JSON response {}", jsonResponse);
+
+                // {"issue":[{"id":"PATRICK-1","entityId":"87-2","jiraId":null,"field":[],"comment":[],"tag":[]},{"id":"PATRICK-2","entityId":"87-4","jiraId":null,"field":[{"name":"resolved","value":"1446292986266"}],"comment":[],"tag":[]}]}
+                IssueDetailsResponse issueDetailsResponse = JacksonUtil.parseValue(new StringReader(jsonResponse), IssueDetailsResponse.class);
+                for (IssueDetails issueDetails : issueDetailsResponse.getIssues()) {
+                    String taskId = issueDetails.getId();
+
+                    issueDetails.getFieldList().stream()
+                        .filter(issueField -> StringUtils.equals("resolved", issueField.getName()) && StringUtils.isNotEmpty(issueField.getValue()))
+                        .forEach(issueField -> {
+                            try {
+                                Long resolvedTimestamp = Long.valueOf(issueField.getValue());
+                                TaskWithWorklogs taskWithWorklogs = taskIdToTask.get(taskId);
+
+                                if (taskWithWorklogs != null) {
+                                    LocalDateTime resolvedDate = DateUtil.getDateTime(resolvedTimestamp);
+                                    taskWithWorklogs.setResolved(resolvedDate);
+                                }
+                            } catch (NumberFormatException e) {
+                                LOGGER.warn("Could not parse resolved date long from {}", issueField.getValue(), e);
+                            }
+                        });
+                }
             }
         }
     }
