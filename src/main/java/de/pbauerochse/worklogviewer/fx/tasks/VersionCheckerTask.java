@@ -24,16 +24,20 @@ public class VersionCheckerTask extends Task<GitHubVersion> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VersionCheckerTask.class);
 
+    public VersionCheckerTask() {
+        updateTitle("VersionChecker-Task");
+    }
+
     @Override
     protected GitHubVersion call() throws Exception {
 
         updateMessage(FormattingUtil.getFormatted("worker.updatecheck.checking"));
-        updateProgress(0,1);
+        updateProgress(0, 1);
 
         HttpGet request = new HttpGet("https://api.github.com/repos/pbauerochse/youtrack-worklog-viewer/releases");
         request.addHeader("Accept", "application/json, text/plain, */*");
 
-        CloseableHttpClient client = HttpClientUtil.getDefaultClientBuilder()
+        CloseableHttpClient client = HttpClientUtil.getDefaultClientBuilder(1)
                 .setDefaultHeaders(HttpClientUtil.getRegularBrowserHeaders())
                 .build();
 
@@ -48,7 +52,8 @@ public class VersionCheckerTask extends Task<GitHubVersion> {
                 String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
 
                 StringReader response = new StringReader(jsonResponse);
-                List<GitHubVersion> versions = JacksonUtil.parseValue(response, new TypeReference<List<GitHubVersion>>() {});
+                List<GitHubVersion> versions = JacksonUtil.parseValue(response, new TypeReference<List<GitHubVersion>>() {
+                });
 
                 if (versions != null && versions.size() > 0) {
                     Optional<GitHubVersion> mostRecent = versions.stream()
@@ -64,7 +69,7 @@ public class VersionCheckerTask extends Task<GitHubVersion> {
         }
 
         updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
-        updateProgress(1,1);
+        updateProgress(1, 1);
 
         return version;
     }

@@ -40,6 +40,7 @@ public class TaskStatusTreeTableColumn extends TreeTableColumn<DisplayRow, Optio
                         setGraphic(null);
                         setTooltip(null);
                     } else {
+                        LOGGER.debug("Setting graphic on column with a resolved date");
                         setGraphic(new ImageView("/fx/img/accept.png"));
                         setTooltip(new Tooltip(FormattingUtil.formatDateTime(item.get())));
                     }

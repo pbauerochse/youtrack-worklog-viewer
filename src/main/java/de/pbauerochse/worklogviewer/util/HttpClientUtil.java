@@ -18,11 +18,11 @@ import java.util.List;
  */
 public class HttpClientUtil {
 
-    public static HttpClientBuilder getDefaultClientBuilder() {
+    public static HttpClientBuilder getDefaultClientBuilder(int connectTimeoutInSeconds) {
         RequestConfig config = RequestConfig
                 .custom()
-                .setConnectTimeout(10 * 1000)               // 10 s
-                .setConnectionRequestTimeout(10 * 1000)     // 10 s
+                .setConnectTimeout(connectTimeoutInSeconds * 1000)
+                .setConnectionRequestTimeout(connectTimeoutInSeconds * 1000)
                 .build();
 
         SystemDefaultRoutePlanner routePlanner = new SystemDefaultRoutePlanner(ProxySelector.getDefault());

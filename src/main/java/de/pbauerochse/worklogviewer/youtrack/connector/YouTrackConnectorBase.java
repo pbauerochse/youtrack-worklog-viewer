@@ -52,7 +52,7 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
     protected abstract CloseableHttpClient performLoginIfNecessary(HttpClientBuilder clientBuilder, List<Header> requestHeaders) throws Exception;
 
     protected CloseableHttpClient getLoggedInClient() throws Exception {
-        HttpClientBuilder defaultClientBuilder = getDefaultClientBuilder();
+        HttpClientBuilder defaultClientBuilder = getDefaultClientBuilder(10);
         return performLoginIfNecessary(defaultClientBuilder, getRegularBrowserHeaders());
     }
 
@@ -77,7 +77,8 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
             LOGGER.debug("Received JSON groupByCategories response {}", jsonResponse);
 
             StringReader response = new StringReader(jsonResponse);
-            return JacksonUtil.parseValue(response, new TypeReference<List<GroupByCategory>>() {});
+            return JacksonUtil.parseValue(response, new TypeReference<List<GroupByCategory>>() {
+            });
         }
     }
 
@@ -93,6 +94,7 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
 
         // request body
         String requestEntityAsString = JacksonUtil.writeObject(requestEntity);
+        LOGGER.debug("Sending createReport request with body {}", requestEntityAsString);
 
         createReportRequest.setEntity(new StringEntity(requestEntityAsString, "utf-8"));
         createReportRequest.addHeader("Content-Type", "application/json;charset=UTF-8");
@@ -121,9 +123,10 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
         CloseableHttpClient client = getLoggedInClient();
 
         String reportUrlTemplate = buildYoutrackApiUrl("current/reports/%s");
-        LOGGER.debug("Fetching report details from {}", reportUrlTemplate);
+        String fullReportUrl = String.format(reportUrlTemplate, reportId);
+        LOGGER.debug("Fetching report details from {}", fullReportUrl);
 
-        HttpGet reportDetailsRequest = new HttpGet(String.format(reportUrlTemplate, reportId));
+        HttpGet reportDetailsRequest = new HttpGet(fullReportUrl);
 
         try (CloseableHttpResponse httpResponse = client.execute(reportDetailsRequest)) {
             if (!isValidResponseCode(httpResponse.getStatusLine())) {
@@ -230,20 +233,20 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
                     String taskId = issueDetails.getId();
 
                     issueDetails.getFieldList().stream()
-                        .filter(issueField -> StringUtils.equals("resolved", issueField.getName()) && StringUtils.isNotEmpty(issueField.getValue()))
-                        .forEach(issueField -> {
-                            try {
-                                Long resolvedTimestamp = Long.valueOf(issueField.getValue());
-                                TaskWithWorklogs taskWithWorklogs = taskIdToTask.get(taskId);
+                            .filter(issueField -> StringUtils.equals("resolved", issueField.getName()) && StringUtils.isNotEmpty(issueField.getValue()))
+                            .forEach(issueField -> {
+                                try {
+                                    Long resolvedTimestamp = Long.valueOf(issueField.getValue());
+                                    TaskWithWorklogs taskWithWorklogs = taskIdToTask.get(taskId);
 
-                                if (taskWithWorklogs != null) {
-                                    LocalDateTime resolvedDate = DateUtil.getDateTime(resolvedTimestamp);
-                                    taskWithWorklogs.setResolved(resolvedDate);
+                                    if (taskWithWorklogs != null) {
+                                        LocalDateTime resolvedDate = DateUtil.getDateTime(resolvedTimestamp);
+                                        taskWithWorklogs.setResolved(resolvedDate);
+                                    }
+                                } catch (NumberFormatException e) {
+                                    LOGGER.warn("Could not parse resolved date long from {}", issueField.getValue(), e);
                                 }
-                            } catch (NumberFormatException e) {
-                                LOGGER.warn("Could not parse resolved date long from {}", issueField.getValue(), e);
-                            }
-                        });
+                            });
                 }
             }
         }
