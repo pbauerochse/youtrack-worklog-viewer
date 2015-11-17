@@ -6,7 +6,7 @@
 
     <groupId>de.pbauerochse</groupId>
     <artifactId>youtrack-worklog-viewer</artifactId>
-    <version>1.1.1</version>
+    <version>2.2.0</version>
 
     <properties>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -18,8 +18,23 @@
         <opencsv.version>3.3</opencsv.version>
         <junit.version>4.11</junit.version>
 
-        <jackson-databind.version>2.5.2</jackson-databind.version>
+        <jackson.version>2.5.2</jackson.version>
+        <slf4j-api.version>1.7.7</slf4j-api.version>
+        <logback.version>1.1.2</logback.version>
+        <poi.version>3.12</poi.version>
+        <google-guava.version>18.0</google-guava.version>
+        <google-oauth-client.version>1.20.0</google-oauth-client.version>
+        <google-http.version>1.19.0</google-http.version>
+        <jersey-client.version>2.22.1</jersey-client.version>
+        <jetbrains-hub.version>1.0.41</jetbrains-hub.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>youtrack-dependencies-local-repo</id>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
@@ -58,7 +73,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>de.pbauerochse.youtrack.WorklogViewer</mainClass>
+                                    <mainClass>de.pbauerochse.worklogviewer.WorklogViewer</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -89,6 +104,44 @@
         </dependency>
 
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j-api.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${google-guava.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
@@ -96,11 +149,52 @@
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson-databind.version}</version>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-java6</artifactId>
+            <version>${google-oauth-client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client-jackson2</artifactId>
+            <version>${google-http.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${jersey-client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jetbrains.hub</groupId>
+            <artifactId>client</artifactId>
+            <version>${jetbrains-hub.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jetbrains.hub</groupId>
+            <artifactId>api</artifactId>
+            <version>${jetbrains-hub.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jetbrains.hub</groupId>
+            <artifactId>api-impl</artifactId>
+            <version>${jetbrains-hub.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jetbrains.hub</groupId>
+            <artifactId>api-impl</artifactId>
+            <version>${jetbrains-hub.version}</version>
+        </dependency>
     </dependencies>
 
 

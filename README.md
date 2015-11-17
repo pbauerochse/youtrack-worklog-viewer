@@ -8,6 +8,10 @@ With this tool you can now overcome this issue. It let's you create your persona
 
 ![Screenshot of the report](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/screenshot.png) (*Issues column has been obfuscated for the screenshot*)
 
+## Latest Version
+
+[Download v2.2.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.2.0)
+
 ## How does it work?
 You simply enter the URL to your YouTrack installation, and your own login data at the settings screen, select the reporting range in the main window and click on the "Download worklogs" button. That's it!
 
@@ -19,7 +23,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **How do I start the application?**
 
-*Simply open up your terminal/console and start the application with `java -jar youtrack-worklog-viewer-1.1.jar` or right click the file and select `Open with...` and then select the path to your java executable*
+*Simply open up your terminal/console and start the application with `java -jar youtrack-worklog-viewer-[version].jar` or right click the file and select `Open with...` and then select the path to your java executable*
 
 **Where are the settings stored?**
 
@@ -35,7 +39,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **What reporting options are available?**
 
-*You can create a report for the current week, previous week, current month and previous month. You can also enter your daily work hours to adjust the time format (e.g. 9 booked hours will be presented in an 8 hour workday with `1d 1h` and in an 9 hour workday with `1d`)*  
+*You can create a report for the current week, previous week, current month and previous month or a free time range. You can also enter your daily work hours to adjust the time format (e.g. 9 booked hours will be presented in an 8 hour workday with `1d 1h` and in an 9 hour workday with `1d`)*  
 
 **I just get a blank report. What's wrong?**
 
@@ -44,3 +48,13 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 **Why are worklogs for subtasks not taken into calculation?**
 
 *This seems to be a bug in YouTrack with the generation of the time report. See https://youtrack.jetbrains.com/issue/JT-29447 . Unfortunately I can't do anything about this :disappointed:*
+
+**I'm seeing a lot question marks where umlauts should be**
+
+*Unfortunately this also is a YouTrack issue: The report itself already contains the broken characters so I have no chance to fix that. If you want to get this fixed vote on the issue at https://youtrack.jetbrains.com/issue/JT-29234*
+
+**Can I use OAuth2 authentication?**
+
+*Starting from version 2.1.0 you may now switch authentication from REST to OAuth2 in the settings dialogue. To get this working you will need to configure a service in the YouTrack Hub for the YouTrack Worklog Viewer and also provide the client id and client secret in the settings dialogue. See [the Wiki page](https://github.com/pbauerochse/youtrack-worklog-viewer/wiki/Authentication-with-YouTrack) for a detailed explanation*
+
+
