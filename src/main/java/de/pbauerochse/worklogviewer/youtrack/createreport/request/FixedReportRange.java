@@ -5,6 +5,7 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Patrick Bauerochse
@@ -12,10 +13,15 @@ import java.time.ZonedDateTime;
  */
 public class FixedReportRange implements CreateReportRange {
 
+    /**
+     * Report names must not container <, > or / so we can't use
+     * the regular formatter (the US date format for example contains / )
+     **/
+    private static final DateTimeFormatter REPORT_NAME_FORMATTER = DateTimeFormatter.ofPattern("ddMM");
+
     private long from;
 
     private long to;
-
     private transient String name;
 
     public FixedReportRange() {}
@@ -27,7 +33,7 @@ public class FixedReportRange implements CreateReportRange {
         from = zonedStartDateTime.toInstant().toEpochMilli();
         to = zonedEndDateTime.toInstant().toEpochMilli();
 
-        name = FormattingUtil.formatDate(startDate) + " - " + FormattingUtil.formatDate(endDate);
+        name = REPORT_NAME_FORMATTER.format(startDate) + " - " + REPORT_NAME_FORMATTER.format(endDate);
     }
 
     public long getFrom() {
