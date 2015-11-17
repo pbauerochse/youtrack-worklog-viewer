@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 /**
  * @author Patrick Bauerochse
@@ -48,6 +49,12 @@ public class WorklogViewer extends Application {
     public void start(Stage primaryStage) throws Exception {
         instance = this;
         this.primaryStage = primaryStage;
+
+        Locale locale = Locale.getDefault();
+        Charset charset = Charset.defaultCharset();
+
+        LOGGER.info("Default Locale: {}", locale);
+        LOGGER.info("Default Charset: {}", charset);
 
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
