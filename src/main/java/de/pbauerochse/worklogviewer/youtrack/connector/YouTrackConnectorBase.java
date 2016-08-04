@@ -205,7 +205,7 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
             String detailUrl = buildYoutrackApiUrl("issue?%s");
 
             List<NameValuePair> fetchIssuesParameters = ImmutableList.<NameValuePair>builder()
-                    .add(new BasicNameValuePair("q", "issue id:" + issueParameter))
+                    .add(new BasicNameValuePair("filter", "issue id:" + issueParameter))
                     .add(new BasicNameValuePair("with", "id"))
                     .add(new BasicNameValuePair("with", "resolved"))
                     .add(new BasicNameValuePair("max", String.valueOf(taskIdToTask.size())))
