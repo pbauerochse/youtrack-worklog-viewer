@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.youtrack.connector;
 
 import com.intellij.hub.auth.oauth2.token.AccessToken;
-import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import jetbrains.jetpass.client.hub.HubClient;
@@ -21,7 +20,7 @@ import java.util.List;
  * @author Patrick Bauerochse
  * @since 14.10.15
  */
-class OAuth2Connector extends YouTrackConnectorBase {
+public class OAuth2Connector extends YouTrackConnectorBase {
 
     private static final String YOUTRACK_SCOPE = "YouTrack";
 

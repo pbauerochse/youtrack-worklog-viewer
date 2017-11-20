@@ -1,5 +1,6 @@
-package de.pbauerochse.worklogviewer.youtrack.connector;
+package de.pbauerochse.worklogviewer.youtrack;
 
+import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
 import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
@@ -9,11 +10,13 @@ import java.io.ByteArrayInputStream;
 import java.util.List;
 
 /**
- * @author Patrick Bauerochse
- * @since 01.04.15
+ * Allows the interaction with the YouTrack API
  */
 public interface YouTrackConnector {
 
+    /**
+     * Returns all available GroupByCategories
+     */
     List<GroupByCategory> getPossibleGroupByCategories() throws Exception;
 
     ReportDetailsResponse createReport(CreateReportRequestEntity requestEntity) throws Exception;

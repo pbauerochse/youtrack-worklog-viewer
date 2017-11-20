@@ -3,16 +3,14 @@ package de.pbauerochse.worklogviewer.fx.tasks;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
-import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnector;
-import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnectorFactory;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackConnector;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackConnectorFactory;
 import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
 import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
 import de.pbauerochse.worklogviewer.youtrack.csv.YouTrackCsvReportProcessor;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
 import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 
@@ -21,8 +19,6 @@ import java.io.ByteArrayInputStream;
  * @since 07.07.15
  */
 public class FetchTimereportTask extends Task<WorklogReport> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(FetchTimereportTask.class);
 
     private static final int MAX_REPORT_STATUS_POLLS = 5;
 

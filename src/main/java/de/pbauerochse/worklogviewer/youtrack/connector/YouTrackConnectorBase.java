@@ -7,6 +7,7 @@ import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackConnector;
 import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
 import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
@@ -51,7 +52,7 @@ public abstract class YouTrackConnectorBase implements YouTrackConnector {
 
     protected abstract CloseableHttpClient performLoginIfNecessary(HttpClientBuilder clientBuilder, List<Header> requestHeaders) throws Exception;
 
-    protected CloseableHttpClient getLoggedInClient() throws Exception {
+    private CloseableHttpClient getLoggedInClient() throws Exception {
         HttpClientBuilder defaultClientBuilder = getDefaultClientBuilder(10);
         return performLoginIfNecessary(defaultClientBuilder, getRegularBrowserHeaders());
     }

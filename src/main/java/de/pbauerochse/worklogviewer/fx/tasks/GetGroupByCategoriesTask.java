@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
-import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnector;
-import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackConnectorFactory;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackConnector;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackConnectorFactory;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import javafx.concurrent.Task;
 

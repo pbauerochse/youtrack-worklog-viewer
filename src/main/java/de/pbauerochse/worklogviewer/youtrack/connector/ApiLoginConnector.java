@@ -20,7 +20,7 @@ import java.util.List;
  * @author Patrick Bauerochse
  * @since 14.10.15
  */
-class ApiLoginConnector extends YouTrackConnectorBase {
+public class ApiLoginConnector extends YouTrackConnectorBase {
 
     private Integer connectionParameterHashCode;
 
