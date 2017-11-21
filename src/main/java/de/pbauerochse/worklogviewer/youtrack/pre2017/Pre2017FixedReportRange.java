@@ -1,17 +1,11 @@
-package de.pbauerochse.worklogviewer.youtrack.createreport.request;
-
-import de.pbauerochse.worklogviewer.util.FormattingUtil;
+package de.pbauerochse.worklogviewer.youtrack.pre2017;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * @author Patrick Bauerochse
- * @since 07.07.15
- */
-public class FixedReportRange implements CreateReportRange {
+public class Pre2017FixedReportRange implements Pre2017ReportRange {
 
     /**
      * Report names must not container <, > or / so we can't use
@@ -20,12 +14,11 @@ public class FixedReportRange implements CreateReportRange {
     private static final DateTimeFormatter REPORT_NAME_FORMATTER = DateTimeFormatter.ofPattern("ddMM");
 
     private long from;
-
     private long to;
     private transient String name;
 
-    public FixedReportRange() {}
-    public FixedReportRange(LocalDate startDate, LocalDate endDate) {
+    public Pre2017FixedReportRange() {}
+    public Pre2017FixedReportRange(LocalDate startDate, LocalDate endDate) {
         ZoneId defaultZone = ZoneId.systemDefault();
         ZonedDateTime zonedStartDateTime = startDate.atStartOfDay(defaultZone);
         ZonedDateTime zonedEndDateTime = endDate.atStartOfDay(defaultZone);

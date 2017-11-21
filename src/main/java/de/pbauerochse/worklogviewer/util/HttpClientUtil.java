@@ -1,9 +1,14 @@
 package de.pbauerochse.worklogviewer.util;
 
+import com.google.common.collect.ImmutableList;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationProvider;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
+import de.pbauerochse.worklogviewer.youtrack.authentication.YouTrackAuthenticationProviderFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
@@ -17,6 +22,23 @@ import java.util.List;
  * Created by patrick on 01.11.15.
  */
 public class HttpClientUtil {
+
+    public static CloseableHttpClient getHttpClient(YouTrackUrlBuilder urlBuilder) {
+        HttpClientBuilder clientBuilder = HttpClientUtil.getDefaultClientBuilder(10);
+
+        YouTrackAuthenticationProvider authenticationProvider = YouTrackAuthenticationProviderFactory.getActiveProvider();
+        List<Header> authenticationHeaders = authenticationProvider.getAuthenticationHeaders(clientBuilder, urlBuilder);
+        List<Header> defaultHeaders = HttpClientUtil.getRegularBrowserHeaders();
+
+        List<Header> headers = ImmutableList.<Header>builder()
+                .addAll(authenticationHeaders)
+                .addAll(defaultHeaders)
+                .build();
+
+        clientBuilder.setDefaultHeaders(headers);
+
+        return clientBuilder.build();
+    }
 
     public static HttpClientBuilder getDefaultClientBuilder(int connectTimeoutInSeconds) {
         RequestConfig config = RequestConfig

@@ -35,7 +35,7 @@ class Post2017UrlBuilder implements YouTrackUrlBuilder {
 
     @Override
     public String getDownloadReportUrl(String reportId) {
-        String template = buildYoutrackApiUrl("/rest/current/reports/%s/export");
+        String template = buildYoutrackApiUrl("/api/reports/%s/export");
         return String.format(template, reportId);
     }
 

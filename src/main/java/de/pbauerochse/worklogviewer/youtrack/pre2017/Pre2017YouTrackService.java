@@ -5,24 +5,24 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
-import de.pbauerochse.worklogviewer.util.HttpClientUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.youtrack.*;
-import de.pbauerochse.worklogviewer.youtrack.authentication.YouTrackAuthenticationProviderFactory;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
 import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetails;
 import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetailsResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static de.pbauerochse.worklogviewer.util.HttpClientUtil.getHttpClient;
 import static de.pbauerochse.worklogviewer.util.HttpClientUtil.isValidResponseCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
@@ -48,6 +49,7 @@ public class Pre2017YouTrackService implements YouTrackService {
 
     private static final YouTrackUrlBuilder URL_BUILDER = new Pre2017UrlBuilder();
 
+    @SuppressWarnings("Duplicates")
     @Override
     public List<GroupByCategory> getPossibleGroupByCategories() {
         String url = URL_BUILDER.getGroupByCriteriaUrl();
@@ -56,7 +58,7 @@ public class Pre2017YouTrackService implements YouTrackService {
         HttpGet request = new HttpGet(url);
         request.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*"));
 
-        try (CloseableHttpClient client = getHttpClient()) {
+        try (CloseableHttpClient client = getHttpClient(URL_BUILDER)) {
             try (CloseableHttpResponse response = client.execute(request)) {
                 StatusLine statusLine = response.getStatusLine();
 
@@ -91,7 +93,7 @@ public class Pre2017YouTrackService implements YouTrackService {
         request.setEntity(new StringEntity(payloadString, UTF_8));
         request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8"));
 
-        try (CloseableHttpClient httpClient = getHttpClient()) {
+        try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 StatusLine statusLine = response.getStatusLine();
 
@@ -123,7 +125,7 @@ public class Pre2017YouTrackService implements YouTrackService {
 
         HttpGet request = new HttpGet(url);
 
-        try (CloseableHttpClient httpClient = getHttpClient()) {
+        try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 StatusLine statusLine = response.getStatusLine();
@@ -145,6 +147,7 @@ public class Pre2017YouTrackService implements YouTrackService {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public ByteArrayInputStream downloadReport(String reportId) {
         String url = URL_BUILDER.getDownloadReportUrl(reportId);
@@ -152,7 +155,7 @@ public class Pre2017YouTrackService implements YouTrackService {
 
         HttpGet request = new HttpGet(url);
 
-        try (CloseableHttpClient httpClient = getHttpClient()) {
+        try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
             return httpClient.execute(request, response -> {
                 ByteArrayInputStream inputStream;
 
@@ -176,6 +179,7 @@ public class Pre2017YouTrackService implements YouTrackService {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void deleteReport(String reportId) {
         String url = URL_BUILDER.getDeleteReportUrl(reportId);
@@ -183,7 +187,7 @@ public class Pre2017YouTrackService implements YouTrackService {
 
         HttpDelete request = new HttpDelete(url);
 
-        try (CloseableHttpClient httpClient = getHttpClient()) {
+        try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 EntityUtils.consumeQuietly(response.getEntity());
 
@@ -199,6 +203,7 @@ public class Pre2017YouTrackService implements YouTrackService {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void fetchTaskDetails(WorklogReport report) {
         Map<String, TaskWithWorklogs> taskIdToTask = report.getTasks().stream()
@@ -217,7 +222,7 @@ public class Pre2017YouTrackService implements YouTrackService {
             HttpGet request = new HttpGet(url);
             request.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*"));
 
-            try (CloseableHttpClient httpClient = getHttpClient()) {
+            try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
 
                 try (CloseableHttpResponse response = httpClient.execute(request)) {
                     StatusLine statusLine = response.getStatusLine();
@@ -275,21 +280,5 @@ public class Pre2017YouTrackService implements YouTrackService {
         );
     }
 
-    private CloseableHttpClient getHttpClient() {
-        HttpClientBuilder clientBuilder = HttpClientUtil.getDefaultClientBuilder(10);
-
-        YouTrackAuthenticationProvider authenticationProvider = YouTrackAuthenticationProviderFactory.getActiveProvider();
-        List<Header> authenticationHeaders = authenticationProvider.getAuthenticationHeaders(clientBuilder, URL_BUILDER);
-        List<Header> defaultHeaders = HttpClientUtil.getRegularBrowserHeaders();
-
-        List<Header> headers = ImmutableList.<Header>builder()
-                .addAll(authenticationHeaders)
-                .addAll(defaultHeaders)
-                .build();
-
-        clientBuilder.setDefaultHeaders(headers);
-
-        return clientBuilder.build();
-    }
 
 }

@@ -6,9 +6,6 @@ import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.youtrack.TimereportContext;
 import de.pbauerochse.worklogviewer.youtrack.createreport.ReportParameters;
-import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRange;
-import de.pbauerochse.worklogviewer.youtrack.createreport.request.FixedReportRange;
-import de.pbauerochse.worklogviewer.youtrack.createreport.request.NamedReportRange;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +40,7 @@ class Pre2017CreateReportRequestPayload {
     public ReportParameters getParameters() {
         ReportParameters parameters = new ReportParameters();
 
-        CreateReportRange reportRange = getReportRange();
+        Pre2017ReportRange reportRange = getReportRange();
         LOGGER.debug("Using timerange {}", reportRange);
         parameters.setRange(reportRange);
 
@@ -55,14 +52,14 @@ class Pre2017CreateReportRequestPayload {
     }
 
     @JsonIgnore
-    private CreateReportRange getReportRange() {
+    private Pre2017ReportRange getReportRange() {
         TimerangeProvider timerangeProvider = timereportContext.getTimerangeProvider();
         ReportTimerange reportTimerange = timerangeProvider.getReportTimerange();
 
         if (reportTimerange == ReportTimerange.CUSTOM) {
-            return new FixedReportRange(timerangeProvider.getStartDate(), timerangeProvider.getEndDate());
+            return new Pre2017FixedReportRange(timerangeProvider.getStartDate(), timerangeProvider.getEndDate());
         }
 
-        return new NamedReportRange(reportTimerange);
+        return new Pre2017NamedReportRange(reportTimerange);
     }
 }

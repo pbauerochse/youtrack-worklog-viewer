@@ -2,7 +2,7 @@ package de.pbauerochse.worklogviewer.youtrack.createreport;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRange;
+import de.pbauerochse.worklogviewer.youtrack.pre2017.Pre2017ReportRange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class ReportParameters {
 
     private List<String> projects = new ArrayList<>(0);
     private String queryUrl;
-    private CreateReportRange range;
+    private Pre2017ReportRange range;
 
     @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
     private String groupById;
@@ -37,11 +37,11 @@ public class ReportParameters {
         this.queryUrl = queryUrl;
     }
 
-    public CreateReportRange getRange() {
+    public Pre2017ReportRange getRange() {
         return range;
     }
 
-    public void setRange(CreateReportRange range) {
+    public void setRange(Pre2017ReportRange range) {
         this.range = range;
     }
 
