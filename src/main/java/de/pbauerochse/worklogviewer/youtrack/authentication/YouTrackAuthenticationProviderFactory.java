@@ -1,8 +1,9 @@
 package de.pbauerochse.worklogviewer.youtrack.authentication;
 
 import com.google.common.collect.ImmutableSet;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationProvider;
 
@@ -17,7 +18,7 @@ public class YouTrackAuthenticationProviderFactory {
     );
 
     public static YouTrackAuthenticationProvider getActiveProvider() {
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
         YouTrackAuthenticationMethod authenticationMethod = settings.getYouTrackAuthenticationMethod();
 
         return PROVIDERS.stream()

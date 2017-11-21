@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.youtrack.pre2017;
 
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
@@ -52,7 +53,7 @@ class Pre2017UrlBuilder implements YouTrackUrlBuilder {
     }
 
     private String buildYoutrackApiUrl(String path) {
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
         StringBuilder finalUrl = new StringBuilder(StringUtils.trim(settings.getYoutrackUrl()));
 
         if (!StringUtils.endsWith(settings.getYoutrackUrl(), "/") && !StringUtils.startsWith(path, "/")) {

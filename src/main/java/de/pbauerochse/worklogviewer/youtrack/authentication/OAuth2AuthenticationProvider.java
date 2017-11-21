@@ -2,7 +2,8 @@ package de.pbauerochse.worklogviewer.youtrack.authentication;
 
 import com.google.common.collect.ImmutableList;
 import com.intellij.hub.auth.oauth2.token.AccessToken;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationProvider;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
@@ -35,7 +36,7 @@ public class OAuth2AuthenticationProvider implements YouTrackAuthenticationProvi
     @Override
     public List<Header> getAuthenticationHeaders(HttpClientBuilder clientBuilder, YouTrackUrlBuilder urlBuilder) {
         if (isReauthenticationRequired()) {
-            SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+            Settings settings = SettingsUtil.getSettings();
 
             accessToken = fetchAccessToken();
             connectionParameterHashCode = settings.getConnectionParametersHashCode();
@@ -53,7 +54,7 @@ public class OAuth2AuthenticationProvider implements YouTrackAuthenticationProvi
     }
 
     private AccessToken fetchAccessToken() {
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
         String hubUrl = settings.getYoutrackOAuthHubUrl();
         LOGGER.info("Fetching new access token from url {}", hubUrl);
 
@@ -83,7 +84,7 @@ public class OAuth2AuthenticationProvider implements YouTrackAuthenticationProvi
     }
 
     private boolean connectionParametersHaveChanged() {
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
         return connectionParameterHashCode != null && !connectionParameterHashCode.equals(settings.getConnectionParametersHashCode());
     }
 

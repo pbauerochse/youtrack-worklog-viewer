@@ -3,8 +3,9 @@ package de.pbauerochse.worklogviewer.excel.columns;
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayDayEntry;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import javafx.scene.control.TreeItem;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -38,14 +39,14 @@ public class WorklogExcelColumn extends ExcelColumnRenderer {
             renderHeadline(currentRowIndex, sheet, columnIndex);
         }
 
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
 
         for (TreeItem<DisplayRow> taskWithWorklogsTreeItem : displayResult) {
             renderTreeItem(taskWithWorklogsTreeItem, sheet, currentRowIndex, columnIndex, settings);
         }
     }
 
-    private void renderTreeItem(TreeItem<DisplayRow> item, Sheet sheet, AtomicInteger rowIndex, int columnIndex, SettingsUtil.Settings settings) {
+    private void renderTreeItem(TreeItem<DisplayRow> item, Sheet sheet, AtomicInteger rowIndex, int columnIndex, Settings settings) {
         DisplayRow displayRow = item.getValue();
 
         Row row = getOrCreateRow(rowIndex.getAndIncrement(), sheet);

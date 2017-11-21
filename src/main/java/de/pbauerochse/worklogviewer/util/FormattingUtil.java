@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.util;
 
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
@@ -38,7 +39,7 @@ public class FormattingUtil {
     public static String formatMinutes(long minutes, boolean full) {
         StringBuilder worklogFormatted = new StringBuilder();
 
-        int workhours = SettingsUtil.loadSettings().getWorkHoursADay();
+        int workhours = SettingsUtil.getSettings().getWorkHoursADay();
 
         if (workhours == 0) {
             throw ExceptionUtil.getIllegalStateException("exceptions.main.workhours.zero");

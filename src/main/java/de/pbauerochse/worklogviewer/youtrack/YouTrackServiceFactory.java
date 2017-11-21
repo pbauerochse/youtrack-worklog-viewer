@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.youtrack;
 
 import com.google.common.collect.ImmutableSet;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.post2017.Post2017YouTrackService;
 import de.pbauerochse.worklogviewer.youtrack.pre2017.Pre2017YouTrackService;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class YouTrackServiceFactory {
 
     public static YouTrackService getInstance() {
 
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
 
         if (authenticationMethodChanged(settings)) {
             cachedInstance = getYouTrackService(settings.getYouTrackVersion());
@@ -46,7 +47,7 @@ public class YouTrackServiceFactory {
                 .orElseThrow(() -> getIllegalArgumentException("exceptions.settings.version.invalid", version.name()));
     }
 
-    private static boolean authenticationMethodChanged(SettingsUtil.Settings settings) {
+    private static boolean authenticationMethodChanged(Settings settings) {
         return cachedInstance == null || !cachedInstance.getVersion().equals(settings.getYouTrackVersion());
     }
 

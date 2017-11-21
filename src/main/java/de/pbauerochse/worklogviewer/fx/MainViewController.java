@@ -13,10 +13,11 @@ import de.pbauerochse.worklogviewer.fx.tabs.OwnWorklogsTab;
 import de.pbauerochse.worklogviewer.fx.tabs.ProjectWorklogTab;
 import de.pbauerochse.worklogviewer.fx.tabs.WorklogTab;
 import de.pbauerochse.worklogviewer.fx.tasks.*;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.util.HyperlinkUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import de.pbauerochse.worklogviewer.version.GitHubVersion;
 import de.pbauerochse.worklogviewer.version.Version;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
@@ -111,14 +112,14 @@ public class MainViewController implements Initializable {
     private ToolBar mainToolbar;
 
     private ResourceBundle resources;
-    private SettingsUtil.Settings settings;
+    private Settings settings;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.debug("Initializing main view");
         this.resources = resources;
 
-        settings = SettingsUtil.loadSettings();
+        settings = SettingsUtil.getSettings();
 
         // prepopulate timerange dropdown
         timerangeComboBox.setConverter(new ReportTimerangeStringConverter());
@@ -387,7 +388,7 @@ public class MainViewController implements Initializable {
         EXECUTOR.submit(task);
     }
 
-    private void displayWorklogResult(FetchTimereportContext context, SettingsUtil.Settings settings) {
+    private void displayWorklogResult(FetchTimereportContext context, Settings settings) {
         LOGGER.info("Displaying WorklogResult to the user");
 
         if (resultTabPane.getTabs().size() == 0) {

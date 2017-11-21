@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.tabs;
 
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem;
 import javafx.scene.chart.PieChart;
@@ -29,7 +30,7 @@ public class OwnWorklogsTab extends WorklogTab {
 
     @Override
     protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
 
         return tasks.stream()
                 .filter(taskWithWorklogs -> {

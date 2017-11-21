@@ -1,8 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tablecolumns;
 
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Tooltip;
@@ -23,7 +24,7 @@ public class WorklogTreeTableColumn extends TreeTableColumn<DisplayRow, DisplayR
 
     public WorklogTreeTableColumn(String displayDate, LocalDate currentColumnDate) {
         super(displayDate);
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
 
         setSortable(false);
         setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getValue()));
@@ -84,12 +85,12 @@ public class WorklogTreeTableColumn extends TreeTableColumn<DisplayRow, DisplayR
         }
     }
 
-    private static boolean isCollapsed(LocalDate date, SettingsUtil.Settings settings) {
+    private static boolean isCollapsed(LocalDate date, Settings settings) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         return settings.hasCollapseState(dayOfWeek);
     }
 
-    private static boolean isHighlighted(LocalDate date, SettingsUtil.Settings settings) {
+    private static boolean isHighlighted(LocalDate date, Settings settings) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         return settings.hasHighlightState(dayOfWeek);
     }

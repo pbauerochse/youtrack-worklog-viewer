@@ -1,9 +1,10 @@
 package de.pbauerochse.worklogviewer.youtrack.authentication;
 
 import com.google.common.collect.ImmutableList;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.HttpClientUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationProvider;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
@@ -80,7 +81,7 @@ public class ApiLoginAuthenticationProvider implements YouTrackAuthenticationPro
     }
 
     private List<NameValuePair> getCredentials() {
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
         return ImmutableList.of(
                 new BasicNameValuePair("login", settings.getYoutrackUsername()),
                 new BasicNameValuePair("password", settings.getYoutrackPassword())

@@ -1,9 +1,10 @@
 package de.pbauerochse.worklogviewer;
 
 import de.pbauerochse.worklogviewer.fx.MainViewController;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -56,7 +57,7 @@ public class WorklogViewer extends Application {
         LOGGER.info("Default Locale: {}", locale);
         LOGGER.info("Default Charset: {}", charset);
 
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+        Settings settings = SettingsUtil.getSettings();
 
         FXMLLoader loader = new FXMLLoader(Charset.forName("utf-8"));
         loader.setResources(FormattingUtil.RESOURCE_BUNDLE);

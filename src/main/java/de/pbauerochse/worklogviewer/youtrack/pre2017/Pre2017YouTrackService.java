@@ -3,7 +3,6 @@ package de.pbauerochse.worklogviewer.youtrack.pre2017;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.HttpClientUtil;
@@ -36,7 +35,6 @@ import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 import static de.pbauerochse.worklogviewer.util.HttpClientUtil.isValidResponseCode;
@@ -270,8 +268,8 @@ public class Pre2017YouTrackService implements YouTrackService {
     }
 
     @Override
-    public Set<YouTrackAuthenticationMethod> getValidAuthenticationMethods() {
-        return ImmutableSet.of(
+    public List<YouTrackAuthenticationMethod> getValidAuthenticationMethods() {
+        return ImmutableList.of(
                 YouTrackAuthenticationMethod.HTTP_API,
                 YouTrackAuthenticationMethod.OAUTH2
         );

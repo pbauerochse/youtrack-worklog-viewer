@@ -3,7 +3,8 @@ package de.pbauerochse.worklogviewer.fx;
 import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackAuthenticationMethodStringConverter;
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
+import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackService;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackServiceFactory;
@@ -27,7 +28,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
-import static java.time.DayOfWeek.*;
 import static javafx.beans.binding.Bindings.or;
 
 /**
@@ -141,55 +141,10 @@ public class SettingsViewController implements Initializable {
         LOGGER.debug("Initializing");
         this.resourceBundle = resources;
 
-        SettingsViewModel viewModel = SettingsUtil.loadSettingsViewModel();
-
+        SettingsViewModel viewModel = SettingsUtil.getSettingsViewModel();
+        attachListeners(viewModel);
         initializeDefaultValues(viewModel);
         bindInputElements(viewModel);
-        attachListeners(viewModel);
-
-        // only show version required label when no version set yet
-        youtrackVersionRequiredLabel.visibleProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
-        youtrackVersionRequiredLabel.managedProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
-
-
-
-        youtrackUrlField.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {
-                youtrackOAuthHubUrlField.setText(getHubUrl(newValue).toExternalForm());
-            } catch (MalformedURLException e) {}
-        });
-
-        // disable oauth fields when other authentication method is selected
-        youtrackOAuthHubUrlField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
-        youtrackOAuthServiceIdField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
-        youtrackOAuthServiceSecretField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
-
-        // disabled token auth field when other authentication method is selected
-        youtrackPermanentTokenField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
-
-        // disable username and password field when bearer is used
-        youtrackUsernameField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
-        youtrackPasswordField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
-
-//        updateComponentsFromSettings(settings);
-
-        // cancel button disabled, when crucial properties not set
-        BooleanBinding cancelDisabledProperty = or(
-                or(youtrackUrlField.textProperty().isEmpty(), youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNull()),
-                youtrackVersionField.getSelectionModel().selectedItemProperty().isNull()
-        );
-
-        cancelSettingsButton.disableProperty().bind(cancelDisabledProperty);
-        cancelSettingsButton.setOnAction(event -> {
-//            updateComponentsFromSettings(settings);
-            closeSettingsDialogue();
-        });
-
-        saveSettingsButton.setOnAction(event -> {
-            LOGGER.debug("Save settings clicked");
-//            applyToSettings(settings);
-            closeSettingsDialogue();
-        });
     }
 
     private void initializeDefaultValues(SettingsViewModel viewModel) {
@@ -216,12 +171,35 @@ public class SettingsViewController implements Initializable {
         youtrackOAuthServiceIdField.textProperty().bindBidirectional(viewModel.youTrackOAuth2ServiceIdProperty());
         youtrackOAuthServiceSecretField.textProperty().bindBidirectional(viewModel.youTrackOAuth2ServiceSecretProperty());
         youtrackPermanentTokenField.textProperty().bindBidirectional(viewModel.youTrackPermanentTokenProperty());
+
+        workhoursComboBox.valueProperty().bindBidirectional(viewModel.workhoursProperty().asObject());
+        showAllWorklogsCheckBox.selectedProperty().bindBidirectional(viewModel.showAllWorklogsProperty());
+        showStatisticsCheckBox.selectedProperty().bindBidirectional(viewModel.showStatisticsProperty());
+        loadDataAtStartupCheckBox.selectedProperty().bindBidirectional(viewModel.loadDataAtStartupProperty());
+        showDecimalsInExcel.selectedProperty().bindBidirectional(viewModel.showDecimalsInExcelProperty());
+
+        mondayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateMondayProperty());
+        tuesdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateTuesdayProperty());
+        wednesdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateWednesdayProperty());
+        thursdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateThursdayProperty());
+        fridayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateFridayProperty());
+        saturdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateSaturdayProperty());
+        sundayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateSundayProperty());
+
+        mondayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateMondayProperty());
+        tuesdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateTuesdayProperty());
+        wednesdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateWednesdayProperty());
+        thursdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateThursdayProperty());
+        fridayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateFridayProperty());
+        saturdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateSaturdayProperty());
+        sundayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateSundayProperty());
     }
 
     private void attachListeners(SettingsViewModel viewModel) {
-        youtrackAuthenticationMethodField.itemsProperty().bind(viewModel.youTrackVersionProperty().);
+        // update hub url from youtrack base url
+        youtrackUrlField.textProperty().addListener((observable, oldValue, newValue) -> youtrackOAuthHubUrlField.setText(getHubUrl(newValue)));
 
-
+        // only show authentication methods, that are supported by the selected version
         youtrackVersionField.getSelectionModel().selectedItemProperty().addListener((observable, oldVersion, newVersion) -> {
             YouTrackService service = YouTrackServiceFactory.getYouTrackService(newVersion);
             List<YouTrackAuthenticationMethod> validAuthenticationMethods = service.getValidAuthenticationMethods();
@@ -234,90 +212,41 @@ public class SettingsViewController implements Initializable {
                 youtrackAuthenticationMethodField.setValue(validAuthenticationMethods.get(0));
             }
         });
-    }
 
+        // only show version required label when no version set yet
+        youtrackVersionRequiredLabel.visibleProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
+        youtrackVersionRequiredLabel.managedProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
 
-    private void updateComponentsFromSettings(SettingsUtil.Settings settings) {
-        youtrackUrlField.setText(settings.getYoutrackUrl());
+        // disable oauth fields when other auth method is selected
+        youtrackOAuthHubUrlField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
+        youtrackOAuthServiceIdField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
+        youtrackOAuthServiceSecretField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
 
-        if (settings.getYouTrackVersion() != null) {
-            youtrackVersionField.getSelectionModel().select(settings.getYouTrackVersion());
-        }
+        // disabled token auth field when other authentication method is selected
+        youtrackPermanentTokenField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
 
-        if (settings.getYouTrackAuthenticationMethod() != null) {
-            youtrackAuthenticationMethodField.getSelectionModel().select(settings.getYouTrackAuthenticationMethod());
-        }
+        // disable username and password field when bearer is used
+        youtrackUsernameField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
+        youtrackPasswordField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
 
-        youtrackUsernameField.setText(settings.getYoutrackUsername());
-        youtrackPasswordField.setText(settings.getYoutrackPassword());
+        // cancel button disabled, when crucial properties not set
+        BooleanBinding cancelDisabledProperty = or(
+                or(youtrackUrlField.textProperty().isEmpty(), youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNull()),
+                youtrackVersionField.getSelectionModel().selectedItemProperty().isNull()
+        );
 
-        youtrackOAuthHubUrlField.setText(settings.getYoutrackOAuthHubUrl());
-        youtrackOAuthServiceIdField.setText(settings.getYoutrackOAuthServiceId());
-        youtrackOAuthServiceSecretField.setText(settings.getYoutrackOAuthServiceSecret());
+        cancelSettingsButton.disableProperty().bind(cancelDisabledProperty);
+        cancelSettingsButton.setOnAction(event -> {
+            LOGGER.debug("Cancel clicked");
+            viewModel.discardChanges();
+            closeSettingsDialogue();
+        });
 
-        youtrackPermanentTokenField.setText(settings.getYoutrackPermanentToken());
-
-        workhoursComboBox.getSelectionModel().select((Integer) settings.getWorkHoursADay());
-        showAllWorklogsCheckBox.setSelected(settings.isShowAllWorklogs());
-        showStatisticsCheckBox.setSelected(settings.isShowStatistics());
-        loadDataAtStartupCheckBox.setSelected(settings.isLoadDataAtStartup());
-        showDecimalsInExcel.setSelected(settings.isShowDecimalHourTimesInExcelReport());
-
-        mondayCollapseCheckbox.setSelected(settings.hasCollapseState(MONDAY));
-        mondayHighlightCheckbox.setSelected(settings.hasHighlightState(MONDAY));
-
-        tuesdayCollapseCheckbox.setSelected(settings.hasCollapseState(TUESDAY));
-        tuesdayHighlightCheckbox.setSelected(settings.hasHighlightState(TUESDAY));
-
-        wednesdayCollapseCheckbox.setSelected(settings.hasCollapseState(WEDNESDAY));
-        wednesdayHighlightCheckbox.setSelected(settings.hasHighlightState(WEDNESDAY));
-
-        thursdayCollapseCheckbox.setSelected(settings.hasCollapseState(THURSDAY));
-        thursdayHighlightCheckbox.setSelected(settings.hasHighlightState(THURSDAY));
-
-        fridayCollapseCheckbox.setSelected(settings.hasCollapseState(FRIDAY));
-        fridayHighlightCheckbox.setSelected(settings.hasHighlightState(FRIDAY));
-
-        saturdayCollapseCheckbox.setSelected(settings.hasCollapseState(SATURDAY));
-        saturdayHighlightCheckbox.setSelected(settings.hasHighlightState(SATURDAY));
-
-        sundayCollapseCheckbox.setSelected(settings.hasCollapseState(SUNDAY));
-        sundayHighlightCheckbox.setSelected(settings.hasHighlightState(SUNDAY));
-    }
-
-    private void applyToSettings(SettingsUtil.Settings settings) {
-        settings.setYoutrackUrl(youtrackUrlField.getText());
-        settings.setYouTrackAuthenticationMethod(youtrackAuthenticationMethodField.getSelectionModel().getSelectedItem());
-        settings.setYoutrackUsername(youtrackUsernameField.getText());
-        settings.setYoutrackPassword(youtrackPasswordField.getText());
-        settings.setYoutrackOAuthHubUrl(youtrackOAuthHubUrlField.getText());
-        settings.setYoutrackOAuthServiceId(youtrackOAuthServiceIdField.getText());
-        settings.setYoutrackOAuthServiceSecret(youtrackOAuthServiceSecretField.getText());
-        settings.setYoutrackPermanentToken(youtrackPermanentTokenField.getText());
-        settings.setYouTrackVersion(youtrackVersionField.getSelectionModel().getSelectedItem());
-
-        settings.setWorkHoursADay(workhoursComboBox.getSelectionModel().getSelectedItem());
-        settings.setShowAllWorklogs(showAllWorklogsCheckBox.isSelected());
-        settings.setShowStatistics(showStatisticsCheckBox.isSelected());
-        settings.setLoadDataAtStartup(loadDataAtStartupCheckBox.isSelected());
-        settings.setShowDecimalHourTimesInExcelReport(showDecimalsInExcel.isSelected());
-
-        settings.setCollapseState(MONDAY, mondayCollapseCheckbox.isSelected());
-        settings.setCollapseState(TUESDAY, tuesdayCollapseCheckbox.isSelected());
-        settings.setCollapseState(WEDNESDAY, wednesdayCollapseCheckbox.isSelected());
-        settings.setCollapseState(THURSDAY, thursdayCollapseCheckbox.isSelected());
-        settings.setCollapseState(FRIDAY, fridayCollapseCheckbox.isSelected());
-        settings.setCollapseState(SATURDAY, saturdayCollapseCheckbox.isSelected());
-        settings.setCollapseState(SUNDAY, sundayCollapseCheckbox.isSelected());
-
-
-        settings.setHighlightState(MONDAY, mondayHighlightCheckbox.isSelected());
-        settings.setHighlightState(TUESDAY, tuesdayHighlightCheckbox.isSelected());
-        settings.setHighlightState(WEDNESDAY, wednesdayHighlightCheckbox.isSelected());
-        settings.setHighlightState(THURSDAY, thursdayHighlightCheckbox.isSelected());
-        settings.setHighlightState(FRIDAY, fridayHighlightCheckbox.isSelected());
-        settings.setHighlightState(SATURDAY, saturdayHighlightCheckbox.isSelected());
-        settings.setHighlightState(SUNDAY, sundayHighlightCheckbox.isSelected());
+        saveSettingsButton.setOnAction(event -> {
+            LOGGER.debug("Save settings clicked");
+            viewModel.saveChanges();
+            closeSettingsDialogue();
+        });
     }
 
     @FXML
@@ -333,9 +262,9 @@ public class SettingsViewController implements Initializable {
         window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
-    private static URL getHubUrl(String baseUrl) throws MalformedURLException {
+    private static String getHubUrl(String baseUrl) {
         if (StringUtils.isBlank(baseUrl)) {
-            return new URL("");
+            return StringUtils.EMPTY;
         }
 
         StringBuilder sb = new StringBuilder(StringUtils.trim(baseUrl));
@@ -353,6 +282,10 @@ public class SettingsViewController implements Initializable {
             sb.replace(indexOfYoutrackPath, indexOfYoutrackPath + MYJETBRAINS_HOSTED_YOUTRACK_PATH.length(), "");
         }
 
-        return new URL(sb.toString());
+        try {
+            return new URL(sb.toString()).toExternalForm();
+        } catch (MalformedURLException e) {
+            return StringUtils.EMPTY;
+        }
     }
 }

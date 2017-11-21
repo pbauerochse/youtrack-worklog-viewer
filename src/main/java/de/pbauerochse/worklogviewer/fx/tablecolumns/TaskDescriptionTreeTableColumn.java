@@ -2,8 +2,9 @@ package de.pbauerochse.worklogviewer.fx.tablecolumns;
 
 import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
+import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
-import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
@@ -66,7 +67,7 @@ public class TaskDescriptionTreeTableColumn extends TreeTableColumn<DisplayRow, 
                 DisplayRow clickedWorklogItem = cell.getTreeTableRow().getItem();
                 if (clickedWorklogItem != null && !clickedWorklogItem.isGrandTotalSummary() && !clickedWorklogItem.isGroupContainer()) {
                     LOGGER.debug("Selected item {}", clickedWorklogItem.getLabel());
-                    SettingsUtil.Settings settings = SettingsUtil.loadSettings();
+                    Settings settings = SettingsUtil.getSettings();
                     String issueUrl = String.format("%s/issue/%s#tab=Time%%20Tracking", StringUtils.stripEnd(settings.getYoutrackUrl(), "/"), clickedWorklogItem.getIssueId().get());
                     Platform.runLater(() -> WorklogViewer.getInstance().getHostServices().showDocument(issueUrl));
                 }
