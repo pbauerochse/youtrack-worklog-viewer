@@ -2,12 +2,8 @@ package de.pbauerochse.worklogviewer.youtrack.domain;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -38,7 +34,7 @@ public class WorklogReport {
     public ImmutableList<String> getDistinctProjectNames() {
         return ImmutableList.copyOf(
             worklogSummaryMap.values().stream()
-                    .map(taskWithWorklogs -> taskWithWorklogs.getProject())
+                    .map(TaskWithWorklogs::getProject)
                     .distinct()
                     .collect(Collectors.toList())
         );

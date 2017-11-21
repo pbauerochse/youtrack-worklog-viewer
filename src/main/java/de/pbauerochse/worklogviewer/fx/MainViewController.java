@@ -22,6 +22,7 @@ import de.pbauerochse.worklogviewer.version.Version;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -47,7 +48,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Patrick Bauerochse
@@ -66,7 +69,7 @@ public class MainViewController implements Initializable {
     private ComboBox<ReportTimerange> timerangeComboBox;
 
     @FXML
-    private ComboBox<Optional<GroupByCategory>> groupByCategoryComboBox;
+    private ComboBox<GroupByCategory> groupByCategoryComboBox;
 
     @FXML
     private Button fetchWorklogButton;
@@ -234,11 +237,12 @@ public class MainViewController implements Initializable {
         LOGGER.info("Fetching GroupByCategories");
         GetGroupByCategoriesTask task = new GetGroupByCategoriesTask();
         task.setOnSucceeded(event -> {
-            List<GroupByCategory> categoryList = (List<GroupByCategory>) event.getSource().getValue();
+            @SuppressWarnings("unchecked") Worker<List<GroupByCategory>> worker = event.getSource();
+            List<GroupByCategory> categoryList = worker.getValue();
             LOGGER.info("{} succeeded with {} GroupByCategories", task.getTitle(), categoryList.size());
 
-            groupByCategoryComboBox.getItems().add(Optional.empty());
-            categoryList.forEach(groupByCategory -> groupByCategoryComboBox.getItems().add(Optional.of(groupByCategory)));
+            groupByCategoryComboBox.getItems().add(GroupByCategory.NO_SELECTION_ITEM);
+            categoryList.forEach(groupByCategoryComboBox.getItems()::add);
             groupByCategoryComboBox.getSelectionModel().select(0);
         });
 

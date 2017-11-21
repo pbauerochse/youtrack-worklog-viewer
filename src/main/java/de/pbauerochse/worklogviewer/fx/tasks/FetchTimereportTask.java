@@ -3,14 +3,12 @@ package de.pbauerochse.worklogviewer.fx.tasks;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackConnector;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackConnectorFactory;
-import de.pbauerochse.worklogviewer.youtrack.createreport.request.CreateReportRequestEntity;
-import de.pbauerochse.worklogviewer.youtrack.createreport.response.ReportDetailsResponse;
+import de.pbauerochse.worklogviewer.youtrack.ReportDetails;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackService;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackServiceFactory;
 import de.pbauerochse.worklogviewer.youtrack.csv.YouTrackCsvReportProcessor;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
 import javafx.concurrent.Task;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 
@@ -32,15 +30,14 @@ public class FetchTimereportTask extends Task<WorklogReport> {
     @Override
     protected WorklogReport call() throws Exception {
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
-        YouTrackConnector connector = YouTrackConnectorFactory.getInstance();
+        YouTrackService connector = YouTrackServiceFactory.getInstance();
 
         updateProgress(0, 100);
         updateMessage(FormattingUtil.getFormatted("worker.progress.login", settings.getYoutrackUsername()));
 
         // create report
-        CreateReportRequestEntity reportRequestEntity = new CreateReportRequestEntity(context);
         updateMessage(FormattingUtil.getFormatted("worker.progress.creatingreport", FormattingUtil.getFormatted(context.getTimerangeProvider().getReportTimerange().getLabelKey())));
-        ReportDetailsResponse reportDetailsResponse = connector.createReport(reportRequestEntity);
+        ReportDetails reportDetails = connector.createReport(context);
         updateProgress(50, 100);
 
         // report generation succeeded and is in progress right now
@@ -55,19 +52,19 @@ public class FetchTimereportTask extends Task<WorklogReport> {
             // poll report status every second
             // until report generation is finished or MAX_REPORT_STATUS_POLLS reached
             int currentRetry = 0;
-            while (!StringUtils.equals(ReportDetailsResponse.READY_STATE, reportDetailsResponse.getState()) && currentRetry++ < MAX_REPORT_STATUS_POLLS) {
+            while (reportDetails.isRecomputing() && currentRetry++ < MAX_REPORT_STATUS_POLLS) {
                 Thread.sleep(1000);
-                reportDetailsResponse = connector.getReportDetails(reportDetailsResponse.getId());
+                reportDetails = connector.getReportDetails(reportDetails.getReportId());
             }
 
-            if (!StringUtils.equals(ReportDetailsResponse.READY_STATE, reportDetailsResponse.getState())) {
+            if (reportDetails.isRecomputing()) {
                 throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.recalculation", MAX_REPORT_STATUS_POLLS);
             }
 
             // download the generated report
-            updateMessage(FormattingUtil.getFormatted("worker.progress.downloadingreport", reportDetailsResponse.getId()));
+            updateMessage(FormattingUtil.getFormatted("worker.progress.downloadingreport", reportDetails.getReportId()));
 
-            ByteArrayInputStream reportData = connector.downloadReport(reportDetailsResponse.getId());
+            ByteArrayInputStream reportData = connector.downloadReport(reportDetails.getReportId());
 
             updateProgress(80, 100);
             updateMessage(FormattingUtil.getFormatted("worker.progress.processingreport"));
@@ -81,7 +78,7 @@ public class FetchTimereportTask extends Task<WorklogReport> {
             updateProgress(90, 100);
             updateMessage(FormattingUtil.getFormatted("worker.progress.deletingreport"));
 
-            connector.deleteReport(reportDetailsResponse.getId());
+            connector.deleteReport(reportDetails.getReportId());
 
             updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
             updateProgress(100, 100);

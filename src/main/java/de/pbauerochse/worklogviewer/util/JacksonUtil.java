@@ -30,8 +30,12 @@ public class JacksonUtil {
         objectMapper.registerModule(customModule);
     }
 
-    public static String writeObject(Object object) throws JsonProcessingException {
-        return objectMapper.writer().writeValueAsString(object);
+    public static String writeObject(Object object) {
+        try {
+            return objectMapper.writer().writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw ExceptionUtil.getIllegalArgumentException("exceptions.main.worker.unknown", e);
+        }
     }
 
     public static <T> T parseValue(Reader contentReader, Class<T> tClass) throws IOException {

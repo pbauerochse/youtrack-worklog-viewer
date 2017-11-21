@@ -1,8 +1,10 @@
 package de.pbauerochse.worklogviewer.youtrack.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.pbauerochse.worklogviewer.util.FormattingUtil;
 
 /**
  * A category which can be used to group
@@ -10,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GroupByCategory {
+
+    public static final GroupByCategory NO_SELECTION_ITEM = new GroupByCategory(null, FormattingUtil.getFormatted("view.main.groupby.nogroupby"));
 
     private final String id;
     private final String name;
@@ -26,6 +30,11 @@ public class GroupByCategory {
 
     public String getName() {
         return name;
+    }
+
+    @JsonIgnore
+    public boolean isNoSelection() {
+        return NO_SELECTION_ITEM == this;
     }
 
 }

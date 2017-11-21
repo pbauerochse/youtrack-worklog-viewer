@@ -2,12 +2,16 @@ package de.pbauerochse.worklogviewer.fx;
 
 import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackAuthenticationMethodStringConverter;
+import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
-import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackAuthenticationMethod;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +23,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import static java.time.DayOfWeek.*;
+import static javafx.beans.binding.Bindings.or;
 
 /**
  * @author Patrick Bauerochse
@@ -32,7 +37,13 @@ public class SettingsViewController implements Initializable {
     private static final String MYJETBRAINS_HOSTED_YOUTRACK_PATH = "/youtrack";
 
     @FXML
+    private Text youtrackVersionRequiredLabel;
+
+    @FXML
     private TextField youtrackUrlField;
+
+    @FXML
+    private ComboBox<YouTrackVersion> youtrackVersionField;
 
     @FXML
     private TextField youtrackUsernameField;
@@ -66,6 +77,9 @@ public class SettingsViewController implements Initializable {
 
     @FXML
     private PasswordField youtrackOAuthServiceSecretField;
+
+    @FXML
+    private PasswordField youtrackPermanentTokenField;
 
     @FXML
     private Button saveSettingsButton;
@@ -127,6 +141,13 @@ public class SettingsViewController implements Initializable {
             workhoursComboBox.getItems().add(i);
         }
 
+        youtrackVersionField.getItems().addAll(YouTrackVersion.values());
+        youtrackVersionField.setConverter(new YouTrackVersionStringConverter());
+
+        // only show version required label when no version set yet
+        youtrackVersionRequiredLabel.visibleProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
+        youtrackVersionRequiredLabel.managedProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
+
         youtrackAuthenticationMethodField.getItems().addAll(YouTrackAuthenticationMethod.values());
         youtrackAuthenticationMethodField.setConverter(new YouTrackAuthenticationMethodStringConverter());
 
@@ -136,40 +157,27 @@ public class SettingsViewController implements Initializable {
             } catch (MalformedURLException e) {}
         });
 
-        // disable oauth fields when api is selected
-        youtrackOAuthHubUrlField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.HTTP_API));
-        youtrackOAuthServiceIdField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.HTTP_API));
-        youtrackOAuthServiceSecretField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.HTTP_API));
+        // disable oauth fields when other authentication method is selected
+        youtrackOAuthHubUrlField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
+        youtrackOAuthServiceIdField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
+        youtrackOAuthServiceSecretField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
 
+        // disabled token auth field when other authentication method is selected
+        youtrackPermanentTokenField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
 
+        // disable username and password field when bearer is used
+        youtrackUsernameField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
+        youtrackPasswordField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
 
         updateComponentsFromSettings(settings);
 
-//        youtrackUrlField.textProperty().bindBidirectional(settings.youtrackUrlProperty());
-//        youtrackUsernameField.textProperty().bindBidirectional(settings.youtrackUsernameProperty());
-//        youtrackPasswordField.textProperty().bindBidirectional(settings.youtrackPasswordProperty());
-//
-//        youtrackOAuthHubUrlField.textProperty().bindBidirectional(settings.youtrackOAuthHubUrlProperty());
-//        youtrackOAuthServiceIdField.textProperty().bindBidirectional(settings.youtrackOAuthServiceIdProperty());
-//        youtrackOAuthServiceSecretField.textProperty().bindBidirectional(settings.youtrackOAuthServiceSecretProperty());
-//
-//        youtrackAuthenticationMethodField.getSelectionModel().select(settings.youTrackAuthenticationMethodProperty().get());
-//        youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> settings.youTrackAuthenticationMethodProperty().set(newValue));
-//
-//        if (youtrackAuthenticationMethodField.getSelectionModel().getSelectedItem() == YouTrackAuthenticationMethod.OAUTH2 && StringUtils.isBlank(youtrackOAuthHubUrlField.getText())) {
-//            try {
-//                youtrackOAuthHubUrlField.setText(getHubUrl(youtrackUrlField.getText()).toExternalForm());
-//            } catch (MalformedURLException e) {}
-//        }
-//
-//        showAllWorklogsCheckBox.selectedProperty().bindBidirectional(settings.showAllWorklogsProperty());
-//        showStatisticsCheckBox.selectedProperty().bindBidirectional(settings.showStatisticsProperty());
-//        loadDataAtStartupCheckBox.selectedProperty().bindBidirectional(settings.loadDataAtStartupProperty());
-//        showDecimalsInExcel.selectedProperty().bindBidirectional(settings.showDecimalHourTimesInExcelReportProperty());
-//
-//        settings.workHoursADayProperty().bind(workhoursComboBox.getSelectionModel().selectedItemProperty());
+        // cancel button disabled, when crucial properties not set
+        BooleanBinding cancelDisabledProperty = or(
+                or(youtrackUrlField.textProperty().isEmpty(), youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNull()),
+                youtrackVersionField.getSelectionModel().selectedItemProperty().isNull()
+        );
 
-        // button clicks
+        cancelSettingsButton.disableProperty().bind(cancelDisabledProperty);
         cancelSettingsButton.setOnAction(event -> {
             updateComponentsFromSettings(settings);
             closeSettingsDialogue();
@@ -185,6 +193,10 @@ public class SettingsViewController implements Initializable {
     private void updateComponentsFromSettings(SettingsUtil.Settings settings) {
         youtrackUrlField.setText(settings.getYoutrackUrl());
 
+        if (settings.getYouTrackVersion() != null) {
+            youtrackVersionField.getSelectionModel().select(settings.getYouTrackVersion());
+        }
+
         if (settings.getYouTrackAuthenticationMethod() != null) {
             youtrackAuthenticationMethodField.getSelectionModel().select(settings.getYouTrackAuthenticationMethod());
         }
@@ -195,6 +207,8 @@ public class SettingsViewController implements Initializable {
         youtrackOAuthHubUrlField.setText(settings.getYoutrackOAuthHubUrl());
         youtrackOAuthServiceIdField.setText(settings.getYoutrackOAuthServiceId());
         youtrackOAuthServiceSecretField.setText(settings.getYoutrackOAuthServiceSecret());
+
+        youtrackPermanentTokenField.setText(settings.getYoutrackPermanentToken());
 
         workhoursComboBox.getSelectionModel().select((Integer) settings.getWorkHoursADay());
         showAllWorklogsCheckBox.setSelected(settings.isShowAllWorklogs());
@@ -232,6 +246,8 @@ public class SettingsViewController implements Initializable {
         settings.setYoutrackOAuthHubUrl(youtrackOAuthHubUrlField.getText());
         settings.setYoutrackOAuthServiceId(youtrackOAuthServiceIdField.getText());
         settings.setYoutrackOAuthServiceSecret(youtrackOAuthServiceSecretField.getText());
+        settings.setYoutrackPermanentToken(youtrackPermanentTokenField.getText());
+        settings.setYouTrackVersion(youtrackVersionField.getSelectionModel().getSelectedItem());
 
         settings.setWorkHoursADay(workhoursComboBox.getSelectionModel().getSelectedItem());
         settings.setShowAllWorklogs(showAllWorklogsCheckBox.isSelected());

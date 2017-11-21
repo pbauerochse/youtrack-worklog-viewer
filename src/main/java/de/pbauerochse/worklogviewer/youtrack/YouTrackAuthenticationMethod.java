@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.connector;
+package de.pbauerochse.worklogviewer.youtrack;
 
 /**
  * @author Patrick Bauerochse
@@ -11,6 +11,7 @@ public enum YouTrackAuthenticationMethod {
     PERMANENT_TOKEN("youtrack.authentication.permanenttoken");
 
     private final String labelKey;
+
     YouTrackAuthenticationMethod(String labelKey) {
         this.labelKey = labelKey;
     }
@@ -18,4 +19,5 @@ public enum YouTrackAuthenticationMethod {
     public String getLabelKey() {
         return labelKey;
     }
+
 }

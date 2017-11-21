@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.util;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
-import de.pbauerochse.worklogviewer.youtrack.connector.YouTrackAuthenticationMethod;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import java.util.Properties;
 
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * @author Patrick Bauerochse
@@ -33,6 +35,7 @@ public class SettingsUtil {
     private static final String WINDOW_HEIGHT_PROPERTY = "window.height";
     private static final String WORK_HOURS_PROPERTY = "workhours";
 
+    private static final String YOUTRACK_VERSION_PROPERTY = "youtrackversion";
     private static final String YOUTRACK_AUTHENITCATION_METHOD_PROPERTY = "auth_method";
     private static final String YOUTRACK_USERNAME_PROPERTY = "username";
     private static final String YOUTRACK_PASSWORD_PROPERTY = "password";
@@ -40,6 +43,7 @@ public class SettingsUtil {
     private static final String YOUTRACK_OAUTH_SERVICE_ID_PROPERTY = "oauth_service_id";
     private static final String YOUTRACK_OAUTH_SERVICE_SECRET = "oauth_service_secret";
     private static final String YOUTRACK_OAUTH_HUB_URL = "oauth_hub_url";
+    private static final String YOUTRACK_PERMANENT_TOKEN = "permanent_token";
 
     private static final String SHOW_ALL_WORKLOGS_PROPERTY = "showonlyowntimelogs.enabled";
     private static final String SHOW_STATISTICS_PROPERTY = "statistics.enabled";
@@ -164,10 +168,22 @@ public class SettingsUtil {
             }
         }
 
+        // youtrack version
+        String youtrackVersionAsString = properties.getProperty(YOUTRACK_VERSION_PROPERTY);
+        if (StringUtils.isNotBlank(youtrackVersionAsString)) {
+            try {
+                YouTrackVersion version = YouTrackVersion.valueOf(youtrackVersionAsString);
+                settings.setYouTrackVersion(version);
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn("Could not determine YouTrackVersion by settings value {}", youtrackVersionAsString);
+            }
+        }
+
         settings.setYoutrackUrl(properties.getProperty(YOUTRACK_URL_PROPERTY));
         settings.setYoutrackUsername(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
         settings.setYoutrackOAuthServiceId(properties.getProperty(YOUTRACK_OAUTH_SERVICE_ID_PROPERTY));
         settings.setYoutrackOAuthHubUrl(properties.getProperty(YOUTRACK_OAUTH_HUB_URL));
+
         String encryptedUserPassword = properties.getProperty(YOUTRACK_PASSWORD_PROPERTY);
         if (StringUtils.isNotBlank(encryptedUserPassword)) {
             try {
@@ -185,6 +201,16 @@ public class SettingsUtil {
             } catch (GeneralSecurityException e) {
                 LOGGER.error("Could not decrypt oauth secret from settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.oauthsecret.decrypt", e);
+            }
+        }
+
+        String encryptedPermanentToken = properties.getProperty(YOUTRACK_PERMANENT_TOKEN);
+        if (StringUtils.isNotBlank(encryptedPermanentToken)) {
+            try {
+                settings.setYoutrackPermanentToken(EncryptionUtil.decryptEncryptedString(encryptedPermanentToken));
+            } catch (GeneralSecurityException e) {
+                LOGGER.error("Could not decrypt permanent token from settings file", e);
+                throw ExceptionUtil.getIllegalStateException("exceptions.settings.permanenttoken.decrypt", e);
             }
         }
 
@@ -263,6 +289,7 @@ public class SettingsUtil {
         }
 
         properties.setProperty(YOUTRACK_AUTHENITCATION_METHOD_PROPERTY, settings.getYouTrackAuthenticationMethod().name());
+        properties.setProperty(YOUTRACK_VERSION_PROPERTY, settings.getYouTrackVersion().name());
 
         if (StringUtils.isNotBlank(settings.getYoutrackOAuthServiceId())) {
             properties.setProperty(YOUTRACK_OAUTH_SERVICE_ID_PROPERTY, settings.getYoutrackOAuthServiceId());
@@ -286,6 +313,15 @@ public class SettingsUtil {
             }
         }
 
+        if (StringUtils.isNotBlank(settings.getYoutrackPermanentToken())) {
+            try {
+                properties.setProperty(YOUTRACK_PERMANENT_TOKEN, EncryptionUtil.encryptCleartextString(settings.getYoutrackPermanentToken()));
+            } catch (GeneralSecurityException e) {
+                LOGGER.error("Could not encrypt permanent token for settings file", e);
+                throw ExceptionUtil.getIllegalStateException("exceptions.settings.permanenttoken.encrypt", e);
+            }
+        }
+
         if (settings.getLastUsedReportTimerange() != null) {
             properties.setProperty(AUTOLOAD_DATA_TIMERANGE_PROPERTY, settings.getLastUsedReportTimerange().name());
         }
@@ -299,27 +335,24 @@ public class SettingsUtil {
     public static class Settings {
 
         private int windowWidth = 800;
-
         private int windowHeight = 600;
-
         private int windowX = 0;
-
         private int windowY = 0;
 
         private int workHoursADay = 8;
 
+        private YouTrackVersion youTrackVersion;
         private YouTrackAuthenticationMethod youTrackAuthenticationMethod = YouTrackAuthenticationMethod.HTTP_API;
 
         private String youtrackOAuthHubUrl;
-
         private String youtrackOAuthServiceId;
-
         private String youtrackOAuthServiceSecret;
+
+        private String youtrackPermanentToken;
 
         private String youtrackUrl;
 
         private String youtrackUsername;
-
         private String youtrackPassword;
 
         private boolean loadDataAtStartup = false;
@@ -384,6 +417,14 @@ public class SettingsUtil {
             this.youTrackAuthenticationMethod = youTrackAuthenticationMethod;
         }
 
+        public YouTrackVersion getYouTrackVersion() {
+            return youTrackVersion;
+        }
+
+        public void setYouTrackVersion(YouTrackVersion youTrackVersion) {
+            this.youTrackVersion = youTrackVersion;
+        }
+
         public String getYoutrackOAuthHubUrl() {
             return youtrackOAuthHubUrl;
         }
@@ -406,6 +447,14 @@ public class SettingsUtil {
 
         public void setYoutrackOAuthServiceSecret(String youtrackOAuthServiceSecret) {
             this.youtrackOAuthServiceSecret = youtrackOAuthServiceSecret;
+        }
+
+        public String getYoutrackPermanentToken() {
+            return youtrackPermanentToken;
+        }
+
+        public void setYoutrackPermanentToken(String youtrackPermanentToken) {
+            this.youtrackPermanentToken = youtrackPermanentToken;
         }
 
         public String getYoutrackUrl() {
@@ -476,7 +525,7 @@ public class SettingsUtil {
             return collapseState;
         }
 
-        public void setCollapseState(int collapseState) {
+        void setCollapseState(int collapseState) {
             this.collapseState = collapseState;
         }
 
@@ -484,19 +533,45 @@ public class SettingsUtil {
             return highlightState;
         }
 
-        public void setHighlightState(int highlightState) {
+        void setHighlightState(int highlightState) {
             this.highlightState = highlightState;
         }
 
         public boolean hasMissingConnectionParameters() {
-            return StringUtils.isEmpty(youtrackUrl) ||
-                   StringUtils.isEmpty(youtrackUsername) ||
-                   StringUtils.isEmpty(youtrackPassword) ||
-                    (
-                        youTrackAuthenticationMethod == YouTrackAuthenticationMethod.OAUTH2 &&
-                        (StringUtils.isEmpty(youtrackOAuthHubUrl) || StringUtils.isEmpty(youtrackOAuthServiceId) || StringUtils.isEmpty(youtrackOAuthServiceSecret))
-                    );
+            return isEmpty(youtrackUrl) || hasMissingPropertiesForSelectedAuthenticationMethod();
         }
+
+        private boolean hasMissingPropertiesForSelectedAuthenticationMethod() {
+            if (youTrackAuthenticationMethod == null || youTrackVersion == null) {
+                return true;
+            }
+
+            switch (youTrackAuthenticationMethod) {
+                case OAUTH2:
+                    return hasMissingOAuthSettings();
+
+                case PERMANENT_TOKEN:
+                    return hasMissingPermanentTokenSettings();
+
+                case HTTP_API:
+                default:
+                    return hasMissingUsernamePasswordSettings();
+            }
+        }
+
+        private boolean hasMissingUsernamePasswordSettings() {
+            return isEmpty(youtrackUsername) || isEmpty(youtrackPassword);
+        }
+
+        private boolean hasMissingOAuthSettings() {
+            return hasMissingUsernamePasswordSettings() ||
+                    isEmpty(youtrackOAuthHubUrl) || isEmpty(youtrackOAuthServiceId) || isEmpty(youtrackOAuthServiceSecret);
+        }
+
+        private boolean hasMissingPermanentTokenSettings() {
+            return isEmpty(youtrackPermanentToken);
+        }
+
 
         public boolean hasHighlightState(DayOfWeek day) {
             return hasBitValue(highlightState, day);
@@ -514,7 +589,7 @@ public class SettingsUtil {
             collapseState = setBitValue(collapseState, day, selected);
         }
 
-        public int createBitMaskState(DayOfWeek... setDays) {
+        int createBitMaskState(DayOfWeek... setDays) {
             int bitmask = 0;
 
             for (DayOfWeek day : setDays) {
@@ -524,7 +599,7 @@ public class SettingsUtil {
             return bitmask;
         }
 
-        public int setBitValue(int state, DayOfWeek day, boolean selected) {
+        int setBitValue(int state, DayOfWeek day, boolean selected) {
             if (selected) {
                 return state | (1 << day.ordinal());
             } else {
@@ -532,7 +607,7 @@ public class SettingsUtil {
             }
         }
 
-        public boolean hasBitValue(int state, DayOfWeek day) {
+        boolean hasBitValue(int state, DayOfWeek day) {
             int bitValue = (1 << day.ordinal());
             return (state & bitValue) == bitValue;
         }
@@ -545,6 +620,7 @@ public class SettingsUtil {
             result = 31 * result + getHashOrZero(youtrackOAuthServiceId);
             result = 31 * result + getHashOrZero(youtrackOAuthServiceSecret);
             result = 31 * result + getHashOrZero(youtrackOAuthHubUrl);
+            result = 31 * result + getHashOrZero(youtrackPermanentToken);
             return result;
         }
 

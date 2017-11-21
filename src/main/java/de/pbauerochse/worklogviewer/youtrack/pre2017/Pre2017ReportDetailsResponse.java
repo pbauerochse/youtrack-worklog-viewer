@@ -1,7 +1,10 @@
-package de.pbauerochse.worklogviewer.youtrack.createreport.response;
+package de.pbauerochse.worklogviewer.youtrack.pre2017;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.pbauerochse.worklogviewer.youtrack.ReportDetails;
 import de.pbauerochse.worklogviewer.youtrack.createreport.BasicReportDetails;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * {"id":"116-37","name":"Timetracker: THIS_WEEK","ownerLogin":"bauerochse","type":"time","own":true,"visibleTo":null,"invalidationInterval":0,"state":"CALCULATING","lastCalculated":"—","progress":-1,"parameters":{"projects":[],"queryUrl":"/issues"}}
@@ -10,7 +13,7 @@ import de.pbauerochse.worklogviewer.youtrack.createreport.BasicReportDetails;
  * @since 15.04.15
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ReportDetailsResponse extends BasicReportDetails {
+public class Pre2017ReportDetailsResponse extends BasicReportDetails implements ReportDetails {
 
     public static final String READY_STATE = "READY";
 
@@ -67,5 +70,23 @@ public class ReportDetailsResponse extends BasicReportDetails {
 
     public void setProgress(Long progress) {
         this.progress = progress;
+    }
+
+    @JsonIgnore
+    @Override
+    public String getReportId() {
+        return getId();
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isRecomputing() {
+        return !isReady();
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isReady() {
+        return StringUtils.equals(READY_STATE, getState());
     }
 }

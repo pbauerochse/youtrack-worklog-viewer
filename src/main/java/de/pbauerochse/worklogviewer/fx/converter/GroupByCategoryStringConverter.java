@@ -12,31 +12,31 @@ import java.util.Optional;
  * @author Patrick Bauerochse
  * @since 08.07.15
  */
-public class GroupByCategoryStringConverter extends StringConverter<Optional<GroupByCategory>> {
+public class GroupByCategoryStringConverter extends StringConverter<GroupByCategory> {
 
-    private ComboBox<Optional<GroupByCategory>> categoryComboBox;
+    private ComboBox<GroupByCategory> categoryComboBox;
 
-    public GroupByCategoryStringConverter(ComboBox<Optional<GroupByCategory>> categoryComboBox) {
+    public GroupByCategoryStringConverter(ComboBox<GroupByCategory> categoryComboBox) {
         this.categoryComboBox = categoryComboBox;
     }
 
     @Override
-    public String toString(Optional<GroupByCategory> object) {
-        if (!object.isPresent()) {
-            return FormattingUtil.getFormatted("view.main.groupby.nogroupby");
-        }
-
-        return object.get().getName();
+    public String toString(GroupByCategory category) {
+        return Optional.ofNullable(category)
+                .map(GroupByCategory::getName)
+                .orElseGet(() -> FormattingUtil.getFormatted("view.main.groupby.nogroupby"));
     }
 
     @Override
-    public Optional<GroupByCategory> fromString(String string) {
-        for (Optional<GroupByCategory> groupByCategory : categoryComboBox.getItems()) {
-            if (groupByCategory.isPresent() && StringUtils.equals(groupByCategory.get().getName(), string)) {
-                return groupByCategory;
-            }
+    public GroupByCategory fromString(String categoryName) {
+        // special "nothing-selected" item
+        if (StringUtils.equals(FormattingUtil.getFormatted("view.main.groupby.nogroupby"), categoryName)) {
+            return null;
         }
 
-        return Optional.empty();
+        return categoryComboBox.getItems().stream()
+                .filter(category -> StringUtils.equals(category.getName(), categoryName))
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -40,7 +40,7 @@ public class OwnWorklogsTab extends WorklogTab {
                     }
                     return false;
                 })
-                .sorted((o1, o2) -> COLLATOR.compare(o2.getIssue(), o2.getIssue()))
+                .sorted((o1, o2) -> COLLATOR.compare(o1.getIssue(), o2.getIssue()))
                 .peek(taskWithWorklogs -> {
                     // remove items not belonging to self
                     taskWithWorklogs
