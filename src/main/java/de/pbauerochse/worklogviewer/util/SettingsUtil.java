@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.util;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
+import de.pbauerochse.worklogviewer.fx.SettingsViewModel;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import org.apache.commons.lang3.StringUtils;
@@ -54,6 +55,7 @@ public class SettingsUtil {
     private static final String HIGHLIGHT_STATE_PROPERTY = "highlight.state";
 
     private static Settings settings;
+    private static SettingsViewModel settingsViewModel;
 
     /**
      * Loads the user settings for the config file if present
@@ -79,6 +81,13 @@ public class SettingsUtil {
         }
 
         return settings;
+    }
+
+    public static SettingsViewModel loadSettingsViewModel() {
+        if (settingsViewModel == null) {
+            settingsViewModel = new SettingsViewModel(loadSettings());
+        }
+        return settingsViewModel;
     }
 
     /**
@@ -344,13 +353,12 @@ public class SettingsUtil {
         private YouTrackVersion youTrackVersion;
         private YouTrackAuthenticationMethod youTrackAuthenticationMethod = YouTrackAuthenticationMethod.HTTP_API;
 
+        private String youtrackUrl;
         private String youtrackOAuthHubUrl;
         private String youtrackOAuthServiceId;
         private String youtrackOAuthServiceSecret;
 
         private String youtrackPermanentToken;
-
-        private String youtrackUrl;
 
         private String youtrackUsername;
         private String youtrackPassword;

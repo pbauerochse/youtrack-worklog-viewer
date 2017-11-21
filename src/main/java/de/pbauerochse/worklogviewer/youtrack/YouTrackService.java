@@ -29,4 +29,6 @@ public interface YouTrackService {
 
     YouTrackVersion getVersion();
 
+    List<YouTrackAuthenticationMethod> getValidAuthenticationMethods();
+
 }

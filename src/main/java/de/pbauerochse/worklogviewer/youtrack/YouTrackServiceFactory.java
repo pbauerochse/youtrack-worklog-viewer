@@ -31,15 +31,19 @@ public class YouTrackServiceFactory {
         SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
         if (authenticationMethodChanged(settings)) {
-            cachedInstance = AVAILABLE_SERVICE_IMPLEMENTATIONS.stream()
-                    .filter(connector -> connector.getVersion() == settings.getYouTrackVersion())
-                    .findFirst()
-                    .orElseThrow(() -> getIllegalArgumentException("exceptions.settings.version.invalid", settings.getYouTrackVersion().name()));
+            cachedInstance = getYouTrackService(settings.getYouTrackVersion());
 
             LOGGER.info("Created new YouTrackService instance of type {}", cachedInstance.getClass().getSimpleName());
         }
 
         return cachedInstance;
+    }
+
+    public static YouTrackService getYouTrackService(YouTrackVersion version) {
+        return AVAILABLE_SERVICE_IMPLEMENTATIONS.stream()
+                .filter(connector -> connector.getVersion() == version)
+                .findFirst()
+                .orElseThrow(() -> getIllegalArgumentException("exceptions.settings.version.invalid", version.name()));
     }
 
     private static boolean authenticationMethodChanged(SettingsUtil.Settings settings) {

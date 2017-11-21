@@ -5,9 +5,12 @@ import de.pbauerochse.worklogviewer.fx.converter.YouTrackAuthenticationMethodStr
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter;
 import de.pbauerochse.worklogviewer.util.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackService;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackServiceFactory;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -20,7 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.IntStream;
 
 import static java.time.DayOfWeek.*;
 import static javafx.beans.binding.Bindings.or;
@@ -135,21 +140,18 @@ public class SettingsViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.debug("Initializing");
         this.resourceBundle = resources;
-        SettingsUtil.Settings settings = SettingsUtil.loadSettings();
 
-        for (int i = 1; i <= 24; i++) {
-            workhoursComboBox.getItems().add(i);
-        }
+        SettingsViewModel viewModel = SettingsUtil.loadSettingsViewModel();
 
-        youtrackVersionField.getItems().addAll(YouTrackVersion.values());
-        youtrackVersionField.setConverter(new YouTrackVersionStringConverter());
+        initializeDefaultValues(viewModel);
+        bindInputElements(viewModel);
+        attachListeners(viewModel);
 
         // only show version required label when no version set yet
         youtrackVersionRequiredLabel.visibleProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
         youtrackVersionRequiredLabel.managedProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
 
-        youtrackAuthenticationMethodField.getItems().addAll(YouTrackAuthenticationMethod.values());
-        youtrackAuthenticationMethodField.setConverter(new YouTrackAuthenticationMethodStringConverter());
+
 
         youtrackUrlField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
@@ -169,7 +171,7 @@ public class SettingsViewController implements Initializable {
         youtrackUsernameField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
         youtrackPasswordField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
 
-        updateComponentsFromSettings(settings);
+//        updateComponentsFromSettings(settings);
 
         // cancel button disabled, when crucial properties not set
         BooleanBinding cancelDisabledProperty = or(
@@ -179,16 +181,61 @@ public class SettingsViewController implements Initializable {
 
         cancelSettingsButton.disableProperty().bind(cancelDisabledProperty);
         cancelSettingsButton.setOnAction(event -> {
-            updateComponentsFromSettings(settings);
+//            updateComponentsFromSettings(settings);
             closeSettingsDialogue();
         });
 
         saveSettingsButton.setOnAction(event -> {
             LOGGER.debug("Save settings clicked");
-            applyToSettings(settings);
+//            applyToSettings(settings);
             closeSettingsDialogue();
         });
     }
+
+    private void initializeDefaultValues(SettingsViewModel viewModel) {
+        IntStream.range(1, 25).forEach(workhoursComboBox.getItems()::add);
+
+        // Version Combobox Values
+        youtrackVersionField.getItems().addAll(YouTrackVersion.values());
+        youtrackVersionField.setConverter(new YouTrackVersionStringConverter());
+
+        // Authentication Methods Values
+        if (viewModel.getYouTrackVersion() != null) {
+            youtrackAuthenticationMethodField.getItems().addAll(YouTrackAuthenticationMethod.values());
+        }
+        youtrackAuthenticationMethodField.setConverter(new YouTrackAuthenticationMethodStringConverter());
+    }
+
+    private void bindInputElements(SettingsViewModel viewModel) {
+        youtrackUrlField.textProperty().bindBidirectional(viewModel.youTrackUrlProperty());
+        youtrackVersionField.valueProperty().bindBidirectional(viewModel.youTrackVersionProperty());
+        youtrackAuthenticationMethodField.valueProperty().bindBidirectional(viewModel.youTrackAuthenticationMethodProperty());
+        youtrackUsernameField.textProperty().bindBidirectional(viewModel.youTrackUsernameProperty());
+        youtrackPasswordField.textProperty().bindBidirectional(viewModel.youTrackPasswordProperty());
+        youtrackOAuthHubUrlField.textProperty().bindBidirectional(viewModel.youTrackHubUrlProperty());
+        youtrackOAuthServiceIdField.textProperty().bindBidirectional(viewModel.youTrackOAuth2ServiceIdProperty());
+        youtrackOAuthServiceSecretField.textProperty().bindBidirectional(viewModel.youTrackOAuth2ServiceSecretProperty());
+        youtrackPermanentTokenField.textProperty().bindBidirectional(viewModel.youTrackPermanentTokenProperty());
+    }
+
+    private void attachListeners(SettingsViewModel viewModel) {
+        youtrackAuthenticationMethodField.itemsProperty().bind(viewModel.youTrackVersionProperty().);
+
+
+        youtrackVersionField.getSelectionModel().selectedItemProperty().addListener((observable, oldVersion, newVersion) -> {
+            YouTrackService service = YouTrackServiceFactory.getYouTrackService(newVersion);
+            List<YouTrackAuthenticationMethod> validAuthenticationMethods = service.getValidAuthenticationMethods();
+
+            YouTrackAuthenticationMethod currentlySelectedAuthenticationMethod = youtrackAuthenticationMethodField.getValue();
+            youtrackAuthenticationMethodField.setItems(FXCollections.observableArrayList(validAuthenticationMethods));
+
+            if (!validAuthenticationMethods.contains(currentlySelectedAuthenticationMethod)) {
+                // select the first in the list
+                youtrackAuthenticationMethodField.setValue(validAuthenticationMethods.get(0));
+            }
+        });
+    }
+
 
     private void updateComponentsFromSettings(SettingsUtil.Settings settings) {
         youtrackUrlField.setText(settings.getYoutrackUrl());
