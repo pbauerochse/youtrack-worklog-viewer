@@ -14,13 +14,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
- * Created by patrick on 01.11.15.
+ * Fetches the most recent version of the
+ * Worklog Viewer from Github
  */
-public class VersionCheckerTask extends Task<GitHubVersion> {
+public class VersionCheckerTask extends Task<Optional<GitHubVersion>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VersionCheckerTask.class);
 
@@ -29,48 +33,48 @@ public class VersionCheckerTask extends Task<GitHubVersion> {
     }
 
     @Override
-    protected GitHubVersion call() throws Exception {
+    protected Optional<GitHubVersion> call() throws Exception {
 
         updateMessage(FormattingUtil.getFormatted("worker.updatecheck.checking"));
         updateProgress(0, 1);
 
-        HttpGet request = new HttpGet("https://api.github.com/repos/pbauerochse/youtrack-worklog-viewer/releases");
-        request.addHeader("Accept", "application/json, text/plain, */*");
-
-        CloseableHttpClient client = HttpClientUtil.getDefaultClientBuilder(1)
-                .setDefaultHeaders(HttpClientUtil.getRegularBrowserHeaders())
-                .build();
-
-        GitHubVersion version = null;
-
-        try (CloseableHttpResponse httpResponse = client.execute(request)) {
-
-            if (!HttpClientUtil.isValidResponseCode(httpResponse.getStatusLine())) {
-                LOGGER.warn("Could not get most recent version: {}", httpResponse.getStatusLine().getReasonPhrase());
-                EntityUtils.consumeQuietly(httpResponse.getEntity());
-            } else {
-                String jsonResponse = EntityUtils.toString(httpResponse.getEntity());
-
-                StringReader response = new StringReader(jsonResponse);
-                List<GitHubVersion> versions = JacksonUtil.parseValue(response, new TypeReference<List<GitHubVersion>>() {
-                });
-
-                if (versions != null && versions.size() > 0) {
-                    Optional<GitHubVersion> mostRecent = versions.stream()
-                            .filter(gitHubVersion -> !gitHubVersion.isDraft())
-                            .sorted((o1, o2) -> o2.getPublished().compareTo(o1.getPublished()))
-                            .findFirst();
-
-                    if (mostRecent.isPresent()) {
-                        version = mostRecent.get();
-                    }
-                }
-            }
-        }
+        Optional<GitHubVersion> version = getVersionFromGithub();
 
         updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
         updateProgress(1, 1);
 
         return version;
+    }
+
+    private Optional<GitHubVersion> getVersionFromGithub() throws Exception {
+        HttpGet request = new HttpGet("https://api.github.com/repos/pbauerochse/youtrack-worklog-viewer/releases");
+        request.addHeader("Accept", "application/json, text/plain, */*");
+
+        try (CloseableHttpClient client = getHttpClient()) {
+
+            try (CloseableHttpResponse response = client.execute(request)) {
+                if (HttpClientUtil.isValidResponseCode(response.getStatusLine())) {
+                    String jsonResponse = EntityUtils.toString(response.getEntity());
+
+                    List<GitHubVersion> versions = JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<GitHubVersion>>() {});
+
+                    return Optional.ofNullable(versions)
+                            .orElse(Collections.emptyList()).stream()
+                            .filter(((Predicate<GitHubVersion>) GitHubVersion::isDraft).negate())
+                            .max(Comparator.comparing(GitHubVersion::getPublished));
+                }
+
+                LOGGER.warn("Could not get most recent version: {}", response.getStatusLine().getReasonPhrase());
+                EntityUtils.consumeQuietly(response.getEntity());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private CloseableHttpClient getHttpClient() {
+        return HttpClientUtil.getDefaultClientBuilder(1)
+                .setDefaultHeaders(HttpClientUtil.getRegularBrowserHeaders())
+                .build();
     }
 }

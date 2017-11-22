@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.post2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

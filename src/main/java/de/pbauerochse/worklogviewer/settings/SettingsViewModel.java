@@ -4,14 +4,10 @@ import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static java.time.DayOfWeek.*;
 
 public class SettingsViewModel {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SettingsViewModel.class);
 
     private final StringProperty youTrackUrl = new SimpleStringProperty();
     private final ObjectProperty<YouTrackVersion> youTrackVersion = new SimpleObjectProperty<>();
@@ -45,7 +41,7 @@ public class SettingsViewModel {
     private final BooleanProperty highlightStateSaturday = new SimpleBooleanProperty();
     private final BooleanProperty highlightStateSunday = new SimpleBooleanProperty();
 
-    private final BooleanBinding requiresUsernamePassword = youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.HTTP_API).or(youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.OAUTH2));
+    private final BooleanBinding requiresPassword = youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.HTTP_API).or(youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.OAUTH2));
     private final BooleanBinding requiresOAuthSettings = youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.OAUTH2);
     private final BooleanBinding requiresPermanentToken = youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN);
 
@@ -53,15 +49,16 @@ public class SettingsViewModel {
 
     private BooleanBinding getHasMissingConnectionSettingsBinding() {
 
-        BooleanBinding hasMissingUsernamePassword = youTrackUsername.isEmpty().or(youTrackPassword.isEmpty());
-        BooleanBinding hasMissingOAuthSettings = hasMissingUsernamePassword
+        BooleanBinding hasMissingPassword = youTrackPassword.isEmpty();
+        BooleanBinding hasMissingOAuthSettings = hasMissingPassword
                 .or(youTrackOAuth2ServiceId.isEmpty())
                 .or(youTrackOAuth2ServiceSecret.isEmpty())
                 .or(youTrackHubUrl.isEmpty());
         BooleanBinding hasMissingPermanentToken = youTrackPermanentToken.isEmpty();
 
         return youTrackUrl.isEmpty()
-                .or(requiresUsernamePassword.and(hasMissingUsernamePassword))
+                .or(youTrackUsername.isEmpty())
+                .or(requiresPassword.and(hasMissingPassword))
                 .or(requiresOAuthSettings.and(hasMissingOAuthSettings))
                 .or(requiresPermanentToken.and(hasMissingPermanentToken));
     }
@@ -493,12 +490,12 @@ public class SettingsViewModel {
         return hasMissingConnectionSettings;
     }
 
-    public Boolean getRequiresUsernamePassword() {
-        return requiresUsernamePassword.get();
+    public Boolean getRequiresPassword() {
+        return requiresPassword.get();
     }
 
-    public BooleanBinding requiresUsernamePasswordProperty() {
-        return requiresUsernamePassword;
+    public BooleanBinding requiresPasswordProperty() {
+        return requiresPassword;
     }
 
     public Boolean getRequiresOAuthSettings() {

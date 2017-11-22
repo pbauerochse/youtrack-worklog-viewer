@@ -10,6 +10,7 @@ import de.pbauerochse.worklogviewer.youtrack.YouTrackService;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackServiceFactory;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -42,7 +43,6 @@ public class SettingsViewController implements Initializable {
     @FXML private ComboBox<YouTrackAuthenticationMethod> youtrackAuthenticationMethodField;
 
     @FXML private TextField youtrackUsernameField;
-    @FXML private Label youtrackUsernameLabel;
 
     @FXML private PasswordField youtrackPasswordField;
     @FXML private Label youtrackPasswordLabel;
@@ -65,12 +65,8 @@ public class SettingsViewController implements Initializable {
     @FXML private CheckBox loadDataAtStartupCheckBox;
     @FXML private CheckBox showDecimalsInExcel;
 
-
-    @FXML
-    private Button saveSettingsButton;
-
-    @FXML
-    private Button cancelSettingsButton;
+    @FXML private Button saveSettingsButton;
+    @FXML private Button cancelSettingsButton;
 
     @FXML private CheckBox mondayCollapseCheckbox;
     @FXML private CheckBox tuesdayCollapseCheckbox;
@@ -116,9 +112,6 @@ public class SettingsViewController implements Initializable {
     }
 
     private void bindInputElements(SettingsViewModel viewModel) {
-
-        youtrackAuthenticationMethodField.valueProperty().addListener((observable, oldValue, newValue) -> LOGGER.info("AUth Mehiod {} > {}", oldValue, newValue));
-
         youtrackUrlField.textProperty().bindBidirectional(viewModel.youTrackUrlProperty());
         youtrackVersionField.valueProperty().bindBidirectional(viewModel.youTrackVersionProperty());
         youtrackAuthenticationMethodField.valueProperty().bindBidirectional(viewModel.youTrackAuthenticationMethodProperty());
@@ -169,16 +162,11 @@ public class SettingsViewController implements Initializable {
             }
         });
 
-        // Hide username password field, when they are not needed
-        youtrackUsernameLabel.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
-        youtrackUsernameLabel.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
-        youtrackUsernameField.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
-        youtrackUsernameField.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
-
-        youtrackPasswordLabel.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
-        youtrackPasswordLabel.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
-        youtrackPasswordField.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
-        youtrackPasswordField.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
+        // Hide password field, when not required
+        youtrackPasswordLabel.visibleProperty().bind(viewModel.requiresPasswordProperty());
+        youtrackPasswordLabel.managedProperty().bind(viewModel.requiresPasswordProperty());
+        youtrackPasswordField.visibleProperty().bind(viewModel.requiresPasswordProperty());
+        youtrackPasswordField.managedProperty().bind(viewModel.requiresPasswordProperty());
 
         // Hide OAuth2 fields when they are not needed
         youtrackOAuthServiceSecretLabel.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
@@ -202,6 +190,12 @@ public class SettingsViewController implements Initializable {
         youtrackPermanentTokenLabel.managedProperty().bind(viewModel.requiresPermanentTokenProperty());
         youtrackPermanentTokenField.visibleProperty().bind(viewModel.requiresPermanentTokenProperty());
         youtrackPermanentTokenField.managedProperty().bind(viewModel.requiresPermanentTokenProperty());
+
+        SimpleBooleanProperty hadMissingSettingsWhenOpened = new SimpleBooleanProperty(viewModel.getHasMissingConnectionSettings());
+
+        // enable cancel button only when settings are valid or have been valid
+        // when the form was shown, to allow the user cancel invalid inputs
+        cancelSettingsButton.disableProperty().bind(hadMissingSettingsWhenOpened.and(viewModel.hasMissingConnectionSettingsProperty()));
 
         cancelSettingsButton.setOnAction(event -> {
             LOGGER.debug("Cancel clicked");

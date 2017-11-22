@@ -86,7 +86,7 @@ public class TaskWithWorklogs {
     public ImmutableList<String> getDistinctGroupByCriteriaValues() {
         return ImmutableList.copyOf(
                 getWorklogItemList().stream()
-                        .map(item -> item.getGroup())
+                        .map(WorklogItem::getGroup)
                         .distinct()
                         .collect(Collectors.toList())
         );

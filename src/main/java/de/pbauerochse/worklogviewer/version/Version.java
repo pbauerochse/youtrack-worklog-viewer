@@ -43,11 +43,10 @@ public class Version {
     }
 
     public boolean isNewerThan(Version other) {
-        if (major > other.major) return true;
-        if (major == other.major && minor > other.minor) return true;
-        if (major == other.major && minor == other.minor && release > other.release) return true;
+        return major > other.major ||
+                major == other.major && minor > other.minor ||
+                major == other.major && minor == other.minor && release > other.release;
 
-        return false;
     }
 
     @Override

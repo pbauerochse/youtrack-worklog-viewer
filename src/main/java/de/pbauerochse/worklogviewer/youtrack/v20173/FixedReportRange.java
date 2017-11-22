@@ -1,11 +1,14 @@
-package de.pbauerochse.worklogviewer.youtrack.pre2017;
+package de.pbauerochse.worklogviewer.youtrack.v20173;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class Pre2017FixedReportRange implements Pre2017ReportRange {
+class FixedReportRange implements ReportRange {
 
     /**
      * Report names must not container <, > or / so we can't use
@@ -13,19 +16,26 @@ public class Pre2017FixedReportRange implements Pre2017ReportRange {
      **/
     private static final DateTimeFormatter REPORT_NAME_FORMATTER = DateTimeFormatter.ofPattern("ddMM");
 
-    private long from;
-    private long to;
-    private transient String name;
+    private final long from;
+    private final long to;
+    private final String name;
 
-    public Pre2017FixedReportRange() {}
-    public Pre2017FixedReportRange(LocalDate startDate, LocalDate endDate) {
+    @JsonCreator
+    public FixedReportRange(@JsonProperty("name") String name,
+                            @JsonProperty("from") long from,
+                            @JsonProperty("to") long to) {
+        this.name = name;
+        this.from = from;
+        this.to = to;
+    }
+
+    FixedReportRange(LocalDate startDate, LocalDate endDate) {
         ZoneId defaultZone = ZoneId.systemDefault();
         ZonedDateTime zonedStartDateTime = startDate.atStartOfDay(defaultZone);
         ZonedDateTime zonedEndDateTime = endDate.atStartOfDay(defaultZone);
 
         from = zonedStartDateTime.toInstant().toEpochMilli();
         to = zonedEndDateTime.toInstant().toEpochMilli();
-
         name = REPORT_NAME_FORMATTER.format(startDate) + " - " + REPORT_NAME_FORMATTER.format(endDate);
     }
 
@@ -33,16 +43,8 @@ public class Pre2017FixedReportRange implements Pre2017ReportRange {
         return from;
     }
 
-    public void setFrom(long from) {
-        this.from = from;
-    }
-
     public long getTo() {
         return to;
-    }
-
-    public void setTo(long to) {
-        this.to = to;
     }
 
     @Override

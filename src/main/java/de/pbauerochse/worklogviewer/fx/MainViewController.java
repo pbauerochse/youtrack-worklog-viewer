@@ -113,6 +113,7 @@ public class MainViewController implements Initializable {
 
     private ResourceBundle resources;
     private Settings settings;
+    private SettingsViewModel settingsViewModel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -120,7 +121,7 @@ public class MainViewController implements Initializable {
         this.resources = resources;
 
         settings = SettingsUtil.getSettings();
-        SettingsViewModel settingsViewModel = SettingsUtil.getSettingsViewModel();
+        settingsViewModel = SettingsUtil.getSettingsViewModel();
 
         // prepopulate timerange dropdown
         timerangeComboBox.setConverter(new ReportTimerangeStringConverter());
@@ -190,31 +191,31 @@ public class MainViewController implements Initializable {
 
         // check for update
         VersionCheckerTask versionCheckTask = new VersionCheckerTask();
-        versionCheckTask.setOnSucceeded(event -> {
-            GitHubVersion gitHubVersion = ((VersionCheckerTask) event.getSource()).getValue();
-            if (gitHubVersion != null) {
-                Version currentVersion = new Version(resources.getString("release.version"));
-                Version mostRecentVersion = new Version(gitHubVersion.getVersion());
-
-                LOGGER.debug("Most recent github version is {}, this version is {}", mostRecentVersion, currentVersion);
-
-                if (mostRecentVersion.isNewerThan(currentVersion)) {
-                    Hyperlink link = HyperlinkUtil.createLink(
-                            FormattingUtil.getFormatted("worker.updatecheck.available", mostRecentVersion.toString()),
-                            gitHubVersion.getUrl()
-                        );
-                    mainToolbar.getItems().add(link);
-                }
-            }
-
-        });
+        versionCheckTask.setOnSucceeded(this::onVersionCheckFinished);
         startTask(versionCheckTask);
+    }
+
+    private void onVersionCheckFinished(WorkerStateEvent event) {
+        Optional<GitHubVersion> gitHubVersionOptional = ((VersionCheckerTask) event.getSource()).getValue();
+        gitHubVersionOptional.ifPresent(gitHubVersion -> {
+            Version currentVersion = new Version(resources.getString("release.version"));
+            Version mostRecentVersion = new Version(gitHubVersion.getVersion());
+
+            LOGGER.debug("Most recent github version is {}, this version is {}", mostRecentVersion, currentVersion);
+            if (mostRecentVersion.isNewerThan(currentVersion)) {
+                Hyperlink link = HyperlinkUtil.createLink(
+                        FormattingUtil.getFormatted("worker.updatecheck.available", mostRecentVersion.toString()),
+                        gitHubVersion.getUrl()
+                );
+                mainToolbar.getItems().add(link);
+            }
+        });
     }
 
     private void onFormShown() {
         LOGGER.debug("MainForm shown");
 
-        if (settings.hasMissingConnectionParameters()) {
+        if (settingsViewModel.getHasMissingConnectionSettings()) {
             LOGGER.info("No YouTrack connection settings defined yet. Opening settings dialogue");
             showSettingsDialogue();
         }
@@ -437,29 +438,29 @@ public class MainViewController implements Initializable {
 
         // pass in a handler to fetch the group by categories if connection
         // parameters get set
-        openDialogue("/fx/views/settings.fxml", "view.settings.title", true, Optional.of(() -> {
+        openDialogue("/fx/views/settings.fxml", "view.settings.title", true, () -> {
             if (!settings.hasMissingConnectionParameters() && groupByCategoryComboBox.getItems().size() == 0) {
                 LOGGER.debug("Settings window closed, connection settings set and groupBy combobox empty -> trying to fetch groupByCategories");
                 startGetGroupByCategoriesTask();
             }
-        }));
+        });
     }
 
     private void showLogMessagesDialogue() {
         LOGGER.debug("Showing log messages dialogue");
-        openDialogue("/fx/views/logMessagesView.fxml", "view.menu.help.logs", false);
+        openDialogue("/fx/views/logMessagesView.fxml", "view.menu.help.logs");
     }
 
     private void showAboutDialogue() {
         LOGGER.debug("Showing log messages dialogue");
-        openDialogue("/fx/views/about.fxml", "view.menu.help.about", true);
+        openDialogue("/fx/views/about.fxml", "view.menu.help.about");
     }
 
-    private void openDialogue(String view, String titleResourceKey, boolean modal) {
-        openDialogue(view, titleResourceKey, modal, Optional.empty());
+    private void openDialogue(String view, String titleResourceKey) {
+        openDialogue(view, titleResourceKey, false, null);
     }
 
-    private void openDialogue(String view, String titleResourceKey, boolean modal, Optional<Callback> onCloseCallback) {
+    private void openDialogue(String view, String titleResourceKey, boolean modal, Callback onCloseCallback) {
         try {
             Parent content = FXMLLoader.load(MainViewController.class.getResource(view), resources);
 
@@ -477,10 +478,10 @@ public class MainViewController implements Initializable {
             stage.setTitle(FormattingUtil.getFormatted(titleResourceKey));
             stage.setScene(scene);
 
-            if (onCloseCallback.isPresent()) {
+            if (onCloseCallback != null) {
                 stage.setOnCloseRequest(event -> {
                     LOGGER.debug("View {} got close request. Notifying callback", view);
-                    onCloseCallback.get().invoke();
+                    onCloseCallback.invoke();
                 });
             }
 

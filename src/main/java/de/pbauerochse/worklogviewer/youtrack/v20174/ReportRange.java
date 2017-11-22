@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.post2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 )
 @JsonSubTypes({
         @JsonSubTypes.Type(value = FixedTimeRange.class, name = "jetbrains.charisma.smartui.report.common.timeRange.FixedTimeRange"),
-        @JsonSubTypes.Type(value = Post2017NamedReportRange.class, name = "jetbrains.charisma.smartui.report.common.timeRange.NamedTimeRange")
+        @JsonSubTypes.Type(value = NamedReportRange.class, name = "jetbrains.charisma.smartui.report.common.timeRange.NamedTimeRange")
 })
-public interface Post2017ReportRange {
+public interface ReportRange {
 }

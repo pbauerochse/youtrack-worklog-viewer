@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.pre2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Joiner;
@@ -17,6 +17,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -43,11 +44,11 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-public class Pre2017YouTrackService implements YouTrackService {
+public class YouTrackServiceV20174 implements YouTrackService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Pre2017YouTrackService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackServiceV20174.class);
 
-    private static final YouTrackUrlBuilder URL_BUILDER = new Pre2017UrlBuilder();
+    private static final YouTrackUrlBuilder URL_BUILDER = new UrlBuilder();
 
     @SuppressWarnings("Duplicates")
     @Override
@@ -85,7 +86,7 @@ public class Pre2017YouTrackService implements YouTrackService {
         String url = URL_BUILDER.getCreateReportUrl();
         LOGGER.debug("Creating temporary timereport using url {}", url);
 
-        Pre2017CreateReportRequestPayload payload = new Pre2017CreateReportRequestPayload(timereportContext);
+        CreateReportParameters payload = new CreateReportParameters(timereportContext);
 
         // request body
         HttpPost request = new HttpPost(url);
@@ -109,7 +110,7 @@ public class Pre2017YouTrackService implements YouTrackService {
                     throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.blankresponse");
                 }
 
-                return JacksonUtil.parseValue(new StringReader(responseJson), Pre2017ReportDetailsResponse.class);
+                return JacksonUtil.parseValue(new StringReader(responseJson), ReportDetailsResponse.class);
             }
 
         } catch (IOException e) {
@@ -138,7 +139,8 @@ public class Pre2017YouTrackService implements YouTrackService {
 
                 String jsonResponse = EntityUtils.toString(response.getEntity());
                 LOGGER.debug("Received JSON response {}", jsonResponse);
-                return JacksonUtil.parseValue(new StringReader(jsonResponse), Pre2017ReportDetailsResponse.class);
+                ReportStatus reportStatus = JacksonUtil.parseValue(new StringReader(jsonResponse), ReportStatus.class);
+                return new ReportDetailsResponse(reportId, reportStatus);
             }
 
         } catch (IOException e) {
@@ -154,6 +156,7 @@ public class Pre2017YouTrackService implements YouTrackService {
         LOGGER.debug("Downloading report {} using url {}", reportId, url);
 
         HttpGet request = new HttpGet(url);
+        request.setConfig(RequestConfig.custom().setDecompressionEnabled(false).build());
 
         try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
             return httpClient.execute(request, response -> {
@@ -269,16 +272,11 @@ public class Pre2017YouTrackService implements YouTrackService {
 
     @Override
     public YouTrackVersion getVersion() {
-        return YouTrackVersion.PRE_2017;
+        return YouTrackVersion.POST_2017;
     }
 
     @Override
     public List<YouTrackAuthenticationMethod> getValidAuthenticationMethods() {
-        return ImmutableList.of(
-                YouTrackAuthenticationMethod.HTTP_API,
-                YouTrackAuthenticationMethod.OAUTH2
-        );
+        return ImmutableList.of(YouTrackAuthenticationMethod.PERMANENT_TOKEN);
     }
-
-
 }

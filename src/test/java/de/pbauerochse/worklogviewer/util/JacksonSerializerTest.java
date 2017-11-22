@@ -2,7 +2,7 @@ package de.pbauerochse.worklogviewer.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
-import de.pbauerochse.worklogviewer.youtrack.pre2017.Pre2017ReportDetailsResponse;
+import de.pbauerochse.worklogviewer.youtrack.v20173.ReportDetailsResponse;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class JacksonSerializerTest {
 
     @Test
     public void testDeserialization() throws IOException {
-        Pre2017ReportDetailsResponse response = JacksonUtil.parseValue(new StringReader(DESERIALIZATION_TEST_DATA), Pre2017ReportDetailsResponse.class);
+        ReportDetailsResponse response = JacksonUtil.parseValue(new StringReader(DESERIALIZATION_TEST_DATA), ReportDetailsResponse.class);
 
         Assert.assertEquals("id", "116-892", response.getId());
         Assert.assertEquals("name", "Timetracker: THIS_WEEK", response.getName());

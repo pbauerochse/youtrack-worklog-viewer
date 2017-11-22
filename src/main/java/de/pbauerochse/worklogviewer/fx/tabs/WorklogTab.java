@@ -340,7 +340,7 @@ public abstract class WorklogTab extends Tab {
 
                         taskWithWorklogs.getWorklogItemList().stream()
                                 .filter(worklogItem -> StringUtils.equals(worklogItem.getGroup(), groupByCriteria))
-                                .sorted((o1, o2) -> o1.getDate().compareTo(o2.getDate()))
+                                .sorted(Comparator.comparing(WorklogItem::getDate))
                                 .forEach(worklogItem -> {
                                     // this worklog item matches the critera
                                     // add workday entry to current row
@@ -412,55 +412,30 @@ public abstract class WorklogTab extends Tab {
         WorklogStatistics statistics = new WorklogStatistics();
 
         // generic statistics
-        displayResult.forEach(taskWithWorklogs -> {
+        displayResult.forEach((TaskWithWorklogs taskWithWorklogs) -> {
             statistics.getTotalTimeSpent().addAndGet(taskWithWorklogs.getTotalInMinutes());
 
             for (WorklogItem worklogItem : taskWithWorklogs.getWorklogItemList()) {
                 String employee = worklogItem.getUserDisplayname();
 
                 // employee total time spent
-                AtomicLong totalTimeSpent = statistics.getEmployeeToTotaltimeSpent().get(employee);
-                if (totalTimeSpent == null) {
-                    totalTimeSpent = new AtomicLong(0);
-                    statistics.getEmployeeToTotaltimeSpent().put(employee, totalTimeSpent);
-                }
+                AtomicLong totalTimeSpent = statistics.getEmployeeToTotaltimeSpent().computeIfAbsent(employee, k -> new AtomicLong(0));
                 totalTimeSpent.addAndGet(worklogItem.getDurationInMinutes());
 
                 // distinct tasks per employee
-                Set<String> totalDistinctTasks = statistics.getEmployeeToTotalDistinctTasks().get(employee);
-                if (totalDistinctTasks == null) {
-                    totalDistinctTasks = new HashSet<>();
-                    statistics.getEmployeeToTotalDistinctTasks().put(employee, totalDistinctTasks);
-                }
+                Set<String> totalDistinctTasks = statistics.getEmployeeToTotalDistinctTasks().computeIfAbsent(employee, k -> new HashSet<>());
                 totalDistinctTasks.add(taskWithWorklogs.getIssue());
 
                 // distinct tasks per employee per project
-                Map<String, Set<String>> projectToDistinctTasks = statistics.getEmployeeToProjectToDistinctTasks().get(employee);
-                if (projectToDistinctTasks == null) {
-                    projectToDistinctTasks = new HashMap<>();
-                    statistics.getEmployeeToProjectToDistinctTasks().put(employee, projectToDistinctTasks);
-                }
+                Map<String, Set<String>> projectToDistinctTasks = statistics.getEmployeeToProjectToDistinctTasks().computeIfAbsent(employee, k -> new HashMap<>());
 
-                Set<String> distinctTasks = projectToDistinctTasks.get(taskWithWorklogs.getProject());
-                if (distinctTasks == null) {
-                    distinctTasks = new HashSet<>();
-                    projectToDistinctTasks.put(taskWithWorklogs.getProject(), distinctTasks);
-                }
-
+                Set<String> distinctTasks = projectToDistinctTasks.computeIfAbsent(taskWithWorklogs.getProject(), k -> new HashSet<>());
                 distinctTasks.add(taskWithWorklogs.getIssue());
 
                 // time spent per project
-                Map<String, AtomicLong> projectToTimespent = statistics.getEmployeeToProjectToWorktime().get(employee);
-                if (projectToTimespent == null) {
-                    projectToTimespent = new HashMap<>();
-                    statistics.getEmployeeToProjectToWorktime().put(employee, projectToTimespent);
-                }
+                Map<String, AtomicLong> projectToTimespent = statistics.getEmployeeToProjectToWorktime().computeIfAbsent(employee, k -> new HashMap<>());
 
-                AtomicLong timespentOnProject = projectToTimespent.get(taskWithWorklogs.getProject());
-                if (timespentOnProject == null) {
-                    timespentOnProject = new AtomicLong(0);
-                    projectToTimespent.put(taskWithWorklogs.getProject(), timespentOnProject);
-                }
+                AtomicLong timespentOnProject = projectToTimespent.computeIfAbsent(taskWithWorklogs.getProject(), k -> new AtomicLong(0));
 
                 timespentOnProject.addAndGet(worklogItem.getDurationInMinutes());
             }
@@ -492,9 +467,7 @@ public abstract class WorklogTab extends Tab {
         employeeProjectBargraph.setTitle(FormattingUtil.getFormatted("view.statistics.byemployeeandproject"));
 
         Set<String> projectsToDisplay = new HashSet<>();
-        displayResult.forEach(taskWithWorklogs -> {
-            projectsToDisplay.add(taskWithWorklogs.getProject());
-        });
+        displayResult.forEach(taskWithWorklogs -> projectsToDisplay.add(taskWithWorklogs.getProject()));
         int projectEmployeeBargraphPreferedHeight = HEIGHT_PER_Y_AXIS_ELEMENT * projectsToDisplay.size() + HEIGHT_PER_X_AXIS_ELEMENT * statistics.getEmployeeToTotaltimeSpent().keySet().size() + ADDITIONAL_HEIGHT;
         projectEmployeeBargraph.setPrefHeight(projectEmployeeBargraphPreferedHeight);
         VBox.setVgrow(projectEmployeeBargraph, Priority.ALWAYS);

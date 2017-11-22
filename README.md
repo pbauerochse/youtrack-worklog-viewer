@@ -10,7 +10,7 @@ With this tool you can now overcome this issue. It let's you create your persona
 
 ## Latest Version
 
-[Download v2.2.3](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.2.3)
+[Download v2.3.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.3.0)
 
 ## How does it work?
 You simply enter the URL to your YouTrack installation, and your own login data at the settings screen, select the reporting range in the main window and click on the "Download worklogs" button. That's it!
@@ -31,7 +31,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **Which YouTrack versions are supported?**
 
-*Since I only have access to a YouTrack 6 installation, this tool has only been tested on that version. I can not guarantee, that it will work with any other version*
+*It has been tested with YouTrack Version 6 up to YouTrack 2017.4*
 
 **How does the tool get the data from YouTrack?**
 
@@ -49,12 +49,9 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 *This seems to be a bug in YouTrack with the generation of the time report. See https://youtrack.jetbrains.com/issue/JT-29447 . Unfortunately I can't do anything about this :disappointed:*
 
-**I'm seeing a lot question marks where umlauts should be**
-
-*Unfortunately this also is a YouTrack issue: The report itself already contains the broken characters so I have no chance to fix that. If you want to get this fixed vote on the issue at https://youtrack.jetbrains.com/issue/JT-29234*
-
 **Can I use OAuth2 authentication?**
 
 *Starting from version 2.1.0 you may now switch authentication from REST to OAuth2 in the settings dialogue. To get this working you will need to configure a service in the YouTrack Hub for the YouTrack Worklog Viewer and also provide the client id and client secret in the settings dialogue. See [the Wiki page](https://github.com/pbauerochse/youtrack-worklog-viewer/wiki/Authentication-with-YouTrack) for a detailed explanation*
 
+*Please note, that starting from YouTrack Version 2017.4, the use of permanent token with YouTrack scope is required. A tutorial on how to generate these tokens can be found [here](https://www.jetbrains.com/help/youtrack/standalone/Manage-Permanent-Token.html). Your user needs to have the "Service Read" Role*
 

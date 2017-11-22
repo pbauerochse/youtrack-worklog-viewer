@@ -1,9 +1,9 @@
-package de.pbauerochse.worklogviewer.youtrack.post2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-public class FixedTimeRange implements Post2017ReportRange {
+public class FixedTimeRange implements ReportRange {
 
     private final LocalDate startDate;
     private final LocalDate endDate;

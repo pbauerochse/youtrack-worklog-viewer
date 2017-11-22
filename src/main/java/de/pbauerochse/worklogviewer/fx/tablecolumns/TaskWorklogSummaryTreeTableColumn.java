@@ -9,9 +9,6 @@ import javafx.scene.control.TreeTableColumn;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.text.resources.cldr.ga.FormatData_ga;
-
-import java.text.Format;
 
 import static de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.*;
 

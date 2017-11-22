@@ -2,8 +2,8 @@ package de.pbauerochse.worklogviewer.youtrack;
 
 public enum YouTrackVersion {
 
-    PRE_2017("youtrack.version.pre2017"),
-    POST_2017("youtrack.version.post2017");
+    PRE_2017("youtrack.version.olderOrEqual20173"),
+    POST_2017("youtrack.version.newerOrEqual20174");
 
     private final String labelKey;
 

@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.post2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unused")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class Post2017CreateReportRequestPayload {
+class CreateReportParameters {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Post2017CreateReportRequestPayload.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CreateReportParameters.class);
 
     private final TimereportContext timereportContext;
 
-    Post2017CreateReportRequestPayload(TimereportContext timereportContext) {
+    CreateReportParameters(TimereportContext timereportContext) {
         this.timereportContext = timereportContext;
     }
 
@@ -39,7 +39,7 @@ class Post2017CreateReportRequestPayload {
         return true;
     }
 
-    public Post2017ReportRange getRange() {
+    public ReportRange getRange() {
         TimerangeProvider timerangeProvider = timereportContext.getTimerangeProvider();
         ReportTimerange reportTimerange = timerangeProvider.getReportTimerange();
 
@@ -47,7 +47,7 @@ class Post2017CreateReportRequestPayload {
             return new FixedTimeRange(timerangeProvider.getStartDate(), timerangeProvider.getEndDate());
         }
 
-        return new Post2017NamedReportRange(reportTimerange);
+        return new NamedReportRange(reportTimerange);
     }
 
     public Grouping getGrouping() {

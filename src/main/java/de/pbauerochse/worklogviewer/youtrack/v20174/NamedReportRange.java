@@ -1,12 +1,12 @@
-package de.pbauerochse.worklogviewer.youtrack.post2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 
-public class Post2017NamedReportRange implements Post2017ReportRange {
+public class NamedReportRange implements ReportRange {
 
     private final ReportTimerange reportTimerange;
 
-    Post2017NamedReportRange(ReportTimerange reportTimerange) {
+    NamedReportRange(ReportTimerange reportTimerange) {
         this.reportTimerange = reportTimerange;
     }
 

@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.post2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -6,14 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.pbauerochse.worklogviewer.youtrack.ReportDetails;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Post2017ReportDetailsResponse implements ReportDetails {
+public class ReportDetailsResponse implements ReportDetails {
 
     private final String id;
-    private final Post2017ReportStatus status;
+    private final ReportStatus status;
 
     @JsonCreator
-    public Post2017ReportDetailsResponse(@JsonProperty("id") String id,
-                                         @JsonProperty("status") Post2017ReportStatus status) {
+    public ReportDetailsResponse(@JsonProperty("id") String id,
+                                 @JsonProperty("status") ReportStatus status) {
         this.id = id;
         this.status = status;
     }

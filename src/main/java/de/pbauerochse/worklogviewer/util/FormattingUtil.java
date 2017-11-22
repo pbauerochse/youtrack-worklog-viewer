@@ -32,9 +32,6 @@ public class FormattingUtil {
 
     /**
      * Formats the given amount of minutes in Jira Style format
-     *
-     * @param minutes
-     * @return
      */
     public static String formatMinutes(long minutes, boolean full) {
         StringBuilder worklogFormatted = new StringBuilder();

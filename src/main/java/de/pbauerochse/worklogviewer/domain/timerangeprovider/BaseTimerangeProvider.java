@@ -29,9 +29,7 @@ public abstract class BaseTimerangeProvider implements TimerangeProvider {
         if (!(obj instanceof TimerangeProvider)) return false;
 
         TimerangeProvider other = (TimerangeProvider) obj;
-        if (other.getReportTimerange() != getReportTimerange()) return false;
-
-        return startDate.isEqual(other.getStartDate()) && endDate.isEqual(other.getEndDate());
+        return other.getReportTimerange() == getReportTimerange() && startDate.isEqual(other.getStartDate()) && endDate.isEqual(other.getEndDate());
     }
 
     @Override

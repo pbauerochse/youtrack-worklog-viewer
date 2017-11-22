@@ -1,13 +1,10 @@
 package de.pbauerochse.worklogviewer.fx;
 
-import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.util.HyperlinkUtil;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;

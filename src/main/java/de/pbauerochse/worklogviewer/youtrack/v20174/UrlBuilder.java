@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.pre2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
@@ -10,44 +10,44 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import java.nio.charset.Charset;
 import java.util.List;
 
-class Pre2017UrlBuilder implements YouTrackUrlBuilder {
+class UrlBuilder implements YouTrackUrlBuilder {
 
     @Override
     public String getUsernamePasswordLoginUrl() {
-        return buildYoutrackApiUrl("user/login");
+        throw new UnsupportedOperationException("Username Password Authentication is not supported with Versions >= 2017.03");
     }
 
     @Override
     public String getGroupByCriteriaUrl() {
-        return buildYoutrackApiUrl("reports/timeReports/possibleGroupByCategories");
+        return buildYoutrackApiUrl("/rest/reports/timeReports/possibleGroupByCategories");
     }
 
     @Override
     public String getCreateReportUrl() {
-        return buildYoutrackApiUrl("current/reports");
+        return buildYoutrackApiUrl("/api/reports?fields=$type,authors(fullName,id,login,ringId),effectiveQuery,effectiveQueryUrl,id,invalidationInterval,name,own,owner(id,login),pinned,projects(id,name,shortName),query,sprint(id,name),status(calculationInProgress,error(id),errorMessage,isOutdated,lastCalculated,progress,wikifiedErrorMessage),visibleTo(id,name),wikifiedError,windowSize,workTypes(id,name)");
     }
 
     @Override
     public String getReportDetailsUrl(String reportId) {
-        String template = buildYoutrackApiUrl("current/reports/%s");
+        String template = buildYoutrackApiUrl("/api/reports/%s/status?fields=calculationInProgress,error(id),errorMessage,isOutdated,lastCalculated,progress,wikifiedErrorMessage");
         return String.format(template, reportId);
     }
 
     @Override
     public String getDownloadReportUrl(String reportId) {
-        String template = buildYoutrackApiUrl("current/reports/%s/export");
+        String template = buildYoutrackApiUrl("/api/reports/%s/export");
         return String.format(template, reportId);
     }
 
     @Override
     public String getDeleteReportUrl(String reportId) {
-        String template = buildYoutrackApiUrl("current/reports/%s");
+        String template = buildYoutrackApiUrl("/api/reports/%s?fields=$type,authors(fullName,id,login,ringId),effectiveQuery,effectiveQueryUrl,id,invalidationInterval,name,own,owner(id,login),pinned,projects(id,name,shortName),query,sprint(id,name),status(calculationInProgress,error(id),errorMessage,isOutdated,lastCalculated,progress,wikifiedErrorMessage),visibleTo(id,name),wikifiedError,windowSize,workTypes(id,name)");
         return String.format(template, reportId);
     }
 
     @Override
     public String getIssueDetailsUrl(List<NameValuePair> fetchIssuesParameters) {
-        String template = buildYoutrackApiUrl("issue?%s");
+        String template = buildYoutrackApiUrl("/rest/issue?%s");
         String issuesQuery = URLEncodedUtils.format(fetchIssuesParameters, Charset.forName("utf-8"));
         return String.format(template, issuesQuery);
     }
@@ -58,10 +58,6 @@ class Pre2017UrlBuilder implements YouTrackUrlBuilder {
 
         if (!StringUtils.endsWith(settings.getYoutrackUrl(), "/") && !StringUtils.startsWith(path, "/")) {
             finalUrl.append('/');
-        }
-
-        if (!StringUtils.endsWith(finalUrl, "rest/")) {
-            finalUrl.append("rest/");
         }
 
         return finalUrl.append(path).toString();

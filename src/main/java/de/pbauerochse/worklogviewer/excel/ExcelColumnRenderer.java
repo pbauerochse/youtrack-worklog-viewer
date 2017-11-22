@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.excel;
 
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
-import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import javafx.scene.control.TreeItem;
 import org.apache.poi.ss.usermodel.*;
 

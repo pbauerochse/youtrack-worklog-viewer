@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.pre2017;
+package de.pbauerochse.worklogviewer.youtrack.v20173;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unused")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class Pre2017CreateReportRequestPayload {
+class CreateReportParameters {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Pre2017CreateReportRequestPayload.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CreateReportParameters.class);
 
     private static final String TIMEREPORT_TYPE = "time";
     private final TimereportContext timereportContext;
 
-    Pre2017CreateReportRequestPayload(TimereportContext timereportContext) {
+    CreateReportParameters(TimereportContext timereportContext) {
         this.timereportContext = timereportContext;
     }
 
@@ -40,7 +40,7 @@ class Pre2017CreateReportRequestPayload {
     public ReportParameters getParameters() {
         ReportParameters parameters = new ReportParameters();
 
-        Pre2017ReportRange reportRange = getReportRange();
+        ReportRange reportRange = getReportRange();
         LOGGER.debug("Using timerange {}", reportRange);
         parameters.setRange(reportRange);
 
@@ -52,14 +52,14 @@ class Pre2017CreateReportRequestPayload {
     }
 
     @JsonIgnore
-    private Pre2017ReportRange getReportRange() {
+    private ReportRange getReportRange() {
         TimerangeProvider timerangeProvider = timereportContext.getTimerangeProvider();
         ReportTimerange reportTimerange = timerangeProvider.getReportTimerange();
 
         if (reportTimerange == ReportTimerange.CUSTOM) {
-            return new Pre2017FixedReportRange(timerangeProvider.getStartDate(), timerangeProvider.getEndDate());
+            return new FixedReportRange(timerangeProvider.getStartDate(), timerangeProvider.getEndDate());
         }
 
-        return new Pre2017NamedReportRange(reportTimerange);
+        return new NamedReportRange(reportTimerange);
     }
 }

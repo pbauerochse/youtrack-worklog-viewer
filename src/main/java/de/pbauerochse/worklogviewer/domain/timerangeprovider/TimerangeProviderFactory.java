@@ -34,10 +34,7 @@ public class TimerangeProviderFactory {
         if (timerangeProviderClass != null) {
             try {
                 timerangeProvider = timerangeProviderClass.newInstance();
-            } catch (InstantiationException e) {
-                LOGGER.error("Could not instanttiate class {}", timerangeProviderClass.getName(), e);
-                throw ExceptionUtil.getIllegalArgumentException("exceptions.internal", e);
-            } catch (IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException e) {
                 LOGGER.error("Could not instanttiate class {}", timerangeProviderClass.getName(), e);
                 throw ExceptionUtil.getIllegalArgumentException("exceptions.internal", e);
             }

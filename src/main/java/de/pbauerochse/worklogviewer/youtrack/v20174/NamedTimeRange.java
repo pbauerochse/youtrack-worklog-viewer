@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.youtrack.post2017;
+package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 
