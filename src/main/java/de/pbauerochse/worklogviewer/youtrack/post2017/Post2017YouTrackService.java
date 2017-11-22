@@ -17,6 +17,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -155,6 +156,7 @@ public class Post2017YouTrackService implements YouTrackService {
         LOGGER.debug("Downloading report {} using url {}", reportId, url);
 
         HttpGet request = new HttpGet(url);
+        request.setConfig(RequestConfig.custom().setDecompressionEnabled(false).build());
 
         try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
             return httpClient.execute(request, response -> {
