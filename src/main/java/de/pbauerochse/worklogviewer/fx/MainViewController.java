@@ -15,13 +15,13 @@ import de.pbauerochse.worklogviewer.fx.tabs.WorklogTab;
 import de.pbauerochse.worklogviewer.fx.tasks.*;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
+import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.util.HyperlinkUtil;
 import de.pbauerochse.worklogviewer.version.GitHubVersion;
 import de.pbauerochse.worklogviewer.version.Version;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
-import javafx.beans.binding.BooleanBinding;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
@@ -120,6 +120,7 @@ public class MainViewController implements Initializable {
         this.resources = resources;
 
         settings = SettingsUtil.getSettings();
+        SettingsViewModel settingsViewModel = SettingsUtil.getSettingsViewModel();
 
         // prepopulate timerange dropdown
         timerangeComboBox.setConverter(new ReportTimerangeStringConverter());
@@ -162,12 +163,7 @@ public class MainViewController implements Initializable {
         });
 
         // fetch worklog button click
-        fetchWorklogButton.disableProperty().bind(new BooleanBinding() {
-            @Override
-            protected boolean computeValue() {
-                return settings.hasMissingConnectionParameters();
-            }
-        });
+        fetchWorklogButton.disableProperty().bind(settingsViewModel.hasValidConnectionParametersProperty().not());
         fetchWorklogButton.setOnAction(clickEvent -> startFetchWorklogsTask());
 
         // export to excel only possible if resultTabPane is not empty and therefore seems to contain data

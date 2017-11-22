@@ -10,12 +10,10 @@ import de.pbauerochse.worklogviewer.youtrack.YouTrackService;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackServiceFactory;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.application.Platform;
-import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -28,8 +26,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
-import static javafx.beans.binding.Bindings.or;
-
 /**
  * @author Patrick Bauerochse
  * @since 15.04.15
@@ -40,9 +36,6 @@ public class SettingsViewController implements Initializable {
 
     private static final String MYJETBRAINS_HOST = "myjetbrains.com";
     private static final String MYJETBRAINS_HOSTED_YOUTRACK_PATH = "/youtrack";
-
-    @FXML
-    private Text youtrackVersionRequiredLabel;
 
     @FXML
     private TextField youtrackUrlField;
@@ -213,35 +206,35 @@ public class SettingsViewController implements Initializable {
             }
         });
 
-        // only show version required label when no version set yet
-        youtrackVersionRequiredLabel.visibleProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
-        youtrackVersionRequiredLabel.managedProperty().bind(youtrackVersionField.getSelectionModel().selectedItemProperty().isNull());
+        // Hide username password field, when they are not needed
+        youtrackUsernameField.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
+        youtrackUsernameField.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
 
-        // disable oauth fields when other auth method is selected
-        youtrackOAuthHubUrlField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
-        youtrackOAuthServiceIdField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
-        youtrackOAuthServiceSecretField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.OAUTH2));
+        youtrackPasswordField.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
+        youtrackPasswordField.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
 
-        // disabled token auth field when other authentication method is selected
-        youtrackPermanentTokenField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNotEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
+        // Hide OAuth2 fields when they are not needed
+        youtrackOAuthServiceSecretField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
+        youtrackOAuthServiceSecretField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
 
-        // disable username and password field when bearer is used
-        youtrackUsernameField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
-        youtrackPasswordField.disableProperty().bind(youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN));
+        youtrackOAuthServiceIdField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
+        youtrackOAuthServiceIdField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
 
-        // cancel button disabled, when crucial properties not set
-        BooleanBinding cancelDisabledProperty = or(
-                or(youtrackUrlField.textProperty().isEmpty(), youtrackAuthenticationMethodField.getSelectionModel().selectedItemProperty().isNull()),
-                youtrackVersionField.getSelectionModel().selectedItemProperty().isNull()
-        );
+        youtrackOAuthHubUrlField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
+        youtrackOAuthHubUrlField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
 
-        cancelSettingsButton.disableProperty().bind(cancelDisabledProperty);
+        // Hide token field if not needed
+        youtrackPermanentTokenField.visibleProperty().bind(viewModel.requiresPermanentTokenProperty());
+        youtrackPermanentTokenField.managedProperty().bind(viewModel.requiresPermanentTokenProperty());
+
         cancelSettingsButton.setOnAction(event -> {
             LOGGER.debug("Cancel clicked");
             viewModel.discardChanges();
             closeSettingsDialogue();
         });
 
+        viewModel.hasValidConnectionParametersProperty().addListener((observable, oldValue, newValue) -> LOGGER.debug("HasValidSettings Changed from {} to {}", oldValue, newValue));
+        saveSettingsButton.disableProperty().bind(viewModel.hasValidConnectionParametersProperty().not());
         saveSettingsButton.setOnAction(event -> {
             LOGGER.debug("Save settings clicked");
             viewModel.saveChanges();

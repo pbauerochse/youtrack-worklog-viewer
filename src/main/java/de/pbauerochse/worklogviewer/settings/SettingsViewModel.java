@@ -2,43 +2,66 @@ package de.pbauerochse.worklogviewer.settings;
 
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 
 import static java.time.DayOfWeek.*;
 
 public class SettingsViewModel {
 
-    private StringProperty youTrackUrl = new SimpleStringProperty();
-    private ObjectProperty<YouTrackVersion> youTrackVersion = new SimpleObjectProperty<>();
-    private ObjectProperty<YouTrackAuthenticationMethod> youTrackAuthenticationMethod = new SimpleObjectProperty<>();
-    private StringProperty youTrackUsername = new SimpleStringProperty();
-    private StringProperty youTrackPassword = new SimpleStringProperty();
-    private StringProperty youTrackHubUrl = new SimpleStringProperty();
-    private StringProperty youTrackOAuth2ServiceId = new SimpleStringProperty();
-    private StringProperty youTrackOAuth2ServiceSecret = new SimpleStringProperty();
-    private StringProperty youTrackPermanentToken = new SimpleStringProperty();
+    private final StringProperty youTrackUrl = new SimpleStringProperty();
+    private final ObjectProperty<YouTrackVersion> youTrackVersion = new SimpleObjectProperty<>();
+    private final ObjectProperty<YouTrackAuthenticationMethod> youTrackAuthenticationMethod = new SimpleObjectProperty<>();
+    private final StringProperty youTrackUsername = new SimpleStringProperty();
+    private final StringProperty youTrackPassword = new SimpleStringProperty();
+    private final StringProperty youTrackHubUrl = new SimpleStringProperty();
+    private final StringProperty youTrackOAuth2ServiceId = new SimpleStringProperty();
+    private final StringProperty youTrackOAuth2ServiceSecret = new SimpleStringProperty();
+    private final StringProperty youTrackPermanentToken = new SimpleStringProperty();
 
-    private IntegerProperty workhours = new SimpleIntegerProperty();
-    private BooleanProperty showAllWorklogs = new SimpleBooleanProperty();
-    private BooleanProperty showStatistics = new SimpleBooleanProperty();
-    private BooleanProperty loadDataAtStartup = new SimpleBooleanProperty();
-    private BooleanProperty showDecimalsInExcel = new SimpleBooleanProperty();
+    private final IntegerProperty workhours = new SimpleIntegerProperty();
+    private final BooleanProperty showAllWorklogs = new SimpleBooleanProperty();
+    private final BooleanProperty showStatistics = new SimpleBooleanProperty();
+    private final BooleanProperty loadDataAtStartup = new SimpleBooleanProperty();
+    private final BooleanProperty showDecimalsInExcel = new SimpleBooleanProperty();
 
-    private BooleanProperty collapseStateMonday = new SimpleBooleanProperty();
-    private BooleanProperty collapseStateTuesday = new SimpleBooleanProperty();
-    private BooleanProperty collapseStateWednesday = new SimpleBooleanProperty();
-    private BooleanProperty collapseStateThursday = new SimpleBooleanProperty();
-    private BooleanProperty collapseStateFriday = new SimpleBooleanProperty();
-    private BooleanProperty collapseStateSaturday = new SimpleBooleanProperty();
-    private BooleanProperty collapseStateSunday = new SimpleBooleanProperty();
+    private final BooleanProperty collapseStateMonday = new SimpleBooleanProperty();
+    private final BooleanProperty collapseStateTuesday = new SimpleBooleanProperty();
+    private final BooleanProperty collapseStateWednesday = new SimpleBooleanProperty();
+    private final BooleanProperty collapseStateThursday = new SimpleBooleanProperty();
+    private final BooleanProperty collapseStateFriday = new SimpleBooleanProperty();
+    private final BooleanProperty collapseStateSaturday = new SimpleBooleanProperty();
+    private final BooleanProperty collapseStateSunday = new SimpleBooleanProperty();
 
-    private BooleanProperty highlightStateMonday = new SimpleBooleanProperty();
-    private BooleanProperty highlightStateTuesday = new SimpleBooleanProperty();
-    private BooleanProperty highlightStateWednesday = new SimpleBooleanProperty();
-    private BooleanProperty highlightStateThursday = new SimpleBooleanProperty();
-    private BooleanProperty highlightStateFriday = new SimpleBooleanProperty();
-    private BooleanProperty highlightStateSaturday = new SimpleBooleanProperty();
-    private BooleanProperty highlightStateSunday = new SimpleBooleanProperty();
+    private final BooleanProperty highlightStateMonday = new SimpleBooleanProperty();
+    private final BooleanProperty highlightStateTuesday = new SimpleBooleanProperty();
+    private final BooleanProperty highlightStateWednesday = new SimpleBooleanProperty();
+    private final BooleanProperty highlightStateThursday = new SimpleBooleanProperty();
+    private final BooleanProperty highlightStateFriday = new SimpleBooleanProperty();
+    private final BooleanProperty highlightStateSaturday = new SimpleBooleanProperty();
+    private final BooleanProperty highlightStateSunday = new SimpleBooleanProperty();
+
+    private final BooleanBinding requiresUsernamePassword = youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.HTTP_API).or(youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.OAUTH2));
+    private final BooleanBinding requiresOAuthSettings = youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.OAUTH2);
+    private final BooleanBinding requiresPermanentToken = youTrackAuthenticationMethod.isEqualTo(YouTrackAuthenticationMethod.PERMANENT_TOKEN);
+
+    private final BooleanBinding hasValidConnectionParameters = getValidConnectionSettingsBinding();
+
+    private BooleanBinding getValidConnectionSettingsBinding() {
+        BooleanBinding hasValidUsernamePasswordCombination = youTrackUsername.isNotEmpty().and(youTrackPassword.isNotEmpty());
+        BooleanBinding hasValidOAuth2Combination = hasValidUsernamePasswordCombination
+                .and(youTrackOAuth2ServiceId.isNotEmpty())
+                .and(youTrackOAuth2ServiceSecret.isNotEmpty())
+                .and(youTrackHubUrl.isNotEmpty());
+        BooleanBinding hasValidPermanentTokenCombination = youTrackPermanentToken.isNotEmpty();
+
+        return youTrackUrl.isNotEmpty()
+                .and(
+                        (requiresUsernamePassword.and(hasValidUsernamePasswordCombination))
+                                .or(requiresOAuthSettings.and(hasValidOAuth2Combination))
+                                .or(requiresPermanentToken.and(hasValidPermanentTokenCombination))
+                );
+    }
 
     SettingsViewModel() {
         loadPropertiesFromSettings();
@@ -457,5 +480,37 @@ public class SettingsViewModel {
 
     public void setHighlightStateSunday(boolean highlightStateSunday) {
         this.highlightStateSunday.set(highlightStateSunday);
+    }
+
+    public Boolean getHasValidConnectionParameters() {
+        return hasValidConnectionParameters.get();
+    }
+
+    public BooleanBinding hasValidConnectionParametersProperty() {
+        return hasValidConnectionParameters;
+    }
+
+    public Boolean getRequiresUsernamePassword() {
+        return requiresUsernamePassword.get();
+    }
+
+    public BooleanBinding requiresUsernamePasswordProperty() {
+        return requiresUsernamePassword;
+    }
+
+    public Boolean getRequiresOAuthSettings() {
+        return requiresOAuthSettings.get();
+    }
+
+    public BooleanBinding requiresOAuthSettingsProperty() {
+        return requiresOAuthSettings;
+    }
+
+    public Boolean getRequiresPermanentToken() {
+        return requiresPermanentToken.get();
+    }
+
+    public BooleanBinding requiresPermanentTokenProperty() {
+        return requiresPermanentToken;
     }
 }

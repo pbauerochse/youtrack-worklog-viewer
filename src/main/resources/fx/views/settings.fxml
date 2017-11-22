@@ -43,15 +43,8 @@
                                 <Insets top="3.0"/>
                             </GridPane.margin>
                         </Label>
-                        <VBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                            <ComboBox fx:id="youtrackVersionField" maxWidth="1.7976931348623157E308"/>
-                            <Text fx:id="youtrackVersionRequiredLabel" fill="#c91414" strokeType="OUTSIDE"
-                                  strokeWidth="0.0" text="%view.settings.requiredfield">
-                                <VBox.margin>
-                                    <Insets bottom="3.0" top="3.0"/>
-                                </VBox.margin>
-                            </Text>
-                        </VBox>
+                        <ComboBox fx:id="youtrackVersionField" maxWidth="1.7976931348623157E308"
+                                  GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
                         <Label text="%view.settings.youtrackauthenticationmethod" GridPane.rowIndex="3"/>
                         <ComboBox fx:id="youtrackAuthenticationMethodField" maxWidth="1.7976931348623157E308"
