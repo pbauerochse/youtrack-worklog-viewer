@@ -163,7 +163,7 @@ public class MainViewController implements Initializable {
         });
 
         // fetch worklog button click
-        fetchWorklogButton.disableProperty().bind(settingsViewModel.hasValidConnectionParametersProperty().not());
+        fetchWorklogButton.disableProperty().bind(settingsViewModel.hasMissingConnectionSettingsProperty());
         fetchWorklogButton.setOnAction(clickEvent -> startFetchWorklogsTask());
 
         // export to excel only possible if resultTabPane is not empty and therefore seems to contain data

@@ -37,47 +37,34 @@ public class SettingsViewController implements Initializable {
     private static final String MYJETBRAINS_HOST = "myjetbrains.com";
     private static final String MYJETBRAINS_HOSTED_YOUTRACK_PATH = "/youtrack";
 
-    @FXML
-    private TextField youtrackUrlField;
+    @FXML private TextField youtrackUrlField;
+    @FXML private ComboBox<YouTrackVersion> youtrackVersionField;
+    @FXML private ComboBox<YouTrackAuthenticationMethod> youtrackAuthenticationMethodField;
 
-    @FXML
-    private ComboBox<YouTrackVersion> youtrackVersionField;
+    @FXML private TextField youtrackUsernameField;
+    @FXML private Label youtrackUsernameLabel;
 
-    @FXML
-    private TextField youtrackUsernameField;
+    @FXML private PasswordField youtrackPasswordField;
+    @FXML private Label youtrackPasswordLabel;
 
-    @FXML
-    private PasswordField youtrackPasswordField;
+    @FXML private TextField youtrackOAuthHubUrlField;
+    @FXML private Label youtrackOAuthHubUrlLabel;
 
-    @FXML
-    private ComboBox<Integer> workhoursComboBox;
+    @FXML private TextField youtrackOAuthServiceIdField;
+    @FXML private Label youtrackOAuthServiceIdLabel;
 
-    @FXML
-    private CheckBox showAllWorklogsCheckBox;
+    @FXML private PasswordField youtrackOAuthServiceSecretField;
+    @FXML private Label youtrackOAuthServiceSecretLabel;
 
-    @FXML
-    private CheckBox showStatisticsCheckBox;
+    @FXML private PasswordField youtrackPermanentTokenField;
+    @FXML private Label youtrackPermanentTokenLabel;
 
-    @FXML
-    private CheckBox loadDataAtStartupCheckBox;
+    @FXML private ComboBox<Integer> workhoursComboBox;
+    @FXML private CheckBox showAllWorklogsCheckBox;
+    @FXML private CheckBox showStatisticsCheckBox;
+    @FXML private CheckBox loadDataAtStartupCheckBox;
+    @FXML private CheckBox showDecimalsInExcel;
 
-    @FXML
-    private CheckBox showDecimalsInExcel;
-
-    @FXML
-    private ComboBox<YouTrackAuthenticationMethod> youtrackAuthenticationMethodField;
-
-    @FXML
-    private TextField youtrackOAuthHubUrlField;
-
-    @FXML
-    private TextField youtrackOAuthServiceIdField;
-
-    @FXML
-    private PasswordField youtrackOAuthServiceSecretField;
-
-    @FXML
-    private PasswordField youtrackPermanentTokenField;
 
     @FXML
     private Button saveSettingsButton;
@@ -85,47 +72,21 @@ public class SettingsViewController implements Initializable {
     @FXML
     private Button cancelSettingsButton;
 
-    @FXML
-    private CheckBox mondayCollapseCheckbox;
+    @FXML private CheckBox mondayCollapseCheckbox;
+    @FXML private CheckBox tuesdayCollapseCheckbox;
+    @FXML private CheckBox wednesdayCollapseCheckbox;
+    @FXML private CheckBox thursdayCollapseCheckbox;
+    @FXML private CheckBox fridayCollapseCheckbox;
+    @FXML private CheckBox saturdayCollapseCheckbox;
+    @FXML private CheckBox sundayCollapseCheckbox;
 
-    @FXML
-    private CheckBox mondayHighlightCheckbox;
-
-    @FXML
-    private CheckBox tuesdayCollapseCheckbox;
-
-    @FXML
-    private CheckBox tuesdayHighlightCheckbox;
-
-    @FXML
-    private CheckBox wednesdayCollapseCheckbox;
-
-    @FXML
-    private CheckBox wednesdayHighlightCheckbox;
-
-    @FXML
-    private CheckBox thursdayCollapseCheckbox;
-
-    @FXML
-    private CheckBox thursdayHighlightCheckbox;
-
-    @FXML
-    private CheckBox fridayCollapseCheckbox;
-
-    @FXML
-    private CheckBox fridayHighlightCheckbox;
-
-    @FXML
-    private CheckBox saturdayCollapseCheckbox;
-
-    @FXML
-    private CheckBox saturdayHighlightCheckbox;
-
-    @FXML
-    private CheckBox sundayCollapseCheckbox;
-
-    @FXML
-    private CheckBox sundayHighlightCheckbox;
+    @FXML private CheckBox mondayHighlightCheckbox;
+    @FXML private CheckBox tuesdayHighlightCheckbox;
+    @FXML private CheckBox wednesdayHighlightCheckbox;
+    @FXML private CheckBox thursdayHighlightCheckbox;
+    @FXML private CheckBox fridayHighlightCheckbox;
+    @FXML private CheckBox saturdayHighlightCheckbox;
+    @FXML private CheckBox sundayHighlightCheckbox;
 
     private ResourceBundle resourceBundle;
 
@@ -155,6 +116,9 @@ public class SettingsViewController implements Initializable {
     }
 
     private void bindInputElements(SettingsViewModel viewModel) {
+
+        youtrackAuthenticationMethodField.valueProperty().addListener((observable, oldValue, newValue) -> LOGGER.info("AUth Mehiod {} > {}", oldValue, newValue));
+
         youtrackUrlField.textProperty().bindBidirectional(viewModel.youTrackUrlProperty());
         youtrackVersionField.valueProperty().bindBidirectional(viewModel.youTrackVersionProperty());
         youtrackAuthenticationMethodField.valueProperty().bindBidirectional(viewModel.youTrackAuthenticationMethodProperty());
@@ -189,8 +153,7 @@ public class SettingsViewController implements Initializable {
     }
 
     private void attachListeners(SettingsViewModel viewModel) {
-        // update hub url from youtrack base url
-        youtrackUrlField.textProperty().addListener((observable, oldValue, newValue) -> youtrackOAuthHubUrlField.setText(getHubUrl(newValue)));
+
 
         // only show authentication methods, that are supported by the selected version
         youtrackVersionField.getSelectionModel().selectedItemProperty().addListener((observable, oldVersion, newVersion) -> {
@@ -207,23 +170,36 @@ public class SettingsViewController implements Initializable {
         });
 
         // Hide username password field, when they are not needed
+        youtrackUsernameLabel.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
+        youtrackUsernameLabel.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
         youtrackUsernameField.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
         youtrackUsernameField.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
 
+        youtrackPasswordLabel.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
+        youtrackPasswordLabel.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
         youtrackPasswordField.visibleProperty().bind(viewModel.requiresUsernamePasswordProperty());
         youtrackPasswordField.managedProperty().bind(viewModel.requiresUsernamePasswordProperty());
 
         // Hide OAuth2 fields when they are not needed
+        youtrackOAuthServiceSecretLabel.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
+        youtrackOAuthServiceSecretLabel.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
         youtrackOAuthServiceSecretField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
         youtrackOAuthServiceSecretField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
 
+        youtrackOAuthServiceIdLabel.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
+        youtrackOAuthServiceIdLabel.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
         youtrackOAuthServiceIdField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
         youtrackOAuthServiceIdField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
 
+        youtrackUrlField.textProperty().addListener((observable, oldValue, newValue) -> youtrackOAuthHubUrlField.setText(getHubUrl(newValue)));
+        youtrackOAuthHubUrlLabel.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
+        youtrackOAuthHubUrlLabel.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
         youtrackOAuthHubUrlField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
         youtrackOAuthHubUrlField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
 
         // Hide token field if not needed
+        youtrackPermanentTokenLabel.visibleProperty().bind(viewModel.requiresPermanentTokenProperty());
+        youtrackPermanentTokenLabel.managedProperty().bind(viewModel.requiresPermanentTokenProperty());
         youtrackPermanentTokenField.visibleProperty().bind(viewModel.requiresPermanentTokenProperty());
         youtrackPermanentTokenField.managedProperty().bind(viewModel.requiresPermanentTokenProperty());
 
@@ -233,8 +209,7 @@ public class SettingsViewController implements Initializable {
             closeSettingsDialogue();
         });
 
-        viewModel.hasValidConnectionParametersProperty().addListener((observable, oldValue, newValue) -> LOGGER.debug("HasValidSettings Changed from {} to {}", oldValue, newValue));
-        saveSettingsButton.disableProperty().bind(viewModel.hasValidConnectionParametersProperty().not());
+        saveSettingsButton.disableProperty().bind(viewModel.hasMissingConnectionSettingsProperty());
         saveSettingsButton.setOnAction(event -> {
             LOGGER.debug("Save settings clicked");
             viewModel.saveChanges();
