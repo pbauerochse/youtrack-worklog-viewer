@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
+import de.pbauerochse.worklogviewer.youtrack.v20173.Grouping;
 import de.pbauerochse.worklogviewer.youtrack.v20173.ReportDetailsResponse;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
@@ -17,7 +17,6 @@ import java.util.List;
  */
 public class JacksonSerializerTest {
 
-    private static final String EXPECTED_SERIALIZATION_RESULT = "{\"name\":\"Timetracker: THIS_WEEK\",\"type\":\"time\",\"own\":true,\"parameters\":{\"projects\":[],\"queryUrl\":null,\"range\":{\"type\":\"named\",\"name\":\"THIS_WEEK\"}}}";
     private static final String DESERIALIZATION_TEST_DATA = "{\"id\":\"116-892\",\"name\":\"Timetracker: THIS_WEEK\",\"ownerLogin\":\"bauerochse\",\"type\":\"time\",\"own\":true,\"visibleTo\":null,\"invalidationInterval\":0,\"state\":\"CALCULATING\",\"lastCalculated\":\"—\",\"progress\":-1,\"parameters\":{\"projects\":[],\"queryUrl\":\"/issues\",\"range\":{\"type\":\"named\",\"name\":\"THIS_WEEK\"},\"perUserAvailable\":true,\"showTypesAvailable\":true}}";
     private static final String GROUP_BY_DESERIALIZATION_TEST_DATA = "[{\"name\":\"Work author\",\"id\":\"WORK_AUTHOR\"},{\"name\":\"Work type\",\"id\":\"WORK_TYPE\"},{\"name\":\"Priorität\",\"id\":\"__CUSTOM_FIELD__Priority_1\"},{\"name\":\"Typ\",\"id\":\"__CUSTOM_FIELD__Type_0\"},{\"name\":\"Status\",\"id\":\"__CUSTOM_FIELD__State_2\"},{\"name\":\"Bearbeiter\",\"id\":\"__CUSTOM_FIELD__Assignee_5\"},{\"name\":\"Komponente\",\"id\":\"__CUSTOM_FIELD__components_9\"},{\"name\":\"Lösungsversion\",\"id\":\"__CUSTOM_FIELD__Fix versions_7\"},{\"name\":\"Sprint\",\"id\":\"__CUSTOM_FIELD__Sprint_21\"},{\"name\":\"Zeitschätzung\",\"id\":\"__CUSTOM_FIELD__Estimation_12\"},{\"name\":\"Zeitaufwand\",\"id\":\"__CUSTOM_FIELD__Spent time_17\"},{\"name\":\"Abrechnung\",\"id\":\"__CUSTOM_FIELD__Abrechnung_19\"},{\"name\":\"Abnahme\",\"id\":\"__CUSTOM_FIELD__Abnahme_20\"},{\"name\":\"Verlag\",\"id\":\"__CUSTOM_FIELD__Verlag_18\"},{\"name\":\"bis wann\",\"id\":\"__CUSTOM_FIELD__bis wann_23\"},{\"name\":\"Behoben in Build\",\"id\":\"__CUSTOM_FIELD__Fixed in build_4\"}]";
 
@@ -42,7 +41,8 @@ public class JacksonSerializerTest {
 
     @Test
     public void testGroupByCategories() throws IOException {
-        List<GroupByCategory> groupByCategories = JacksonUtil.parseValue(new StringReader(GROUP_BY_DESERIALIZATION_TEST_DATA), new TypeReference<List<GroupByCategory>>() {});
+        List<Grouping> groupByCategories = JacksonUtil.parseValue(new StringReader(GROUP_BY_DESERIALIZATION_TEST_DATA), new TypeReference<List<Grouping>>() {
+        });
         Assert.assertNotNull(groupByCategories);
         Assert.assertThat(groupByCategories.size(), Is.is(16));
     }

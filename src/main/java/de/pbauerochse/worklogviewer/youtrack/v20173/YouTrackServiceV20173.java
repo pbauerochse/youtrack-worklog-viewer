@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static de.pbauerochse.worklogviewer.util.HttpClientUtil.getHttpClient;
 import static de.pbauerochse.worklogviewer.util.HttpClientUtil.isValidResponseCode;
@@ -71,8 +72,11 @@ public class YouTrackServiceV20173 implements YouTrackService {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
                 LOGGER.debug("Received JSON groupByCategories response {}", jsonResponse);
 
-                return JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<GroupByCategory>>() {
-                });
+                return JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<Grouping>>() {
+                })
+                        .stream()
+                        .map(GroupByCategory.class::cast)
+                        .collect(Collectors.toList());
             }
         } catch (IOException e) {
             LOGGER.error("Could not get GroupByCriterias from {}", url, e);
