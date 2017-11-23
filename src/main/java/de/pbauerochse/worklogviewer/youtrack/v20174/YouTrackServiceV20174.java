@@ -12,6 +12,10 @@ import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
 import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetails;
 import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetailsResponse;
+import de.pbauerochse.worklogviewer.youtrack.v20174.types.FieldBasedGrouping;
+import de.pbauerochse.worklogviewer.youtrack.v20174.types.GroupByTypes;
+import de.pbauerochse.worklogviewer.youtrack.v20174.types.GroupingField;
+import de.pbauerochse.worklogviewer.youtrack.v20174.types.WorkItemBasedGrouping;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -37,7 +41,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
 import static de.pbauerochse.worklogviewer.util.HttpClientUtil.getHttpClient;
 import static de.pbauerochse.worklogviewer.util.HttpClientUtil.isValidResponseCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -72,8 +78,17 @@ public class YouTrackServiceV20174 implements YouTrackService {
                 String jsonResponse = EntityUtils.toString(response.getEntity());
                 LOGGER.debug("Received JSON groupByCategories response {}", jsonResponse);
 
-                return JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<GroupByCategory>>() {
+                List<GroupingField> fields = JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<GroupingField>>() {
                 });
+
+                List<FieldBasedGrouping> asGrouping = fields.stream()
+                        .map(FieldBasedGrouping::new)
+                        .collect(Collectors.toList());
+
+                return ImmutableList.<GroupByCategory>builder()
+                        .addAll(getStaticGroupByCategories())
+                        .addAll(asGrouping)
+                        .build();
             }
         } catch (IOException e) {
             LOGGER.error("Could not get GroupByCriterias from {}", url, e);
@@ -81,6 +96,15 @@ public class YouTrackServiceV20174 implements YouTrackService {
         }
     }
 
+    private List<GroupByCategory> getStaticGroupByCategories() {
+        return ImmutableList.of(
+                new WorkItemBasedGrouping(new GroupByTypes("WORK_TYPE", getFormatted("grouping.worktype"))),
+                new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR", getFormatted("grouping.author"))),
+                new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR_AND_DATE", getFormatted("grouping.authoranddate")))
+        );
+    }
+
+    @SuppressWarnings("Duplicates")
     @Override
     public ReportDetails createReport(TimereportContext timereportContext) {
         String url = URL_BUILDER.getCreateReportUrl();

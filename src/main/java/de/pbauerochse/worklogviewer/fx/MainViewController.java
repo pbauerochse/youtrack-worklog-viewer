@@ -22,6 +22,7 @@ import de.pbauerochse.worklogviewer.util.HyperlinkUtil;
 import de.pbauerochse.worklogviewer.version.GitHubVersion;
 import de.pbauerochse.worklogviewer.version.Version;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
+import de.pbauerochse.worklogviewer.youtrack.domain.NoSelectionGroupByCategory;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
@@ -239,7 +240,7 @@ public class MainViewController implements Initializable {
             List<GroupByCategory> categoryList = worker.getValue();
             LOGGER.info("{} succeeded with {} GroupByCategories", task.getTitle(), categoryList.size());
 
-            groupByCategoryComboBox.getItems().add(GroupByCategory.NO_SELECTION_ITEM);
+            groupByCategoryComboBox.getItems().add(new NoSelectionGroupByCategory());
             categoryList.forEach(groupByCategoryComboBox.getItems()::add);
             groupByCategoryComboBox.getSelectionModel().select(0);
         });

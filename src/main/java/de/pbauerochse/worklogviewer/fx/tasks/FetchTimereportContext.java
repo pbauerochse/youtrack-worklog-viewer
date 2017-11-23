@@ -33,11 +33,8 @@ public class FetchTimereportContext implements TimereportContext {
 
     @Override
     public Optional<GroupByCategory> getGroupByCategory() {
-        if (groupByCategory == null || groupByCategory.isNoSelection()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(groupByCategory);
+        return Optional.ofNullable(groupByCategory)
+                .filter(GroupByCategory::isValidYouTrackCategory);
     }
 
     @Override

@@ -80,6 +80,7 @@ public class YouTrackServiceV20173 implements YouTrackService {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public ReportDetails createReport(TimereportContext timereportContext) {
         String url = URL_BUILDER.getCreateReportUrl();
