@@ -276,7 +276,8 @@ public class YouTrackServiceV20173 implements YouTrackService {
     public List<YouTrackAuthenticationMethod> getValidAuthenticationMethods() {
         return ImmutableList.of(
                 YouTrackAuthenticationMethod.HTTP_API,
-                YouTrackAuthenticationMethod.OAUTH2
+                YouTrackAuthenticationMethod.OAUTH2,
+                YouTrackAuthenticationMethod.PERMANENT_TOKEN
         );
     }
 

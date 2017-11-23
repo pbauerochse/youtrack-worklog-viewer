@@ -8,7 +8,6 @@ import java.time.DayOfWeek;
 
 import static java.time.DayOfWeek.SATURDAY;
 import static java.time.DayOfWeek.SUNDAY;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Settings, that get stored in a properties file
@@ -216,42 +215,6 @@ public class Settings {
     void setHighlightState(int highlightState) {
         this.highlightState = highlightState;
     }
-
-    public boolean hasMissingConnectionParameters() {
-        return isEmpty(youtrackUrl) || hasMissingPropertiesForSelectedAuthenticationMethod();
-    }
-
-    private boolean hasMissingPropertiesForSelectedAuthenticationMethod() {
-        if (youTrackAuthenticationMethod == null || youTrackVersion == null) {
-            return true;
-        }
-
-        switch (youTrackAuthenticationMethod) {
-            case OAUTH2:
-                return hasMissingOAuthSettings();
-
-            case PERMANENT_TOKEN:
-                return hasMissingPermanentTokenSettings();
-
-            case HTTP_API:
-            default:
-                return hasMissingUsernamePasswordSettings();
-        }
-    }
-
-    private boolean hasMissingUsernamePasswordSettings() {
-        return isEmpty(youtrackUsername) || isEmpty(youtrackPassword);
-    }
-
-    private boolean hasMissingOAuthSettings() {
-        return hasMissingUsernamePasswordSettings() ||
-                isEmpty(youtrackOAuthHubUrl) || isEmpty(youtrackOAuthServiceId) || isEmpty(youtrackOAuthServiceSecret);
-    }
-
-    private boolean hasMissingPermanentTokenSettings() {
-        return isEmpty(youtrackPermanentToken);
-    }
-
 
     public boolean hasHighlightState(DayOfWeek day) {
         return hasBitValue(highlightState, day);

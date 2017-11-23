@@ -57,6 +57,8 @@ public class SettingsViewModel {
         BooleanBinding hasMissingPermanentToken = youTrackPermanentToken.isEmpty();
 
         return youTrackUrl.isEmpty()
+                .or(youTrackVersion.isNull())
+                .or(youTrackAuthenticationMethod.isNull())
                 .or(youTrackUsername.isEmpty())
                 .or(requiresPassword.and(hasMissingPassword))
                 .or(requiresOAuthSettings.and(hasMissingOAuthSettings))

@@ -185,7 +185,7 @@ public class MainViewController implements Initializable {
         });
 
         // load group by criteria when connection parameters are present
-        if (!settings.hasMissingConnectionParameters()) {
+        if (!settingsViewModel.getHasMissingConnectionSettings()) {
             startGetGroupByCategoriesTask();
         }
 
@@ -439,7 +439,7 @@ public class MainViewController implements Initializable {
         // pass in a handler to fetch the group by categories if connection
         // parameters get set
         openDialogue("/fx/views/settings.fxml", "view.settings.title", true, () -> {
-            if (!settings.hasMissingConnectionParameters() && groupByCategoryComboBox.getItems().size() == 0) {
+            if (!settingsViewModel.getHasMissingConnectionSettings() && groupByCategoryComboBox.getItems().size() == 0) {
                 LOGGER.debug("Settings window closed, connection settings set and groupBy combobox empty -> trying to fetch groupByCategories");
                 startGetGroupByCategoriesTask();
             }
