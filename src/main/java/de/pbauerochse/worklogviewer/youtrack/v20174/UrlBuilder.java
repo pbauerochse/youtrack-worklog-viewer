@@ -3,12 +3,13 @@ package de.pbauerochse.worklogviewer.youtrack.v20174;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
 import java.nio.charset.Charset;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.*;
 
 class UrlBuilder implements YouTrackUrlBuilder {
 
@@ -54,13 +55,7 @@ class UrlBuilder implements YouTrackUrlBuilder {
 
     private String buildYoutrackApiUrl(String path) {
         Settings settings = SettingsUtil.getSettings();
-        StringBuilder finalUrl = new StringBuilder(StringUtils.trim(settings.getYoutrackUrl()));
-
-        if (!StringUtils.endsWith(settings.getYoutrackUrl(), "/") && !StringUtils.startsWith(path, "/")) {
-            finalUrl.append('/');
-        }
-
-        return finalUrl.append(path).toString();
+        return removeEnd(trim(settings.getYoutrackUrl()), "/") + "/" + removeStart(trim(path), "/");
     }
 
 }
