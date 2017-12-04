@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.youtrack.v20174;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
@@ -54,7 +55,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackServiceV20174.class);
 
-    private static final YouTrackUrlBuilder URL_BUILDER = new UrlBuilder();
+    private static final YouTrackUrlBuilder URL_BUILDER = new UrlBuilder(() -> SettingsUtil.getSettings().getYoutrackUrl());
 
     @SuppressWarnings("Duplicates")
     @Override

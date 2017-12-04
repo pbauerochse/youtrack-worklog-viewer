@@ -1,17 +1,22 @@
 package de.pbauerochse.worklogviewer.youtrack.v20174;
 
-import de.pbauerochse.worklogviewer.settings.Settings;
-import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
 class UrlBuilder implements YouTrackUrlBuilder {
+
+    private final Supplier<String> baseUrlSupplier;
+
+    UrlBuilder(Supplier<String> baseUrlSupplier) {
+        this.baseUrlSupplier = baseUrlSupplier;
+    }
 
     @Override
     public String getUsernamePasswordLoginUrl() {
@@ -54,8 +59,8 @@ class UrlBuilder implements YouTrackUrlBuilder {
     }
 
     private String buildYoutrackApiUrl(String path) {
-        Settings settings = SettingsUtil.getSettings();
-        return removeEnd(trim(settings.getYoutrackUrl()), "/") + "/" + removeStart(trim(path), "/");
+        String youtrackBaseUrl = baseUrlSupplier.get();
+        return removeEnd(trim(youtrackBaseUrl), "/") + "/" + removeStart(trim(path), "/");
     }
 
 }

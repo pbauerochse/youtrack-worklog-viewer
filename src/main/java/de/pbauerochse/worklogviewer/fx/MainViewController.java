@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -241,7 +242,11 @@ public class MainViewController implements Initializable {
             LOGGER.info("{} succeeded with {} GroupByCategories", task.getTitle(), categoryList.size());
 
             groupByCategoryComboBox.getItems().add(new NoSelectionGroupByCategory());
-            categoryList.forEach(groupByCategoryComboBox.getItems()::add);
+
+            categoryList.stream()
+                    .sorted(Comparator.comparing(GroupByCategory::getName))
+                    .forEach(groupByCategoryComboBox.getItems()::add);
+
             groupByCategoryComboBox.getSelectionModel().select(0);
         });
 
