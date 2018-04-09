@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter;
 
 class FixedReportRange implements ReportRange {
 
+    private static final ZoneId EXPECTED_TIMEZONE = ZoneId.of("UTC");
+
     /**
      * Report names must not container <, > or / so we can't use
      * the regular formatter (the US date format for example contains / )
@@ -30,9 +32,8 @@ class FixedReportRange implements ReportRange {
     }
 
     FixedReportRange(LocalDate startDate, LocalDate endDate) {
-        ZoneId defaultZone = ZoneId.systemDefault();
-        ZonedDateTime zonedStartDateTime = startDate.atStartOfDay(defaultZone);
-        ZonedDateTime zonedEndDateTime = endDate.atStartOfDay(defaultZone);
+        ZonedDateTime zonedStartDateTime = startDate.atStartOfDay(EXPECTED_TIMEZONE);
+        ZonedDateTime zonedEndDateTime = endDate.plusDays(1).atStartOfDay(EXPECTED_TIMEZONE).minusNanos(1);
 
         from = zonedStartDateTime.toInstant().toEpochMilli();
         to = zonedEndDateTime.toInstant().toEpochMilli();

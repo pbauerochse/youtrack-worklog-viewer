@@ -5,8 +5,7 @@ import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import java.time.LocalDate;
 
 /**
- * @author Patrick Bauerochse
- * @since 07.07.15
+ * TimerangeProvider for custom provided dates
  */
 public class CustomTimerangeProvider extends BaseTimerangeProvider {
 
