@@ -55,7 +55,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackServiceV20174.class);
 
-    private static final YouTrackUrlBuilder URL_BUILDER = new UrlBuilder(() -> SettingsUtil.getSettings().getYoutrackUrl());
+    private static final YouTrackUrlBuilder URL_BUILDER = new UrlBuilder(() -> SettingsUtil.getSettings().getYoutrackUrl(), () -> SettingsUtil.getSettings().getYouTrackVersion());
 
     @SuppressWarnings("Duplicates")
     @Override
@@ -296,12 +296,12 @@ public class YouTrackServiceV20174 implements YouTrackService {
     }
 
     @Override
-    public YouTrackVersion getVersion() {
-        return YouTrackVersion.POST_2017;
+    public List<YouTrackVersion> getSupportedVersions() {
+        return ImmutableList.of(YouTrackVersion.POST_2017, YouTrackVersion.POST_2018);
     }
 
     @Override
-    public List<YouTrackAuthenticationMethod> getValidAuthenticationMethods() {
+    public List<YouTrackAuthenticationMethod> getSupportedAuthenticationMethods() {
         return ImmutableList.of(YouTrackAuthenticationMethod.PERMANENT_TOKEN);
     }
 }

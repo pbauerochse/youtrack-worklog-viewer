@@ -42,13 +42,13 @@ public class YouTrackServiceFactory {
 
     public static YouTrackService getYouTrackService(YouTrackVersion version) {
         return AVAILABLE_SERVICE_IMPLEMENTATIONS.stream()
-                .filter(connector -> connector.getVersion() == version)
+                .filter(connector -> connector.getSupportedVersions().contains(version))
                 .findFirst()
                 .orElseThrow(() -> getIllegalArgumentException("exceptions.settings.version.invalid", version.name()));
     }
 
     private static boolean authenticationMethodChanged(Settings settings) {
-        return cachedInstance == null || !cachedInstance.getVersion().equals(settings.getYouTrackVersion());
+        return cachedInstance == null || !cachedInstance.getSupportedVersions().contains(settings.getYouTrackVersion());
     }
 
 }

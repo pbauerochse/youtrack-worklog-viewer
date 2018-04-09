@@ -33,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -273,12 +274,12 @@ public class YouTrackServiceV20173 implements YouTrackService {
     }
 
     @Override
-    public YouTrackVersion getVersion() {
-        return YouTrackVersion.PRE_2017;
+    public List<YouTrackVersion> getSupportedVersions() {
+        return Collections.singletonList(YouTrackVersion.PRE_2017);
     }
 
     @Override
-    public List<YouTrackAuthenticationMethod> getValidAuthenticationMethods() {
+    public List<YouTrackAuthenticationMethod> getSupportedAuthenticationMethods() {
         return ImmutableList.of(
                 YouTrackAuthenticationMethod.HTTP_API,
                 YouTrackAuthenticationMethod.OAUTH2,

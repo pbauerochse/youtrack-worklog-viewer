@@ -6,7 +6,7 @@
 
     <groupId>de.pbauerochse</groupId>
     <artifactId>youtrack-worklog-viewer</artifactId>
-    <version>2.3.1</version>
+    <version>2.3.2</version>
 
     <properties>
         <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>

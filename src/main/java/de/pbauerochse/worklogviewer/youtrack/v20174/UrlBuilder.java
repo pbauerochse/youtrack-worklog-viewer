@@ -1,6 +1,9 @@
 package de.pbauerochse.worklogviewer.youtrack.v20174;
 
+import de.pbauerochse.worklogviewer.util.ExceptionUtil;
+import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
+import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 
@@ -13,9 +16,11 @@ import static org.apache.commons.lang3.StringUtils.*;
 class UrlBuilder implements YouTrackUrlBuilder {
 
     private final Supplier<String> baseUrlSupplier;
+    private final Supplier<YouTrackVersion> youtrackVersionSupplier;
 
-    UrlBuilder(Supplier<String> baseUrlSupplier) {
+    UrlBuilder(Supplier<String> baseUrlSupplier, Supplier<YouTrackVersion> youtrackVersionSupplier) {
         this.baseUrlSupplier = baseUrlSupplier;
+        this.youtrackVersionSupplier = youtrackVersionSupplier;
     }
 
     @Override
@@ -41,8 +46,22 @@ class UrlBuilder implements YouTrackUrlBuilder {
 
     @Override
     public String getDownloadReportUrl(String reportId) {
-        String template = buildYoutrackApiUrl("/api/reports/%s/export");
-        return String.format(template, reportId);
+        YouTrackVersion youTrackVersion = youtrackVersionSupplier.get();
+
+        String template;
+        switch (youTrackVersion) {
+            case POST_2017:
+                template = "/api/reports/%s/export";
+                break;
+            case POST_2018:
+                template = "/api/reports/%s/export/csv";
+                break;
+            default:
+                throw ExceptionUtil.getIllegalStateException("exceptions.settings.version.invalid", FormattingUtil.getFormatted(youTrackVersion.getLabelKey()));
+        }
+
+        String urlTemplate = buildYoutrackApiUrl(template);
+        return String.format(urlTemplate, reportId);
     }
 
     @Override

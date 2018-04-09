@@ -10,7 +10,7 @@ With this tool you can now overcome this issue. It let's you create your persona
 
 ## Latest Version
 
-[Download v2.3.1](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.3.1)
+[Download v2.3.2](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.3.2)
 
 ## How does it work?
 You simply enter the URL to your YouTrack installation, and your own login data at the settings screen, select the reporting range in the main window and click on the "Download worklogs" button. That's it!

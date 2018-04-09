@@ -151,7 +151,7 @@ public class SettingsViewController implements Initializable {
         // only show authentication methods, that are supported by the selected version
         youtrackVersionField.getSelectionModel().selectedItemProperty().addListener((observable, oldVersion, newVersion) -> {
             YouTrackService service = YouTrackServiceFactory.getYouTrackService(newVersion);
-            List<YouTrackAuthenticationMethod> validAuthenticationMethods = service.getValidAuthenticationMethods();
+            List<YouTrackAuthenticationMethod> validAuthenticationMethods = service.getSupportedAuthenticationMethods();
 
             YouTrackAuthenticationMethod currentlySelectedAuthenticationMethod = youtrackAuthenticationMethodField.getValue();
             youtrackAuthenticationMethodField.setItems(FXCollections.observableArrayList(validAuthenticationMethods));

@@ -27,8 +27,8 @@ public interface YouTrackService {
 
     void fetchTaskDetails(WorklogReport report);
 
-    YouTrackVersion getVersion();
+    List<YouTrackVersion> getSupportedVersions();
 
-    List<YouTrackAuthenticationMethod> getValidAuthenticationMethods();
+    List<YouTrackAuthenticationMethod> getSupportedAuthenticationMethods();
 
 }
