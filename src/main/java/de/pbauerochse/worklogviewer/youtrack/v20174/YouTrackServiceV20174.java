@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
@@ -193,6 +194,12 @@ public class YouTrackServiceV20174 implements YouTrackService {
                     inputStream = new ByteArrayInputStream(bytes);
                 }
 
+                StatusLine statusLine = response.getStatusLine();
+                if (seemsToBeBlankReport(statusLine)) {
+                    LOGGER.warn("Got {} - {} from YouTrack, report propably did not contain any data", statusLine.getStatusCode(), statusLine.getReasonPhrase());
+                    return null;
+                }
+
                 if (!isValidResponseCode(response.getStatusLine())) {
                     // invalid response code
                     int statusCode = response.getStatusLine().getStatusCode();
@@ -303,5 +310,13 @@ public class YouTrackServiceV20174 implements YouTrackService {
     @Override
     public List<YouTrackAuthenticationMethod> getSupportedAuthenticationMethods() {
         return ImmutableList.of(YouTrackAuthenticationMethod.PERMANENT_TOKEN);
+    }
+
+    /**
+     * YouTrack returns status 500 when no time
+     * tracking occured for the requested time period
+     */
+    private boolean seemsToBeBlankReport(StatusLine statusLine) {
+        return statusLine.getStatusCode() == HttpStatusCodes.STATUS_CODE_SERVER_ERROR;
     }
 }

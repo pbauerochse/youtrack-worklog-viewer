@@ -11,7 +11,7 @@ import de.pbauerochse.worklogviewer.youtrack.csv.YouTrackCsvReportProcessor;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
 import javafx.concurrent.Task;
 
-import java.io.ByteArrayInputStream;
+import java.util.Optional;
 
 /**
  * @author Patrick Bauerochse
@@ -65,15 +65,15 @@ public class FetchTimereportTask extends Task<WorklogReport> {
             // download the generated report
             updateMessage(FormattingUtil.getFormatted("worker.progress.downloadingreport", reportDetails.getReportId()));
 
-            ByteArrayInputStream reportData = connector.downloadReport(reportDetails.getReportId());
+            Optional.ofNullable(connector.downloadReport(reportDetails.getReportId())).ifPresent(reportData -> {
+                updateProgress(80, 100);
+                updateMessage(FormattingUtil.getFormatted("worker.progress.processingreport"));
 
-            updateProgress(80, 100);
-            updateMessage(FormattingUtil.getFormatted("worker.progress.processingreport"));
+                YouTrackCsvReportProcessor.processResponse(reportData, result);
 
-            YouTrackCsvReportProcessor.processResponse(reportData, result);
-
-            // fetch issue details
-            connector.fetchTaskDetails(result);
+                // fetch issue details
+                connector.fetchTaskDetails(result);
+            });
         } finally {
             // delete the report again
             updateProgress(90, 100);
