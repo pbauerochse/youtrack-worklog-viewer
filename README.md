@@ -31,7 +31,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **Which YouTrack versions are supported?**
 
-*It has been tested with YouTrack Version 6 up to YouTrack 2017.4*
+*It has been tested with YouTrack Version 6 up to YouTrack 2018.1*
 
 **How does the tool get the data from YouTrack?**
 
