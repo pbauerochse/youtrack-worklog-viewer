@@ -18,8 +18,7 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 
 /**
- * @author Patrick Bauerochse
- * @since 01.04.15
+ * Main class to start the Java FX UI
  */
 public class WorklogViewer extends Application {
 
@@ -41,7 +40,7 @@ public class WorklogViewer extends Application {
     private Stage primaryStage;
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         SettingsUtil.saveSettings();
         MainViewController.EXECUTOR.shutdownNow();
     }

@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -26,6 +27,58 @@ import java.util.Properties;
 public class SettingsUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsUtil.class);
+
+    private static final File OLD_SETTINGS_PROPERTIES_FILE = new File(System.getProperty("user.home"), "youtrack-worklog.properties");
+    private static final File SETTINGS_JSON_FILE = new File(System.getProperty("user.home"), ".youtrack-worklog-viewer.json");
+
+    private static Settings settings = loadSettings();
+
+    public static Settings getSettings() {
+
+    }
+
+    private static Settings loadSettings() {
+        if (needsMigrationOfOldSettingsFile()) {
+            migrateOldSettingsToNewSettings();
+        }
+
+        return loadFromSettingsFile()
+                .orElse(new SettingsImpl());
+    }
+
+    private static boolean needsMigrationOfOldSettingsFile() {
+        return OLD_SETTINGS_PROPERTIES_FILE.exists() && !SETTINGS_JSON_FILE.exists();
+    }
+
+    private static void migrateOldSettingsToNewSettings() {
+        new SettingsMigrator(OLD_SETTINGS_PROPERTIES_FILE).migrateTo(SETTINGS_JSON_FILE);
+    }
+
+    private static Optional<Settings> loadFromSettingsFile() {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private static final File CONFIG_FILE_LOCATION = new File(System.getProperty("user.home"), "youtrack-worklog.properties");
 
@@ -53,7 +106,7 @@ public class SettingsUtil {
     private static final String COLLAPSE_STATE_PROPERTY = "collapse.state";
     private static final String HIGHLIGHT_STATE_PROPERTY = "highlight.state";
 
-    private static Settings settings;
+    private static SettingsImpl settings;
     private static SettingsViewModel settingsViewModel;
 
     /**
@@ -64,7 +117,7 @@ public class SettingsUtil {
      */
     public static Settings getSettings() {
         if (settings == null) {
-            settings = new Settings();
+            settings = new SettingsImpl();
 
             if (CONFIG_FILE_LOCATION.exists()) {
                 LOGGER.debug("Loading configuration from {}", CONFIG_FILE_LOCATION.getAbsolutePath());

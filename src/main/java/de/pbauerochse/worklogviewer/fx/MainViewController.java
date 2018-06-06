@@ -56,8 +56,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author Patrick Bauerochse
- * @since 01.04.15
+ * Java FX Controller for the main window
  */
 public class MainViewController implements Initializable {
 
@@ -114,7 +113,6 @@ public class MainViewController implements Initializable {
     private ToolBar mainToolbar;
 
     private ResourceBundle resources;
-    private Settings settings;
     private SettingsViewModel settingsViewModel;
 
     @Override
@@ -122,7 +120,7 @@ public class MainViewController implements Initializable {
         LOGGER.debug("Initializing main view");
         this.resources = resources;
 
-        settings = SettingsUtil.getSettings();
+        Settings settings = SettingsUtil.getSettings();
         settingsViewModel = SettingsUtil.getSettingsViewModel();
 
         // prepopulate timerange dropdown
@@ -224,6 +222,7 @@ public class MainViewController implements Initializable {
 
         // auto load data if a named timerange was selected
         // and the user chose to load data at startup
+        Settings settings = SettingsUtil.getSettings();
         if (timerangeComboBox.getSelectionModel().getSelectedItem() != ReportTimerange.CUSTOM && settings.isLoadDataAtStartup()) {
             LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.getSelectionModel().getSelectedItem().name());
             fetchWorklogButton.fire();
@@ -313,6 +312,7 @@ public class MainViewController implements Initializable {
         // success handler
         fetchTimereportTask.setOnSucceeded(event -> {
             LOGGER.info("Fetching worklogs succeeded");
+            Settings settings = SettingsUtil.getSettings();
             displayWorklogResult(context, settings);
         });
 
