@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Main class to start the Java FX UI
@@ -50,11 +51,9 @@ public class WorklogViewer extends Application {
         instance = this;
         this.primaryStage = primaryStage;
 
-        Locale locale = Locale.getDefault();
-        Charset charset = Charset.defaultCharset();
-
-        LOGGER.info("Default Locale: {}", locale);
-        LOGGER.info("Default Charset: {}", charset);
+        LOGGER.info("Default Locale: {}", Locale.getDefault());
+        LOGGER.info("Default Charset: {}", Charset.defaultCharset());
+        LOGGER.info("Default TimeZone: {}", TimeZone.getDefault().toZoneId());
 
         Settings settings = SettingsUtil.getSettings();
 

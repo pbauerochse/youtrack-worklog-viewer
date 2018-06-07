@@ -9,7 +9,8 @@ import javafx.concurrent.Task;
 import java.util.List;
 
 /**
- * Created by patrick on 07.07.15.
+ * Async task, that fetches the GroupByCategory List from
+ * YouTrack
  */
 public class GetGroupByCategoriesTask extends Task<List<GroupByCategory>> {
 
@@ -18,13 +19,13 @@ public class GetGroupByCategoriesTask extends Task<List<GroupByCategory>> {
     }
 
     @Override
-    protected List<GroupByCategory> call() throws Exception {
-        YouTrackService connector = YouTrackServiceFactory.getInstance();
+    protected List<GroupByCategory> call() {
+        YouTrackService youTrackService = YouTrackServiceFactory.getInstance();
 
         updateProgress(0.5, 1);
         updateMessage(FormattingUtil.getFormatted("worker.progress.categories"));
 
-        List<GroupByCategory> possibleGroupByCategories = connector.getPossibleGroupByCategories();
+        List<GroupByCategory> possibleGroupByCategories = youTrackService.getPossibleGroupByCategories();
 
         updateProgress(1, 1);
         updateMessage(FormattingUtil.getFormatted("worker.progress.done"));

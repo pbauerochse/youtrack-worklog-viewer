@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
-import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
+import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.youtrack.ReportDetails;
@@ -30,11 +30,11 @@ public class FetchTimereportTask extends Task<WorklogReport> {
 
     @Override
     protected WorklogReport call() throws Exception {
-        Settings settings = SettingsUtil.getSettings();
+        SettingsViewModel settings = SettingsUtil.getSettingsViewModel();
         YouTrackService connector = YouTrackServiceFactory.getInstance();
 
         updateProgress(0, 100);
-        updateMessage(FormattingUtil.getFormatted("worker.progress.login", settings.getYouTrackConnectionSettings().getUsername()));
+        updateMessage(FormattingUtil.getFormatted("worker.progress.login", settings.youTrackUsernameProperty().get()));
 
         // create report
         updateMessage(FormattingUtil.getFormatted("worker.progress.creatingreport", FormattingUtil.getFormatted(context.getTimerangeProvider().getReportTimerange().getLabelKey())));

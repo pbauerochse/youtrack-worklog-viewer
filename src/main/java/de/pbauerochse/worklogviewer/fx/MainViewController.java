@@ -40,6 +40,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,38 +114,80 @@ public class MainViewController implements Initializable {
     private ToolBar mainToolbar;
 
     private ResourceBundle resources;
-    private SettingsViewModel settingsViewModel;
+    private SettingsViewModel settingsModel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.debug("Initializing main view");
         this.resources = resources;
+        this.settingsModel = SettingsUtil.getSettingsViewModel();
 
-        Settings settings = SettingsUtil.getSettings();
-        settingsViewModel = SettingsUtil.getSettingsViewModel();
+        initializeTimerangeComboBox();
+        initializeGroupByComboBox();
+        initializeDatePickers();
+        initializeFetchWorklogsButton();
+        initializeMenuItems();
 
-        // prepopulate timerange dropdown
-        timerangeComboBox.setConverter(new ReportTimerangeStringConverter());
-        timerangeComboBox.getItems().addAll(ReportTimerange.values());
-        timerangeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                // update settings
-                settings.setLastUsedReportTimerange(newValue);
+        checkForUpdate();
 
-                // prepopulate start and end datepickers and remove error labels
-                TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, null, null);
-                startDatePicker.setValue(timerangeProvider.getStartDate());
-                endDatePicker.setValue(timerangeProvider.getEndDate());
+        // workaround to detect whether the whole form has been rendered to screen yet
+        progressBar.sceneProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue == null && newValue != null) {
+                onFormShown();
             }
         });
 
-        // prepopulate report timerange combobox with last used value
-        timerangeComboBox.getSelectionModel().select(settings.getLastUsedReportTimerange());
+    }
 
-        // group by combobox converter
+    private void initializeTimerangeComboBox() {
+        timerangeComboBox.setConverter(new ReportTimerangeStringConverter());
+        timerangeComboBox.getItems().addAll(ReportTimerange.values());
+        timerangeComboBox.getSelectionModel().select(settingsModel.lastUsedReportTimerangeProperty().get());
+        timerangeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> timerangeChanged(newValue));
+
+        settingsModel.lastUsedReportTimerangeProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty());
+    }
+
+    private void timerangeChanged(@NotNull ReportTimerange newValue) {
+        // prepopulate start and end datepickers and remove error labels
+        TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, null, null);
+        startDatePicker.setValue(timerangeProvider.getStartDate());
+        endDatePicker.setValue(timerangeProvider.getEndDate());
+    }
+
+    private void initializeGroupByComboBox() {
         groupByCategoryComboBox.disableProperty().bind(groupByCategoryComboBox.itemsProperty().isNull());
         groupByCategoryComboBox.setConverter(new GroupByCategoryStringConverter(groupByCategoryComboBox));
 
+        // load group by criteria when connection parameters are present
+        if (!settingsModel.getHasMissingConnectionSettings()) {
+            startGetGroupByCategoriesTask();
+        }
+    }
+
+    /**
+     * Fetches groupBy criteria from YouTrack
+     */
+    @SuppressWarnings("unchecked")
+    private void startGetGroupByCategoriesTask() {
+        LOGGER.info("Fetching GroupByCategories");
+        GetGroupByCategoriesTask task = new GetGroupByCategoriesTask();
+        task.setOnSucceeded(event -> {
+            Worker<List<GroupByCategory>> worker = event.getSource();
+            List<GroupByCategory> categoryList = worker.getValue();
+            LOGGER.info("{} succeeded with {} GroupByCategories", task.getTitle(), categoryList.size());
+
+            groupByCategoryComboBox.getItems().add(new NoSelectionGroupByCategory());
+            categoryList.stream()
+                    .sorted(Comparator.comparing(GroupByCategory::getName))
+                    .forEach(groupByCategoryComboBox.getItems()::add);
+
+            groupByCategoryComboBox.getSelectionModel().select(0);
+        });
+        startTask(task);
+    }
+
+    private void initializeDatePickers() {
         // start and end datepicker are only editable if report timerange is CUSTOM
         startDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
         startDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -162,40 +205,34 @@ public class MainViewController implements Initializable {
                 endDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
             }
         });
+    }
 
+    private void initializeFetchWorklogsButton() {
         // fetch worklog button click
-        fetchWorklogButton.disableProperty().bind(settingsViewModel.hasMissingConnectionSettingsProperty());
-        fetchWorklogButton.setOnAction(clickEvent -> startFetchWorklogsTask());
+        fetchWorklogButton.disableProperty().bind(settingsModel.hasMissingConnectionSettingsProperty());
+        fetchWorklogButton.setOnAction(event -> fetchWorklogs());
+    }
 
+    private void initializeMenuItems() {
         // export to excel only possible if resultTabPane is not empty and therefore seems to contain data
         exportToExcelMenuItem.disableProperty().bind(resultTabPane.getSelectionModel().selectedItemProperty().isNull());
 
         // menu items click actions
         exportToExcelMenuItem.setOnAction(event -> startExportToExcelTask());
+
         settingsMenuItem.setOnAction(event -> showSettingsDialogue());
         exitMenuItem.setOnAction(event -> WorklogViewer.getInstance().requestShutdown());
         logMessagesMenuItem.setOnAction(event -> showLogMessagesDialogue());
         aboutMenuItem.setOnAction(event -> showAboutDialogue());
+    }
 
-        // workaround to detect whether the whole form has been rendered to screen yet
-        progressBar.sceneProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue == null && newValue != null) {
-                onFormShown();
-            }
-        });
-
-        // load group by criteria when connection parameters are present
-        if (!settingsViewModel.getHasMissingConnectionSettings()) {
-            startGetGroupByCategoriesTask();
-        }
-
-        // check for update
+    private void checkForUpdate() {
         VersionCheckerTask versionCheckTask = new VersionCheckerTask();
-        versionCheckTask.setOnSucceeded(this::onVersionCheckFinished);
+        versionCheckTask.setOnSucceeded(this::addDownloadLinkToToolbarIfNeverVersionPresent);
         startTask(versionCheckTask);
     }
 
-    private void onVersionCheckFinished(WorkerStateEvent event) {
+    private void addDownloadLinkToToolbarIfNeverVersionPresent(WorkerStateEvent event) {
         Optional<GitHubVersion> gitHubVersionOptional = ((VersionCheckerTask) event.getSource()).getValue();
         gitHubVersionOptional.ifPresent(gitHubVersion -> {
             Version currentVersion = new Version(resources.getString("release.version"));
@@ -215,42 +252,19 @@ public class MainViewController implements Initializable {
     private void onFormShown() {
         LOGGER.debug("MainForm shown");
 
-        if (settingsViewModel.getHasMissingConnectionSettings()) {
+        if (settingsModel.getHasMissingConnectionSettings()) {
             LOGGER.info("No YouTrack connection settings defined yet. Opening settings dialogue");
             showSettingsDialogue();
         }
 
         // auto load data if a named timerange was selected
         // and the user chose to load data at startup
-        Settings settings = SettingsUtil.getSettings();
-        if (timerangeComboBox.getSelectionModel().getSelectedItem() != ReportTimerange.CUSTOM && settings.isLoadDataAtStartup()) {
+        if (timerangeComboBox.getSelectionModel().getSelectedItem() != ReportTimerange.CUSTOM && settingsModel.loadDataAtStartupProperty().get()) {
             LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.getSelectionModel().getSelectedItem().name());
             fetchWorklogButton.fire();
         }
     }
 
-    /**
-     * Fetches groupBy criteria from YouTrack
-     */
-    private void startGetGroupByCategoriesTask() {
-        LOGGER.info("Fetching GroupByCategories");
-        GetGroupByCategoriesTask task = new GetGroupByCategoriesTask();
-        task.setOnSucceeded(event -> {
-            @SuppressWarnings("unchecked") Worker<List<GroupByCategory>> worker = event.getSource();
-            List<GroupByCategory> categoryList = worker.getValue();
-            LOGGER.info("{} succeeded with {} GroupByCategories", task.getTitle(), categoryList.size());
-
-            groupByCategoryComboBox.getItems().add(new NoSelectionGroupByCategory());
-
-            categoryList.stream()
-                    .sorted(Comparator.comparing(GroupByCategory::getName))
-                    .forEach(groupByCategoryComboBox.getItems()::add);
-
-            groupByCategoryComboBox.getSelectionModel().select(0);
-        });
-
-        startTask(task);
-    }
 
     /**
      * Exports the currently visible data to an excel spreadsheet
@@ -284,14 +298,13 @@ public class MainViewController implements Initializable {
     /**
      * Fetches the worklogs for the currently defined settings from YouTrack
      */
-    private void startFetchWorklogsTask() {
-
+    private void fetchWorklogs() {
         // sanity checks
         LocalDate selectedStartDate = startDatePicker.getValue();
         LocalDate selectedEndDate = endDatePicker.getValue();
 
         if (selectedStartDate == null || selectedEndDate == null) {
-            LOGGER.warn("Startdate or enddate were null");
+            LOGGER.warn("Startdate and / or enddate was null");
             progressText.setText(FormattingUtil.getFormatted("exceptions.timerange.datesrequired"));
             return;
         } else if (selectedStartDate.isAfter(selectedEndDate)) {
@@ -300,23 +313,15 @@ public class MainViewController implements Initializable {
             return;
         }
 
-        // start the task
         ReportTimerange timerange = timerangeComboBox.getSelectionModel().getSelectedItem();
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
 
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, selectedStartDate, selectedEndDate);
         FetchTimereportContext context = new FetchTimereportContext(timerangeProvider, groupByCategoryComboBox.getSelectionModel().getSelectedItem());
 
-        FetchTimereportTask fetchTimereportTask = new FetchTimereportTask(context);
-
-        // success handler
-        fetchTimereportTask.setOnSucceeded(event -> {
-            LOGGER.info("Fetching worklogs succeeded");
-            Settings settings = SettingsUtil.getSettings();
-            displayWorklogResult(context, settings);
-        });
-
-        startTask(fetchTimereportTask);
+        FetchTimereportTask task = new FetchTimereportTask(context);
+        task.setOnSucceeded(event -> displayWorklogResult(context, SettingsUtil.getSettings()));
+        startTask(task);
     }
 
     /**
@@ -445,7 +450,7 @@ public class MainViewController implements Initializable {
         // pass in a handler to fetch the group by categories if connection
         // parameters get set
         openDialogue("/fx/views/settings.fxml", "view.settings.title", true, () -> {
-            if (!settingsViewModel.getHasMissingConnectionSettings() && groupByCategoryComboBox.getItems().size() == 0) {
+            if (!settingsModel.getHasMissingConnectionSettings() && groupByCategoryComboBox.getItems().size() == 0) {
                 LOGGER.debug("Settings window closed, connection settings set and groupBy combobox empty -> trying to fetch groupByCategories");
                 startGetGroupByCategoriesTask();
             }

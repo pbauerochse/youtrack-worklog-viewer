@@ -1,9 +1,13 @@
 package de.pbauerochse.worklogviewer.settings;
 
+import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
 
 import static java.time.DayOfWeek.*;
 
@@ -24,6 +28,7 @@ public class SettingsViewModel {
     private final BooleanProperty showStatistics = new SimpleBooleanProperty();
     private final BooleanProperty loadDataAtStartup = new SimpleBooleanProperty();
     private final BooleanProperty showDecimalsInExcel = new SimpleBooleanProperty();
+    private final ObjectProperty<ReportTimerange> lastUsedReportTimerange = new SimpleObjectProperty<>();
 
     private final BooleanProperty collapseStateMonday = new SimpleBooleanProperty();
     private final BooleanProperty collapseStateTuesday = new SimpleBooleanProperty();
@@ -46,6 +51,7 @@ public class SettingsViewModel {
     SettingsViewModel(@NotNull Settings settings) {
         this.settings = settings;
         this.applyPropertiesFromSettings();
+        this.bindAutoUpdatingProperties();
     }
 
     private BooleanBinding getHasMissingConnectionSettingsBinding() {
@@ -66,6 +72,7 @@ public class SettingsViewModel {
         settings.setShowStatistics(showStatisticsProperty().get());
         settings.setLoadDataAtStartup(loadDataAtStartupProperty().get());
         settings.setShowDecimalHourTimesInExcelReport(showDecimalsInExcelProperty().get());
+        settings.setLastUsedReportTimerange(lastUsedReportTimerangeProperty().get());
 
         settings.getCollapseState().set(MONDAY, collapseStateMondayProperty().get());
         settings.getCollapseState().set(TUESDAY, collapseStateTuesdayProperty().get());
@@ -95,11 +102,14 @@ public class SettingsViewModel {
         youTrackVersionProperty().set(settings.getYouTrackConnectionSettings().getVersion());
         youTrackUsernameProperty().set(settings.getYouTrackConnectionSettings().getUsername());
         youTrackPermanentTokenProperty().set(settings.getYouTrackConnectionSettings().getPermanentToken());
+
         workhoursProperty().set(settings.getWorkHoursADay());
         showAllWorklogsProperty().set(settings.isShowAllWorklogs());
         showStatisticsProperty().set(settings.isShowStatistics());
         loadDataAtStartupProperty().set(settings.isLoadDataAtStartup());
         showDecimalsInExcelProperty().set(settings.isShowDecimalHourTimesInExcelReport());
+        lastUsedReportTimerangeProperty().set(settings.getLastUsedReportTimerange());
+
         collapseStateMondayProperty().set(settings.getCollapseState().isSet(MONDAY));
         collapseStateTuesdayProperty().set(settings.getCollapseState().isSet(TUESDAY));
         collapseStateWednesdayProperty().set(settings.getCollapseState().isSet(WEDNESDAY));
@@ -107,6 +117,7 @@ public class SettingsViewModel {
         collapseStateFridayProperty().set(settings.getCollapseState().isSet(FRIDAY));
         collapseStateSaturdayProperty().set(settings.getCollapseState().isSet(SATURDAY));
         collapseStateSundayProperty().set(settings.getCollapseState().isSet(SUNDAY));
+
         highlightStateMondayProperty().set(settings.getHighlightState().isSet(MONDAY));
         highlightStateTuesdayProperty().set(settings.getHighlightState().isSet(TUESDAY));
         highlightStateWednesdayProperty().set(settings.getHighlightState().isSet(WEDNESDAY));
@@ -114,6 +125,20 @@ public class SettingsViewModel {
         highlightStateFridayProperty().set(settings.getHighlightState().isSet(FRIDAY));
         highlightStateSaturdayProperty().set(settings.getHighlightState().isSet(SATURDAY));
         highlightStateSundayProperty().set(settings.getHighlightState().isSet(SUNDAY));
+    }
+
+    /**
+     * These settings are applied to the persistent settings
+     * object whenever they are changed. In general, those are
+     * the application state properties, that are not set
+     * in the settings view.
+     */
+    private void bindAutoUpdatingProperties() {
+        lastUsedReportTimerangeProperty().addListener(invokeSetter(settings::setLastUsedReportTimerange));
+    }
+
+    private <T> ChangeListener<T> invokeSetter(Consumer<T> setter) {
+        return ((observable, oldValue, newValue) -> setter.accept(newValue));
     }
 
     public StringProperty youTrackUrlProperty() {
@@ -154,6 +179,10 @@ public class SettingsViewModel {
 
     public BooleanProperty showDecimalsInExcelProperty() {
         return showDecimalsInExcel;
+    }
+
+    public ObjectProperty<ReportTimerange> lastUsedReportTimerangeProperty() {
+        return lastUsedReportTimerange;
     }
 
     public BooleanProperty collapseStateMondayProperty() {
