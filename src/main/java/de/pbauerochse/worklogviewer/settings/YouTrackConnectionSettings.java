@@ -1,6 +1,10 @@
 package de.pbauerochse.worklogviewer.settings;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.pbauerochse.worklogviewer.settings.jackson.EncryptingDeserializer;
+import de.pbauerochse.worklogviewer.settings.jackson.EncryptingSerializer;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 
 /**
@@ -11,10 +15,9 @@ import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 public class YouTrackConnectionSettings {
 
     private YouTrackVersion version;
-
     private String url;
-    private String permanentToken;
     private String username;
+    private String permanentToken;
 
     public YouTrackVersion getVersion() {
         return version;
@@ -24,6 +27,8 @@ public class YouTrackConnectionSettings {
         return url;
     }
 
+    @JsonSerialize(using = EncryptingSerializer.class)
+    @JsonDeserialize(using = EncryptingDeserializer.class)
     public String getPermanentToken() {
         return permanentToken;
     }

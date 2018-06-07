@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.settings;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
@@ -32,6 +33,7 @@ public class Settings {
     /**
      * Settings regarding the main application window
      */
+    @JsonProperty("window")
     public WindowSettings getWindowSettings() {
         return windowSettings;
     }
@@ -39,6 +41,7 @@ public class Settings {
     /**
      * Any settings required to access the YouTrack API
      */
+    @JsonProperty("youtrack")
     public YouTrackConnectionSettings getYouTrackConnectionSettings() {
         return youTrackConnectionSettings;
     }
