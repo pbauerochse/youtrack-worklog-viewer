@@ -29,6 +29,4 @@ public interface YouTrackService {
 
     List<YouTrackVersion> getSupportedVersions();
 
-    List<YouTrackAuthenticationMethod> getSupportedAuthenticationMethods();
-
 }

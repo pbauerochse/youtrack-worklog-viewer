@@ -2,7 +2,6 @@ package de.pbauerochse.worklogviewer.youtrack.createreport;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.pbauerochse.worklogviewer.youtrack.v20173.ReportRange;
 
 import java.util.ArrayList;
 import java.util.List;

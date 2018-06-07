@@ -53,35 +53,10 @@
                             <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
                         </ComboBox>
 
-                        <Label text="%view.settings.youtrackauthenticationmethod" GridPane.rowIndex="3" />
-                        <ComboBox fx:id="youtrackAuthenticationMethodField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
-                        </ComboBox>
-
                         <Label text="%view.settings.youtrackuser" GridPane.rowIndex="4" />
                         <TextField fx:id="youtrackUsernameField" GridPane.columnIndex="1" GridPane.rowIndex="4">
                             <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
                         </TextField>
-
-                        <Label fx:id="youtrackPasswordLabel" text="%view.settings.youtrackpassword" GridPane.rowIndex="5" />
-                        <PasswordField fx:id="youtrackPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
-                        </PasswordField>
-
-                        <Label fx:id="youtrackOAuthHubUrlLabel" text="%view.settings.youtrackoauthhuburl" GridPane.rowIndex="6" />
-                        <TextField fx:id="youtrackOAuthHubUrlField" GridPane.columnIndex="1" GridPane.rowIndex="6">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
-                        </TextField>
-
-                        <Label fx:id="youtrackOAuthServiceIdLabel" text="%view.settings.youtrackoauthserviceid" GridPane.rowIndex="7" />
-                        <TextField fx:id="youtrackOAuthServiceIdField" GridPane.columnIndex="1" GridPane.rowIndex="7">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
-                        </TextField>
-
-                        <Label fx:id="youtrackOAuthServiceSecretLabel" text="%view.settings.youtrackoauthservicesecret" GridPane.rowIndex="8" />
-                        <PasswordField fx:id="youtrackOAuthServiceSecretField" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
-                        </PasswordField>
 
                         <Label fx:id="youtrackPermanentTokenLabel" text="%view.settings.youtrackpermanenttoken" GridPane.rowIndex="9" />
                         <PasswordField fx:id="youtrackPermanentTokenField" GridPane.columnIndex="1" GridPane.rowIndex="9">

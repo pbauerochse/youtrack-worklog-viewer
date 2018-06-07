@@ -1,34 +1,51 @@
 package de.pbauerochse.worklogviewer.settings;
 
-import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 
 /**
  * Contains the settings required to use the
  * YouTrack API
  */
-public interface YouTrackConnectionSettings {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class YouTrackConnectionSettings {
 
-    YouTrackVersion getVersion();
+    private YouTrackVersion version;
 
-    YouTrackAuthenticationMethod getAuthenticationMethod();
+    private String url;
+    private String permanentToken;
+    private String username;
 
-    @Deprecated
-    String getOAuthHubUrl();
+    public YouTrackVersion getVersion() {
+        return version;
+    }
 
-    @Deprecated
-    String getOAuthServiceId();
+    public String getUrl() {
+        return url;
+    }
 
-    @Deprecated
-    String getOAuthServiceSecret();
+    public String getPermanentToken() {
+        return permanentToken;
+    }
 
-    String getUsername();
+    public String getUsername() {
+        return username;
+    }
 
-    @Deprecated
-    String getPassword();
+    public void setVersion(YouTrackVersion version) {
+        this.version = version;
+    }
 
-    String getUrl();
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-    String getPermanentToken();
+    public void setPermanentToken(String permanentToken) {
+        this.permanentToken = permanentToken;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
 }

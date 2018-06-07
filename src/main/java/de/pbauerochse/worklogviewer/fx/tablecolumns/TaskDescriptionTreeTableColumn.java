@@ -68,7 +68,7 @@ public class TaskDescriptionTreeTableColumn extends TreeTableColumn<DisplayRow, 
                 if (clickedWorklogItem != null && !clickedWorklogItem.isGrandTotalSummary() && !clickedWorklogItem.isGroupContainer()) {
                     LOGGER.debug("Selected item {}", clickedWorklogItem.getLabel());
                     Settings settings = SettingsUtil.getSettings();
-                    String issueUrl = String.format("%s/issue/%s#tab=Time%%20Tracking", StringUtils.stripEnd(settings.getYoutrackUrl(), "/"), clickedWorklogItem.getIssueId().get());
+                    String issueUrl = String.format("%s/issue/%s#tab=Time%%20Tracking", StringUtils.stripEnd(settings.getYouTrackConnectionSettings().getUrl(), "/"), clickedWorklogItem.getIssueId().get());
                     Platform.runLater(() -> WorklogViewer.getInstance().getHostServices().showDocument(issueUrl));
                 }
             });

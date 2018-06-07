@@ -1,9 +1,8 @@
 package de.pbauerochse.worklogviewer.util;
 
 import com.google.common.collect.ImmutableList;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationProvider;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
-import de.pbauerochse.worklogviewer.youtrack.authentication.YouTrackAuthenticationProviderFactory;
+import de.pbauerochse.worklogviewer.youtrack.authentication.BearerTokenAuthenticationProvider;
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -26,7 +25,7 @@ public class HttpClientUtil {
     public static CloseableHttpClient getHttpClient(YouTrackUrlBuilder urlBuilder) {
         HttpClientBuilder clientBuilder = HttpClientUtil.getDefaultClientBuilder(10);
 
-        YouTrackAuthenticationProvider authenticationProvider = YouTrackAuthenticationProviderFactory.getActiveProvider();
+        BearerTokenAuthenticationProvider authenticationProvider = new BearerTokenAuthenticationProvider();
         List<Header> authenticationHeaders = authenticationProvider.getAuthenticationHeaders(clientBuilder, urlBuilder);
         List<Header> defaultHeaders = HttpClientUtil.getRegularBrowserHeaders();
 

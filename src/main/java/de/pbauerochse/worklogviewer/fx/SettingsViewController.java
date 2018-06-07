@@ -1,29 +1,21 @@
 package de.pbauerochse.worklogviewer.fx;
 
 import de.pbauerochse.worklogviewer.WorklogViewer;
-import de.pbauerochse.worklogviewer.fx.converter.YouTrackAuthenticationMethodStringConverter;
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackService;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackServiceFactory;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
@@ -38,51 +30,64 @@ public class SettingsViewController implements Initializable {
     private static final String MYJETBRAINS_HOST = "myjetbrains.com";
     private static final String MYJETBRAINS_HOSTED_YOUTRACK_PATH = "/youtrack";
 
-    @FXML private TextField youtrackUrlField;
-    @FXML private ComboBox<YouTrackVersion> youtrackVersionField;
-    @FXML private ComboBox<YouTrackAuthenticationMethod> youtrackAuthenticationMethodField;
+    @FXML
+    private TextField youtrackUrlField;
+    @FXML
+    private ComboBox<YouTrackVersion> youtrackVersionField;
 
-    @FXML private TextField youtrackUsernameField;
+    @FXML
+    private TextField youtrackUsernameField;
 
-    @FXML private PasswordField youtrackPasswordField;
-    @FXML private Label youtrackPasswordLabel;
+    @FXML
+    private PasswordField youtrackPermanentTokenField;
+    @FXML
+    private Label youtrackPermanentTokenLabel;
 
-    @FXML private TextField youtrackOAuthHubUrlField;
-    @FXML private Label youtrackOAuthHubUrlLabel;
+    @FXML
+    private ComboBox<Integer> workhoursComboBox;
+    @FXML
+    private CheckBox showAllWorklogsCheckBox;
+    @FXML
+    private CheckBox showStatisticsCheckBox;
+    @FXML
+    private CheckBox loadDataAtStartupCheckBox;
+    @FXML
+    private CheckBox showDecimalsInExcel;
 
-    @FXML private TextField youtrackOAuthServiceIdField;
-    @FXML private Label youtrackOAuthServiceIdLabel;
+    @FXML
+    private Button saveSettingsButton;
+    @FXML
+    private Button cancelSettingsButton;
 
-    @FXML private PasswordField youtrackOAuthServiceSecretField;
-    @FXML private Label youtrackOAuthServiceSecretLabel;
+    @FXML
+    private CheckBox mondayCollapseCheckbox;
+    @FXML
+    private CheckBox tuesdayCollapseCheckbox;
+    @FXML
+    private CheckBox wednesdayCollapseCheckbox;
+    @FXML
+    private CheckBox thursdayCollapseCheckbox;
+    @FXML
+    private CheckBox fridayCollapseCheckbox;
+    @FXML
+    private CheckBox saturdayCollapseCheckbox;
+    @FXML
+    private CheckBox sundayCollapseCheckbox;
 
-    @FXML private PasswordField youtrackPermanentTokenField;
-    @FXML private Label youtrackPermanentTokenLabel;
-
-    @FXML private ComboBox<Integer> workhoursComboBox;
-    @FXML private CheckBox showAllWorklogsCheckBox;
-    @FXML private CheckBox showStatisticsCheckBox;
-    @FXML private CheckBox loadDataAtStartupCheckBox;
-    @FXML private CheckBox showDecimalsInExcel;
-
-    @FXML private Button saveSettingsButton;
-    @FXML private Button cancelSettingsButton;
-
-    @FXML private CheckBox mondayCollapseCheckbox;
-    @FXML private CheckBox tuesdayCollapseCheckbox;
-    @FXML private CheckBox wednesdayCollapseCheckbox;
-    @FXML private CheckBox thursdayCollapseCheckbox;
-    @FXML private CheckBox fridayCollapseCheckbox;
-    @FXML private CheckBox saturdayCollapseCheckbox;
-    @FXML private CheckBox sundayCollapseCheckbox;
-
-    @FXML private CheckBox mondayHighlightCheckbox;
-    @FXML private CheckBox tuesdayHighlightCheckbox;
-    @FXML private CheckBox wednesdayHighlightCheckbox;
-    @FXML private CheckBox thursdayHighlightCheckbox;
-    @FXML private CheckBox fridayHighlightCheckbox;
-    @FXML private CheckBox saturdayHighlightCheckbox;
-    @FXML private CheckBox sundayHighlightCheckbox;
+    @FXML
+    private CheckBox mondayHighlightCheckbox;
+    @FXML
+    private CheckBox tuesdayHighlightCheckbox;
+    @FXML
+    private CheckBox wednesdayHighlightCheckbox;
+    @FXML
+    private CheckBox thursdayHighlightCheckbox;
+    @FXML
+    private CheckBox fridayHighlightCheckbox;
+    @FXML
+    private CheckBox saturdayHighlightCheckbox;
+    @FXML
+    private CheckBox sundayHighlightCheckbox;
 
     private ResourceBundle resourceBundle;
 
@@ -93,33 +98,22 @@ public class SettingsViewController implements Initializable {
 
         SettingsViewModel viewModel = SettingsUtil.getSettingsViewModel();
         attachListeners(viewModel);
-        initializeDefaultValues(viewModel);
+        initializeDefaultValues();
         bindInputElements(viewModel);
     }
 
-    private void initializeDefaultValues(SettingsViewModel viewModel) {
+    private void initializeDefaultValues() {
         IntStream.range(1, 25).forEach(workhoursComboBox.getItems()::add);
 
         // Version Combobox Values
         youtrackVersionField.getItems().addAll(YouTrackVersion.values());
         youtrackVersionField.setConverter(new YouTrackVersionStringConverter());
-
-        // Authentication Methods Values
-        if (viewModel.getYouTrackVersion() != null) {
-            youtrackAuthenticationMethodField.getItems().addAll(YouTrackAuthenticationMethod.values());
-        }
-        youtrackAuthenticationMethodField.setConverter(new YouTrackAuthenticationMethodStringConverter());
     }
 
     private void bindInputElements(SettingsViewModel viewModel) {
         youtrackUrlField.textProperty().bindBidirectional(viewModel.youTrackUrlProperty());
         youtrackVersionField.valueProperty().bindBidirectional(viewModel.youTrackVersionProperty());
-        youtrackAuthenticationMethodField.valueProperty().bindBidirectional(viewModel.youTrackAuthenticationMethodProperty());
         youtrackUsernameField.textProperty().bindBidirectional(viewModel.youTrackUsernameProperty());
-        youtrackPasswordField.textProperty().bindBidirectional(viewModel.youTrackPasswordProperty());
-        youtrackOAuthHubUrlField.textProperty().bindBidirectional(viewModel.youTrackHubUrlProperty());
-        youtrackOAuthServiceIdField.textProperty().bindBidirectional(viewModel.youTrackOAuth2ServiceIdProperty());
-        youtrackOAuthServiceSecretField.textProperty().bindBidirectional(viewModel.youTrackOAuth2ServiceSecretProperty());
         youtrackPermanentTokenField.textProperty().bindBidirectional(viewModel.youTrackPermanentTokenProperty());
 
         workhoursComboBox.valueProperty().bindBidirectional(viewModel.workhoursProperty().asObject());
@@ -146,51 +140,6 @@ public class SettingsViewController implements Initializable {
     }
 
     private void attachListeners(SettingsViewModel viewModel) {
-
-
-        // only show authentication methods, that are supported by the selected version
-        youtrackVersionField.getSelectionModel().selectedItemProperty().addListener((observable, oldVersion, newVersion) -> {
-            YouTrackService service = YouTrackServiceFactory.getYouTrackService(newVersion);
-            List<YouTrackAuthenticationMethod> validAuthenticationMethods = service.getSupportedAuthenticationMethods();
-
-            YouTrackAuthenticationMethod currentlySelectedAuthenticationMethod = youtrackAuthenticationMethodField.getValue();
-            youtrackAuthenticationMethodField.setItems(FXCollections.observableArrayList(validAuthenticationMethods));
-
-            if (!validAuthenticationMethods.contains(currentlySelectedAuthenticationMethod)) {
-                // select the first in the list
-                youtrackAuthenticationMethodField.setValue(validAuthenticationMethods.get(0));
-            }
-        });
-
-        // Hide password field, when not required
-        youtrackPasswordLabel.visibleProperty().bind(viewModel.requiresPasswordProperty());
-        youtrackPasswordLabel.managedProperty().bind(viewModel.requiresPasswordProperty());
-        youtrackPasswordField.visibleProperty().bind(viewModel.requiresPasswordProperty());
-        youtrackPasswordField.managedProperty().bind(viewModel.requiresPasswordProperty());
-
-        // Hide OAuth2 fields when they are not needed
-        youtrackOAuthServiceSecretLabel.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthServiceSecretLabel.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthServiceSecretField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthServiceSecretField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
-
-        youtrackOAuthServiceIdLabel.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthServiceIdLabel.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthServiceIdField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthServiceIdField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
-
-        youtrackUrlField.textProperty().addListener((observable, oldValue, newValue) -> youtrackOAuthHubUrlField.setText(getHubUrl(newValue)));
-        youtrackOAuthHubUrlLabel.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthHubUrlLabel.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthHubUrlField.visibleProperty().bind(viewModel.requiresOAuthSettingsProperty());
-        youtrackOAuthHubUrlField.managedProperty().bind(viewModel.requiresOAuthSettingsProperty());
-
-        // Hide token field if not needed
-        youtrackPermanentTokenLabel.visibleProperty().bind(viewModel.requiresPermanentTokenProperty());
-        youtrackPermanentTokenLabel.managedProperty().bind(viewModel.requiresPermanentTokenProperty());
-        youtrackPermanentTokenField.visibleProperty().bind(viewModel.requiresPermanentTokenProperty());
-        youtrackPermanentTokenField.managedProperty().bind(viewModel.requiresPermanentTokenProperty());
-
         SimpleBooleanProperty hadMissingSettingsWhenOpened = new SimpleBooleanProperty(viewModel.getHasMissingConnectionSettings());
 
         // enable cancel button only when settings are valid or have been valid
@@ -224,30 +173,4 @@ public class SettingsViewController implements Initializable {
         window.fireEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
-    private static String getHubUrl(String baseUrl) {
-        if (StringUtils.isBlank(baseUrl)) {
-            return StringUtils.EMPTY;
-        }
-
-        StringBuilder sb = new StringBuilder(StringUtils.trim(baseUrl));
-
-        while (sb.charAt(sb.length() - 1) == '/') {
-            sb.deleteCharAt(sb.length() - 1);
-        }
-
-        sb.append("/hub");
-
-        boolean seemsToBeJetbrainsHosted = StringUtils.containsIgnoreCase(baseUrl, MYJETBRAINS_HOST);
-        int indexOfYoutrackPath = sb.indexOf(MYJETBRAINS_HOSTED_YOUTRACK_PATH);
-
-        if (seemsToBeJetbrainsHosted && indexOfYoutrackPath >= 0) {
-            sb.replace(indexOfYoutrackPath, indexOfYoutrackPath + MYJETBRAINS_HOSTED_YOUTRACK_PATH.length(), "");
-        }
-
-        try {
-            return new URL(sb.toString()).toExternalForm();
-        } catch (MalformedURLException e) {
-            return StringUtils.EMPTY;
-        }
-    }
 }

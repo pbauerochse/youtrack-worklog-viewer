@@ -62,19 +62,19 @@ public class WorklogViewer extends Application {
         loader.setResources(FormattingUtil.RESOURCE_BUNDLE);
 
         Parent root = loader.load(WorklogViewer.class.getResource("/fx/views/main.fxml"), FormattingUtil.RESOURCE_BUNDLE);
-        Scene mainScene = new Scene(root, settings.getWindowWidth(), settings.getWindowHeight());
+        Scene mainScene = new Scene(root, settings.getWindowSettings().getWidth(), settings.getWindowSettings().getHeight());
         mainScene.getStylesheets().add("/fx/css/main.css");
 
         primaryStage.setTitle("YouTrack Worklog Viewer " + FormattingUtil.getFormatted("release.version"));
         primaryStage.setScene(mainScene);
-        primaryStage.setX(settings.getWindowX());
-        primaryStage.setY(settings.getWindowY());
+        primaryStage.setX(settings.getWindowSettings().getPositionX());
+        primaryStage.setY(settings.getWindowSettings().getPositionY());
         primaryStage.show();
 
-        primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> settings.setWindowWidth(newValue.intValue()));
-        primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> settings.setWindowHeight(newValue.intValue()));
-        primaryStage.xProperty().addListener((observable, oldValue, newValue) -> settings.setWindowX(newValue.intValue()));
-        primaryStage.yProperty().addListener((observable, oldValue, newValue) -> settings.setWindowY(newValue.intValue()));
+        primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> settings.getWindowSettings().setWidth(newValue.intValue()));
+        primaryStage.heightProperty().addListener((observable, oldValue, newValue) -> settings.getWindowSettings().setHeight(newValue.intValue()));
+        primaryStage.xProperty().addListener((observable, oldValue, newValue) -> settings.getWindowSettings().setPositionX(newValue.intValue()));
+        primaryStage.yProperty().addListener((observable, oldValue, newValue) -> settings.getWindowSettings().setPositionY(newValue.intValue()));
     }
 
     public void requestShutdown() {

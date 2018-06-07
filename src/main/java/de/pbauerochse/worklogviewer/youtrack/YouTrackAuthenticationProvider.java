@@ -9,6 +9,4 @@ public interface YouTrackAuthenticationProvider {
 
     List<Header> getAuthenticationHeaders(HttpClientBuilder clientBuilder, YouTrackUrlBuilder urlBuilder);
 
-    YouTrackAuthenticationMethod getMethod();
-
 }

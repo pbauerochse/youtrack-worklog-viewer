@@ -19,6 +19,7 @@ import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportContext;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
+import de.pbauerochse.worklogviewer.settings.WeekdaySettings;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
@@ -73,9 +74,9 @@ public abstract class WorklogTab extends Tab {
 
     private Optional<TimerangeProvider> lastUsedTimerangeProvider = Optional.empty();
 
-    private Optional<Integer> lastHighlightState = Optional.empty();
+    private Optional<WeekdaySettings> lastHighlightState = Optional.empty();
 
-    private Optional<Integer> lastCollapseState = Optional.empty();
+    private Optional<WeekdaySettings> lastCollapseState = Optional.empty();
 
     private Optional<FetchTimereportContext> fetchTimereportContext = Optional.empty();
 

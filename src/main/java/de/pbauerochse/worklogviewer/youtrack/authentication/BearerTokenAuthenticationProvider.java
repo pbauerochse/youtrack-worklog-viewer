@@ -3,7 +3,6 @@ package de.pbauerochse.worklogviewer.youtrack.authentication;
 import com.google.common.collect.ImmutableList;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationMethod;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackAuthenticationProvider;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
 import org.apache.http.Header;
@@ -25,13 +24,8 @@ public class BearerTokenAuthenticationProvider implements YouTrackAuthentication
     public List<Header> getAuthenticationHeaders(HttpClientBuilder clientBuilder, YouTrackUrlBuilder urlBuilder) {
         Settings settings = SettingsUtil.getSettings();
         return ImmutableList.of(
-                new BasicHeader("Authorization", "Bearer " + settings.getYoutrackPermanentToken())
+                new BasicHeader("Authorization", "Bearer " + settings.getYouTrackConnectionSettings().getPermanentToken())
         );
-    }
-
-    @Override
-    public YouTrackAuthenticationMethod getMethod() {
-        return YouTrackAuthenticationMethod.PERMANENT_TOKEN;
     }
 
 }

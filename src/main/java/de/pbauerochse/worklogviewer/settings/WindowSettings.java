@@ -1,31 +1,49 @@
 package de.pbauerochse.worklogviewer.settings;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Settings concerning the location and size
  * of the application window
  */
-public interface WindowSettings {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class WindowSettings {
 
-    /**
-     * The width of the main window
-     */
-    int getWidth();
+    private int width = 800;
+    private int height = 600;
+    private int positionX = 0;
+    private int positionY = 0;
 
-    /**
-     * The height of the main window
-     */
-    int getHeight();
+    public int getWidth() {
+        return width;
+    }
 
-    /**
-     * The x location of the window in
-     * screen pixels
-     */
-    int getPositionX();
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
-    /**
-     * The y location of the window in
-     * screen pixels
-     */
-    int getPositionY();
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getPositionX() {
+        return positionX;
+    }
+
+    public void setPositionX(int positionX) {
+        this.positionX = positionX;
+    }
+
+    public int getPositionY() {
+        return positionY;
+    }
+
+    public void setPositionY(int positionY) {
+        this.positionY = positionY;
+    }
 
 }

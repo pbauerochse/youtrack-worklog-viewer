@@ -43,8 +43,8 @@ public abstract class ExcelColumnRenderer {
         if (boldCellStyle == null) {
             boldCellStyle = sheet.getWorkbook().createCellStyle();
             boldCellStyle.setFont(getBoldFont(sheet));
-            boldCellStyle.setAlignment(CellStyle.ALIGN_CENTER);
-            boldCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+            boldCellStyle.setAlignment(HorizontalAlignment.CENTER);
+            boldCellStyle.setVerticalAlignment(VerticalAlignment.TOP);
         }
         return boldCellStyle;
     }
@@ -52,8 +52,8 @@ public abstract class ExcelColumnRenderer {
     protected CellStyle getWorklogCellStyle(Sheet sheet) {
         if (regularRightAlignedCellStyle == null) {
             regularRightAlignedCellStyle = sheet.getWorkbook().createCellStyle();
-            regularRightAlignedCellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
-            regularRightAlignedCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+            regularRightAlignedCellStyle.setAlignment(HorizontalAlignment.CENTER);
+            regularRightAlignedCellStyle.setVerticalAlignment(VerticalAlignment.TOP);
         }
         return regularRightAlignedCellStyle;
     }
@@ -61,9 +61,9 @@ public abstract class ExcelColumnRenderer {
     protected CellStyle getWorklogSummaryCellStyle(Sheet sheet) {
         if (boldRightAlignedCellStyle == null) {
             boldRightAlignedCellStyle = sheet.getWorkbook().createCellStyle();
-            boldRightAlignedCellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+            boldRightAlignedCellStyle.setAlignment(HorizontalAlignment.CENTER);
             boldRightAlignedCellStyle.setFont(getBoldFont(sheet));
-            boldRightAlignedCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+            boldRightAlignedCellStyle.setVerticalAlignment(VerticalAlignment.TOP);
         }
         return boldRightAlignedCellStyle;
     }
@@ -72,7 +72,7 @@ public abstract class ExcelColumnRenderer {
         if (groupHeadlineCellStyle == null) {
             groupHeadlineCellStyle = sheet.getWorkbook().createCellStyle();
             groupHeadlineCellStyle.setFont(getBiggerBoldFont(sheet));
-            groupHeadlineCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+            groupHeadlineCellStyle.setVerticalAlignment(VerticalAlignment.TOP);
         }
         return groupHeadlineCellStyle;
     }
@@ -81,8 +81,8 @@ public abstract class ExcelColumnRenderer {
         if (groupHeadlineWorklogCellStyle == null) {
             groupHeadlineWorklogCellStyle = sheet.getWorkbook().createCellStyle();
             groupHeadlineWorklogCellStyle.setFont(getBiggerBoldFont(sheet));
-            groupHeadlineWorklogCellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
-            groupHeadlineWorklogCellStyle.setVerticalAlignment(CellStyle.VERTICAL_TOP);
+            groupHeadlineWorklogCellStyle.setAlignment(HorizontalAlignment.CENTER);
+            groupHeadlineWorklogCellStyle.setVerticalAlignment(VerticalAlignment.TOP);
         }
         return groupHeadlineWorklogCellStyle;
     }

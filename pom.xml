@@ -34,6 +34,7 @@
         <google-oauth-client.version>1.20.0</google-oauth-client.version>
         <google-http.version>1.19.0</google-http.version>
         <jersey-client.version>2.22.1</jersey-client.version>
+        <jetbrains-annotations.version>16.0.2</jetbrains-annotations.version>
     </properties>
 
     <build>
@@ -229,6 +230,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jetbrains-annotations.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
             <version>${spock.version}</version>
@@ -248,6 +255,7 @@
             <version>${byte-buddy.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
 

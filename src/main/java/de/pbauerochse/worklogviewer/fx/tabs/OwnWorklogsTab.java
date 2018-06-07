@@ -35,7 +35,7 @@ public class OwnWorklogsTab extends WorklogTab {
         return tasks.stream()
                 .filter(taskWithWorklogs -> {
                     for (WorklogItem worklogItem : taskWithWorklogs.getWorklogItemList()) {
-                        if (StringUtils.equals(worklogItem.getUsername(), settings.getYoutrackUsername())) {
+                        if (StringUtils.equals(worklogItem.getUsername(), settings.getYouTrackConnectionSettings().getUsername())) {
                             return true;
                         }
                     }
@@ -46,7 +46,7 @@ public class OwnWorklogsTab extends WorklogTab {
                     // remove items not belonging to self
                     taskWithWorklogs
                             .getWorklogItemList()
-                            .removeIf(worklogItem -> !StringUtils.equals(worklogItem.getUsername(), settings.getYoutrackUsername()));
+                            .removeIf(worklogItem -> !StringUtils.equals(worklogItem.getUsername(), settings.getYouTrackConnectionSettings().getUsername()));
                 })
                 .collect(Collectors.toList());
     }

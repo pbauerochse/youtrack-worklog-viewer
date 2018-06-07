@@ -34,7 +34,7 @@ public class FetchTimereportTask extends Task<WorklogReport> {
         YouTrackService connector = YouTrackServiceFactory.getInstance();
 
         updateProgress(0, 100);
-        updateMessage(FormattingUtil.getFormatted("worker.progress.login", settings.getYoutrackUsername()));
+        updateMessage(FormattingUtil.getFormatted("worker.progress.login", settings.getYouTrackConnectionSettings().getUsername()));
 
         // create report
         updateMessage(FormattingUtil.getFormatted("worker.progress.creatingreport", FormattingUtil.getFormatted(context.getTimerangeProvider().getReportTimerange().getLabelKey())));

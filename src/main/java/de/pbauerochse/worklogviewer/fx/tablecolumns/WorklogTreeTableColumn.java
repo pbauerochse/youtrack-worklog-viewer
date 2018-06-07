@@ -87,12 +87,12 @@ public class WorklogTreeTableColumn extends TreeTableColumn<DisplayRow, DisplayR
 
     private static boolean isCollapsed(LocalDate date, Settings settings) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
-        return settings.hasCollapseState(dayOfWeek);
+        return settings.getCollapseState().isSet(dayOfWeek);
     }
 
     private static boolean isHighlighted(LocalDate date, Settings settings) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
-        return settings.hasHighlightState(dayOfWeek);
+        return settings.getHighlightState().isSet(dayOfWeek);
     }
 
     private static boolean isToday(LocalDate date) {
