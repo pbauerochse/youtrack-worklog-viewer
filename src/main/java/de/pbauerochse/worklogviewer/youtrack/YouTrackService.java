@@ -1,10 +1,7 @@
 package de.pbauerochse.worklogviewer.youtrack;
 
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
-import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -17,16 +14,21 @@ public interface YouTrackService {
      */
     List<GroupByCategory> getPossibleGroupByCategories();
 
-    ReportDetails createReport(TimereportContext timereportContext);
+    /**
+     * Loads the TimeReport for the given parameters
+     */
+    TimeReport getReport(TimeReportParameters parameters, ProgressCallback progressCallback);
 
-    ReportDetails getReportDetails(String reportId) throws IOException;
-
-    ByteArrayInputStream downloadReport(String reportId);
-
-    void deleteReport(String reportId);
-
-    void fetchTaskDetails(WorklogReport report);
-
+    /**
+     * Returns the YouTrack versions this
+     * Service can retrieve TimeReports from
+     */
     List<YouTrackVersion> getSupportedVersions();
+
+//    ReportDetails createReport(TimeReportParameters timereportContext);
+//    ReportDetails getReportDetails(String reportId) throws IOException;
+//    ByteArrayInputStream downloadReport(String reportId);
+//    void deleteReport(String reportId);
+//    void fetchTaskDetails(WorklogReport report);
 
 }

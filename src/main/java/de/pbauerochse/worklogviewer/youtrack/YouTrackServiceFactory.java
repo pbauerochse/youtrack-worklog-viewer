@@ -40,7 +40,7 @@ public class YouTrackServiceFactory {
 
     private static YouTrackService getYouTrackService(YouTrackVersion version) {
         return AVAILABLE_SERVICE_IMPLEMENTATIONS.stream()
-                .filter(connector -> connector.getSupportedVersions().contains(version))
+                .filter(service -> service.getSupportedVersions().contains(version))
                 .findFirst()
                 .orElseThrow(() -> getIllegalArgumentException("exceptions.settings.version.invalid", version.name()));
     }

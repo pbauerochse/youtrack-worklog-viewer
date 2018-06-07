@@ -169,6 +169,10 @@ public class SettingsViewModel {
         return showAllWorklogs;
     }
 
+    public boolean isShowAllWorklogs() {
+        return showAllWorklogsProperty().get();
+    }
+
     public BooleanProperty showStatisticsProperty() {
         return showStatistics;
     }

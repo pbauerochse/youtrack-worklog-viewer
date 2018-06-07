@@ -16,12 +16,13 @@ import de.pbauerochse.worklogviewer.fx.tablecolumns.WorklogTreeTableColumn;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayData;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayDayEntry;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
-import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportContext;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.WeekdaySettings;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.youtrack.TimeReport;
+import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
@@ -44,6 +45,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +80,7 @@ public abstract class WorklogTab extends Tab {
 
     private Optional<WeekdaySettings> lastCollapseState = Optional.empty();
 
-    private Optional<FetchTimereportContext> fetchTimereportContext = Optional.empty();
+    private Optional<TimeReportParameters> fetchTimereportContext = Optional.empty();
 
     private boolean resultToDisplayChangedSinceLastRender;
 
@@ -114,7 +116,7 @@ public abstract class WorklogTab extends Tab {
      *
      * @param timereportContext The TaskWithWorklogs to show in this tab
      */
-    public void updateItems(FetchTimereportContext timereportContext) {
+    public void updateItems(TimeReportParameters timereportContext) {
         this.fetchTimereportContext = Optional.of(timereportContext);
 
         resultToDisplayChangedSinceLastRender = true;
@@ -183,7 +185,7 @@ public abstract class WorklogTab extends Tab {
 
         // return early if no data present or still the same data
         // as the last time this tab was active
-        Optional<FetchTimereportContext> reportContextOptional = this.fetchTimereportContext;
+        Optional<TimeReportParameters> reportContextOptional = this.fetchTimereportContext;
         if (!reportContextOptional.isPresent() || !reportContextOptional.get().getResult().isPresent() || !resultToDisplayChangedSinceLastRender) {
             LOGGER.debug("[{}] No results to display or data not changed. Not refreshing TableView and data", getText());
             return;
@@ -198,7 +200,7 @@ public abstract class WorklogTab extends Tab {
             setContent(getContentNode());
         }
 
-        FetchTimereportContext timereportContext = reportContextOptional.get();
+        TimeReportParameters timereportContext = reportContextOptional.get();
         TimerangeProvider timerangeProvider = timereportContext.getTimerangeProvider();
 
         // render the table columns if the timerange changed from last result
@@ -242,7 +244,7 @@ public abstract class WorklogTab extends Tab {
         resultToDisplayChangedSinceLastRender = false;
     }
 
-    private DisplayData getDisplayData(FetchTimereportContext reportContext, boolean changedSinceLastRender) {
+    private DisplayData getDisplayData(TimeReportParameters reportContext, boolean changedSinceLastRender) {
 
         if (changedSinceLastRender) {
             LOGGER.debug("Refreshing display data");
@@ -631,6 +633,8 @@ public abstract class WorklogTab extends Tab {
             sheet.autoSizeColumn(i);
         }
     }
+
+    abstract void update(@NotNull TimeReport timeReport);
 
     protected class WorklogStatistics {
 

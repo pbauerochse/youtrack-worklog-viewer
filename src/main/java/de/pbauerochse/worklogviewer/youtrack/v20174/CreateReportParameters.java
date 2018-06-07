@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
-import de.pbauerochse.worklogviewer.youtrack.TimereportContext;
+import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import de.pbauerochse.worklogviewer.youtrack.v20174.types.Grouping;
 import org.slf4j.Logger;
@@ -16,14 +16,14 @@ class CreateReportParameters {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateReportParameters.class);
 
-    private final TimereportContext timereportContext;
+    private final TimeReportParameters timeReportParameters;
 
-    CreateReportParameters(TimereportContext timereportContext) {
-        this.timereportContext = timereportContext;
+    CreateReportParameters(TimeReportParameters timeReportParameters) {
+        this.timeReportParameters = timeReportParameters;
     }
 
     public String getName() {
-        TimerangeProvider timerangeProvider = timereportContext.getTimerangeProvider();
+        TimerangeProvider timerangeProvider = timeReportParameters.getTimerangeProvider();
         ReportTimerange reportTimerange = timerangeProvider.getReportTimerange();
         return String.format("YT-WorklogViewer: %s", reportTimerange.name());
     }
@@ -42,7 +42,7 @@ class CreateReportParameters {
     }
 
     public ReportRange getRange() {
-        TimerangeProvider timerangeProvider = timereportContext.getTimerangeProvider();
+        TimerangeProvider timerangeProvider = timeReportParameters.getTimerangeProvider();
         ReportTimerange reportTimerange = timerangeProvider.getReportTimerange();
 
         if (reportTimerange == ReportTimerange.CUSTOM) {
@@ -53,7 +53,7 @@ class CreateReportParameters {
     }
 
     public Grouping getGrouping() {
-        return timereportContext.getGroupByCategory()
+        return timeReportParameters.getGroupByCategory()
                 .filter(GroupByCategory::isValidYouTrackCategory)
                 .map(Grouping.class::cast)
                 .orElse(null);

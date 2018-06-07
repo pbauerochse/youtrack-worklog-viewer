@@ -108,11 +108,11 @@ public class YouTrackServiceV20174 implements YouTrackService {
 
     @SuppressWarnings("Duplicates")
     @Override
-    public ReportDetails createReport(TimereportContext timereportContext) {
+    public ReportDetails createReport(TimeReportParameters timeReportParameters) {
         String url = URL_BUILDER.getCreateReportUrl();
         LOGGER.debug("Creating temporary timereport using url {}", url);
 
-        CreateReportParameters payload = new CreateReportParameters(timereportContext);
+        CreateReportParameters payload = new CreateReportParameters(timeReportParameters);
 
         // request body
         HttpPost request = new HttpPost(url);

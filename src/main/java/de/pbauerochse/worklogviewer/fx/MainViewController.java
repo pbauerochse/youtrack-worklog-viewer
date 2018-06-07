@@ -1,6 +1,5 @@
 package de.pbauerochse.worklogviewer.fx;
 
-import com.google.common.collect.ImmutableList;
 import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.domain.Callback;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
@@ -8,12 +7,13 @@ import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.domain.timerangeprovider.TimerangeProviderFactory;
 import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter;
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter;
-import de.pbauerochse.worklogviewer.fx.tabs.AllWorklogsTab;
 import de.pbauerochse.worklogviewer.fx.tabs.OwnWorklogsTab;
-import de.pbauerochse.worklogviewer.fx.tabs.ProjectWorklogTab;
+import de.pbauerochse.worklogviewer.fx.tabs.TimeReportResultTabbedPane;
 import de.pbauerochse.worklogviewer.fx.tabs.WorklogTab;
-import de.pbauerochse.worklogviewer.fx.tasks.*;
-import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.fx.tasks.ExcelExporterTask;
+import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask;
+import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask;
+import de.pbauerochse.worklogviewer.fx.tasks.VersionCheckerTask;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
@@ -21,6 +21,8 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import de.pbauerochse.worklogviewer.util.HyperlinkUtil;
 import de.pbauerochse.worklogviewer.version.GitHubVersion;
 import de.pbauerochse.worklogviewer.version.Version;
+import de.pbauerochse.worklogviewer.youtrack.TimeReport;
+import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import de.pbauerochse.worklogviewer.youtrack.domain.NoSelectionGroupByCategory;
 import javafx.concurrent.Task;
@@ -99,7 +101,7 @@ public class MainViewController implements Initializable {
     private Text progressText;
 
     @FXML
-    private TabPane resultTabPane;
+    private TimeReportResultTabbedPane resultTabPane;
 
     @FXML
     private StackPane waitScreenOverlay;
@@ -317,10 +319,12 @@ public class MainViewController implements Initializable {
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
 
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, selectedStartDate, selectedEndDate);
-        FetchTimereportContext context = new FetchTimereportContext(timerangeProvider, groupByCategoryComboBox.getSelectionModel().getSelectedItem());
+        GroupByCategory groupByCategory = groupByCategoryComboBox.getSelectionModel().getSelectedItem();
 
-        FetchTimereportTask task = new FetchTimereportTask(context);
-        task.setOnSucceeded(event -> displayWorklogResult(context, SettingsUtil.getSettings()));
+        TimeReportParameters parameters = new TimeReportParameters(timerangeProvider, groupByCategory);
+
+        FetchTimereportTask task = new FetchTimereportTask(parameters);
+        task.setOnSucceeded(event -> displayWorklogResult((TimeReport) event.getSource().getValue()));
         startTask(task);
     }
 
@@ -396,52 +400,54 @@ public class MainViewController implements Initializable {
         EXECUTOR.submit(task);
     }
 
-    private void displayWorklogResult(FetchTimereportContext context, Settings settings) {
-        LOGGER.info("Displaying WorklogResult to the user");
+    private void displayWorklogResult(TimeReport timeReport) {
+        LOGGER.info("Presenting TimeReport to the user");
+        resultTabPane.update(timeReport);
+
 
         if (resultTabPane.getTabs().size() == 0) {
             LOGGER.debug("Adding default tabs");
             resultTabPane.getTabs().add(new OwnWorklogsTab());
         }
 
-        if (settings.isShowAllWorklogs()) {
-
-            if (resultTabPane.getTabs().size() < 2 || !(resultTabPane.getTabs().get(1) instanceof AllWorklogsTab)) {
-                resultTabPane.getTabs().add(new AllWorklogsTab());
-            }
-
-            ImmutableList<String> distinctProjectNames = context.getResult().get().getDistinctProjectNames();
-            for (int i = 0; i < distinctProjectNames.size(); i++) {
-                int tabIndex = AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS + i;
-
-                String newTabLabel = distinctProjectNames.get(i);
-                WorklogTab tab;
-                if (resultTabPane.getTabs().size() > tabIndex) {
-                    // there is a tab we can reuse
-                    tab = (WorklogTab) resultTabPane.getTabs().get(tabIndex);
-                    LOGGER.debug("Reusing Tab {} for project {}", tab.getText(), newTabLabel);
-                } else {
-                    LOGGER.debug("Adding new project tab for project {}", newTabLabel);
-                    tab = new ProjectWorklogTab(newTabLabel);
-                    resultTabPane.getTabs().add(tab);
-                }
-
-                tab.setText(newTabLabel);
-            }
-
-            // remove any redundant tabs
-            for (int tabIndexToRemove = distinctProjectNames.size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
-                WorklogTab removedTab = (WorklogTab) resultTabPane.getTabs().remove(tabIndexToRemove);
-                LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
-            }
-        } else if (resultTabPane.getTabs().size() > 1) {
-            // remove all other tabs when settings changed from showAll to showOnlyOwnWorklogs
-            LOGGER.debug("Removing all and project tabs since user switched to showOnlyOwnWorklogs mode");
-            resultTabPane.getTabs().remove(1, resultTabPane.getTabs().size());
-            resultTabPane.getSelectionModel().select(0);
-        }
-
-        resultTabPane.getTabs().forEach(tab -> ((WorklogTab) tab).updateItems(context));
+//        if (settings.isShowAllWorklogs()) {
+//
+//            if (resultTabPane.getTabs().size() < 2 || !(resultTabPane.getTabs().get(1) instanceof AllWorklogsTab)) {
+//                resultTabPane.getTabs().add(new AllWorklogsTab());
+//            }
+//
+//            ImmutableList<String> distinctProjectNames = context.getResult().get().getDistinctProjectNames();
+//            for (int i = 0; i < distinctProjectNames.size(); i++) {
+//                int tabIndex = AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS + i;
+//
+//                String newTabLabel = distinctProjectNames.get(i);
+//                WorklogTab tab;
+//                if (resultTabPane.getTabs().size() > tabIndex) {
+//                    // there is a tab we can reuse
+//                    tab = (WorklogTab) resultTabPane.getTabs().get(tabIndex);
+//                    LOGGER.debug("Reusing Tab {} for project {}", tab.getText(), newTabLabel);
+//                } else {
+//                    LOGGER.debug("Adding new project tab for project {}", newTabLabel);
+//                    tab = new ProjectWorklogTab(newTabLabel);
+//                    resultTabPane.getTabs().add(tab);
+//                }
+//
+//                tab.setText(newTabLabel);
+//            }
+//
+//            // remove any redundant tabs
+//            for (int tabIndexToRemove = distinctProjectNames.size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
+//                WorklogTab removedTab = (WorklogTab) resultTabPane.getTabs().remove(tabIndexToRemove);
+//                LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
+//            }
+//        } else if (resultTabPane.getTabs().size() > 1) {
+//            // remove all other tabs when settings changed from showAll to showOnlyOwnWorklogs
+//            LOGGER.debug("Removing all and project tabs since user switched to showOnlyOwnWorklogs mode");
+//            resultTabPane.getTabs().remove(1, resultTabPane.getTabs().size());
+//            resultTabPane.getSelectionModel().select(0);
+//        }
+//
+//        resultTabPane.getTabs().forEach(tab -> ((WorklogTab) tab).updateItems(context));
     }
 
     private void showSettingsDialogue() {
