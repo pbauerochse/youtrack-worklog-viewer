@@ -27,6 +27,10 @@ public class JsonSettingsLoader {
     }
 
     public Settings load() {
+        if (!jsonFile.exists()) {
+            return new Settings();
+        }
+
         try {
             LOG.debug("Loading settings from {}", jsonFile.getAbsolutePath());
             return objectMapper.readValue(jsonFile, Settings.class);
