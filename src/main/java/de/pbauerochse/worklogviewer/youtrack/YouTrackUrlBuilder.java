@@ -6,8 +6,6 @@ import java.util.List;
 
 public interface YouTrackUrlBuilder {
 
-    String getUsernamePasswordLoginUrl();
-
     String getGroupByCriteriaUrl();
 
     String getCreateReportUrl();
@@ -19,4 +17,5 @@ public interface YouTrackUrlBuilder {
     String getDeleteReportUrl(String reportId);
 
     String getIssueDetailsUrl(List<NameValuePair> fetchIssuesParameters);
+
 }

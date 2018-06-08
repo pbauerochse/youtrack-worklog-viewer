@@ -12,8 +12,8 @@ public class ReportDetailsResponse implements ReportDetails {
     private final ReportStatus status;
 
     @JsonCreator
-    public ReportDetailsResponse(@JsonProperty("id") String id,
-                                 @JsonProperty("status") ReportStatus status) {
+    ReportDetailsResponse(@JsonProperty("id") String id,
+                          @JsonProperty("status") ReportStatus status) {
         this.id = id;
         this.status = status;
     }

@@ -1,7 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tabs;
 
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.youtrack.TimeReport;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,5 +25,10 @@ public class AllWorklogsTab extends WorklogTab {
     protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
         // no filtering neccessary since we display all
         return tasks;
+    }
+
+    @Override
+    void update(@NotNull TimeReport timeReport) {
+        // TODO implement
     }
 }

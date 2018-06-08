@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters;
-import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import de.pbauerochse.worklogviewer.youtrack.v20174.types.Grouping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +52,10 @@ class CreateReportParameters {
     }
 
     public Grouping getGrouping() {
-        return timeReportParameters.getGroupByCategory()
-                .filter(GroupByCategory::isValidYouTrackCategory)
-                .map(Grouping.class::cast)
-                .orElse(null);
+        return null;
+//        return timeReportParameters.getGroupByCategory()
+//                .filter(GroupByCategory::isValidYouTrackCategory)
+//                .map(Grouping.class::cast)
+//                .orElse(null);
     }
 }

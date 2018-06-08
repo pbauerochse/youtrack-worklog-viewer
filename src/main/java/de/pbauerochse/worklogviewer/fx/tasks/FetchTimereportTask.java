@@ -80,8 +80,8 @@ public class FetchTimereportTask extends Task<TimeReport> {
         return timeReport;
     }
 
-    private void updateProgress(String message, long percent) {
-        updateMessage(message);
-        updateProgress(percent, 100);
+    private void updateProgress(String message, int amount) {
+        // TODO implement
     }
+
 }

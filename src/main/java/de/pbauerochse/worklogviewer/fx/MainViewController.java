@@ -301,24 +301,15 @@ public class MainViewController implements Initializable {
      * Fetches the worklogs for the currently defined settings from YouTrack
      */
     private void fetchWorklogs() {
-        // sanity checks
-        LocalDate selectedStartDate = startDatePicker.getValue();
-        LocalDate selectedEndDate = endDatePicker.getValue();
-
-        if (selectedStartDate == null || selectedEndDate == null) {
-            LOGGER.warn("Startdate and / or enddate was null");
-            progressText.setText(FormattingUtil.getFormatted("exceptions.timerange.datesrequired"));
-            return;
-        } else if (selectedStartDate.isAfter(selectedEndDate)) {
-            LOGGER.warn("Startdate was after enddate");
-            progressText.setText(FormattingUtil.getFormatted("exceptions.timerange.startafterend"));
-            return;
-        }
-
         ReportTimerange timerange = timerangeComboBox.getSelectionModel().getSelectedItem();
         LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString());
 
+        LocalDate selectedStartDate = startDatePicker.getValue();
+        LocalDate selectedEndDate = endDatePicker.getValue();
+
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, selectedStartDate, selectedEndDate);
+
+
         GroupByCategory groupByCategory = groupByCategoryComboBox.getSelectionModel().getSelectedItem();
 
         TimeReportParameters parameters = new TimeReportParameters(timerangeProvider, groupByCategory);

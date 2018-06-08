@@ -9,6 +9,7 @@ import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.youtrack.*;
+import de.pbauerochse.worklogviewer.youtrack.csv.YouTrackCsvReportProcessor;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
@@ -33,6 +34,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +58,24 @@ public class YouTrackServiceV20174 implements YouTrackService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackServiceV20174.class);
 
-    private static final YouTrackUrlBuilder URL_BUILDER = new UrlBuilder(() -> SettingsUtil.getSettings().getYouTrackConnectionSettings().getUrl(), () -> SettingsUtil.getSettings().getYouTrackConnectionSettings().getVersion());
+    /**
+     * The maximum amount of polls to wait for the report generation
+     */
+    private static final int MAX_POLL_COUNT = 10;
 
-    @SuppressWarnings("Duplicates")
+    /**
+     * The interval in seconds between the polls
+     * for the report generation to finish
+     */
+    private static final int POLL_INTERVAL_IN_SECONDS = 2;
+
+    private static final YouTrackUrlBuilder URL_BUILDER = new UrlBuilder(() -> SettingsUtil.getSettings().getYouTrackConnectionSettings().getUrl(), () -> SettingsUtil.getSettings().getYouTrackConnectionSettings().getVersion());
+    private static final ImmutableList<GroupByCategory> CONSTANT_GROUP_BY_CRITERIA = ImmutableList.of(
+            new WorkItemBasedGrouping(new GroupByTypes("WORK_TYPE", getFormatted("grouping.worktype"))),
+            new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR", getFormatted("grouping.author"))),
+            new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR_AND_DATE", getFormatted("grouping.authoranddate")))
+    );
+
     @Override
     public List<GroupByCategory> getPossibleGroupByCategories() {
         String url = URL_BUILDER.getGroupByCriteriaUrl();
@@ -83,13 +100,13 @@ public class YouTrackServiceV20174 implements YouTrackService {
                 List<GroupingField> fields = JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<GroupingField>>() {
                 });
 
-                List<FieldBasedGrouping> asGrouping = fields.stream()
+                List<FieldBasedGrouping> fieldBasedGroupings = fields.stream()
                         .map(FieldBasedGrouping::new)
                         .collect(Collectors.toList());
 
                 return ImmutableList.<GroupByCategory>builder()
-                        .addAll(getStaticGroupByCategories())
-                        .addAll(asGrouping)
+                        .addAll(CONSTANT_GROUP_BY_CRITERIA)
+                        .addAll(fieldBasedGroupings)
                         .build();
             }
         } catch (IOException e) {
@@ -98,21 +115,43 @@ public class YouTrackServiceV20174 implements YouTrackService {
         }
     }
 
-    private List<GroupByCategory> getStaticGroupByCategories() {
-        return ImmutableList.of(
-                new WorkItemBasedGrouping(new GroupByTypes("WORK_TYPE", getFormatted("grouping.worktype"))),
-                new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR", getFormatted("grouping.author"))),
-                new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR_AND_DATE", getFormatted("grouping.authoranddate")))
-        );
+    @Override
+    public TimeReport getReport(TimeReportParameters parameters, ProgressCallback progressCallback) {
+        ReportDetails reportDetails = triggerReportGeneration(parameters, progressCallback);
+
+        int pollCount = 0;
+        while (!reportDetails.isReady() && pollCount++ < MAX_POLL_COUNT) {
+            progressCallback.incrementProgress(getFormatted("worker.progress.waitingforrecalculation"), 0);
+            waitUntilNextPoll();
+            reportDetails = getReportDetails(reportDetails.getReportId());
+        }
+
+        if (!reportDetails.isReady()) {
+            throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.recalculation", MAX_POLL_COUNT);
+        }
+
+        ByteArrayInputStream csvReportData = downloadReport(reportDetails.getReportId());
+        YouTrackCsvReportProcessor.processResponse(csvReportData, );
+
+
+        deleteReport(reportDetails.getReportId());
+
+        return null;
     }
 
-    @SuppressWarnings("Duplicates")
-    @Override
-    public ReportDetails createReport(TimeReportParameters timeReportParameters) {
+    private void waitUntilNextPoll() {
+        try {
+            Thread.sleep(POLL_INTERVAL_IN_SECONDS * 1000);
+        } catch (InterruptedException e) {
+            throw ExceptionUtil.getIllegalStateException("exceptions.internal", e);
+        }
+    }
+
+    private ReportDetails triggerReportGeneration(@NotNull TimeReportParameters parameters, ProgressCallback progressCallback) {
         String url = URL_BUILDER.getCreateReportUrl();
         LOGGER.debug("Creating temporary timereport using url {}", url);
 
-        CreateReportParameters payload = new CreateReportParameters(timeReportParameters);
+        CreateReportParameters payload = new CreateReportParameters(parameters);
 
         // request body
         HttpPost request = new HttpPost(url);
@@ -121,6 +160,8 @@ public class YouTrackServiceV20174 implements YouTrackService {
         request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8"));
 
         try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
+            progressCallback.incrementProgress(getFormatted("worker.progress.creatingreport", payload.getName()));
+
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 StatusLine statusLine = response.getStatusLine();
 
@@ -145,8 +186,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
         }
     }
 
-    @Override
-    public ReportDetails getReportDetails(String reportId) {
+    private ReportDetails getReportDetails(String reportId) {
         String url = URL_BUILDER.getReportDetailsUrl(reportId);
         LOGGER.debug("Fetching report details for report {} using url {}", reportId, url);
 
@@ -175,9 +215,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
         }
     }
 
-    @SuppressWarnings("Duplicates")
-    @Override
-    public ByteArrayInputStream downloadReport(String reportId) {
+    private ByteArrayInputStream downloadReport(String reportId) {
         String url = URL_BUILDER.getDownloadReportUrl(reportId);
         LOGGER.debug("Downloading report {} using url {}", reportId, url);
 
@@ -214,9 +252,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
         }
     }
 
-    @SuppressWarnings("Duplicates")
-    @Override
-    public void deleteReport(String reportId) {
+    private void deleteReport(String reportId) {
         String url = URL_BUILDER.getDeleteReportUrl(reportId);
         LOGGER.debug("Deleting report {} using url {}", reportId, url);
 
@@ -238,9 +274,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
         }
     }
 
-    @SuppressWarnings("Duplicates")
-    @Override
-    public void fetchTaskDetails(WorklogReport report) {
+    private void fetchTaskDetails(WorklogReport report) {
         Map<String, TaskWithWorklogs> taskIdToTask = report.getTasks().stream()
                 .collect(toMap(TaskWithWorklogs::getIssue, Function.identity()));
 

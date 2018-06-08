@@ -78,7 +78,7 @@ public class TimeReportResultTabbedPane extends TabPane {
 
         for (int i = startIndex; i < endIndex; i++) {
             ProjectSpecificWorklogs projectWorklogs = projectSpecificWorklogs.get(i);
-            getOrCreateProjectTabAtIndex(i).update(projectWorklogs);
+//            getOrCreateProjectTabAtIndex(i).update(projectWorklogs);
         }
     }
 

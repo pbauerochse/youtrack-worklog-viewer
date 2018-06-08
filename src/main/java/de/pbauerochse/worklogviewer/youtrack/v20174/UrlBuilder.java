@@ -24,11 +24,6 @@ class UrlBuilder implements YouTrackUrlBuilder {
     }
 
     @Override
-    public String getUsernamePasswordLoginUrl() {
-        throw new UnsupportedOperationException("Username Password Authentication is not supported with Versions >= 2017.03");
-    }
-
-    @Override
     public String getGroupByCriteriaUrl() {
         return buildYoutrackApiUrl("/api/filterFields?fieldTypes=version%5B1%5D&fieldTypes=ownedField%5B1%5D&fieldTypes=state%5B1%5D&fieldTypes=user%5B1%5D&fieldTypes=enum%5B1%5D&fieldTypes=date&fieldTypes=integer&fieldTypes=float&fieldTypes=period&fieldTypes=project&fields=id,$type,presentation,name,aggregateable,sortable,customField(id,fieldType(id),name,localizedName),projects(id,name)&includeNonFilterFields=true");
     }

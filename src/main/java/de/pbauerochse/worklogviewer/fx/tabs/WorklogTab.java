@@ -186,10 +186,10 @@ public abstract class WorklogTab extends Tab {
         // return early if no data present or still the same data
         // as the last time this tab was active
         Optional<TimeReportParameters> reportContextOptional = this.fetchTimereportContext;
-        if (!reportContextOptional.isPresent() || !reportContextOptional.get().getResult().isPresent() || !resultToDisplayChangedSinceLastRender) {
-            LOGGER.debug("[{}] No results to display or data not changed. Not refreshing TableView and data", getText());
-            return;
-        }
+//        if (!reportContextOptional.isPresent() || !reportContextOptional.get().getResult().isPresent() || !resultToDisplayChangedSinceLastRender) {
+//            LOGGER.debug("[{}] No results to display or data not changed. Not refreshing TableView and data", getText());
+//            return;
+//        }
 
         Settings settings = SettingsUtil.getSettings();
         if (settings.isShowStatistics() && statisticsView == null || !settings.isShowStatistics() && statisticsView != null) {
@@ -250,7 +250,7 @@ public abstract class WorklogTab extends Tab {
             LOGGER.debug("Refreshing display data");
             DisplayData displayData = new DisplayData();
 
-            WorklogReport result = reportContext.getResult().get();
+            WorklogReport result = null;//reportContext.getResult().get();
             ImmutableList<TaskWithWorklogs> originalTasks = result.getTasks();
 
             // create a copy of the original task list
@@ -261,7 +261,7 @@ public abstract class WorklogTab extends Tab {
             List<TaskWithWorklogs> filteredList = getFilteredList(deepCopiedList);
 
             // render the treetabledata
-            if (reportContext.getGroupByCategory().isPresent()) {
+            if (reportContext.getGroupByCategory() != null) {
                 // grouping present
                 processWithGrouping(filteredList, displayData);
             } else {
@@ -625,7 +625,7 @@ public abstract class WorklogTab extends Tab {
 
         for (int columnIndex = 0; columnIndex < columnRendererList.size(); columnIndex++) {
             ExcelColumnRenderer excelColumnRenderer = columnRendererList.get(columnIndex);
-            excelColumnRenderer.renderCells(columnIndex, sheet, children, fetchTimereportContext.get().getGroupByCategory().isPresent());
+            excelColumnRenderer.renderCells(columnIndex, sheet, children, fetchTimereportContext.get().getGroupByCategory() != null);
         }
 
         // autosize column widths

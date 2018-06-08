@@ -1,6 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.tabs;
 
+import de.pbauerochse.worklogviewer.youtrack.TimeReport;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +28,12 @@ public class ProjectWorklogTab extends WorklogTab {
                 .collect(Collectors.toList());
     }
 
-//    @Override
+    @Override
+    void update(@NotNull TimeReport timeReport) {
+        // TODO implement
+    }
+
+    //    @Override
 //    protected List<TaskWithWorklogs> getDisplayResult(WorklogReport result) {
 //        if (!resultItemsToDisplay.isPresent() || resultToDisplayChangedSinceLastRender) {
 //

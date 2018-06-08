@@ -3,11 +3,13 @@ package de.pbauerochse.worklogviewer.fx.tabs;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.youtrack.TimeReport;
 import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem;
 import javafx.scene.chart.PieChart;
 import javafx.scene.layout.VBox;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,11 @@ public class OwnWorklogsTab extends WorklogTab {
 
     public OwnWorklogsTab() {
         super(FormattingUtil.getFormatted("view.main.tabs.own"));
+    }
+
+    @Override
+    void update(@NotNull TimeReport timeReport) {
+        // TODO implement
     }
 
     @Override
