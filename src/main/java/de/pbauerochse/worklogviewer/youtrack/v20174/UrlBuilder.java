@@ -6,6 +6,7 @@ import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -13,12 +14,12 @@ import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
-class UrlBuilder implements YouTrackUrlBuilder {
+public class UrlBuilder implements YouTrackUrlBuilder {
 
     private final Supplier<String> baseUrlSupplier;
     private final Supplier<YouTrackVersion> youtrackVersionSupplier;
 
-    UrlBuilder(Supplier<String> baseUrlSupplier, Supplier<YouTrackVersion> youtrackVersionSupplier) {
+    public UrlBuilder(@NotNull Supplier<String> baseUrlSupplier, @NotNull Supplier<YouTrackVersion> youtrackVersionSupplier) {
         this.baseUrlSupplier = baseUrlSupplier;
         this.youtrackVersionSupplier = youtrackVersionSupplier;
     }
@@ -73,8 +74,8 @@ class UrlBuilder implements YouTrackUrlBuilder {
     }
 
     private String buildYoutrackApiUrl(String path) {
-        String youtrackBaseUrl = baseUrlSupplier.get();
-        return removeEnd(trim(youtrackBaseUrl), "/") + "/" + removeStart(trim(path), "/");
+        String baseUrl = baseUrlSupplier.get();
+        return removeEnd(trim(baseUrl), "/") + "/" + removeStart(trim(path), "/");
     }
 
 }

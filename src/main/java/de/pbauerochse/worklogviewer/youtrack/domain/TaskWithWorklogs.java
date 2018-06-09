@@ -92,16 +92,16 @@ public class TaskWithWorklogs {
         );
     }
 
-    public TaskWithWorklogs createDeepCopy() {
-        TaskWithWorklogs copy = new TaskWithWorklogs();
-        copy.setEstimatedWorktimeInMinutes(getEstimatedWorktimeInMinutes());
-        copy.setIssue(getIssue());
-        copy.setProject(getProject());
-        copy.setSummary(getSummary());
-        copy.setResolved(getResolved());
-
-        getWorklogItemList().forEach(worklogItem -> copy.getWorklogItemList().add(worklogItem.createDeepCopy()));
-
-        return copy;
-    }
+//    public TaskWithWorklogs createDeepCopy() {
+//        TaskWithWorklogs copy = new TaskWithWorklogs();
+//        copy.setEstimatedWorktimeInMinutes(getEstimatedWorktimeInMinutes());
+//        copy.setIssue(getIssue());
+//        copy.setProject(getProject());
+//        copy.setSummary(getSummary());
+//        copy.setResolved(getResolved());
+//
+//        getWorklogItemList().forEach(worklogItem -> copy.getWorklogItemList().add(worklogItem.createDeepCopy()));
+//
+//        return copy;
+//    }
 }

@@ -257,7 +257,7 @@ public abstract class WorklogTab extends Tab {
             // and pass it on to the getFilteredList method
             // which then may freely modify the list and its items
             List<TaskWithWorklogs> deepCopiedList = Lists.newArrayList();
-            originalTasks.forEach(taskWithWorklogs -> deepCopiedList.add(taskWithWorklogs.createDeepCopy()));
+            originalTasks.forEach(taskWithWorklogs -> deepCopiedList.add(taskWithWorklogs/*.createDeepCopy()*/));
             List<TaskWithWorklogs> filteredList = getFilteredList(deepCopiedList);
 
             // render the treetabledata

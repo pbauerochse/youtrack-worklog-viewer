@@ -61,7 +61,7 @@ public class FetchTimereportTask extends Task<TimeReport> {
 //                updateProgress(80, 100);
 //                updateMessage(FormattingUtil.getFormatted("worker.progress.processingreport"));
 //
-//                YouTrackCsvReportProcessor.processResponse(reportData, result);
+//                CsvReportReader.processResponse(reportData, result);
 //
 //                // fetch issue details
 //                service.fetchTaskDetails(result);

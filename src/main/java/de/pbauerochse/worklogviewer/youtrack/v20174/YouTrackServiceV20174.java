@@ -2,17 +2,16 @@ package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.api.client.http.HttpStatusCodes;
-import com.google.common.base.Joiner;
+import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
-import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.youtrack.*;
-import de.pbauerochse.worklogviewer.youtrack.csv.YouTrackCsvReportProcessor;
+import de.pbauerochse.worklogviewer.youtrack.csv.CsvReportData;
+import de.pbauerochse.worklogviewer.youtrack.csv.CsvReportReader;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
-import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
-import de.pbauerochse.worklogviewer.youtrack.domain.WorklogReport;
+import de.pbauerochse.worklogviewer.youtrack.domain.Issue;
 import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetails;
 import de.pbauerochse.worklogviewer.youtrack.issuedetails.IssueDetailsResponse;
 import de.pbauerochse.worklogviewer.youtrack.v20174.types.FieldBasedGrouping;
@@ -44,14 +43,12 @@ import java.io.StringReader;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
 import static de.pbauerochse.worklogviewer.util.HttpClientUtil.getHttpClient;
 import static de.pbauerochse.worklogviewer.util.HttpClientUtil.isValidResponseCode;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class YouTrackServiceV20174 implements YouTrackService {
@@ -69,22 +66,31 @@ public class YouTrackServiceV20174 implements YouTrackService {
      */
     private static final int POLL_INTERVAL_IN_SECONDS = 2;
 
-    private static final YouTrackUrlBuilder URL_BUILDER = new UrlBuilder(() -> SettingsUtil.getSettings().getYouTrackConnectionSettings().getUrl(), () -> SettingsUtil.getSettings().getYouTrackConnectionSettings().getVersion());
+    /**
+     * GroupBy Criteria, that can not be retrieved with the {@link #getPossibleGroupByCategories()}
+     * call but are always available to be used
+     */
     private static final ImmutableList<GroupByCategory> CONSTANT_GROUP_BY_CRITERIA = ImmutableList.of(
             new WorkItemBasedGrouping(new GroupByTypes("WORK_TYPE", getFormatted("grouping.worktype"))),
             new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR", getFormatted("grouping.author"))),
             new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR_AND_DATE", getFormatted("grouping.authoranddate")))
     );
 
+    private final YouTrackUrlBuilder urlBuilder;
+
+    public YouTrackServiceV20174(@NotNull YouTrackUrlBuilder urlBuilder) {
+        this.urlBuilder = urlBuilder;
+    }
+
     @Override
     public List<GroupByCategory> getPossibleGroupByCategories() {
-        String url = URL_BUILDER.getGroupByCriteriaUrl();
+        String url = urlBuilder.getGroupByCriteriaUrl();
         LOGGER.debug("Getting GroupBy Criteria using url {}", url);
 
         HttpGet request = new HttpGet(url);
         request.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*"));
 
-        try (CloseableHttpClient client = getHttpClient(URL_BUILDER)) {
+        try (CloseableHttpClient client = getHttpClient(urlBuilder)) {
             try (CloseableHttpResponse response = client.execute(request)) {
                 StatusLine statusLine = response.getStatusLine();
 
@@ -117,6 +123,13 @@ public class YouTrackServiceV20174 implements YouTrackService {
 
     @Override
     public TimeReport getReport(TimeReportParameters parameters, ProgressCallback progressCallback) {
+        ByteArrayInputStream reportCsvContent = getReportCsvContents(parameters, progressCallback);
+        CsvReportData csvReportData = CsvReportReader.processResponse(reportCsvContent);
+        applyResolutionDate(csvReportData);
+        return new TimeReport(parameters, csvReportData);
+    }
+
+    private ByteArrayInputStream getReportCsvContents(TimeReportParameters parameters, ProgressCallback progressCallback) {
         ReportDetails reportDetails = triggerReportGeneration(parameters, progressCallback);
 
         int pollCount = 0;
@@ -130,13 +143,10 @@ public class YouTrackServiceV20174 implements YouTrackService {
             throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.recalculation", MAX_POLL_COUNT);
         }
 
-        ByteArrayInputStream csvReportData = downloadReport(reportDetails.getReportId());
-        YouTrackCsvReportProcessor.processResponse(csvReportData, );
-
-
+        ByteArrayInputStream byteArrayInputStream = downloadReport(reportDetails.getReportId());
         deleteReport(reportDetails.getReportId());
 
-        return null;
+        return byteArrayInputStream;
     }
 
     private void waitUntilNextPoll() {
@@ -148,7 +158,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
     }
 
     private ReportDetails triggerReportGeneration(@NotNull TimeReportParameters parameters, ProgressCallback progressCallback) {
-        String url = URL_BUILDER.getCreateReportUrl();
+        String url = urlBuilder.getCreateReportUrl();
         LOGGER.debug("Creating temporary timereport using url {}", url);
 
         CreateReportParameters payload = new CreateReportParameters(parameters);
@@ -159,7 +169,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
         request.setEntity(new StringEntity(payloadString, UTF_8));
         request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8"));
 
-        try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
+        try (CloseableHttpClient httpClient = getHttpClient(urlBuilder)) {
             progressCallback.incrementProgress(getFormatted("worker.progress.creatingreport", payload.getName()));
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -187,12 +197,12 @@ public class YouTrackServiceV20174 implements YouTrackService {
     }
 
     private ReportDetails getReportDetails(String reportId) {
-        String url = URL_BUILDER.getReportDetailsUrl(reportId);
+        String url = urlBuilder.getReportDetailsUrl(reportId);
         LOGGER.debug("Fetching report details for report {} using url {}", reportId, url);
 
         HttpGet request = new HttpGet(url);
 
-        try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
+        try (CloseableHttpClient httpClient = getHttpClient(urlBuilder)) {
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 StatusLine statusLine = response.getStatusLine();
@@ -216,13 +226,13 @@ public class YouTrackServiceV20174 implements YouTrackService {
     }
 
     private ByteArrayInputStream downloadReport(String reportId) {
-        String url = URL_BUILDER.getDownloadReportUrl(reportId);
+        String url = urlBuilder.getDownloadReportUrl(reportId);
         LOGGER.debug("Downloading report {} using url {}", reportId, url);
 
         HttpGet request = new HttpGet(url);
         request.setConfig(RequestConfig.custom().setDecompressionEnabled(false).build());
 
-        try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
+        try (CloseableHttpClient httpClient = getHttpClient(urlBuilder)) {
             return httpClient.execute(request, response -> {
                 ByteArrayInputStream inputStream;
 
@@ -253,12 +263,12 @@ public class YouTrackServiceV20174 implements YouTrackService {
     }
 
     private void deleteReport(String reportId) {
-        String url = URL_BUILDER.getDeleteReportUrl(reportId);
+        String url = urlBuilder.getDeleteReportUrl(reportId);
         LOGGER.debug("Deleting report {} using url {}", reportId, url);
 
         HttpDelete request = new HttpDelete(url);
 
-        try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
+        try (CloseableHttpClient httpClient = getHttpClient(urlBuilder)) {
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 EntityUtils.consumeQuietly(response.getEntity());
 
@@ -274,24 +284,25 @@ public class YouTrackServiceV20174 implements YouTrackService {
         }
     }
 
-    private void fetchTaskDetails(WorklogReport report) {
-        Map<String, TaskWithWorklogs> taskIdToTask = report.getTasks().stream()
-                .collect(toMap(TaskWithWorklogs::getIssue, Function.identity()));
+    private void applyResolutionDate(CsvReportData report) {
+        Map<String, Issue> issueIdToIssue = report.getProjects().stream()
+                .flatMap(it -> it.getIssues().stream())
+                .collect(Collectors.toMap(Issue::getIssueId, Functions.identity()));
 
-        if (!taskIdToTask.isEmpty()) {
-            String issueParameter = Joiner.on(',').skipNulls().join(taskIdToTask.keySet());
+        if (!issueIdToIssue.isEmpty()) {
+            String issueParameter = issueIdToIssue.keySet().stream().collect(Collectors.joining(","));
             List<NameValuePair> parameters = ImmutableList.<NameValuePair>builder()
                     .add(new BasicNameValuePair("filter", "issue id:" + issueParameter))
                     .add(new BasicNameValuePair("with", "id"))
                     .add(new BasicNameValuePair("with", "resolved"))
-                    .add(new BasicNameValuePair("max", String.valueOf(taskIdToTask.size())))
+                    .add(new BasicNameValuePair("max", String.valueOf(issueIdToIssue.size())))
                     .build();
 
-            String url = URL_BUILDER.getIssueDetailsUrl(parameters);
+            String url = urlBuilder.getIssueDetailsUrl(parameters);
             HttpGet request = new HttpGet(url);
             request.addHeader(new BasicHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*"));
 
-            try (CloseableHttpClient httpClient = getHttpClient(URL_BUILDER)) {
+            try (CloseableHttpClient httpClient = getHttpClient(urlBuilder)) {
 
                 try (CloseableHttpResponse response = httpClient.execute(request)) {
                     StatusLine statusLine = response.getStatusLine();
@@ -305,7 +316,6 @@ public class YouTrackServiceV20174 implements YouTrackService {
                     String jsonResponse = EntityUtils.toString(response.getEntity());
                     LOGGER.debug("Received JSON response {}", jsonResponse);
 
-                    // {"issue":[{"id":"PATRICK-1","entityId":"87-2","jiraId":null,"field":[],"comment":[],"tag":[]},{"id":"PATRICK-2","entityId":"87-4","jiraId":null,"field":[{"name":"resolved","value":"1446292986266"}],"comment":[],"tag":[]}]}
                     IssueDetailsResponse issueDetailsResponse = JacksonUtil.parseValue(new StringReader(jsonResponse), IssueDetailsResponse.class);
                     for (IssueDetails issueDetails : issueDetailsResponse.getIssues()) {
                         String taskId = issueDetails.getId();
@@ -315,11 +325,10 @@ public class YouTrackServiceV20174 implements YouTrackService {
                                 .forEach(issueField -> {
                                     try {
                                         Long resolvedTimestamp = Long.valueOf(issueField.getValue());
-                                        TaskWithWorklogs taskWithWorklogs = taskIdToTask.get(taskId);
-
-                                        if (taskWithWorklogs != null) {
+                                        Issue issue = issueIdToIssue.get(taskId);
+                                        if (issue != null) {
                                             LocalDateTime resolvedDate = DateUtil.getDateTime(resolvedTimestamp);
-                                            taskWithWorklogs.setResolved(resolvedDate);
+                                            issue.setResolved(resolvedDate);
                                         }
                                     } catch (NumberFormatException e) {
                                         LOGGER.warn("Could not parse resolved date long from {}", issueField.getValue(), e);
@@ -332,7 +341,6 @@ public class YouTrackServiceV20174 implements YouTrackService {
                 LOGGER.error("Could not fetch issue details using URL {}", url, e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.unknown");
             }
-
         }
     }
 
