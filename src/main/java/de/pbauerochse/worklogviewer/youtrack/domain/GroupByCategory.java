@@ -7,9 +7,6 @@ package de.pbauerochse.worklogviewer.youtrack.domain;
 public interface GroupByCategory {
 
     String getId();
-
     String getName();
-
-    boolean isValidYouTrackCategory();
 
 }

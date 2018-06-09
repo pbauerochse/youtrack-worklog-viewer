@@ -1,5 +1,8 @@
 package de.pbauerochse.worklogviewer.youtrack;
 
+/**
+ * Enum for the supported YouTrack Versions
+ */
 public enum YouTrackVersion {
 
     POST_2017("youtrack.version.newerOrEqual20174"),

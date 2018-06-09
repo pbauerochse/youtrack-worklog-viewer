@@ -32,7 +32,7 @@ public class ExcelExporterTask extends Task<File> {
 
         Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet(tab.getText());
-        tab.writeDataToExcel(sheet);
+//        tab.writeDataToExcel(sheet);
         workbook.write(new FileOutputStream(targetFile));
 
         updateProgress(1, 1);

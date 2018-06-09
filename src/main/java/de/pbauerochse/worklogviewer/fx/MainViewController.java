@@ -7,7 +7,6 @@ import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.domain.timerangeprovider.TimerangeProviderFactory;
 import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter;
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter;
-import de.pbauerochse.worklogviewer.fx.tabs.OwnWorklogsTab;
 import de.pbauerochse.worklogviewer.fx.tabs.TimeReportResultTabbedPane;
 import de.pbauerochse.worklogviewer.fx.tabs.WorklogTab;
 import de.pbauerochse.worklogviewer.fx.tasks.ExcelExporterTask;
@@ -279,7 +278,7 @@ public class MainViewController implements Initializable {
         // ask the user where to save the excel to
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(FormattingUtil.getFormatted("view.menu.file.exportexcel"));
-        fileChooser.setInitialFileName(tab.getExcelDownloadSuggestedFilename());
+//        fileChooser.setInitialFileName(tab.getExcelDownloadSuggestedFilename());
         fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Microsoft Excel", "*.xls"));
 
         File targetFile = fileChooser.showSaveDialog(progressBar.getScene().getWindow());
@@ -396,11 +395,10 @@ public class MainViewController implements Initializable {
         resultTabPane.update(timeReport);
 
 
-        if (resultTabPane.getTabs().size() == 0) {
-            LOGGER.debug("Adding default tabs");
-            resultTabPane.getTabs().add(new OwnWorklogsTab());
-        }
-
+//        if (resultTabPane.getTabs().size() == 0) {
+//            LOGGER.debug("Adding default tabs");
+//            resultTabPane.getTabs().add(new OwnWorklogsTab());
+//        }
 //        if (settings.isShowAllWorklogs()) {
 //
 //            if (resultTabPane.getTabs().size() < 2 || !(resultTabPane.getTabs().get(1) instanceof AllWorklogsTab)) {

@@ -24,7 +24,7 @@ object YouTrackServiceFactory {
     private var cachedInstance: YouTrackService? = null
 
     @JvmStatic
-    fun getInstance(): YouTrackService {
+    fun getYouTrackService(): YouTrackService {
         val settings = SettingsUtil.settings
 
         if (cachedInstance == null || authenticationMethodChanged(settings)) {

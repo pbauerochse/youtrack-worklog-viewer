@@ -1,37 +1,29 @@
 package de.pbauerochse.worklogviewer.fx.tabs;
 
-import de.pbauerochse.worklogviewer.youtrack.TimeReport;
-import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 /**
  * @author Patrick Bauerochse
  * @since 02.07.15
  */
-public class ProjectWorklogTab extends WorklogTab {
+public class ProjectWorklogTab extends WorklogsTab {
 
-    private Optional<List<TaskWithWorklogs>> resultItemsToDisplay = Optional.empty();
+//    private Optional<List<TaskWithWorklogs>> resultItemsToDisplay = Optional.empty();
 
-    public ProjectWorklogTab(String projectName) {
-        super(projectName);
+    public ProjectWorklogTab() {
+        super();
     }
 
-    @Override
-    protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
-        return tasks.stream()
-                .filter(taskWithWorklogs -> taskWithWorklogs.getProject().equals(getText()))
-                .sorted((o1, o2) -> COLLATOR.compare(o1.getIssue(), o2.getIssue()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    void update(@NotNull TimeReport timeReport) {
-        // TODO implement
-    }
+//    @Override
+//    protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
+//        return tasks.stream()
+//                .filter(taskWithWorklogs -> taskWithWorklogs.getProject().equals(getText()))
+//                .sorted((o1, o2) -> COLLATOR.compare(o1.getIssue(), o2.getIssue()))
+//                .collect(Collectors.toList());
+//    }
+//
+//    @Override
+//    void update(@NotNull TimeReport timeReport) {
+//        // TODO implement
+//    }
 
     //    @Override
 //    protected List<TaskWithWorklogs> getDisplayResult(WorklogReport result) {

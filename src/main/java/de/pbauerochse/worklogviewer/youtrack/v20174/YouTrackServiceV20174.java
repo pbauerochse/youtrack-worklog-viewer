@@ -71,6 +71,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
      * call but are always available to be used
      */
     private static final List<GroupByCategory> CONSTANT_GROUP_BY_CRITERIA = new ArrayList<>();
+
     static {
         CONSTANT_GROUP_BY_CRITERIA.add(new WorkItemBasedGrouping(new GroupByTypes("WORK_TYPE", getFormatted("grouping.worktype"))));
         CONSTANT_GROUP_BY_CRITERIA.add(new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR", getFormatted("grouping.author"))));
@@ -125,17 +126,23 @@ public class YouTrackServiceV20174 implements YouTrackService {
     @Override
     public TimeReport getReport(TimeReportParameters parameters, ProgressCallback progressCallback) {
         ByteArrayInputStream reportCsvContent = getReportCsvContents(parameters, progressCallback);
+
+        progressCallback.setProgress(getFormatted("worker.progress.processingreport"), 80);
         CsvReportData csvReportData = CsvReportReader.processResponse(reportCsvContent);
         applyResolutionDate(csvReportData);
+
+        progressCallback.setProgress(getFormatted("worker.progress.done"), 100);
         return new TimeReport(parameters, csvReportData);
     }
 
     private ByteArrayInputStream getReportCsvContents(TimeReportParameters parameters, ProgressCallback progressCallback) {
-        ReportDetails reportDetails = triggerReportGeneration(parameters, progressCallback);
+        String timerangeDisplayLabel = getFormatted(parameters.getTimerangeProvider().getReportTimerange().getLabelKey());
+        progressCallback.setProgress(getFormatted("worker.progress.creatingreport", timerangeDisplayLabel), 0);
+        ReportDetails reportDetails = triggerReportGeneration(parameters);
 
         int pollCount = 0;
+        progressCallback.setProgress(getFormatted("worker.progress.waitingforrecalculation"), 30);
         while (!reportDetails.isReady() && pollCount++ < MAX_POLL_COUNT) {
-            progressCallback.incrementProgress(getFormatted("worker.progress.waitingforrecalculation"), 0);
             waitUntilNextPoll();
             reportDetails = getReportDetails(reportDetails.getReportId());
         }
@@ -144,7 +151,10 @@ public class YouTrackServiceV20174 implements YouTrackService {
             throw ExceptionUtil.getIllegalStateException("exceptions.main.worker.recalculation", MAX_POLL_COUNT);
         }
 
+        progressCallback.setProgress(getFormatted("worker.progress.downloadingreport", reportDetails.getReportId()), 60);
         ByteArrayInputStream byteArrayInputStream = downloadReport(reportDetails.getReportId());
+
+        progressCallback.setProgress(getFormatted("worker.progress.deletingreport"), 80);
         deleteReport(reportDetails.getReportId());
 
         return byteArrayInputStream;
@@ -158,7 +168,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
         }
     }
 
-    private ReportDetails triggerReportGeneration(@NotNull TimeReportParameters parameters, ProgressCallback progressCallback) {
+    private ReportDetails triggerReportGeneration(@NotNull TimeReportParameters parameters) {
         String url = urlBuilder.getCreateReportUrl();
         LOGGER.debug("Creating temporary timereport using url {}", url);
 
@@ -171,8 +181,6 @@ public class YouTrackServiceV20174 implements YouTrackService {
         request.addHeader(new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8"));
 
         try (CloseableHttpClient httpClient = getHttpClient(urlBuilder)) {
-            progressCallback.incrementProgress(getFormatted("worker.progress.creatingreport", payload.getName()));
-
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 StatusLine statusLine = response.getStatusLine();
 

@@ -6,10 +6,6 @@ package de.pbauerochse.worklogviewer.youtrack;
  */
 public interface ProgressCallback {
 
-    void incrementProgress(String message, int amount);
-
-    default void incrementProgress(String message) {
-        incrementProgress(message, 10);
-    }
+    void setProgress(String message, int amount);
 
 }

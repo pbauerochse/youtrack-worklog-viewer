@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * @author Patrick Bauerochse
  * @since 01.04.15
  */
-public class TaskWithWorklogs {
+class TaskWithWorklogs {
 
     private String project;
     private String issue;

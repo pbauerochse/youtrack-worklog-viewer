@@ -35,9 +35,4 @@ public class WorkItemBasedGrouping implements Grouping, GroupByCategory {
         return getPresentation();
     }
 
-    @JsonIgnore
-    @Override
-    public boolean isValidYouTrackCategory() {
-        return true;
-    }
 }

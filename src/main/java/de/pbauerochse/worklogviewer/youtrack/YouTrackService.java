@@ -25,10 +25,4 @@ public interface YouTrackService {
      */
     List<YouTrackVersion> getSupportedVersions();
 
-//    ReportDetails createReport(TimeReportParameters timereportContext);
-//    ReportDetails getReportDetails(String reportId) throws IOException;
-//    ByteArrayInputStream downloadReport(String reportId);
-//    void deleteReport(String reportId);
-//    void fetchTaskDetails(WorklogReport report);
-
 }

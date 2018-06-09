@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * @author Patrick Bauerochse
  * @since 01.04.15
  */
-public class WorklogReport {
+class WorklogReport {
 
     private Map<String, TaskWithWorklogs> worklogSummaryMap = new HashMap<>();
 

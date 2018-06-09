@@ -1,19 +1,14 @@
 package de.pbauerochse.worklogviewer.fx.tabs;
 
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
-import de.pbauerochse.worklogviewer.youtrack.TimeReport;
-import de.pbauerochse.worklogviewer.youtrack.domain.TaskWithWorklogs;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * @author Patrick Bauerochse
  * @since 02.07.15
  */
-public class AllWorklogsTab extends WorklogTab {
+public class AllWorklogsTab extends WorklogsTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AllWorklogsTab.class);
 
@@ -21,14 +16,4 @@ public class AllWorklogsTab extends WorklogTab {
         super(FormattingUtil.getFormatted("view.main.tabs.all"));
     }
 
-    @Override
-    protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
-        // no filtering neccessary since we display all
-        return tasks;
-    }
-
-    @Override
-    void update(@NotNull TimeReport timeReport) {
-        // TODO implement
-    }
 }

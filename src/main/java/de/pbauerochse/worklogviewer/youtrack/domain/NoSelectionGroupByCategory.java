@@ -14,8 +14,4 @@ public class NoSelectionGroupByCategory implements GroupByCategory {
         return FormattingUtil.getFormatted("view.main.groupby.nogroupby");
     }
 
-    @Override
-    public boolean isValidYouTrackCategory() {
-        return false;
-    }
 }

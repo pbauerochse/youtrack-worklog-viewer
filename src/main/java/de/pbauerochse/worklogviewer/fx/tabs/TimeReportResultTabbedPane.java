@@ -2,14 +2,16 @@ package de.pbauerochse.worklogviewer.fx.tabs;
 
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
-import de.pbauerochse.worklogviewer.youtrack.ProjectSpecificWorklogs;
 import de.pbauerochse.worklogviewer.youtrack.TimeReport;
+import de.pbauerochse.worklogviewer.youtrack.domain.Project;
 import javafx.scene.control.TabPane;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Extension of the TabPane that provides
@@ -30,7 +32,6 @@ public class TimeReportResultTabbedPane extends TabPane {
         updateOwnWorklogs(timeReport);
         updateAllWorklogs(timeReport);
         updateProjectTabs(timeReport);
-        updateStatistics(timeReport);
     }
 
     private void updateOwnWorklogs(@NotNull TimeReport timeReport) {
@@ -70,24 +71,24 @@ public class TimeReportResultTabbedPane extends TabPane {
     }
 
     private void updateProjectTabs(TimeReport timeReport) {
-        List<ProjectSpecificWorklogs> projectSpecificWorklogs = timeReport.getProjectSpecificWorklogs();
+        List<Project> projects = timeReport.getData().getProjects().stream()
+                .sorted(Comparator.comparing(Project::getId))
+                .collect(Collectors.toList());
 
-        int startIndex = settingsViewModel.isShowAllWorklogs() ? 2 : 1;
-        int endIndex = startIndex + projectSpecificWorklogs.size();
-        int excessTabs = getTabs().size() - endIndex;
-
-        for (int i = startIndex; i < endIndex; i++) {
-            ProjectSpecificWorklogs projectWorklogs = projectSpecificWorklogs.get(i);
-//            getOrCreateProjectTabAtIndex(i).update(projectWorklogs);
+        int firstProjectTabIndex = settingsViewModel.isShowAllWorklogs() ? 2 : 1;
+        for (int i = 0; i < projects.size(); i++) {
+            Project project = projects.get(i);
+            WorklogsTab tab = getOrCreateProjectTabAtIndex(firstProjectTabIndex + i);
+            tab.update(project);
         }
     }
 
-    private WorklogTab getOrCreateProjectTabAtIndex(int tabIndex) {
-        return null;
-    }
-
-    private void updateStatistics(TimeReport timeReport) {
-        // TODO update depending on selected tab but only of statistics enabled
+    @NotNull
+    private WorklogsTab getOrCreateProjectTabAtIndex(int tabIndex) {
+        if (getTabs().size() <= tabIndex) {
+            getTabs().add(tabIndex, new ProjectWorklogTab());
+        }
+        return (WorklogsTab) getTabs().get(tabIndex);
     }
 
 }
