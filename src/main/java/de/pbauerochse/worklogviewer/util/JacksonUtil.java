@@ -62,10 +62,7 @@ public class JacksonUtil {
                 LOGGER.info("Value JsonNode for field {} is not of type textual but of type {}", name, valueNode.getNodeType());
             }
 
-            IssueField issueField = new IssueField();
-            issueField.setName(name);
-            issueField.setValue(value);
-            return issueField;
+            return new IssueField(name, value);
         }
     }
 }

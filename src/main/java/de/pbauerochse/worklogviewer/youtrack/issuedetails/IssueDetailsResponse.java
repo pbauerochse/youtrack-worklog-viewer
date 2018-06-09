@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.youtrack.issuedetails;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.api.client.util.Lists;
 
 import java.util.List;
 
@@ -13,14 +13,14 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IssueDetailsResponse {
 
-    @JsonProperty("issue")
-    private List<IssueDetails> issues = Lists.newArrayList();
+    private final List<IssueDetails> issues;
+
+    @JsonCreator
+    public IssueDetailsResponse(@JsonProperty("issue") List<IssueDetails> issues) {
+        this.issues = issues;
+    }
 
     public List<IssueDetails> getIssues() {
         return issues;
-    }
-
-    public void setIssues(List<IssueDetails> issues) {
-        this.issues = issues;
     }
 }

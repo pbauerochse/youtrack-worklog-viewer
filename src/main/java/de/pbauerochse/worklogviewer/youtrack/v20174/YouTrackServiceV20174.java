@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.api.client.http.HttpStatusCodes;
 import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
@@ -355,6 +354,6 @@ public class YouTrackServiceV20174 implements YouTrackService {
      * tracking occured for the requested time period
      */
     private boolean seemsToBeBlankReport(StatusLine statusLine) {
-        return statusLine.getStatusCode() == HttpStatusCodes.STATUS_CODE_SERVER_ERROR;
+        return statusLine.getStatusCode() == 500;
     }
 }

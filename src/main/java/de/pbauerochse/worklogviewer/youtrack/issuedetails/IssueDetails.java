@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.youtrack.issuedetails;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.api.client.util.Lists;
 
 import java.util.List;
 
@@ -14,42 +14,36 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IssueDetails {
 
-    private String id;
-    private String entityId;
-    private String jiraId;
+    private final String id;
+    private final String entityId;
+    private final String jiraId;
+    private final List<IssueField> fieldList;
 
-    @JsonProperty("field")
-    private List<IssueField> fieldList = Lists.newArrayList();
+    @JsonCreator
+    public IssueDetails(@JsonProperty("id") String id,
+                        @JsonProperty("entityId") String entityId,
+                        @JsonProperty("jiraId") String jiraId,
+                        @JsonProperty("field") List<IssueField> fieldList) {
+        this.id = id;
+        this.entityId = entityId;
+        this.jiraId = jiraId;
+        this.fieldList = fieldList;
+    }
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getEntityId() {
         return entityId;
     }
 
-    public void setEntityId(String entityId) {
-        this.entityId = entityId;
-    }
-
     public String getJiraId() {
         return jiraId;
-    }
-
-    public void setJiraId(String jiraId) {
-        this.jiraId = jiraId;
     }
 
     public List<IssueField> getFieldList() {
         return fieldList;
     }
 
-    public void setFieldList(List<IssueField> fieldList) {
-        this.fieldList = fieldList;
-    }
 }
