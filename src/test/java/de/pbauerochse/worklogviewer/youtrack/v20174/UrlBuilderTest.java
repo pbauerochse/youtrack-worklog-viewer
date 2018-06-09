@@ -1,6 +1,5 @@
 package de.pbauerochse.worklogviewer.youtrack.v20174;
 
-import com.google.common.collect.ImmutableList;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.BaseMatcher;
@@ -10,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -21,7 +21,7 @@ public class UrlBuilderTest {
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<UrlBuilderTestdata> getTestBaseUrls() {
-        return ImmutableList.of(
+        return Arrays.asList(
                 new UrlBuilderTestdata("http://mybase.url.com/youtrack/", YouTrackVersion.POST_2017),
                 new UrlBuilderTestdata("http://mybase.url.com/youtrack/", YouTrackVersion.POST_2018),
                 new UrlBuilderTestdata("https://mybase.url.com/youtrack/", YouTrackVersion.POST_2017),

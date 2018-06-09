@@ -1,8 +1,5 @@
 package de.pbauerochse.worklogviewer.fx.tabs;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer;
 import de.pbauerochse.worklogviewer.excel.columns.TaskDescriptionExcelColumn;
@@ -13,9 +10,9 @@ import de.pbauerochse.worklogviewer.fx.tablecolumns.TaskDescriptionTreeTableColu
 import de.pbauerochse.worklogviewer.fx.tablecolumns.TaskStatusTreeTableColumn;
 import de.pbauerochse.worklogviewer.fx.tablecolumns.TaskWorklogSummaryTreeTableColumn;
 import de.pbauerochse.worklogviewer.fx.tablecolumns.WorklogTreeTableColumn;
-import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayData;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayDayEntry;
 import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
+import de.pbauerochse.worklogviewer.fx.tabs.domain.WorklogTabDisplayData;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.WeekdaySettings;
@@ -90,7 +87,7 @@ public abstract class WorklogTab extends Tab {
 
     private TaskStatusTreeTableColumn taskStatusTreeTableColumn;
 
-    private Optional<DisplayData> resultItemsToDisplay = Optional.empty();
+    private Optional<WorklogTabDisplayData> resultItemsToDisplay = Optional.empty();
 
     protected abstract List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks);
 
@@ -238,41 +235,41 @@ public abstract class WorklogTab extends Tab {
         TreeItem<DisplayRow> root = taskTableView.getRoot();
         root.getChildren().clear();
 
-        DisplayData displayData = getDisplayData(timereportContext, resultToDisplayChangedSinceLastRender);
-        root.getChildren().addAll(displayData.getTreeRows());
+        WorklogTabDisplayData worklogTabDisplayData = getDisplayData(timereportContext, resultToDisplayChangedSinceLastRender);
+        root.getChildren().addAll(worklogTabDisplayData.getTreeRows());
 
         resultToDisplayChangedSinceLastRender = false;
     }
 
-    private DisplayData getDisplayData(TimeReportParameters reportContext, boolean changedSinceLastRender) {
+    private WorklogTabDisplayData getDisplayData(TimeReportParameters reportContext, boolean changedSinceLastRender) {
 
         if (changedSinceLastRender) {
             LOGGER.debug("Refreshing display data");
-            DisplayData displayData = new DisplayData();
+            WorklogTabDisplayData worklogTabDisplayData = new WorklogTabDisplayData();
 
             WorklogReport result = null;//reportContext.getResult().get();
-            ImmutableList<TaskWithWorklogs> originalTasks = result.getTasks();
+            List<TaskWithWorklogs> originalTasks = result.getTasks();
 
             // create a copy of the original task list
             // and pass it on to the getFilteredList method
             // which then may freely modify the list and its items
-            List<TaskWithWorklogs> deepCopiedList = Lists.newArrayList();
-            originalTasks.forEach(taskWithWorklogs -> deepCopiedList.add(taskWithWorklogs/*.createDeepCopy()*/));
+            List<TaskWithWorklogs> deepCopiedList = new ArrayList<>();
+            deepCopiedList.addAll(originalTasks/*.createDeepCopy()*/);
             List<TaskWithWorklogs> filteredList = getFilteredList(deepCopiedList);
 
             // render the treetabledata
             if (reportContext.getGroupByCategory() != null) {
                 // grouping present
-                processWithGrouping(filteredList, displayData);
+                processWithGrouping(filteredList, worklogTabDisplayData);
             } else {
                 // no grouping
-                processWithoutGrouping(filteredList, displayData);
+                processWithoutGrouping(filteredList, worklogTabDisplayData);
             }
 
             // add grandtotal column
             DisplayRow grandTotal = new DisplayRow();
             grandTotal.setIsGrandTotalSummary(true);
-            displayData.addRow(new TreeItem<>(grandTotal));
+            worklogTabDisplayData.addRow(new TreeItem<>(grandTotal));
 
             filteredList.stream()
                     .map(TaskWithWorklogs::getWorklogItemList)
@@ -296,13 +293,13 @@ public abstract class WorklogTab extends Tab {
             // call statistics update
             updateStatisticsData(filteredList);
 
-            resultItemsToDisplay = Optional.of(displayData);
+            resultItemsToDisplay = Optional.of(worklogTabDisplayData);
         }
 
         return resultItemsToDisplay.get();
     }
 
-    private void processWithGrouping(List<TaskWithWorklogs> tasks, DisplayData displayData) {
+    private void processWithGrouping(List<TaskWithWorklogs> tasks, WorklogTabDisplayData worklogTabDisplayData) {
         LOGGER.debug("Processing with grouping");
         List<String> distinctGroupByCriteria = tasks.stream()
                 .map(TaskWithWorklogs::getDistinctGroupByCriteriaValues)
@@ -319,7 +316,7 @@ public abstract class WorklogTab extends Tab {
 
             TreeItem<DisplayRow> groupRow = new TreeItem<>(groupCaptionRow);
             groupRow.setExpanded(true);
-            Map<String, DisplayRow> ticketIdToDisplayRow = Maps.newHashMap();
+            Map<String, DisplayRow> ticketIdToDisplayRow = new HashMap<>();
 
             // add sub rows to groupRow
             tasks.stream()
@@ -373,11 +370,11 @@ public abstract class WorklogTab extends Tab {
                     });
 
             // add groupRow to result
-            displayData.addRow(groupRow);
+            worklogTabDisplayData.addRow(groupRow);
         });
     }
 
-    private void processWithoutGrouping(List<TaskWithWorklogs> tasks, DisplayData displayData) {
+    private void processWithoutGrouping(List<TaskWithWorklogs> tasks, WorklogTabDisplayData worklogTabDisplayData) {
         LOGGER.debug("Processing without grouping");
         tasks.stream()
                 .sorted((o1, o2) -> COLLATOR.compare(o1.getIssue(), o2.getIssue()))
@@ -400,7 +397,7 @@ public abstract class WorklogTab extends Tab {
                         workdayEntry.getSpentTime().addAndGet(worklogItem.getDurationInMinutes());
                     });
 
-                    displayData.addRow(new TreeItem<>(row));
+                    worklogTabDisplayData.addRow(new TreeItem<>(row));
                 });
     }
 
@@ -479,7 +476,7 @@ public abstract class WorklogTab extends Tab {
         employeeProjectBargraph.setPrefHeight(employeeProjectBargraphPreferedHeight);
         VBox.setVgrow(employeeProjectBargraph, Priority.ALWAYS);
 
-        Map<String, XYChart.Series<Number, String>> projectNameToSeries = Maps.newHashMap();
+        Map<String, XYChart.Series<Number, String>> projectNameToSeries = new HashMap<>();
 
         statistics.getEmployeeToProjectToWorktime().keySet().stream()
                 .sorted(COLLATOR::compare)
@@ -500,7 +497,7 @@ public abstract class WorklogTab extends Tab {
 
                     // time spent per project
                     Map<String, AtomicLong> projectToWorktime = statistics.getEmployeeToProjectToWorktime().get(employee);
-                    Map<String, Label> projectToPercentageLabel = Maps.newHashMap();
+                    Map<String, Label> projectToPercentageLabel = new HashMap<>();
 
                     projectToWorktime.keySet().stream()
                             .sorted(COLLATOR::compare)

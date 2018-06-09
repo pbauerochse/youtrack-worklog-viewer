@@ -24,7 +24,7 @@ public class FetchTimereportTask extends Task<TimeReport> {
 
     @Override
     protected TimeReport call() {
-        YouTrackService service = YouTrackServiceFactory.getInstance();
+        YouTrackService service = YouTrackServiceFactory.INSTANCE.getInstance();
 
         // create report
         String timerangeDisplayLabel = getFormatted(parameters.getTimerangeProvider().getReportTimerange().getLabelKey());

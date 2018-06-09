@@ -1,10 +1,8 @@
 package de.pbauerochse.worklogviewer.youtrack.domain;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -21,7 +19,7 @@ public class TaskWithWorklogs {
     private long estimatedWorktimeInMinutes;
     private LocalDateTime resolved;
 
-    private List<WorklogItem> worklogItemList = Lists.newArrayList();
+    private List<WorklogItem> worklogItemList = new ArrayList<>();
 
     public String getProject() {
         return project;
@@ -83,13 +81,11 @@ public class TaskWithWorklogs {
         return sum.longValue();
     }
 
-    public ImmutableList<String> getDistinctGroupByCriteriaValues() {
-        return ImmutableList.copyOf(
-                getWorklogItemList().stream()
+    public List<String> getDistinctGroupByCriteriaValues() {
+        return getWorklogItemList().stream()
                         .map(WorklogItem::getGroup)
                         .distinct()
-                        .collect(Collectors.toList())
-        );
+                        .collect(Collectors.toList());
     }
 
 //    public TaskWithWorklogs createDeepCopy() {

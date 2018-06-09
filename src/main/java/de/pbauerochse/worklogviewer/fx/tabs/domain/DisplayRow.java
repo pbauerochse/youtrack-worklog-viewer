@@ -1,9 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tabs.domain;
 
-import com.google.common.collect.Maps;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -20,7 +20,7 @@ public class DisplayRow {
 
     public Optional<LocalDateTime> resolvedDate = Optional.empty();
 
-    private Map<LocalDate, DisplayDayEntry> timespanEntries = Maps.newHashMap();
+    private Map<LocalDate, DisplayDayEntry> timespanEntries = new HashMap<>();
 
     private boolean isGrandTotalSummary;
 

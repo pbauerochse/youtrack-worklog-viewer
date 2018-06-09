@@ -1,6 +1,5 @@
 package de.pbauerochse.worklogviewer.util;
 
-import com.google.common.collect.ImmutableList;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
 import de.pbauerochse.worklogviewer.youtrack.authentication.BearerTokenAuthenticationProvider;
 import org.apache.http.Header;
@@ -29,10 +28,9 @@ public class HttpClientUtil {
         List<Header> authenticationHeaders = authenticationProvider.getAuthenticationHeaders(clientBuilder, urlBuilder);
         List<Header> defaultHeaders = HttpClientUtil.getRegularBrowserHeaders();
 
-        List<Header> headers = ImmutableList.<Header>builder()
-                .addAll(authenticationHeaders)
-                .addAll(defaultHeaders)
-                .build();
+        List<Header> headers = new ArrayList<>();
+        headers.addAll(authenticationHeaders);
+        headers.addAll(defaultHeaders);
 
         clientBuilder.setDefaultHeaders(headers);
 

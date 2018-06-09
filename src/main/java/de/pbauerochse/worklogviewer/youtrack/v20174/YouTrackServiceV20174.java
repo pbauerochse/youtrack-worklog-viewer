@@ -2,8 +2,6 @@ package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.api.client.http.HttpStatusCodes;
-import com.google.common.base.Functions;
-import com.google.common.collect.ImmutableList;
 import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
@@ -41,8 +39,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
@@ -70,11 +71,12 @@ public class YouTrackServiceV20174 implements YouTrackService {
      * GroupBy Criteria, that can not be retrieved with the {@link #getPossibleGroupByCategories()}
      * call but are always available to be used
      */
-    private static final ImmutableList<GroupByCategory> CONSTANT_GROUP_BY_CRITERIA = ImmutableList.of(
-            new WorkItemBasedGrouping(new GroupByTypes("WORK_TYPE", getFormatted("grouping.worktype"))),
-            new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR", getFormatted("grouping.author"))),
-            new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR_AND_DATE", getFormatted("grouping.authoranddate")))
-    );
+    private static final List<GroupByCategory> CONSTANT_GROUP_BY_CRITERIA = new ArrayList<>();
+    static {
+        CONSTANT_GROUP_BY_CRITERIA.add(new WorkItemBasedGrouping(new GroupByTypes("WORK_TYPE", getFormatted("grouping.worktype"))));
+        CONSTANT_GROUP_BY_CRITERIA.add(new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR", getFormatted("grouping.author"))));
+        CONSTANT_GROUP_BY_CRITERIA.add(new WorkItemBasedGrouping(new GroupByTypes("WORK_AUTHOR_AND_DATE", getFormatted("grouping.authoranddate"))));
+    }
 
     private final YouTrackUrlBuilder urlBuilder;
 
@@ -110,10 +112,10 @@ public class YouTrackServiceV20174 implements YouTrackService {
                         .map(FieldBasedGrouping::new)
                         .collect(Collectors.toList());
 
-                return ImmutableList.<GroupByCategory>builder()
-                        .addAll(CONSTANT_GROUP_BY_CRITERIA)
-                        .addAll(fieldBasedGroupings)
-                        .build();
+                ArrayList<GroupByCategory> groupByCategories = new ArrayList<>();
+                groupByCategories.addAll(CONSTANT_GROUP_BY_CRITERIA);
+                groupByCategories.addAll(fieldBasedGroupings);
+                return groupByCategories;
             }
         } catch (IOException e) {
             LOGGER.error("Could not get GroupByCriterias from {}", url, e);
@@ -287,16 +289,15 @@ public class YouTrackServiceV20174 implements YouTrackService {
     private void applyResolutionDate(CsvReportData report) {
         Map<String, Issue> issueIdToIssue = report.getProjects().stream()
                 .flatMap(it -> it.getIssues().stream())
-                .collect(Collectors.toMap(Issue::getIssueId, Functions.identity()));
+                .collect(Collectors.toMap(Issue::getIssueId, Function.identity()));
 
         if (!issueIdToIssue.isEmpty()) {
             String issueParameter = issueIdToIssue.keySet().stream().collect(Collectors.joining(","));
-            List<NameValuePair> parameters = ImmutableList.<NameValuePair>builder()
-                    .add(new BasicNameValuePair("filter", "issue id:" + issueParameter))
-                    .add(new BasicNameValuePair("with", "id"))
-                    .add(new BasicNameValuePair("with", "resolved"))
-                    .add(new BasicNameValuePair("max", String.valueOf(issueIdToIssue.size())))
-                    .build();
+            List<NameValuePair> parameters = new ArrayList<>();
+            parameters.add(new BasicNameValuePair("filter", "issue id:" + issueParameter));
+            parameters.add(new BasicNameValuePair("with", "id"));
+            parameters.add(new BasicNameValuePair("with", "resolved"));
+            parameters.add(new BasicNameValuePair("max", String.valueOf(issueIdToIssue.size())));
 
             String url = urlBuilder.getIssueDetailsUrl(parameters);
             HttpGet request = new HttpGet(url);
@@ -346,7 +347,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
 
     @Override
     public List<YouTrackVersion> getSupportedVersions() {
-        return ImmutableList.of(YouTrackVersion.POST_2017, YouTrackVersion.POST_2018);
+        return Arrays.asList(YouTrackVersion.POST_2017, YouTrackVersion.POST_2018);
     }
 
     /**

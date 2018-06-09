@@ -1,9 +1,10 @@
 package de.pbauerochse.worklogviewer.youtrack.domain;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class WorklogReport {
 
-    private Map<String, TaskWithWorklogs> worklogSummaryMap = Maps.newHashMap();
+    private Map<String, TaskWithWorklogs> worklogSummaryMap = new HashMap<>();
 
     public TaskWithWorklogs getWorklog(String taskId) {
         if (StringUtils.isBlank(taskId)) throw new IllegalArgumentException("TaskId must not be null or empty");
@@ -27,16 +28,14 @@ public class WorklogReport {
         worklogSummaryMap.put(summary.getIssue(), summary);
     }
 
-    public ImmutableList<TaskWithWorklogs> getTasks() {
-        return ImmutableList.copyOf(worklogSummaryMap.values());
+    public List<TaskWithWorklogs> getTasks() {
+        return new ArrayList<>(worklogSummaryMap.values());
     }
 
-    public ImmutableList<String> getDistinctProjectNames() {
-        return ImmutableList.copyOf(
-            worklogSummaryMap.values().stream()
+    public List<String> getDistinctProjectNames() {
+        return worklogSummaryMap.values().stream()
                     .map(TaskWithWorklogs::getProject)
                     .distinct()
-                    .collect(Collectors.toList())
-        );
+                    .collect(Collectors.toList());
     }
 }
