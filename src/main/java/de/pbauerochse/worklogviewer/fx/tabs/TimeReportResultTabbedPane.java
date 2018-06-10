@@ -4,6 +4,7 @@ import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
 import de.pbauerochse.worklogviewer.youtrack.TimeReport;
 import de.pbauerochse.worklogviewer.youtrack.domain.Project;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -82,7 +83,12 @@ public class TimeReportResultTabbedPane extends TabPane {
             tab.update(project);
         }
 
-        // TODO remove excess tabs
+        int numTotalRequiredTabs = firstProjectTabIndex + projects.size();
+        for (int i = getTabs().size() - 1; i > numTotalRequiredTabs - 1; i--) {
+            Tab tab = getTabs().get(i);
+            LOGGER.debug("Removing not needed tab {}", tab.getText());
+            getTabs().remove(i);
+        }
     }
 
     @NotNull
