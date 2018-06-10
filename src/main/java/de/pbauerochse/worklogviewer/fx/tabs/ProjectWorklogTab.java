@@ -4,12 +4,12 @@ package de.pbauerochse.worklogviewer.fx.tabs;
  * @author Patrick Bauerochse
  * @since 02.07.15
  */
-public class ProjectWorklogTab extends WorklogsTab {
+class ProjectWorklogTab extends WorklogsTab {
 
 //    private Optional<List<TaskWithWorklogs>> resultItemsToDisplay = Optional.empty();
 
-    public ProjectWorklogTab() {
-        super();
+    ProjectWorklogTab() {
+        super("");
     }
 
 //    @Override

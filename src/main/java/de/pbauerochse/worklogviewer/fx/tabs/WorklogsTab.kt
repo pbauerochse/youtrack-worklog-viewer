@@ -14,11 +14,8 @@ abstract class WorklogsTab(label : String) : Tab(label) {
 //        content = createContentNode()
     }
 
-    fun update(timeReport : TimeReport) {
-
-    }
-
     fun update(project: Project) {
+        text = project.id
 
     }
 

@@ -1,21 +1,26 @@
 package de.pbauerochse.worklogviewer.fx.tabs;
 
-import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.youtrack.TimeReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
 
 /**
  * @author Patrick Bauerochse
  * @since 02.07.15
  */
-public class OwnWorklogsTab extends WorklogsTab {
+class OwnWorklogsTab extends WorklogsTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OwnWorklogsTab.class);
 
     OwnWorklogsTab() {
-        super(FormattingUtil.getFormatted("view.main.tabs.own"));
+        super(getFormatted("view.main.tabs.own"));
     }
 
+    void update(TimeReport report) {
+
+    }
 
 //    protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
 //        Settings settings = SettingsUtil.getSettings();

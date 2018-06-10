@@ -81,6 +81,8 @@ public class TimeReportResultTabbedPane extends TabPane {
             WorklogsTab tab = getOrCreateProjectTabAtIndex(firstProjectTabIndex + i);
             tab.update(project);
         }
+
+        // TODO remove excess tabs
     }
 
     @NotNull
