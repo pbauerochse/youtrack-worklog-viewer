@@ -1,6 +1,6 @@
-package de.pbauerochse.worklogviewer.fx.tablecolumns;
+package de.pbauerochse.worklogviewer.fx.components.treetable;
 
-import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
+import de.pbauerochse.worklogviewer.fx.components.domain.DisplayRow;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * @author Patrick Bauerochse
- * @since 08.07.15
+ * Displays the status of an issue with
+ * an icon and a tooltip description
  */
-public class TaskStatusTreeTableColumn extends TreeTableColumn<DisplayRow, Optional<LocalDateTime>> {
+class IssueStatusColumn extends TreeTableColumn<DisplayRow, Optional<LocalDateTime>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskStatusTreeTableColumn.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IssueStatusColumn.class);
 
-    public TaskStatusTreeTableColumn() {
+    public IssueStatusColumn() {
         super(FormattingUtil.getFormatted("view.main.resolved"));
 
         setSortable(false);

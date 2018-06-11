@@ -1,10 +1,9 @@
-package de.pbauerochse.worklogviewer.fx.tabs
+package de.pbauerochse.worklogviewer.fx.components.tabs
 
-import de.pbauerochse.worklogviewer.fx.WorklogsTreeTableView
+import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableView
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.youtrack.TimeReport
 import de.pbauerochse.worklogviewer.youtrack.domain.Issue
-import javafx.collections.FXCollections
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.Node
@@ -24,14 +23,24 @@ abstract class WorklogsTab(label: String) : Tab(label) {
     private val worklogsTableView = WorklogsTreeTableView()
     private val settingsModel = SettingsUtil.settingsViewModel
 
-    private val issuesInCurrentTab = FXCollections.observableArrayList<Issue>()
+    private var nextIssues: List<Issue>? = null
+
+    init {
+        content = createContentNode()
+        selectedProperty().addListener({_,_,_ -> render()})
+    }
 
     fun update(label: String, issues: List<Issue>) {
-        issuesInCurrentTab.clear()
-        issuesInCurrentTab.addAll(issues)
-
         text = label
-        content = createContentNode()
+        nextIssues = issues
+    }
+
+    private fun render() {
+        if (nextIssues != null) {
+            LOGGER.debug("Rendering ${nextIssues!!.size} Issues")
+            worklogsTableView.setIssues(nextIssues!!)
+            nextIssues = null
+        }
     }
 
     private fun createContentNode(): Node {

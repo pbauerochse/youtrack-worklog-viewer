@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
-import de.pbauerochse.worklogviewer.fx.tabs.WorklogTab;
+import de.pbauerochse.worklogviewer.fx.components.WorklogTab;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import javafx.concurrent.Task;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;

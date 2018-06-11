@@ -10,6 +10,7 @@ data class Issue(
     val issueDescription: String,
     val estimateInMinutes: Long
 ) : Comparable<Issue> {
+
     val worklogItems: MutableList<WorklogItem> = mutableListOf()
     var resolved: LocalDateTime? = null
 
@@ -19,6 +20,10 @@ data class Issue(
 
     val issueNumber: Long by lazy {
         PROJECT_ID_REGEX.matchEntire(issueId)!!.groupValues[2].toLong()
+    }
+
+    val fullTitle : String by lazy {
+        "$issueId - $issueDescription"
     }
 
     fun hasOwnWorklogs(): Boolean = worklogItems.find { it.isOwn() } != null

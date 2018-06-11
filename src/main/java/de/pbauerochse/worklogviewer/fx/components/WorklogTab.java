@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.fx.tabs;
+package de.pbauerochse.worklogviewer.fx.components;
 
 import javafx.scene.control.Tab;
 
@@ -32,9 +32,9 @@ public abstract class WorklogTab extends Tab {
 //
 //    private VBox statisticsView;
 //
-//    private TaskDescriptionTreeTableColumn taskDescriptionTreeTableColumn;
+//    private IssueLinkColumn taskDescriptionTreeTableColumn;
 //
-//    private TaskStatusTreeTableColumn taskStatusTreeTableColumn;
+//    private IssueStatusColumn taskStatusTreeTableColumn;
 //
 //    private Optional<WorklogTabDisplayData> resultItemsToDisplay = Optional.empty();
 //
@@ -106,13 +106,13 @@ public abstract class WorklogTab extends Tab {
 //        }
 //
 //        if (taskDescriptionTreeTableColumn == null) {
-//            taskDescriptionTreeTableColumn = new TaskDescriptionTreeTableColumn();
+//            taskDescriptionTreeTableColumn = new IssueLinkColumn();
 //            taskDescriptionTreeTableColumn.setPrefWidth(300);
 //            taskDescriptionTreeTableColumn.setMinWidth(300);
 //        }
 //
 //        if (taskStatusTreeTableColumn == null) {
-//            taskStatusTreeTableColumn = new TaskStatusTreeTableColumn();
+//            taskStatusTreeTableColumn = new IssueStatusColumn();
 //            taskStatusTreeTableColumn.setPrefWidth(30);
 //            taskStatusTreeTableColumn.setMinWidth(30);
 //        }
@@ -167,11 +167,11 @@ public abstract class WorklogTab extends Tab {
 //                String displayDate = FormattingUtil.formatDate(currentColumnDate);
 //
 //                // worklog column
-//                taskTableView.getColumns().add(new WorklogTreeTableColumn(displayDate, currentColumnDate));
+//                taskTableView.getColumns().add(new IssueTimeSpentColumn(displayDate, currentColumnDate));
 //            }
 //
 //            // also add another summary per task column
-//            taskTableView.getColumns().add(new TaskWorklogSummaryTreeTableColumn());
+//            taskTableView.getColumns().add(new SummaryColumn());
 //
 //            lastUsedTimerangeProvider = Optional.of(timerangeProvider);
 //            lastCollapseState = Optional.of(settings.getCollapseState());

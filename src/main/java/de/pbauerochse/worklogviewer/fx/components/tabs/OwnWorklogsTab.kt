@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.fx.tabs
+package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.youtrack.TimeReport

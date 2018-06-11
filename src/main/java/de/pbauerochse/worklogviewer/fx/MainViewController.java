@@ -7,8 +7,8 @@ import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.domain.timerangeprovider.TimerangeProviderFactory;
 import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter;
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter;
-import de.pbauerochse.worklogviewer.fx.tabs.TimeReportResultTabbedPane;
-import de.pbauerochse.worklogviewer.fx.tabs.WorklogTab;
+import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane;
+import de.pbauerochse.worklogviewer.fx.components.WorklogTab;
 import de.pbauerochse.worklogviewer.fx.tasks.ExcelExporterTask;
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask;
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask;
@@ -64,7 +64,7 @@ public class MainViewController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainViewController.class);
 
-    private static final int AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS = 2;  // two fixed tabs (own and all)
+    private static final int AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS = 2;  // two fixed components (own and all)
     private static final String REQUIRED_FIELD_CLASS = "required";
 
     public static ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
@@ -396,7 +396,7 @@ public class MainViewController implements Initializable {
 
 
 //        if (resultTabPane.getTabs().size() == 0) {
-//            LOGGER.debug("Adding default tabs");
+//            LOGGER.debug("Adding default components");
 //            resultTabPane.getTabs().add(new OwnWorklogsTab());
 //        }
 //        if (settings.isShowAllWorklogs()) {
@@ -424,14 +424,14 @@ public class MainViewController implements Initializable {
 //                tab.setText(newTabLabel);
 //            }
 //
-//            // remove any redundant tabs
+//            // remove any redundant components
 //            for (int tabIndexToRemove = distinctProjectNames.size() + AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS; tabIndexToRemove < resultTabPane.getTabs().size(); tabIndexToRemove++) {
 //                WorklogTab removedTab = (WorklogTab) resultTabPane.getTabs().remove(tabIndexToRemove);
 //                LOGGER.debug("Removing tab at index {}: {}", tabIndexToRemove, removedTab.getText());
 //            }
 //        } else if (resultTabPane.getTabs().size() > 1) {
-//            // remove all other tabs when settings changed from showAll to showOnlyOwnWorklogs
-//            LOGGER.debug("Removing all and project tabs since user switched to showOnlyOwnWorklogs mode");
+//            // remove all other components when settings changed from showAll to showOnlyOwnWorklogs
+//            LOGGER.debug("Removing all and project components since user switched to showOnlyOwnWorklogs mode");
 //            resultTabPane.getTabs().remove(1, resultTabPane.getTabs().size());
 //            resultTabPane.getSelectionModel().select(0);
 //        }

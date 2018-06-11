@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.fx.tabs.domain
+package de.pbauerochse.worklogviewer.fx.components.domain
 
 import javafx.scene.control.TreeItem
 

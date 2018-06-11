@@ -1,6 +1,6 @@
-package de.pbauerochse.worklogviewer.fx.tablecolumns;
+package de.pbauerochse.worklogviewer.fx.components.treetable;
 
-import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
+import de.pbauerochse.worklogviewer.fx.components.domain.DisplayRow;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
@@ -17,12 +17,12 @@ import java.time.LocalDate;
 import static de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.*;
 
 /**
- * @author Patrick Bauerochse
- * @since 08.07.15
+ * Displays the total spent time at a given
+ * day for the Issue
  */
-public class WorklogTreeTableColumn extends TreeTableColumn<DisplayRow, DisplayRow> {
+class IssueTimeSpentColumn extends TreeTableColumn<DisplayRow, DisplayRow> {
 
-    public WorklogTreeTableColumn(String displayDate, LocalDate currentColumnDate) {
+    public IssueTimeSpentColumn(String displayDate, LocalDate currentColumnDate) {
         super(displayDate);
         Settings settings = SettingsUtil.getSettings();
 

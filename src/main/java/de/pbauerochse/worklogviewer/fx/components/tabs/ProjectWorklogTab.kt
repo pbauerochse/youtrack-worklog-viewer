@@ -1,16 +1,12 @@
-package de.pbauerochse.worklogviewer.fx.tabs;
+package de.pbauerochse.worklogviewer.fx.components.tabs
 
 /**
- * @author Patrick Bauerochse
- * @since 02.07.15
+ * Tab, that displays the results for a single [Project]
+ * independent of the work author
  */
-class ProjectWorklogTab extends WorklogsTab {
+internal class ProjectWorklogTab : WorklogsTab("")
 
 //    private Optional<List<TaskWithWorklogs>> resultItemsToDisplay = Optional.empty();
-
-    ProjectWorklogTab() {
-        super("");
-    }
 
 //    @Override
 //    protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
@@ -24,8 +20,7 @@ class ProjectWorklogTab extends WorklogsTab {
 //    void update(@NotNull TimeReport timeReport) {
 //        // TODO implement
 //    }
-
-    //    @Override
+//    @Override
 //    protected List<TaskWithWorklogs> getDisplayResult(WorklogReport result) {
 //        if (!resultItemsToDisplay.isPresent() || resultToDisplayChangedSinceLastRender) {
 //
@@ -48,4 +43,3 @@ class ProjectWorklogTab extends WorklogsTab {
 //
 //        return resultItemsToDisplay.get();
 //    }
-}

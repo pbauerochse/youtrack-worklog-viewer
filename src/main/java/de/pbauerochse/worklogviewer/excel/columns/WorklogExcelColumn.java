@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.excel.columns;
 
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer;
-import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayDayEntry;
-import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
+import de.pbauerochse.worklogviewer.fx.components.domain.DisplayDayEntry;
+import de.pbauerochse.worklogviewer.fx.components.domain.DisplayRow;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;

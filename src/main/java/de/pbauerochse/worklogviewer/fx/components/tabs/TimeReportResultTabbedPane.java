@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.fx.tabs;
+package de.pbauerochse.worklogviewer.fx.components.tabs;
 
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;

@@ -1,6 +1,6 @@
-package de.pbauerochse.worklogviewer.fx.tablecolumns;
+package de.pbauerochse.worklogviewer.fx.components.treetable;
 
-import de.pbauerochse.worklogviewer.fx.tabs.domain.DisplayRow;
+import de.pbauerochse.worklogviewer.fx.components.domain.DisplayRow;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Pos;
@@ -13,14 +13,15 @@ import org.slf4j.LoggerFactory;
 import static de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.*;
 
 /**
- * @author Patrick Bauerochse
- * @since 08.07.15
+ * Displays the total amount of time spent
+ * for each Issue, as well as a total time
+ * spent row
  */
-public class TaskWorklogSummaryTreeTableColumn extends TreeTableColumn<DisplayRow, DisplayRow> {
+class SummaryColumn extends TreeTableColumn<DisplayRow, DisplayRow> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskWorklogSummaryTreeTableColumn.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SummaryColumn.class);
 
-    public TaskWorklogSummaryTreeTableColumn() {
+    public SummaryColumn() {
         super(FormattingUtil.getFormatted("view.main.summary"));
         setSortable(false);
         setCellValueFactory(param -> new SimpleObjectProperty(param.getValue().getValue()));

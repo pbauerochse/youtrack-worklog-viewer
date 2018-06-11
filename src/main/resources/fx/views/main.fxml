@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import de.pbauerochse.worklogviewer.fx.tabs.TimeReportResultTabbedPane?>
+<?import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
