@@ -80,7 +80,7 @@ public class TimeReportResultTabbedPane extends TabPane {
         for (int i = 0; i < projects.size(); i++) {
             Project project = projects.get(i);
             WorklogsTab tab = getOrCreateProjectTabAtIndex(firstProjectTabIndex + i);
-            tab.update(project);
+            tab.update(project.getId(), project.getIssues());
         }
 
         int numTotalRequiredTabs = firstProjectTabIndex + projects.size();

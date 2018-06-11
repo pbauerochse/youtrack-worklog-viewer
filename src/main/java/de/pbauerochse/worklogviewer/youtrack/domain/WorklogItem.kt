@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.youtrack.domain
 
+import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import java.time.LocalDate
 
 /**
@@ -15,19 +16,6 @@ data class WorklogItem(
     val workType: String,
     val group: String?
 ) {
-
-//    fun createDeepCopy(): WorklogItem {
-//        val copy = WorklogItem()
-//        copy.date = date
-//        copy.durationInMinutes = durationInMinutes
-//        copy.group = group
-//        copy.username = username
-//        copy.userDisplayname = userDisplayname
-//        copy.workType = workType
-//        copy.workDescription = workDescription
-//
-//        return copy
-//    }
-
+    fun isOwn(): Boolean = username == SettingsUtil.settings.youTrackConnectionSettings.username
 
 }

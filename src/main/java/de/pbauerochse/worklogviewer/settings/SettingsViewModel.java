@@ -177,6 +177,10 @@ public class SettingsViewModel {
         return showStatistics;
     }
 
+    public boolean isShowStatistics() {
+        return showStatisticsProperty().get();
+    }
+
     public BooleanProperty loadDataAtStartupProperty() {
         return loadDataAtStartup;
     }
