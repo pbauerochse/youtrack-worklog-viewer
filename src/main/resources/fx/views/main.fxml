@@ -37,7 +37,7 @@
         <StackPane BorderPane.alignment="CENTER">
             <children>
                 <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" />
-                <Text fx:id="progressText" strokeType="OUTSIDE" strokeWidth="0.0" text="">
+                <Text fx:id="progressText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="progress-text">
                     <font>
                         <Font size="10.0" />
                     </font>

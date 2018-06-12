@@ -8,6 +8,7 @@
     -fx-base: derive(#3c3f41, -20%);
     -fx-accent: #245d81;
     -fx-light-text-color: derive(whitesmoke, -20%);
+    -fx-control-inner-background: -fx-base;
 }
 
 .menu-bar {
@@ -22,6 +23,7 @@
     -fx-background-color: -fx-base;
     -fx-border-width: 1px 0 1px 0;
     -fx-border-color: derive(-fx-base, 20%);
+    -fx-padding: 7px 18px 7px 18px;
 }
 
 .context-menu {
@@ -29,7 +31,6 @@
     -fx-border-width: 1px;
     -fx-border-color: -fx-shadow-highlight-color;
     -fx-padding: 5px 0 5px 0;
-    -fx-effect: dropshadow( gaussian, rgba(60, 63, 65, 0.6), 5, 0.0, 2, 2);
 }
 
 .context-menu .separator:horizontal .line {
@@ -42,6 +43,7 @@
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-padding: 0;
+    -fx-background-color: derive(-fx-accent, -40%);
 }
 
 .progress-bar > .bar {
@@ -49,4 +51,32 @@
     -fx-background-radius: 0;
     -fx-padding: 0.6em;
     -fx-background-color: derive(-fx-accent, 5%);
+}
+
+#resultTabPane {
+    -fx-background-color: #2a2a2a;
+}
+
+.progress-text {
+    -fx-fill: -fx-light-text-color;
+    -fx-font-size: 9.5pt;
+}
+
+.combo-box-popup > .list-view {
+    -fx-background-color: -fx-base;
+    -fx-border-width: 1px;
+    -fx-border-color: -fx-shadow-highlight-color;
+}
+
+.combo-box-popup > .list-view {
+    -fx-pref-width: 300px;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
+    -fx-padding: 7px 20px 7px 20px;
+}
+
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background-insets: 0;
 }
