@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 /**
  * Displays the [Issue]s in a TreeTableView
  */
-class WorklogsTreeTableView : TreeTableView<IssueTreeTableRowModel>() {
+class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
 
     init {
         isShowRoot = false
@@ -27,8 +27,10 @@ class WorklogsTreeTableView : TreeTableView<IssueTreeTableRowModel>() {
         root.children.addAll(treeRows)
     }
 
-    private fun convertToTreeRows(issues: List<Issue>): List<TreeItem<IssueTreeTableRowModel>> {
-        return issues.map { TreeItem(IssueTreeTableRowModel(it)) }
+    private fun convertToTreeRows(issues: List<Issue>): List<TreeItem<TreeTableRowModel>> {
+        return issues
+            .map { IssueTreeTableRow(it) as TreeTableRowModel }
+            .map { TreeItem(it) }
     }
 
     companion object {

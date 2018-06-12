@@ -1,27 +1,27 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
 import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses
-import javafx.beans.property.SimpleObjectProperty
-import javafx.scene.control.TreeTableCell
-import javafx.scene.control.TreeTableColumn
-import org.slf4j.LoggerFactory
-
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
+import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
 import javafx.geometry.Pos
 import javafx.scene.control.Tooltip
+import javafx.scene.control.TreeTableCell
+import javafx.scene.control.TreeTableColumn
 import javafx.util.Callback
+import org.slf4j.LoggerFactory
 
 /**
  * Displays the description and the id of the
  * Issue as a link to the YouTrack issue
  */
-internal class IssueLinkColumn : TreeTableColumn<IssueTreeTableRowModel, IssueTreeTableRowModel>(getFormatted("view.main.issue")) {
+internal class IssueLinkColumn : TreeTableColumn<TreeTableRowModel, TreeTableRowModel>(getFormatted("view.main.issue")) {
 
     init {
         isSortable = false
         cellValueFactory = Callback { col -> SimpleObjectProperty(col.value.value) }
-        cellFactory = Callback { col -> createTableCell(col) }
+        cellFactory = Callback { _ -> IssueLinkCell() }
+
 
         //        setCellValueFactory(param -> new SimpleObjectProperty<>(param.getValue().getValue()));
         //        setCellFactory(param -> {
@@ -72,25 +72,23 @@ internal class IssueLinkColumn : TreeTableColumn<IssueTreeTableRowModel, IssueTr
         //        });
     }
 
-    private fun createTableCell(col: TreeTableColumn<IssueTreeTableRowModel, IssueTreeTableRowModel>): TreeTableCell<IssueTreeTableRowModel, IssueTreeTableRowModel>? {
-        return IssueLinkCell()
-    }
-
     companion object {
 
         private val LOGGER = LoggerFactory.getLogger(IssueLinkColumn::class.java)
     }
 }
 
-class IssueLinkCell : TreeTableCell<IssueTreeTableRowModel, IssueTreeTableRowModel>() {
+class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel>() {
 
     init {
         onMouseClicked = EventHandler { _ -> onClick() }
     }
 
-    override fun updateItem(item: IssueTreeTableRowModel?, empty: Boolean) {
+    override fun updateItem(item: TreeTableRowModel?, empty: Boolean) {
         super.updateItem(item, empty)
         LOGGER.debug("Updating Item $item")
+
+        // TODO check if isIssue, isGroupBy, isSummary
 
         text = item?.issue?.fullTitle
         tooltip = Tooltip(item?.issue?.fullTitle)
