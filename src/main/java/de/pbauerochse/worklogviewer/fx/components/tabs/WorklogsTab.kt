@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.fx.components.tabs
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableView
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.youtrack.TimeReport
+import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters
 import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
@@ -24,21 +25,27 @@ abstract class WorklogsTab(label: String) : Tab(label) {
     private val settingsModel = SettingsUtil.settingsViewModel
 
     private var nextIssues: List<Issue>? = null
+    private var nextReportParameters: TimeReportParameters? = null
 
     init {
-        content = createContentNode()
         selectedProperty().addListener({_,_,_ -> render()})
     }
 
-    fun update(label: String, issues: List<Issue>) {
+    fun update(label: String, reportParameters: TimeReportParameters, issues: List<Issue>) {
         text = label
         nextIssues = issues
+        nextReportParameters = reportParameters
+
+        if (isSelected) {
+            render()
+        }
     }
 
     private fun render() {
         if (nextIssues != null) {
+            content = createContentNode()
             LOGGER.debug("Rendering ${nextIssues!!.size} Issues")
-            worklogsTableView.setIssues(nextIssues!!)
+            worklogsTableView.setIssues(nextIssues!!, nextReportParameters!!)
             nextIssues = null
         }
     }

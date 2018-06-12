@@ -14,7 +14,7 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
 
     fun update(report: TimeReport) {
         LOGGER.debug("Showing own worklogs")
-        update(LABEL, extractOwnWorklogs(report))
+        update(LABEL, report.parameters, extractOwnWorklogs(report))
     }
 
     private fun extractOwnWorklogs(report: TimeReport): List<Issue> {

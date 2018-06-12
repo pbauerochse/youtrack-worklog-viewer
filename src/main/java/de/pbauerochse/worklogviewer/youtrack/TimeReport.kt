@@ -9,7 +9,4 @@ import de.pbauerochse.worklogviewer.youtrack.csv.CsvReportData
 data class TimeReport(
     val parameters: TimeReportParameters,
     val data: CsvReportData
-) {
-
-
-}
+)

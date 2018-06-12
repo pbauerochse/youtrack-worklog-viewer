@@ -5,10 +5,10 @@ import de.pbauerochse.worklogviewer.domain.Callback;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.domain.timerangeprovider.TimerangeProviderFactory;
+import de.pbauerochse.worklogviewer.fx.components.WorklogTab;
+import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane;
 import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter;
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter;
-import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane;
-import de.pbauerochse.worklogviewer.fx.components.WorklogTab;
 import de.pbauerochse.worklogviewer.fx.tasks.ExcelExporterTask;
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask;
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask;
@@ -56,6 +56,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Java FX Controller for the main window
@@ -179,11 +180,23 @@ public class MainViewController implements Initializable {
             LOGGER.info("{} succeeded with {} GroupByCategories", task.getTitle(), categoryList.size());
 
             groupByCategoryComboBox.getItems().add(new NoSelectionGroupByCategory());
-            categoryList.stream()
-                    .sorted(Comparator.comparing(GroupByCategory::getName))
-                    .forEach(groupByCategoryComboBox.getItems()::add);
+            groupByCategoryComboBox.getItems().addAll(categoryList.stream().sorted(Comparator.comparing(GroupByCategory::getName)).collect(Collectors.toList()));
+            groupByCategoryComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                String lastUsed = newValue == null ? null : newValue.getId();
+                settingsModel.lastUsedGroupByCategoryIdProperty().setValue(lastUsed);
+            });
 
-            groupByCategoryComboBox.getSelectionModel().select(0);
+            String lastUsedGroupById = settingsModel.getLastUsedGroupByCategoryId();
+            int selectedItemIndex = 0;
+
+            for (int i = 0; i < groupByCategoryComboBox.getItems().size(); i++) {
+                if (StringUtils.equals(groupByCategoryComboBox.getItems().get(i).getId(), lastUsedGroupById)) {
+                    selectedItemIndex = i;
+                    break;
+                }
+            }
+
+            groupByCategoryComboBox.getSelectionModel().select(selectedItemIndex);
         });
         startTask(task);
     }

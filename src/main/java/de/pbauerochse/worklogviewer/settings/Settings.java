@@ -22,6 +22,7 @@ public class Settings {
 
     private int workHoursADay = 8;
     private ReportTimerange lastUsedReportTimerange = ReportTimerange.THIS_WEEK;
+    private String lastUsedGroupByCategoryId;
     private boolean loadDataAtStartup = false;
     private boolean showStatistics = true;
     private boolean showAllWorklogs = true;
@@ -61,6 +62,10 @@ public class Settings {
 
     public ReportTimerange getLastUsedReportTimerange() {
         return lastUsedReportTimerange;
+    }
+
+    public String getLastUsedGroupByCategoryId() {
+        return lastUsedGroupByCategoryId;
     }
 
     public boolean isLoadDataAtStartup() {
@@ -105,6 +110,10 @@ public class Settings {
 
     public void setLastUsedReportTimerange(ReportTimerange lastUsedReportTimerange) {
         this.lastUsedReportTimerange = lastUsedReportTimerange;
+    }
+
+    public void setLastUsedGroupByCategoryId(String lastUsedGroupByCategoryId) {
+        this.lastUsedGroupByCategoryId = lastUsedGroupByCategoryId;
     }
 
     public void setLoadDataAtStartup(boolean loadDataAtStartup) {

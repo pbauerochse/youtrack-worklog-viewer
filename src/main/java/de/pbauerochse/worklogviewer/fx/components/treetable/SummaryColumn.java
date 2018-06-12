@@ -32,7 +32,7 @@ class SummaryColumn extends TreeTableColumn<DisplayRow, DisplayRow> {
                 protected void updateItem(DisplayRow item, boolean empty) {
                     super.updateItem(item, empty);
 
-                    getStyleClass().removeAll(ALL);
+                    getStyleClass().removeAll(ALL_WORKLOGVIEWER_CLASSES);
 
                     if (empty) {
                         setText(StringUtils.EMPTY);

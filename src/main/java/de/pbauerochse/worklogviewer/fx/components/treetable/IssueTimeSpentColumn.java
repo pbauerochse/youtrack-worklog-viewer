@@ -34,7 +34,7 @@ class IssueTimeSpentColumn extends TreeTableColumn<DisplayRow, DisplayRow> {
                 protected void updateItem(DisplayRow item, boolean empty) {
                     super.updateItem(item, empty);
 
-                    getStyleClass().removeAll(ALL);
+                    getStyleClass().removeAll(ALL_WORKLOGVIEWER_CLASSES);
                     setText(StringUtils.EMPTY);
                     setTooltip(null);
 

@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.youtrack.domain
 
+import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import java.time.LocalDateTime
 
 /**
@@ -26,7 +27,12 @@ data class Issue(
         "$issueId - $issueDescription"
     }
 
-    fun hasOwnWorklogs(): Boolean = worklogItems.find { it.isOwn() } != null
+    fun getYoutrackLink(): String {
+        val baseUrl = SettingsUtil.settings.youTrackConnectionSettings.url.removeSuffix("/")
+        return "$baseUrl/issue/$issueId#tab=Time%%20Tracking"
+    }
+
+    fun hasOwnWorklogs(): Boolean = worklogItems.any { it.isOwn() }
 
     override fun compareTo(other: Issue): Int {
         val byProject = project.compareTo(other.project)

@@ -18,3 +18,5 @@ fun String.trimToNull() : String? {
         null
     }
 }
+
+fun String?.isNotNullOrBlank(): Boolean = !this.isNullOrBlank()

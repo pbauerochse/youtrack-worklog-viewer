@@ -9,4 +9,8 @@ public interface GroupByCategory {
     String getId();
     String getName();
 
+    default boolean isValidYouTrackCategory() {
+        return true;
+    }
+
 }

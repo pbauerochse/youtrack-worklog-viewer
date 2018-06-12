@@ -29,6 +29,7 @@ public class SettingsViewModel {
     private final BooleanProperty loadDataAtStartup = new SimpleBooleanProperty();
     private final BooleanProperty showDecimalsInExcel = new SimpleBooleanProperty();
     private final ObjectProperty<ReportTimerange> lastUsedReportTimerange = new SimpleObjectProperty<>();
+    private final StringProperty lastUsedGroupByCategoryId = new SimpleStringProperty();
 
     private final BooleanProperty collapseStateMonday = new SimpleBooleanProperty();
     private final BooleanProperty collapseStateTuesday = new SimpleBooleanProperty();
@@ -73,6 +74,7 @@ public class SettingsViewModel {
         settings.setLoadDataAtStartup(loadDataAtStartupProperty().get());
         settings.setShowDecimalHourTimesInExcelReport(showDecimalsInExcelProperty().get());
         settings.setLastUsedReportTimerange(lastUsedReportTimerangeProperty().get());
+        settings.setLastUsedGroupByCategoryId(lastUsedGroupByCategoryIdProperty().get());
 
         settings.getCollapseState().set(MONDAY, collapseStateMondayProperty().get());
         settings.getCollapseState().set(TUESDAY, collapseStateTuesdayProperty().get());
@@ -109,6 +111,7 @@ public class SettingsViewModel {
         loadDataAtStartupProperty().set(settings.isLoadDataAtStartup());
         showDecimalsInExcelProperty().set(settings.isShowDecimalHourTimesInExcelReport());
         lastUsedReportTimerangeProperty().set(settings.getLastUsedReportTimerange());
+        lastUsedGroupByCategoryIdProperty().set(settings.getLastUsedGroupByCategoryId());
 
         collapseStateMondayProperty().set(settings.getCollapseState().isSet(MONDAY));
         collapseStateTuesdayProperty().set(settings.getCollapseState().isSet(TUESDAY));
@@ -135,6 +138,7 @@ public class SettingsViewModel {
      */
     private void bindAutoUpdatingProperties() {
         lastUsedReportTimerangeProperty().addListener(invokeSetter(settings::setLastUsedReportTimerange));
+        lastUsedGroupByCategoryIdProperty().addListener(invokeSetter(settings::setLastUsedGroupByCategoryId));
     }
 
     private <T> ChangeListener<T> invokeSetter(Consumer<T> setter) {
@@ -191,6 +195,14 @@ public class SettingsViewModel {
 
     public ObjectProperty<ReportTimerange> lastUsedReportTimerangeProperty() {
         return lastUsedReportTimerange;
+    }
+
+    public StringProperty lastUsedGroupByCategoryIdProperty() {
+        return lastUsedGroupByCategoryId;
+    }
+
+    public String getLastUsedGroupByCategoryId() {
+        return lastUsedGroupByCategoryIdProperty().get();
     }
 
     public BooleanProperty collapseStateMondayProperty() {

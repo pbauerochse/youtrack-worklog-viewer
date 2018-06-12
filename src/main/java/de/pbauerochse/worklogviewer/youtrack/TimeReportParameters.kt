@@ -10,4 +10,10 @@ import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory
 data class TimeReportParameters(
     val timerangeProvider: TimerangeProvider,
     val groupByCategory: GroupByCategory?
-)
+) {
+
+    val hasGroupByCategory: Boolean by lazy {
+        groupByCategory != null
+    }
+
+}

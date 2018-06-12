@@ -14,16 +14,9 @@ import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 interface TreeTableRowModel {
 
     val isSummaryRow: Boolean
-
     val isIssueRow: Boolean
-
-    /**
-     * Returns the [Issue] related to this entry
-     * but only if [#isIssueRow] returns `true`
-     */
-    val issue: Issue?
-
     val isGroupByRow: Boolean
 
+    fun getLabel(): String
 
 }
