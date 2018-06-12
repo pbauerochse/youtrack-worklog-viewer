@@ -10,7 +10,7 @@ With this tool you can now overcome this issue. It let's you create your persona
 
 ## Latest Version
 
-[Download vX.X.X](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.3.3)
+[Download v2.4.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.0)
 
 Please note, that authentication support for OAuth2 and Password authentication has been droped, as well
 as the support for any YouTrack version less than 2018.1. If you have an older version of YouTrack please use
