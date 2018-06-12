@@ -1,8 +1,48 @@
 /*+
  * Dark theme for the YouTrack Worklog Viewer
  * For a full reference of the available properties
- * in a JavaFX application see modena.css
+ * in a JavaFX application see modena.css or
+ * https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
  */
 .root {
-    -fx-base: rgba(60, 63, 65, 255);
+    -fx-base: #3c3f41;
+    -fx-accent: #245d81;
+    -fx-light-text-color: derive(whitesmoke, -20%);
+}
+
+.menu-bar {
+    -fx-background-color: -fx-base;
+}
+
+.tool-bar {
+    -fx-background-color: -fx-base;
+    -fx-border-width: 1px 0 1px 0;
+    -fx-border-color: derive(-fx-base, 20%);
+}
+
+.context-menu {
+    -fx-background-color: -fx-base;
+    -fx-border-width: 1px;
+    -fx-border-color: -fx-shadow-highlight-color;
+    -fx-padding: 0.333333em 0.083333em 0.333333em 0.083333em;
+    -fx-effect: dropshadow( gaussian, rgba(60, 63, 65, 0.6), 5, 0.0, 2, 2);
+}
+
+.context-menu .separator:horizontal .line {
+    -fx-border-color: -fx-shadow-highlight-color transparent transparent transparent;
+    -fx-border-insets: 1 0 0 0;
+}
+
+/* http://blog.mynotiz.de/programmieren/java/javafx-progress-bar-css-styling-2271/ */
+.progress-bar > .track {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-background-color: pink;
+    -fx-padding: 0;
+}
+
+.progress-bar > .bar {
+    /*-fx-background-insets: 0;*/
+    -fx-background-radius: 0;
+    -fx-padding: 0.75em;
 }
