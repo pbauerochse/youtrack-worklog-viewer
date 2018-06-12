@@ -80,24 +80,27 @@
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                                <RowConstraints />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                             </rowConstraints>
                             <children>
+                                <Label text="%view.settings.theme"/>
+                                <ComboBox fx:id="themeComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1"/>
 
-                                <Label text="%view.settings.workhours" />
-                                <ComboBox fx:id="workhoursComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" />
+                                <Label text="%view.settings.workhours" GridPane.rowIndex="1"/>
+                                <ComboBox fx:id="workhoursComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
-                                <Label text="%view.settings.showall" GridPane.rowIndex="1" />
-                                <CheckBox fx:id="showAllWorklogsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <Label text="%view.settings.showall" GridPane.rowIndex="2"/>
+                                <CheckBox fx:id="showAllWorklogsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-                                <Label text="%view.settings.showStatistics" GridPane.rowIndex="2" />
-                                <CheckBox fx:id="showStatisticsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <Label text="%view.settings.showStatistics" GridPane.rowIndex="3"/>
+                                <CheckBox fx:id="showStatisticsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 
-                                <Label text="%view.settings.autoload" GridPane.rowIndex="3" />
-                                <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                <Label text="%view.settings.autoload" GridPane.rowIndex="4"/>
+                                <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
-                                <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="4" />
-                                <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="5"/>
+                                <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
 
                             </children>
                             <padding>

@@ -1,0 +1,8 @@
+/*+
+ * Dark theme for the YouTrack Worklog Viewer
+ * For a full reference of the available properties
+ * in a JavaFX application see modena.css
+ */
+.root {
+    -fx-base: rgba(60, 63, 65, 255);
+}

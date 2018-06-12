@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.settings;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
+import de.pbauerochse.worklogviewer.fx.Theme;
 import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
@@ -23,6 +24,7 @@ public class SettingsViewModel {
     private final StringProperty youTrackUsername = new SimpleStringProperty();
     private final StringProperty youTrackPermanentToken = new SimpleStringProperty();
 
+    private final ObjectProperty<Theme> theme = new SimpleObjectProperty<>();
     private final IntegerProperty workhours = new SimpleIntegerProperty();
     private final BooleanProperty showAllWorklogs = new SimpleBooleanProperty();
     private final BooleanProperty showStatistics = new SimpleBooleanProperty();
@@ -68,6 +70,7 @@ public class SettingsViewModel {
         settings.getYouTrackConnectionSettings().setUsername(youTrackUsernameProperty().get());
         settings.getYouTrackConnectionSettings().setPermanentToken(youTrackPermanentTokenProperty().get());
 
+        settings.setTheme(themeProperty().get());
         settings.setWorkHoursADay(workhoursProperty().get());
         settings.setShowAllWorklogs(showAllWorklogsProperty().get());
         settings.setShowStatistics(showStatisticsProperty().get());
@@ -105,6 +108,7 @@ public class SettingsViewModel {
         youTrackUsernameProperty().set(settings.getYouTrackConnectionSettings().getUsername());
         youTrackPermanentTokenProperty().set(settings.getYouTrackConnectionSettings().getPermanentToken());
 
+        themeProperty().set(settings.getTheme());
         workhoursProperty().set(settings.getWorkHoursADay());
         showAllWorklogsProperty().set(settings.isShowAllWorklogs());
         showStatisticsProperty().set(settings.isShowStatistics());
@@ -163,6 +167,14 @@ public class SettingsViewModel {
 
     public StringProperty youTrackPermanentTokenProperty() {
         return youTrackPermanentToken;
+    }
+
+    public Theme getTheme() {
+        return theme.get();
+    }
+
+    public ObjectProperty<Theme> themeProperty() {
+        return theme;
     }
 
     public IntegerProperty workhoursProperty() {

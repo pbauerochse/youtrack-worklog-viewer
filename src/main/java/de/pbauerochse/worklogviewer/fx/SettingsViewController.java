@@ -20,18 +20,16 @@ import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
 /**
- * @author Patrick Bauerochse
- * @since 15.04.15
+ * FX Controller for the settings
+ * dialog
  */
 public class SettingsViewController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsViewController.class);
 
-    private static final String MYJETBRAINS_HOST = "myjetbrains.com";
-    private static final String MYJETBRAINS_HOSTED_YOUTRACK_PATH = "/youtrack";
-
     @FXML
     private TextField youtrackUrlField;
+
     @FXML
     private ComboBox<YouTrackVersion> youtrackVersionField;
 
@@ -40,22 +38,28 @@ public class SettingsViewController implements Initializable {
 
     @FXML
     private PasswordField youtrackPermanentTokenField;
-    @FXML
-    private Label youtrackPermanentTokenLabel;
 
     @FXML
     private ComboBox<Integer> workhoursComboBox;
+
+    @FXML
+    private ComboBox<Theme> themeComboBox;
+
     @FXML
     private CheckBox showAllWorklogsCheckBox;
+
     @FXML
     private CheckBox showStatisticsCheckBox;
+
     @FXML
     private CheckBox loadDataAtStartupCheckBox;
+
     @FXML
     private CheckBox showDecimalsInExcel;
 
     @FXML
     private Button saveSettingsButton;
+
     @FXML
     private Button cancelSettingsButton;
 
@@ -108,6 +112,9 @@ public class SettingsViewController implements Initializable {
         // Version Combobox Values
         youtrackVersionField.getItems().addAll(YouTrackVersion.values());
         youtrackVersionField.setConverter(new YouTrackVersionStringConverter());
+
+        // Theme Combobox
+        themeComboBox.getItems().addAll(Theme.values());
     }
 
     private void bindInputElements(SettingsViewModel viewModel) {
@@ -116,6 +123,7 @@ public class SettingsViewController implements Initializable {
         youtrackUsernameField.textProperty().bindBidirectional(viewModel.youTrackUsernameProperty());
         youtrackPermanentTokenField.textProperty().bindBidirectional(viewModel.youTrackPermanentTokenProperty());
 
+        themeComboBox.valueProperty().bindBidirectional(viewModel.themeProperty());
         workhoursComboBox.valueProperty().bindBidirectional(viewModel.workhoursProperty().asObject());
         showAllWorklogsCheckBox.selectedProperty().bindBidirectional(viewModel.showAllWorklogsProperty());
         showStatisticsCheckBox.selectedProperty().bindBidirectional(viewModel.showStatisticsProperty());

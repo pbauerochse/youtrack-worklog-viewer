@@ -147,7 +147,7 @@ public class MainViewController implements Initializable {
         timerangeComboBox.getSelectionModel().select(settingsModel.lastUsedReportTimerangeProperty().get());
         timerangeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> timerangeChanged(newValue));
 
-        settingsModel.lastUsedReportTimerangeProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty());
+        settingsModel.lastUsedReportTimerangeProperty().addListener((observable, oldValue, newValue) -> timerangeComboBox.getSelectionModel().select(newValue));
     }
 
     private void timerangeChanged(@NotNull ReportTimerange newValue) {
@@ -484,7 +484,7 @@ public class MainViewController implements Initializable {
             Parent content = FXMLLoader.load(MainViewController.class.getResource(view), resources);
 
             Scene scene = new Scene(content);
-            scene.getStylesheets().add("/fx/css/main.css");
+            scene.getStylesheets().add("/fx/css/base-styling.css");
             Stage stage = new Stage();
             stage.initOwner(progressBar.getScene().getWindow());
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
+import de.pbauerochse.worklogviewer.fx.Theme;
 import de.pbauerochse.worklogviewer.settings.jackson.WeekdaySettingsDeserializer;
 import de.pbauerochse.worklogviewer.settings.jackson.WeekdaySettingsSerializer;
 
@@ -20,6 +21,7 @@ public class Settings {
     private WindowSettings windowSettings = new WindowSettings();
     private YouTrackConnectionSettings youTrackConnectionSettings = new YouTrackConnectionSettings();
 
+    private Theme theme = Theme.DARK;
     private int workHoursADay = 8;
     private ReportTimerange lastUsedReportTimerange = ReportTimerange.THIS_WEEK;
     private String lastUsedGroupByCategoryId;
@@ -58,6 +60,10 @@ public class Settings {
      */
     public int getWorkHoursADay() {
         return workHoursADay;
+    }
+
+    public Theme getTheme() {
+        return theme;
     }
 
     public ReportTimerange getLastUsedReportTimerange() {
@@ -102,6 +108,10 @@ public class Settings {
 
     public void setYouTrackConnectionSettings(YouTrackConnectionSettings youTrackConnectionSettings) {
         this.youTrackConnectionSettings = youTrackConnectionSettings;
+    }
+
+    public void setTheme(Theme theme) {
+        this.theme = theme;
     }
 
     public void setWorkHoursADay(int workHoursADay) {

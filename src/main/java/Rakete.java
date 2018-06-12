@@ -27,7 +27,7 @@ public class Rakete extends Application {
 
         Parent root = new BorderPane(tabbedPane);
         Scene scene = new Scene(root, 1024, 768);
-        scene.getStylesheets().add("/fx/css/main.css");
+        scene.getStylesheets().add("/fx/css/base-styling.css");
         primaryStage.setScene(scene);
         primaryStage.show();
 

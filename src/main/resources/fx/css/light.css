@@ -88,23 +88,102 @@
 }
 
 /* chart colors */
-.series0 {  -fx-bar-fill: #f9bf09;   -fx-pie-color: #f9bf09;}
-.series1 {  -fx-bar-fill: #75e25e;   -fx-pie-color: #75e25e;}
-.series2 {  -fx-bar-fill: #22bad9;   -fx-pie-color: #22bad9;}
-.series3 {  -fx-bar-fill: #0181e2;   -fx-pie-color: #0181e2;}
-.series4 {  -fx-bar-fill: #2f357f;   -fx-pie-color: #2f357f;}
-.series5 {  -fx-bar-fill: #860061;   -fx-pie-color: #860061;}
-.series6 {  -fx-bar-fill: #c62b00;   -fx-pie-color: #c62b00;}
-.series7 {  -fx-bar-fill: #ff5700;   -fx-pie-color: #ff5700;}
-.series8 {  -fx-bar-fill: #3dddda;   -fx-pie-color: #3dddda;}
-.series9 {  -fx-bar-fill: #a9e200aa; -fx-pie-color: #a9e200aa;}
-.series10 { -fx-bar-fill: rgba(186, 0, 140, 0.98); -fx-pie-color: rgba(186, 0, 140, 0.98);}
-.series11 { -fx-bar-fill: #b10bb8;   -fx-pie-color: #b10bb8;}
-.series12 { -fx-bar-fill: #860061;   -fx-pie-color: #860061;}
-.series13 { -fx-bar-fill: #2f357faa; -fx-pie-color: #2f357faa;}
-.series14 { -fx-bar-fill: #baffba;   -fx-pie-color: #baffba;}
-.series15 { -fx-bar-fill: #36c6b0;   -fx-pie-color: #36c6b0;}
-.series16 { -fx-bar-fill: #860061aa; -fx-pie-color: #860061aa;}
-.series17 { -fx-bar-fill: #677fd9;   -fx-pie-color: #677fd9;}
-.series18 { -fx-bar-fill: #1cc3e2;   -fx-pie-color: #1cc3e2;}
-.series19 { -fx-bar-fill: #88b501;   -fx-pie-color: #88b501;}
+.series0 {
+    -fx-bar-fill: #f9bf09;
+    -fx-pie-color: #f9bf09;
+}
+
+.series1 {
+    -fx-bar-fill: #75e25e;
+    -fx-pie-color: #75e25e;
+}
+
+.series2 {
+    -fx-bar-fill: #22bad9;
+    -fx-pie-color: #22bad9;
+}
+
+.series3 {
+    -fx-bar-fill: #0181e2;
+    -fx-pie-color: #0181e2;
+}
+
+.series4 {
+    -fx-bar-fill: #2f357f;
+    -fx-pie-color: #2f357f;
+}
+
+.series5 {
+    -fx-bar-fill: #860061;
+    -fx-pie-color: #860061;
+}
+
+.series6 {
+    -fx-bar-fill: #c62b00;
+    -fx-pie-color: #c62b00;
+}
+
+.series7 {
+    -fx-bar-fill: #ff5700;
+    -fx-pie-color: #ff5700;
+}
+
+.series8 {
+    -fx-bar-fill: #3dddda;
+    -fx-pie-color: #3dddda;
+}
+
+.series9 {
+    -fx-bar-fill: #a9e200aa;
+    -fx-pie-color: #a9e200aa;
+}
+
+.series10 {
+    -fx-bar-fill: rgba(186, 0, 140, 0.98);
+    -fx-pie-color: rgba(186, 0, 140, 0.98);
+}
+
+.series11 {
+    -fx-bar-fill: #b10bb8;
+    -fx-pie-color: #b10bb8;
+}
+
+.series12 {
+    -fx-bar-fill: #860061;
+    -fx-pie-color: #860061;
+}
+
+.series13 {
+    -fx-bar-fill: #2f357faa;
+    -fx-pie-color: #2f357faa;
+}
+
+.series14 {
+    -fx-bar-fill: #baffba;
+    -fx-pie-color: #baffba;
+}
+
+.series15 {
+    -fx-bar-fill: #36c6b0;
+    -fx-pie-color: #36c6b0;
+}
+
+.series16 {
+    -fx-bar-fill: #860061aa;
+    -fx-pie-color: #860061aa;
+}
+
+.series17 {
+    -fx-bar-fill: #677fd9;
+    -fx-pie-color: #677fd9;
+}
+
+.series18 {
+    -fx-bar-fill: #1cc3e2;
+    -fx-pie-color: #1cc3e2;
+}
+
+.series19 {
+    -fx-bar-fill: #88b501;
+    -fx-pie-color: #88b501;
+}
