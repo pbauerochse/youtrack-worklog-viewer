@@ -5,13 +5,17 @@
  * https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
  */
 .root {
-    -fx-base: #3c3f41;
+    -fx-base: derive(#3c3f41, -20%);
     -fx-accent: #245d81;
     -fx-light-text-color: derive(whitesmoke, -20%);
 }
 
 .menu-bar {
-    -fx-background-color: -fx-base;
+    -fx-background-color: #2a2a2a;
+}
+
+.menu-item {
+    -fx-padding: 7px 20px 7px 20px;
 }
 
 .tool-bar {
@@ -24,7 +28,7 @@
     -fx-background-color: -fx-base;
     -fx-border-width: 1px;
     -fx-border-color: -fx-shadow-highlight-color;
-    -fx-padding: 0.333333em 0.083333em 0.333333em 0.083333em;
+    -fx-padding: 5px 0 5px 0;
     -fx-effect: dropshadow( gaussian, rgba(60, 63, 65, 0.6), 5, 0.0, 2, 2);
 }
 
@@ -37,12 +41,12 @@
 .progress-bar > .track {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
-    -fx-background-color: pink;
     -fx-padding: 0;
 }
 
 .progress-bar > .bar {
-    /*-fx-background-insets: 0;*/
+    -fx-background-insets: 0;
     -fx-background-radius: 0;
-    -fx-padding: 0.75em;
+    -fx-padding: 0.6em;
+    -fx-background-color: derive(-fx-accent, 5%);
 }
