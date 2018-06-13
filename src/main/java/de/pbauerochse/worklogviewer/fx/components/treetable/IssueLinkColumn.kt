@@ -26,6 +26,12 @@ internal class IssueLinkColumn : TreeTableColumn<TreeTableRowModel, TreeTableRow
     }
 }
 
+/**
+ * Cell that displays the label of the [TreeTableRowModel]
+ *
+ * If it is a [IssueTreeTableRow] it will display a link
+ * to the actual youtrack issue
+ */
 private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel>() {
 
     init {

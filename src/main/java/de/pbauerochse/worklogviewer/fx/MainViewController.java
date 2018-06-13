@@ -148,11 +148,12 @@ public class MainViewController implements Initializable {
         timerangeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> timerangeChanged(newValue));
 
         settingsModel.lastUsedReportTimerangeProperty().addListener((observable, oldValue, newValue) -> timerangeComboBox.getSelectionModel().select(newValue));
+        timerangeChanged(settingsModel.lastUsedReportTimerangeProperty().getValue());
     }
 
     private void timerangeChanged(@NotNull ReportTimerange newValue) {
         // prepopulate start and end datepickers and remove error labels
-        TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, null, null);
+        TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, startDatePicker.getValue(), endDatePicker.getValue());
         startDatePicker.setValue(timerangeProvider.getStartDate());
         endDatePicker.setValue(timerangeProvider.getEndDate());
     }

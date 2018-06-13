@@ -12,8 +12,8 @@ data class TimeReportParameters(
     val groupByCategory: GroupByCategory?
 ) {
 
-    val hasGroupByCategory: Boolean by lazy {
-        groupByCategory != null
+    val isDataGrouped: Boolean by lazy {
+        groupByCategory != null && groupByCategory.isValidYouTrackCategory
     }
 
 }
