@@ -49,7 +49,7 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
             val columnIndex = firstWorklogColumnIndex + days
             getOrCreateWorklogColumnAtIndex(columnIndex).update(columnDate)
         }
-        removeExcessColumns(firstWorklogColumnIndex + daysBetweenStartAndEndDate, columns.size - 1)
+        removeExcessColumns(firstWorklogColumnIndex + daysBetweenStartAndEndDate + 1, columns.size - 1)
     }
 
     private fun getOrCreateWorklogColumnAtIndex(colIndex: Int): IssueTimeSpentColumn {
@@ -62,7 +62,7 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
 
     private fun removeExcessColumns(startIndexInclusive: Int, endIndexExclusive: Int) {
         LOGGER.debug("Removing excess columns from $startIndexInclusive to $endIndexExclusive")
-        // TODO
+        columns.remove(startIndexInclusive, endIndexExclusive)
     }
 
     private fun getSummaryRow(issues: List<Issue>): TreeItem<TreeTableRowModel> {
