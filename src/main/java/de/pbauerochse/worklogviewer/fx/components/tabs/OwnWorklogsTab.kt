@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs
 
+import de.pbauerochse.worklogviewer.fx.components.statistics.TaskCountByUserAndProjectStatistics
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.youtrack.TimeReport
 import de.pbauerochse.worklogviewer.youtrack.domain.Issue
@@ -19,7 +20,7 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
     }
 
     override fun getStatistics(issues: List<Issue>): List<Node> = arrayListOf(
-        // TODO
+        TaskCountByUserAndProjectStatistics(issues)
     )
 
     private fun extractOwnWorklogs(report: TimeReport): List<Issue> {
