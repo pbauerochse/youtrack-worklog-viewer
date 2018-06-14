@@ -1,25 +1,20 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs
 
+import de.pbauerochse.worklogviewer.youtrack.domain.Issue
+import javafx.scene.Node
+
 /**
  * Tab, that displays the results for a single [Project]
  * independent of the work author
  */
-internal class ProjectWorklogTab : WorklogsTab("")
+internal class ProjectWorklogTab : WorklogsTab("") {
 
-//    private Optional<List<TaskWithWorklogs>> resultItemsToDisplay = Optional.empty();
+    override fun getStatistics(issues: List<Issue>): List<Node> = arrayListOf(
+        // TODO
+    )
 
-//    @Override
-//    protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
-//        return tasks.stream()
-//                .filter(taskWithWorklogs -> taskWithWorklogs.getProject().equals(getText()))
-//                .sorted((o1, o2) -> COLLATOR.compare(o1.getIssue(), o2.getIssue()))
-//                .collect(Collectors.toList());
-//    }
-//
-//    @Override
-//    void update(@NotNull TimeReport timeReport) {
-//        // TODO implement
-//    }
+}
+
 //    @Override
 //    protected List<TaskWithWorklogs> getDisplayResult(WorklogReport result) {
 //        if (!resultItemsToDisplay.isPresent() || resultToDisplayChangedSinceLastRender) {

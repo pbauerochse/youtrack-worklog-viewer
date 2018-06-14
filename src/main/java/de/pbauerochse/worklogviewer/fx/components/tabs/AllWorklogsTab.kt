@@ -2,6 +2,8 @@ package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.youtrack.TimeReport
+import de.pbauerochse.worklogviewer.youtrack.domain.Issue
+import javafx.scene.Node
 import org.slf4j.LoggerFactory
 
 /**
@@ -19,6 +21,10 @@ internal class AllWorklogsTab : WorklogsTab(getFormatted("view.main.tabs.all")) 
 
         update(text, report.parameters, allIssues)
     }
+
+    override fun getStatistics(issues: List<Issue>): List<Node> = arrayListOf(
+        // TODO
+    )
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(AllWorklogsTab::class.java)

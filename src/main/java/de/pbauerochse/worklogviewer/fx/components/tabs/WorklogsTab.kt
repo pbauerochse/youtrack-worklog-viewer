@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs
 
+import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableView
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.youtrack.TimeReport
@@ -8,11 +9,9 @@ import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.Node
-import javafx.scene.control.ScrollPane
 import javafx.scene.control.SplitPane
 import javafx.scene.control.Tab
 import javafx.scene.layout.AnchorPane
-import javafx.scene.layout.VBox
 import org.slf4j.LoggerFactory
 
 /**
@@ -22,13 +21,18 @@ import org.slf4j.LoggerFactory
 abstract class WorklogsTab(label: String) : Tab(label) {
 
     private val worklogsTableView = WorklogsTreeTableView()
+    private val statisticsPane = StatisticsPane()
+    private val splitPane = SplitPane(getWorklogsTableView()).apply { orientation = Orientation.HORIZONTAL }
     private val settingsModel = SettingsUtil.settingsViewModel
 
     private var nextIssues: List<Issue>? = null
     private var nextReportParameters: TimeReportParameters? = null
 
     init {
-        selectedProperty().addListener({_,_,_ -> render()})
+        content = splitPane
+        selectedProperty().addListener({ _, _, _ -> renderContent() })
+        settingsModel.showStatisticsProperty().addListener({ _, _, showStatistics -> showStatisticsView(showStatistics) })
+        showStatisticsView(settingsModel.isShowStatistics)
     }
 
     fun update(label: String, reportParameters: TimeReportParameters, issues: List<Issue>) {
@@ -37,45 +41,36 @@ abstract class WorklogsTab(label: String) : Tab(label) {
         nextReportParameters = reportParameters
 
         if (isSelected) {
-            render()
+            renderContent()
         }
     }
 
-    private fun render() {
+    /**
+     * Returns a list of component nodes, that are
+     * supposed to be shown in the statistics panel
+     */
+    internal abstract fun getStatistics(issues: List<Issue>): List<Node>
+
+    private fun showStatisticsView(showStatistics: Boolean) {
+        if (showStatistics && !splitPane.items.contains(statisticsPane)) {
+            LOGGER.debug("Showing '$text' with statistics panel")
+            splitPane.items.add(statisticsPane)
+            splitPane.setDividerPosition(0, 0.8)
+        } else if (!showStatistics && splitPane.items.contains(statisticsPane)) {
+            LOGGER.debug("Showing '$text' without statistics")
+            splitPane.items.remove(statisticsPane)
+        }
+    }
+
+    private fun renderContent() {
         if (nextIssues != null) {
-            content = createContentNode()
             LOGGER.debug("Rendering ${nextIssues!!.size} Issues")
             worklogsTableView.setIssues(nextIssues!!, nextReportParameters!!)
+
+            val statistics = getStatistics(nextIssues!!)
+            statisticsPane.replaceAll(statistics)
+
             nextIssues = null
-        }
-    }
-
-    private fun createContentNode(): Node {
-        return if (settingsModel.isShowStatistics) {
-            LOGGER.debug("Showing '$text' with statistics panel")
-            getWithStatisticsPanel()
-        } else {
-            LOGGER.debug("Showing '$text' without statistics")
-            worklogsTableView
-        }
-    }
-
-    private fun getWithStatisticsPanel(): Node {
-        val statisticsView = getStatisticsView()
-        val worklogsView = getWorklogsTableView()
-
-        return SplitPane(worklogsView, statisticsView).apply {
-            orientation = Orientation.HORIZONTAL
-            setDividerPosition(0, 0.8)
-        }
-    }
-
-    private fun getStatisticsView(): Node {
-        val statistics = VBox(20.0)
-        return ScrollPane(statistics).apply {
-            hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
-            isFitToWidth = true
-            padding = Insets(7.0)
         }
     }
 

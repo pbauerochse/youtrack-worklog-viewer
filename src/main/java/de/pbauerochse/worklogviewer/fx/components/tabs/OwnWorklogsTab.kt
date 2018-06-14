@@ -4,6 +4,7 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.youtrack.TimeReport
 import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import de.pbauerochse.worklogviewer.youtrack.domain.Project
+import javafx.scene.Node
 import org.slf4j.LoggerFactory
 
 /**
@@ -16,6 +17,10 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
         LOGGER.debug("Showing own worklogs")
         update(LABEL, report.parameters, extractOwnWorklogs(report))
     }
+
+    override fun getStatistics(issues: List<Issue>): List<Node> = arrayListOf(
+        // TODO
+    )
 
     private fun extractOwnWorklogs(report: TimeReport): List<Issue> {
         return report.data.projects
@@ -37,28 +42,6 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
         private val LABEL = getFormatted("view.main.tabs.own")
     }
 
-    //    protected List<TaskWithWorklogs> getFilteredList(List<TaskWithWorklogs> tasks) {
-    //        Settings settings = SettingsUtil.getSettings();
-    //
-    //        return tasks.stream()
-    //                .filter(taskWithWorklogs -> {
-    //                    for (WorklogItem worklogItem : taskWithWorklogs.getWorklogItemList()) {
-    //                        if (StringUtils.equals(worklogItem.getUsername(), settings.getYouTrackConnectionSettings().getUsername())) {
-    //                            return true;
-    //                        }
-    //                    }
-    //                    return false;
-    //                })
-    //                .sorted((o1, o2) -> COLLATOR.compare(o1.getIssue(), o2.getIssue()))
-    //                .peek(taskWithWorklogs -> {
-    //                    // remove items not belonging to self
-    //                    taskWithWorklogs
-    //                            .getWorklogItemList()
-    //                            .removeIf(worklogItem -> !StringUtils.equals(worklogItem.getUsername(), settings.getYouTrackConnectionSettings().getUsername()));
-    //                })
-    //                .collect(Collectors.toList());
-    //    }
-    //
     //    @Override
     //    protected void addAdditionalStatistics(VBox statisticsView, WorklogStatistics statistics, List<TaskWithWorklogs> displayResult) {
     //        super.addAdditionalStatistics(statisticsView, statistics, displayResult);
