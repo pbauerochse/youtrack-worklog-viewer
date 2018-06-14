@@ -63,38 +63,50 @@ private class TimeSpentColumn : TreeTableCell<TreeTableRowModel, TimeSpentColumn
 
     override fun updateItem(item: TimeSpentColumnData?, empty: Boolean) {
         super.updateItem(item, empty)
-        LOGGER.debug("Showing for $item")
 
         text = null
         tooltip = null
         styleClass.removeAll(ALL_WORKLOGVIEWER_CLASSES)
 
         if (!empty && item != null) {
+            LOGGER.debug("Showing for $item")
             val date = item.dateProperty.get()
 
-            if (item.rowModel.isGroupByRow) {
-                styleClass.add(GROUP_CELL)
-            }
-
-            if (item.rowModel.isIssueRow) {
-                val issueRowModel = item.rowModel as IssueTreeTableRow
-                val timeSpentInMinutes = issueRowModel.issue.getTimeSpentOn(date)
-                if (timeSpentInMinutes > 0) {
-                    text = formatMinutes(timeSpentInMinutes)
-                    tooltip = Tooltip("${tableColumn.text} - ${issueRowModel.issue.issueId} : $text")
-                    styleClass.add(TIMESPENT_CELL)
-                }
-            }
-
-            if (item.rowModel.isSummaryRow) {
-                text = "SUMMARY $date"
-                styleClass.add(SUMMARY_CELL)
+            when {
+                item.rowModel.isGroupByRow -> handleGroupBy(date, item.rowModel as GroupedIssuesTreeTableRow)
+                item.rowModel.isIssueRow -> handleIssue(date, item.rowModel as IssueTreeTableRow)
+                item.rowModel.isSummaryRow -> handleSummary(date, item.rowModel as SummaryTreeTableRow)
             }
 
             when {
                 isHighlighted(date) -> styleClass.add(HIGHLIGHT_CELL)
                 isToday(date) -> styleClass.add(TODAY_HIGHLIGHT_CELL)
             }
+        }
+    }
+
+    private fun handleGroupBy(date: LocalDate, row: GroupedIssuesTreeTableRow) {
+        val totalTimeSpentInMinutes = row.totalTimeSpentOn(date)
+        if (totalTimeSpentInMinutes > 0) {
+            text = formatMinutes(totalTimeSpentInMinutes)
+        }
+        styleClass.add(GROUP_CELL)
+    }
+
+    private fun handleIssue(date: LocalDate, row: IssueTreeTableRow) {
+        val timeSpentInMinutes = row.issue.getTimeSpentOn(date)
+        if (timeSpentInMinutes > 0) {
+            text = formatMinutes(timeSpentInMinutes)
+            tooltip = Tooltip("${tableColumn.text} - ${row.issue.issueId} : $text")
+            styleClass.add(TIMESPENT_CELL)
+        }
+    }
+
+    private fun handleSummary(date: LocalDate, row: SummaryTreeTableRow) {
+        val totalTimeSpentInMinutes = row.getTotalTimeSpentOn(date)
+        if (totalTimeSpentInMinutes > 0) {
+            text = formatMinutes(totalTimeSpentInMinutes)
+            styleClass.add(SUMMARY_CELL)
         }
     }
 

@@ -57,7 +57,7 @@ class WorklogsTreeTableViewData(
                 val groupCriteria = it.key
                 val groupedByGroupAndIssue = it.value
                     .groupBy { it.issue }
-                    .map { Issue(it.key) }
+                    .map { Issue(it.key, it.value) }
 
                 groupToIssues[groupCriteria] = groupedByGroupAndIssue
             }

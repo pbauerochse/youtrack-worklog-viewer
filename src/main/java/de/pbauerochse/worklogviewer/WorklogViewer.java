@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer;
 
 import de.pbauerochse.worklogviewer.fx.MainViewController;
-import de.pbauerochse.worklogviewer.fx.Theme;
+import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -70,18 +69,7 @@ public class WorklogViewer extends Application {
 
         mainScene.getStylesheets().add("/fx/css/base-styling.css");
         mainScene.getStylesheets().add(settingsViewModel.getTheme().getStylesheet());
-
-        settingsViewModel.themeProperty().addListener((observable, oldValue, newValue) -> {
-            // remove unused stylesheet files
-            Arrays.stream(Theme.values())
-                    .filter(it -> it != newValue)
-                    .map(Theme::getStylesheet)
-                    .forEach(mainScene.getStylesheets()::remove);
-
-            // add new theme
-            mainScene.getStylesheets().add(newValue.getStylesheet());
-        });
-
+        settingsViewModel.themeProperty().addListener(new ThemeChangeListener(mainScene));
 
         primaryStage.setTitle("YouTrack Worklog Viewer " + FormattingUtil.getFormatted("release.version"));
         primaryStage.setScene(mainScene);

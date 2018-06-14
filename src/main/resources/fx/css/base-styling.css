@@ -1,13 +1,8 @@
 /**
  * YouTrack Worklog Viewer basic styling
  */
-.issue-cell {
-    -fx-underline: true;
-}
-
-.resolved .text {
+.resolved-issue-cell .text {
     -fx-strikethrough: true;
-    -fx-underline: false;
 }
 
 .issue-cell:hover {
@@ -23,8 +18,12 @@
     -fx-alignment: center-right;
 }
 
-.group-cell {
+.group-cell, .group-title-cell {
     -fx-font-weight: bold;
+}
+
+.group-cell {
+    -fx-alignment: center-right;
 }
 
 .scroll-bar {

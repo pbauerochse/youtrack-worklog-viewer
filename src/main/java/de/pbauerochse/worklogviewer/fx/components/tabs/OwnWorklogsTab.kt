@@ -21,16 +21,14 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
         return report.data.projects
             .filter { it.hasTicketsWithOwnWorklogs() }
             .flatMap { getEntriesRelatedToUser(it) }
-            .sortedBy { it }
+            .sorted()
     }
 
     private fun getEntriesRelatedToUser(it: Project): List<Issue> {
         return it.issues
             .filter { it.hasOwnWorklogs() }
             .map {
-                Issue(it).apply {
-                    worklogItems.addAll(it.worklogItems.filter { it.isOwn() })
-                }
+                Issue(it, it.worklogItems.filter { it.isOwn() })
             }
     }
 

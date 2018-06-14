@@ -2,8 +2,9 @@ package de.pbauerochse.worklogviewer.fx.components.treetable
 
 import de.pbauerochse.worklogviewer.WorklogViewer
 import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.ALL_WORKLOGVIEWER_CLASSES
-import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.GROUP_CELL
+import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.GROUP_TITLE_CELL
 import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.ISSUE_LINK_CELL
+import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.RESOLVED_ISSUE_CELL
 import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.application.Platform
@@ -54,7 +55,7 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
                 LOGGER.debug("Showing GroupBy Item $it")
                 text = it.getLabel()
                 tooltip = Tooltip(text)
-                styleClass.add(GROUP_CELL)
+                styleClass.add(GROUP_TITLE_CELL)
             }
 
             if (it.isIssueRow) {
@@ -66,7 +67,7 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
                 styleClass.add(ISSUE_LINK_CELL)
 
                 issue.resolved?.let {
-                    styleClass.add("resolved")
+                    styleClass.add(RESOLVED_ISSUE_CELL)
                 }
             }
 

@@ -11,7 +11,13 @@ import org.slf4j.LoggerFactory
 internal class AllWorklogsTab : WorklogsTab(getFormatted("view.main.tabs.all")) {
 
     fun update(report: TimeReport) {
+        LOGGER.debug("Showing all worklogs")
+        val allIssues = report.data.projects
+            .filter { it.hasTicketsWithOwnWorklogs() }
+            .flatMap { it.issues }
+            .sorted()
 
+        update(text, report.parameters, allIssues)
     }
 
     companion object {

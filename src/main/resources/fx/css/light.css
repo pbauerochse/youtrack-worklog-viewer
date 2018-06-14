@@ -64,10 +64,12 @@
 .issue-cell {
     -fx-text-fill: #3b6aed;
     -fx-highlight-text-fill: #ffffff;
+    -fx-underline: true;
 }
 
-.resolved {
-    -fx-text-fill: #777777;
+.resolved-issue-cell {
+    -fx-text-fill: #555555;
+    -fx-underline: false !important;
 }
 
 .summary-cell {
@@ -76,7 +78,7 @@
     -fx-alignment: center-right;
 }
 
-.group-cell {
+.group-cell, .group-title-cell {
     -fx-background-color: #c8ddff;
     -fx-font-size: 14px;
 }

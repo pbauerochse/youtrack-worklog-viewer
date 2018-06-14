@@ -13,6 +13,7 @@ import de.pbauerochse.worklogviewer.fx.tasks.ExcelExporterTask;
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask;
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask;
 import de.pbauerochse.worklogviewer.fx.tasks.VersionCheckerTask;
+import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
@@ -336,6 +337,7 @@ public class MainViewController implements Initializable {
 
     /**
      * Starts a thread performing the given task
+     *
      * @param task The task to perform
      */
     private void startTask(Task task) {
@@ -485,9 +487,15 @@ public class MainViewController implements Initializable {
     private void openDialogue(String view, String titleResourceKey, boolean modal, Callback onCloseCallback) {
         try {
             Parent content = FXMLLoader.load(MainViewController.class.getResource(view), resources);
+            SettingsViewModel settingsViewModel = SettingsUtil.getSettingsViewModel();
 
             Scene scene = new Scene(content);
             scene.getStylesheets().add("/fx/css/base-styling.css");
+            scene.getStylesheets().add(settingsViewModel.getTheme().getStylesheet());
+
+            ThemeChangeListener themeChangeListener = new ThemeChangeListener(scene);
+            settingsViewModel.themeProperty().addListener(themeChangeListener);
+
             Stage stage = new Stage();
             stage.initOwner(progressBar.getScene().getWindow());
 
@@ -503,6 +511,7 @@ public class MainViewController implements Initializable {
             if (onCloseCallback != null) {
                 stage.setOnCloseRequest(event -> {
                     LOGGER.debug("View {} got close request. Notifying callback", view);
+                    settingsViewModel.themeProperty().removeListener(themeChangeListener);
                     onCloseCallback.invoke();
                 });
             }

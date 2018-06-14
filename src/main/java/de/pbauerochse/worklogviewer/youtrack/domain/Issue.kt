@@ -25,8 +25,8 @@ data class Issue(
      * from the other Issue are applied to the
      * new instance
      */
-    constructor(issue: Issue) : this(issue.issueId, issue.issueDescription, issue.estimateInMinutes, issue.resolved) {
-        worklogItems.addAll(issue.worklogItems)
+    constructor(issue: Issue, worklogItems: List<WorklogItem>) : this(issue.issueId, issue.issueDescription, issue.estimateInMinutes, issue.resolved) {
+        this.worklogItems.addAll(worklogItems)
     }
 
     val project: String by lazy {
@@ -50,10 +50,9 @@ data class Issue(
 
     override fun compareTo(other: Issue): Int {
         val byProject = project.compareTo(other.project)
-        return if (byProject == 0) {
-            issueNumber.compareTo(other.issueNumber)
-        } else {
-            byProject
+        return when {
+            byProject == 0 -> issueNumber.compareTo(other.issueNumber)
+            else -> byProject
         }
     }
 
@@ -63,6 +62,15 @@ data class Issue(
      */
     fun getTimeSpentOn(date: LocalDate) = worklogItems
         .filter { it.date == date }
+        .map { it.durationInMinutes }
+        .sum()
+
+    /**
+     * Returns the total time in minutes that
+     * has been logged on this issue in the
+     * defined time period
+     */
+    fun getTotalTime(): Long = worklogItems
         .map { it.durationInMinutes }
         .sum()
 
