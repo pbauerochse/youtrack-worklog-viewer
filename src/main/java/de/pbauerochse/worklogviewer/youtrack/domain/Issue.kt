@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.youtrack.domain
 
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -9,11 +10,24 @@ import java.time.LocalDateTime
 data class Issue(
     val issueId: String,
     val issueDescription: String,
-    val estimateInMinutes: Long
+    val estimateInMinutes: Long,
+    var resolved: LocalDateTime? = null
 ) : Comparable<Issue> {
 
+    // must not be contained in constructor ars
+    // as it has a back reference to this issue
+    // and will then be contained in hashCode, equals and toString
+    // which leads to an infinite loop
     val worklogItems: MutableList<WorklogItem> = mutableListOf()
-    var resolved: LocalDateTime? = null
+
+    /**
+     * Allows "cloning" an Issue. The values
+     * from the other Issue are applied to the
+     * new instance
+     */
+    constructor(issue: Issue) : this(issue.issueId, issue.issueDescription, issue.estimateInMinutes, issue.resolved) {
+        worklogItems.addAll(issue.worklogItems)
+    }
 
     val project: String by lazy {
         PROJECT_ID_REGEX.matchEntire(issueId)!!.groupValues[1]
@@ -42,6 +56,15 @@ data class Issue(
             byProject
         }
     }
+
+    /**
+     * Returns the total time spent in this Issue
+     * on the given date
+     */
+    fun getTimeSpentOn(date: LocalDate) = worklogItems
+        .filter { it.date == date }
+        .map { it.durationInMinutes }
+        .sum()
 
     companion object {
         private val PROJECT_ID_REGEX = Regex("^(.+)-(\\d+)$")

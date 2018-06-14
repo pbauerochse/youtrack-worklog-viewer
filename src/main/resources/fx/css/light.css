@@ -19,11 +19,11 @@
     -fx-border-color: red;
 }
 
-.highlight {
+.highlight-cell {
     -fx-background-color: rgba(189, 255, 209, 0.5);
 }
 
-.today {
+.today-highlight-cell {
     -fx-background-color: rgba(178, 233, 255, 0.5);
 }
 
@@ -57,11 +57,6 @@
     -fx-background-insets: 0, 1, 2;
 }
 
-.scroll-bar {
-    -fx-unit-increment: 100.0;
-    -fx-block-increment: 500.0;
-}
-
 .tree-table-view:focused .tree-table-row-cell:filled:focused:selected .issue-cell {
     -fx-text-fill: #ffffff;
 }
@@ -69,21 +64,20 @@
 .issue-cell {
     -fx-text-fill: #3b6aed;
     -fx-highlight-text-fill: #ffffff;
-    -fx-underline: true;
 }
 
-.issue-cell:hover {
-    -fx-cursor: hand;
+.resolved {
+    -fx-text-fill: #777777;
 }
 
-.summary {
+.summary-cell {
     -fx-font-weight: bold;
     -fx-font-size: 12px;
+    -fx-alignment: center-right;
 }
 
-.group {
+.group-cell {
     -fx-background-color: #c8ddff;
-    -fx-font-weight: bold;
     -fx-font-size: 14px;
 }
 
@@ -187,3 +181,7 @@
     -fx-bar-fill: #88b501;
     -fx-pie-color: #88b501;
 }
+
+
+
+

@@ -28,7 +28,7 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
         return it.issues
             .filter { it.hasOwnWorklogs() }
             .map {
-                Issue(it.issueId, it.issueDescription, it.estimateInMinutes).apply {
+                Issue(it).apply {
                     worklogItems.addAll(it.worklogItems.filter { it.isOwn() })
                 }
             }

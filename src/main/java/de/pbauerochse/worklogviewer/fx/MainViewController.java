@@ -148,6 +148,7 @@ public class MainViewController implements Initializable {
         timerangeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> timerangeChanged(newValue));
 
         settingsModel.lastUsedReportTimerangeProperty().addListener((observable, oldValue, newValue) -> timerangeComboBox.getSelectionModel().select(newValue));
+
         timerangeChanged(settingsModel.lastUsedReportTimerangeProperty().getValue());
     }
 
@@ -156,6 +157,7 @@ public class MainViewController implements Initializable {
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, startDatePicker.getValue(), endDatePicker.getValue());
         startDatePicker.setValue(timerangeProvider.getStartDate());
         endDatePicker.setValue(timerangeProvider.getEndDate());
+        settingsModel.lastUsedReportTimerangeProperty().set(newValue);
     }
 
     private void initializeGroupByComboBox() {

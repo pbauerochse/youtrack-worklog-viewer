@@ -32,9 +32,9 @@ class SummaryColumn extends TreeTableColumn<TreeTableRowModel, TreeTableRowModel
 //                    } else {
 //                        setText(FormattingUtil.formatMinutes(item.getTotaltimeSpent()));
 //                        if (item.isGroupContainer()) {
-//                            getStyleClass().add(GROUP_COLUMN_OR_CELL_CSS_CLASS);
+//                            getStyleClass().add(GROUP_CELL);
 //                        } else {
-//                            getStyleClass().add(SUMMARY_COLUMN_OR_CELL_CSS_CLASS);
+//                            getStyleClass().add(SUMMARY_CELL);
 //                        }
 //                    }
 //                }

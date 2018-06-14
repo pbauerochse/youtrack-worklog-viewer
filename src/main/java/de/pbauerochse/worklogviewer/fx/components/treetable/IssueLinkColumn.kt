@@ -1,12 +1,14 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
 import de.pbauerochse.worklogviewer.WorklogViewer
-import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.*
+import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.ALL_WORKLOGVIEWER_CLASSES
+import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.GROUP_CELL
+import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.ISSUE_LINK_CELL
+import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.event.EventHandler
-import javafx.geometry.Pos
 import javafx.scene.control.Tooltip
 import javafx.scene.control.TreeTableCell
 import javafx.scene.control.TreeTableColumn
@@ -23,6 +25,8 @@ internal class IssueLinkColumn : TreeTableColumn<TreeTableRowModel, TreeTableRow
         isSortable = false
         cellValueFactory = Callback { col -> SimpleObjectProperty(col.value.value) }
         cellFactory = Callback { _ -> IssueLinkCell() }
+        prefWidth = 300.0
+        minWidth = 300.0
     }
 }
 
@@ -41,7 +45,6 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
     override fun updateItem(item: TreeTableRowModel?, empty: Boolean) {
         super.updateItem(item, empty)
 
-        alignment = Pos.CENTER_LEFT
         styleClass.removeAll(ALL_WORKLOGVIEWER_CLASSES)
         tooltip = null
         text = null
@@ -51,21 +54,26 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
                 LOGGER.debug("Showing GroupBy Item $it")
                 text = it.getLabel()
                 tooltip = Tooltip(text)
-                styleClass.add(GROUP_COLUMN_OR_CELL_CSS_CLASS)
+                styleClass.add(GROUP_CELL)
             }
 
             if (it.isIssueRow) {
                 LOGGER.debug("Showing Issue Item $it")
+                val issue = (it as IssueTreeTableRow).issue
+
                 text = it.getLabel()
                 tooltip = Tooltip(text)
-                styleClass.add(ISSUE_CELL_CSS_CLASS)
+                styleClass.add(ISSUE_LINK_CELL)
+
+                issue.resolved?.let {
+                    styleClass.add("resolved")
+                }
             }
 
             if (it.isSummaryRow) {
                 LOGGER.debug("Showing Summary Item $it")
                 text = it.getLabel()
-                styleClass.add(SUMMARY_COLUMN_OR_CELL_CSS_CLASS)
-                alignment = Pos.CENTER_RIGHT
+                styleClass.add(SUMMARY_CELL)
             }
         }
     }

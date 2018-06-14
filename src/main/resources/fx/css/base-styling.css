@@ -1,3 +1,33 @@
 /**
  * YouTrack Worklog Viewer basic styling
  */
+.issue-cell {
+    -fx-underline: true;
+}
+
+.resolved .text {
+    -fx-strikethrough: true;
+    -fx-underline: false;
+}
+
+.issue-cell:hover {
+    -fx-cursor: hand;
+}
+
+.timespent-cell {
+    -fx-alignment: center-right;
+}
+
+.summary-cell {
+    -fx-font-weight: bold;
+    -fx-alignment: center-right;
+}
+
+.group-cell {
+    -fx-font-weight: bold;
+}
+
+.scroll-bar {
+    -fx-unit-increment: 100.0;
+    -fx-block-increment: 500.0;
+}
