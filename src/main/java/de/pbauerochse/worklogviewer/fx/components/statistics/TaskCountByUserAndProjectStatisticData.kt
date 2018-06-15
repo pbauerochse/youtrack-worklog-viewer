@@ -28,9 +28,22 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
     }
 
     private fun getProjectStatistics(worklogsForUser: List<WorklogItem>): List<ProjectStatistic> {
-        val worklogsByProject = worklogsForUser.groupBy { it.issue.project }
-        // TODO
+        val distinctProjects = worklogsForUser
+            .map { it.issue.project }
+            .distinct()
 
+        val totalTimeSpentInTimerange = worklogsForUser.map { it.durationInMinutes }.sum()
+
+        val worklogsByProject = worklogsForUser.groupBy { it.issue.project }
+        val issuesByProject = worklogsForUser
+            .map { it.issue }
+            .distinct()
+            .groupBy { it.project }
+
+        distinctProjects.map {
+            val totalTimeSpentInMinutesOnThisProject = worklogsByProject[]
+            ProjectStatistic(it, percentOfTimeSpentOnThisProject, numberOfWorkedIssuesInThisProject, totalTimeSpentInMinutesOnThisProject)
+        }
     }
 
 
