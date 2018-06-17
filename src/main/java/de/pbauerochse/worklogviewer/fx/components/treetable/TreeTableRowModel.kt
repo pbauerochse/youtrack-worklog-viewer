@@ -18,6 +18,6 @@ interface TreeTableRowModel {
     val isGroupByRow: Boolean
 
     fun getLabel(): String
-    fun getTotalTimeSpent(): Long;
+    fun getTotalTimeSpent(): Long
 
 }

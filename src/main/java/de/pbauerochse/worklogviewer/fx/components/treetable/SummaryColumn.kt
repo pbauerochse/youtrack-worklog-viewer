@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.TreeTableCell
 import javafx.scene.control.TreeTableColumn
 import javafx.util.Callback
-import org.slf4j.LoggerFactory
 
 /**
  * Displays the total amount of time spent
@@ -46,9 +45,5 @@ class SummaryCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel>() {
                 item.isGroupByRow -> styleClass.add(GROUP_CELL)
             }
         }
-    }
-
-    companion object {
-        private val LOGGER = LoggerFactory.getLogger(SummaryCell::class.java)
     }
 }

@@ -33,7 +33,7 @@ data class Issue(
         PROJECT_ID_REGEX.matchEntire(issueId)!!.groupValues[1]
     }
 
-    val issueNumber: Long by lazy {
+    private val issueNumber: Long by lazy {
         PROJECT_ID_REGEX.matchEntire(issueId)!!.groupValues[2].toLong()
     }
 

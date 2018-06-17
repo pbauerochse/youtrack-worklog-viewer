@@ -9,7 +9,7 @@ import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import javafx.scene.Node
 
 /**
- * Tab, that displays the results for a single [Project]
+ * Tab, that displays the results for a single [de.pbauerochse.worklogviewer.youtrack.domain.Project]
  * independent of the work author
  */
 internal class ProjectWorklogTab : WorklogsTab("") {
