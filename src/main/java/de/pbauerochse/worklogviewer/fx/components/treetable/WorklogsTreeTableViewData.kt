@@ -11,7 +11,7 @@ import javafx.scene.control.TreeItem
  */
 class WorklogsTreeTableViewData(
     val reportParameters: TimeReportParameters,
-    private val issues: List<Issue>
+    val issues: List<Issue>
 ) {
 
     internal val treeRows: List<TreeItem<TreeTableRowModel>> by lazy {

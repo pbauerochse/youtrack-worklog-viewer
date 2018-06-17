@@ -5,11 +5,11 @@ import de.pbauerochse.worklogviewer.domain.Callback;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
 import de.pbauerochse.worklogviewer.domain.timerangeprovider.TimerangeProviderFactory;
-import de.pbauerochse.worklogviewer.fx.components.WorklogTab;
 import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane;
+import de.pbauerochse.worklogviewer.fx.components.tabs.WorklogsTab;
 import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter;
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter;
-import de.pbauerochse.worklogviewer.fx.tasks.ExcelExporterTask;
+import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask;
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask;
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask;
 import de.pbauerochse.worklogviewer.fx.tasks.VersionCheckerTask;
@@ -38,7 +38,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -307,28 +306,15 @@ public class MainViewController implements Initializable {
      * Exports the currently visible data to an excel spreadsheet
      */
     private void startExportToExcelTask() {
-
-        // currently visible tab
-        WorklogTab tab = (WorklogTab) resultTabPane.getSelectionModel().getSelectedItem();
-
-        // ask the user where to save the excel to
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(FormattingUtil.getFormatted("view.menu.file.exportexcel"));
-//        fileChooser.setInitialFileName(tab.getExcelDownloadSuggestedFilename());
-        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Microsoft Excel", "*.xls"));
-
-        File targetFile = fileChooser.showSaveDialog(progressBar.getScene().getWindow());
-        if (targetFile != null) {
-            LOGGER.debug("Exporting tab {} to excel {}", tab.getText(), targetFile.getAbsoluteFile());
-
-            ExcelExporterTask excelExporterTask = new ExcelExporterTask(tab, targetFile);
-            excelExporterTask.setOnSucceeded(event -> {
+        WorklogsTab tab = resultTabPane.getCurrentlyVisibleTab();
+        ExportToExcelTask task = tab.getDownloadAsExcelTask();
+        if (task != null) {
+            task.setOnSucceeded(e -> {
                 LOGGER.info("Excel creation succeeded");
-                File result = (File) event.getSource().getValue();
-                progressText.setText(FormattingUtil.getFormatted("exceptions.excel.success", result.getAbsoluteFile()));
+                File file = (File) e.getSource().getValue();
+                progressText.setText(FormattingUtil.getFormatted("exceptions.excel.success", file.getAbsolutePath()));
             });
-
-            startTask(excelExporterTask);
+            startTask(task);
         }
     }
 
@@ -343,10 +329,7 @@ public class MainViewController implements Initializable {
         LocalDate selectedEndDate = endDatePicker.getValue();
 
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, selectedStartDate, selectedEndDate);
-
-
         GroupByCategory groupByCategory = groupByCategoryComboBox.getSelectionModel().getSelectedItem();
-
         TimeReportParameters parameters = new TimeReportParameters(timerangeProvider, groupByCategory);
 
         FetchTimereportTask task = new FetchTimereportTask(parameters);

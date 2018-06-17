@@ -2,7 +2,10 @@ package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableView
+import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData
+import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.youtrack.TimeReport
 import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters
 import de.pbauerochse.worklogviewer.youtrack.domain.Issue
@@ -12,6 +15,7 @@ import javafx.scene.Node
 import javafx.scene.control.SplitPane
 import javafx.scene.control.Tab
 import javafx.scene.layout.AnchorPane
+import javafx.stage.FileChooser
 import org.slf4j.LoggerFactory
 
 /**
@@ -25,8 +29,8 @@ abstract class WorklogsTab(label: String) : Tab(label) {
     private val splitPane = SplitPane(getWorklogsTableView()).apply { orientation = Orientation.HORIZONTAL }
     private val settingsModel = SettingsUtil.settingsViewModel
 
-    private var nextIssues: List<Issue>? = null
-    private var nextReportParameters: TimeReportParameters? = null
+    private var currentData : WorklogsTreeTableViewData? = null
+    private var nextData : WorklogsTreeTableViewData? = null
 
     init {
         content = splitPane
@@ -37,8 +41,7 @@ abstract class WorklogsTab(label: String) : Tab(label) {
 
     fun update(label: String, reportParameters: TimeReportParameters, issues: List<Issue>) {
         text = label
-        nextIssues = issues
-        nextReportParameters = reportParameters
+        nextData = WorklogsTreeTableViewData(reportParameters, issues)
 
         if (isSelected) {
             renderContent()
@@ -63,14 +66,15 @@ abstract class WorklogsTab(label: String) : Tab(label) {
     }
 
     private fun renderContent() {
-        if (nextIssues != null) {
-            LOGGER.debug("Rendering ${nextIssues!!.size} Issues")
-            worklogsTableView.setIssues(nextIssues!!, nextReportParameters!!)
+        if (nextData != null) {
+            LOGGER.debug("Rendering ${nextData!!.issues.size} Issues")
+            currentData = nextData
+            nextData = null
 
-            val statistics = getStatistics(nextIssues!!)
+            worklogsTableView.update(currentData!!)
+
+            val statistics = getStatistics(currentData!!.issues)
             statisticsPane.replaceAll(statistics)
-
-            nextIssues = null
         }
     }
 
@@ -85,6 +89,22 @@ abstract class WorklogsTab(label: String) : Tab(label) {
         AnchorPane.setLeftAnchor(worklogsTableView, 0.0)
 
         return anchorPane
+    }
+
+    fun getDownloadAsExcelTask(): ExportToExcelTask? {
+        // ask the user where to save the target file
+        val timerange = currentData!!.reportParameters.timerangeProvider
+
+        val fileChooser = FileChooser()
+        fileChooser.title = FormattingUtil.getFormatted("view.menu.file.exportexcel")
+        fileChooser.initialFileName = "${text}_$timerange.xls"
+        fileChooser.selectedExtensionFilter = FileChooser.ExtensionFilter("Microsoft Excel", "*.xls")
+
+        val targetFile = fileChooser.showSaveDialog(content.scene.window)
+        return targetFile?.let {
+            LOGGER.debug("Exporting tab {} to excel {}", text, it.absoluteFile)
+            return ExportToExcelTask(text, currentData!!, it)
+        }
     }
 
     companion object {

@@ -1,6 +1,5 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters
 import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeTableView
@@ -17,14 +16,13 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
         root = TreeItem()
     }
 
-    internal fun setIssues(issues: List<Issue>, reportParameters: TimeReportParameters) {
-        LOGGER.debug("Showing ${issues.size} Issues")
+    internal fun update(data: WorklogsTreeTableViewData) {
+        LOGGER.debug("Showing ${data.issues.size} Issues")
         root.children.clear()
         selectionModel.clearSelection()
 
-        val data = WorklogsTreeTableViewData(reportParameters, issues)
         root.children.addAll(data.treeRows)
-        root.children.add(getSummaryRow(issues))
+        root.children.add(getSummaryRow(data.issues))
 
         updateColumns(data)
     }

@@ -99,4 +99,7 @@ public class TimeReportResultTabbedPane extends TabPane {
         return (WorklogsTab) getTabs().get(tabIndex);
     }
 
+    public WorklogsTab getCurrentlyVisibleTab() {
+        return (WorklogsTab) getSelectionModel().getSelectedItem();
+    }
 }

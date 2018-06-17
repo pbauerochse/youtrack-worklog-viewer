@@ -37,7 +37,7 @@ object YouTrackServiceFactory {
 
     private fun getYouTrackService(version: YouTrackVersion): YouTrackService {
         return AVAILABLE_SERVICE_IMPLEMENTATIONS.stream()
-            .filter({ service -> service.supportedVersions.contains(version) })
+            .filter { service -> service.supportedVersions.contains(version) }
             .findFirst()
             .orElseThrow({ getIllegalArgumentException("exceptions.settings.version.invalid", version.name) })
     }

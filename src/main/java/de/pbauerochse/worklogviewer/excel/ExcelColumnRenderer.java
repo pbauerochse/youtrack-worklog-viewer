@@ -1,10 +1,8 @@
 package de.pbauerochse.worklogviewer.excel;
 
-import de.pbauerochse.worklogviewer.fx.components.domain.DisplayRow;
-import javafx.scene.control.TreeItem;
+import de.pbauerochse.worklogviewer.fx.components.treetable.TreeTableRowModel;
 import org.apache.poi.ss.usermodel.*;
-
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Patrick Bauerochse
@@ -13,8 +11,6 @@ import java.util.List;
 public abstract class ExcelColumnRenderer {
 
     private static final int ADDITIONAL_ROW_HEIGHT = 5;
-
-    public abstract void renderCells(int columnIndex, Sheet sheet, List<TreeItem<DisplayRow>> displayResult, boolean isGroupedData);
 
     private Font boldFont;
     private Font biggerBoldFont;
@@ -103,5 +99,9 @@ public abstract class ExcelColumnRenderer {
             biggerBoldFont.setFontHeightInPoints((short) 14);
         }
         return biggerBoldFont;
+    }
+
+    public void write(@NotNull Row row, int columnIndex, @NotNull TreeTableRowModel value) {
+
     }
 }

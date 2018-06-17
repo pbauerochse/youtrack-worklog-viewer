@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.domain.timerangeprovider;
 
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider;
+import de.pbauerochse.worklogviewer.util.FormattingUtil;
 
 import java.time.LocalDate;
 
@@ -37,5 +38,10 @@ public abstract class BaseTimerangeProvider implements TimerangeProvider {
         int result = startDate.hashCode();
         result = 31 * result + endDate.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return FormattingUtil.formatDate(startDate) + "-" + FormattingUtil.formatDate(endDate);
     }
 }
