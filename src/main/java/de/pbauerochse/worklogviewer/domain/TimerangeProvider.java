@@ -3,8 +3,8 @@ package de.pbauerochse.worklogviewer.domain;
 import java.time.LocalDate;
 
 /**
- * @author Patrick Bauerochse
- * @since 13.04.15
+ * Provides the start- and enddate
+ * for a given timerange
  */
 public interface TimerangeProvider {
 

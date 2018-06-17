@@ -5,9 +5,15 @@ data class UserStatistic(
     val projectStatistics: List<ProjectStatistic>
 ) {
 
-    val totalNumberOfTickets : Long by lazy {
+    val totalNumberOfTickets : Int by lazy {
         projectStatistics
             .map { it.numberOfIssues }
+            .sum()
+    }
+
+    val totalTimeSpent : Long by lazy {
+        projectStatistics
+            .map { it.timeSpentInMinutes }
             .sum()
     }
 }

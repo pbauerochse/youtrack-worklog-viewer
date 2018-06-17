@@ -1,15 +1,17 @@
 package de.pbauerochse.worklogviewer.fx.components.statistics
 
+import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.*
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
+import javafx.geometry.HPos
 import javafx.scene.control.Label
 import javafx.scene.layout.GridPane
+import javafx.scene.layout.Priority
 import org.slf4j.LoggerFactory
 
 /**
  *
  */
-class TaskCountByUserAndProjectStatistics(private val issues: List<Issue>) : GridPane() {
+class TaskCountByUserAndProjectStatistics(private val data: TaskCountByUserAndProjectStatisticData) : GridPane() {
 
     private var alreadyRendered = false
 
@@ -31,7 +33,6 @@ class TaskCountByUserAndProjectStatistics(private val issues: List<Issue>) : Gri
 
     private fun renderStatistics() {
         var currentRow = 0
-        val data = TaskCountByUserAndProjectStatisticData(issues)
 
         data.userStatistics.forEach {
             val label = getUserDisplayNameLabel(currentRow++, it)
@@ -40,22 +41,28 @@ class TaskCountByUserAndProjectStatistics(private val issues: List<Issue>) : Gri
             it.projectStatistics.forEach {
                 val percentage = getPercentageLabel(currentRow, it)
                 val projectAndNumberOfTickets = getProjectLabel(currentRow, it)
-                val projectTotalSpentTime = getTotalSpenttimeLabel(currentRow, it)
+                val projectTotalSpentTime = getProjectSpentTimeLabel(currentRow, it)
                 children.addAll(percentage, projectAndNumberOfTickets, projectTotalSpentTime)
                 currentRow++
             }
-            // TOTAL
-            // SPACER
+
+            children.addAll(
+                getTotalSpentTimeLabel(currentRow),
+                getTotalSpentTime(currentRow, it)
+            )
+
+            // spacing to next user section
+            currentRow += 2
         }
     }
 
     private fun getUserDisplayNameLabel(index: Int, userStatistic: UserStatistic): Label {
         val totalNumberOfTickets = userStatistic.totalNumberOfTickets
-        val label = Label(getFormatted("view.statistics.somethingtoamountoftickets", userStatistic, totalNumberOfTickets))
+        val label = Label(getFormatted("view.statistics.somethingtoamountoftickets", userStatistic.userDisplayLabel, totalNumberOfTickets))
         label.styleClass.add("task-by-user-statistics-username")
 //        label.padding = Insets(20.0, 0.0, 0.0, 0.0)
         GridPane.setConstraints(label, 0, index)
-        GridPane.setColumnSpan(label, 4)
+        GridPane.setColumnSpan(label, 3)
         return label
     }
 
@@ -63,27 +70,44 @@ class TaskCountByUserAndProjectStatistics(private val issues: List<Issue>) : Gri
         val percentageFormatted = formatPercentage(projectStatistic.percentage)
         val percentageLabel = Label(percentageFormatted)
         percentageLabel.styleClass.add("task-by-user-statistics-percentage")
-//        percentageLabel.setAlignment(Pos.CENTER_RIGHT)
-//        percentageLabel.setPadding(Insets(0.0, 0.0, 0.0, 20.0))
-//        GridPane.setHalignment(percentageLabel, HPos.RIGHT)
+        GridPane.setHalignment(percentageLabel, HPos.RIGHT)
         GridPane.setConstraints(percentageLabel, 1, currentRow)
         return percentageLabel
     }
 
     private fun getProjectLabel(currentRow: Int, it: ProjectStatistic): Label {
-        val projectLabel = Label(getFormatted("view.statistics.somethingtoamountoftickets", it.id, it.numberOfIssues))
+        val projectLabel = Label(getFormatted("view.statistics.somethingtoamountoftickets", it.projectId, it.numberOfIssues))
         projectLabel.styleClass.add("task-by-user-statistics-project")
         GridPane.setConstraints(projectLabel, 2, currentRow)
         return projectLabel
     }
 
-    private fun getTotalSpenttimeLabel(currentRow: Int, it: ProjectStatistic): Label {
-        val timespentLabel = Label(formatMinutes(it.timespentInMinutes, true))
+    private fun getProjectSpentTimeLabel(currentRow: Int, it: ProjectStatistic): Label {
+        val timespentLabel = Label(formatMinutes(it.timeSpentInMinutes, true))
+        timespentLabel.styleClass.add("task-by-user-statistics-project-spent-time")
         GridPane.setConstraints(timespentLabel, 3, currentRow)
-        timespentLabel.styleClass.add("task-by-user-statistics-timespent")
-//        GridPane.setHgrow(timespentLabel, Priority.ALWAYS)
-//        GridPane.setHalignment(timespentLabel, HPos.RIGHT)
+        GridPane.setHalignment(timespentLabel, HPos.RIGHT)
+        GridPane.setHgrow(timespentLabel, Priority.ALWAYS)
+        timespentLabel.applyCss()
         return timespentLabel
+    }
+
+    private fun getTotalSpentTimeLabel(currentRow: Int): Label {
+        val label = Label(getFormatted("view.statistics.totaltimespent"))
+        label.styleClass.add("task-by-user-statistics-total-spent-time-label")
+        GridPane.setConstraints(label, 0, currentRow)
+        GridPane.setColumnSpan(label, 2)
+        GridPane.setHalignment(label, HPos.RIGHT)
+        return label
+    }
+
+    private fun getTotalSpentTime(currentRow: Int, data: UserStatistic): Label {
+        val label = Label(FormattingUtil.formatMinutes(data.totalTimeSpent, true))
+        label.styleClass.add("task-by-user-statistics-total-spent-time")
+        GridPane.setConstraints(label, 3, currentRow)
+        GridPane.setHalignment(label, HPos.RIGHT)
+        GridPane.setHgrow(label, Priority.ALWAYS)
+        return label
     }
 
     companion object {

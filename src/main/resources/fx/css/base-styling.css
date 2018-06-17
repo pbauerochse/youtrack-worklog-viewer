@@ -30,3 +30,21 @@
     -fx-unit-increment: 100.0;
     -fx-block-increment: 500.0;
 }
+
+.task-by-user-statistics-username {
+    -fx-padding: 20 0 0 0;
+}
+
+.task-by-user-statistics-percentage {
+    -fx-alignment: center-right;
+    -fx-padding: 0 0 0 20;
+    -fx-column-halignment: right;
+}
+
+.task-by-user-statistics-total-spent-time-label,
+.task-by-user-statistics-username,
+.task-by-user-statistics-project,
+.task-by-user-statistics-percentage,
+.task-by-user-statistics-total-spent-time {
+    -fx-font-weight: bold;
+}

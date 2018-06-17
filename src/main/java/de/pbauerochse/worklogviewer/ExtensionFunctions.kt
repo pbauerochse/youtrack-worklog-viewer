@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer
 
 import java.time.*
+import java.time.format.DateTimeFormatter
 
 /**
  * Kotlin convenience extension functions
@@ -18,5 +19,8 @@ fun String.trimToNull() : String? {
         null
     }
 }
+
+fun String.toLocalDate() : LocalDate? = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
+fun LocalDate.toFormattedString() : String = format(DateTimeFormatter.ISO_DATE)
 
 fun String?.isNotNullOrBlank(): Boolean = !this.isNullOrBlank()

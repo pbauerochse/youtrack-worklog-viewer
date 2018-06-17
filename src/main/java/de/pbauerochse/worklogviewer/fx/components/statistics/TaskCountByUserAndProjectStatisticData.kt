@@ -16,6 +16,7 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
         val worklogsGroupedByUserDisplayname = issues
             .flatMap { it.worklogItems }
             .groupBy { it.userDisplayname }
+            .toSortedMap()
 
         return worklogsGroupedByUserDisplayname.map {
             val userDisplayname = it.key
@@ -31,6 +32,7 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
         val distinctProjects = worklogsForUser
             .map { it.issue.project }
             .distinct()
+            .sorted()
 
         val totalTimeSpentInTimerange = worklogsForUser.map { it.durationInMinutes }.sum()
 
@@ -40,8 +42,10 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
             .distinct()
             .groupBy { it.project }
 
-        distinctProjects.map {
-            val totalTimeSpentInMinutesOnThisProject = worklogsByProject[]
+        return distinctProjects.map {
+            val totalTimeSpentInMinutesOnThisProject = worklogsByProject[it]!!.map { it.durationInMinutes }.sum()
+            val numberOfWorkedIssuesInThisProject = issuesByProject[it]!!.count()
+            val percentOfTimeSpentOnThisProject = totalTimeSpentInMinutesOnThisProject.toDouble() / totalTimeSpentInTimerange.toDouble()
             ProjectStatistic(it, percentOfTimeSpentOnThisProject, numberOfWorkedIssuesInThisProject, totalTimeSpentInMinutesOnThisProject)
         }
     }

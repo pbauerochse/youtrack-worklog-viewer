@@ -8,6 +8,7 @@ import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDate;
 import java.util.function.Consumer;
 
 import static java.time.DayOfWeek.*;
@@ -31,6 +32,8 @@ public class SettingsViewModel {
     private final BooleanProperty loadDataAtStartup = new SimpleBooleanProperty();
     private final BooleanProperty showDecimalsInExcel = new SimpleBooleanProperty();
     private final ObjectProperty<ReportTimerange> lastUsedReportTimerange = new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDate> startDate = new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDate> endDate = new SimpleObjectProperty<>();
     private final StringProperty lastUsedGroupByCategoryId = new SimpleStringProperty();
 
     private final BooleanProperty collapseStateMonday = new SimpleBooleanProperty();
@@ -77,6 +80,8 @@ public class SettingsViewModel {
         settings.setLoadDataAtStartup(loadDataAtStartupProperty().get());
         settings.setShowDecimalHourTimesInExcelReport(showDecimalsInExcelProperty().get());
         settings.setLastUsedReportTimerange(lastUsedReportTimerangeProperty().get());
+        settings.setStartDate(startDateProperty().get());
+        settings.setEndDate(endDateProperty().get());
         settings.setLastUsedGroupByCategoryId(lastUsedGroupByCategoryIdProperty().get());
 
         settings.getCollapseState().set(MONDAY, collapseStateMondayProperty().get());
@@ -115,6 +120,8 @@ public class SettingsViewModel {
         loadDataAtStartupProperty().set(settings.isLoadDataAtStartup());
         showDecimalsInExcelProperty().set(settings.isShowDecimalHourTimesInExcelReport());
         lastUsedReportTimerangeProperty().set(settings.getLastUsedReportTimerange());
+        startDateProperty().set(settings.getStartDate());
+        endDateProperty().set(settings.getEndDate());
         lastUsedGroupByCategoryIdProperty().set(settings.getLastUsedGroupByCategoryId());
 
         collapseStateMondayProperty().set(settings.getCollapseState().isSet(MONDAY));
@@ -143,10 +150,16 @@ public class SettingsViewModel {
     private void bindAutoUpdatingProperties() {
         lastUsedReportTimerangeProperty().addListener(invokeSetter(settings::setLastUsedReportTimerange));
         lastUsedGroupByCategoryIdProperty().addListener(invokeSetter(settings::setLastUsedGroupByCategoryId));
+        startDateProperty().addListener(invokeSetter(settings::setStartDate));
+        endDateProperty().addListener(invokeSetter(settings::setEndDate));
     }
 
     private <T> ChangeListener<T> invokeSetter(Consumer<T> setter) {
         return ((observable, oldValue, newValue) -> setter.accept(newValue));
+    }
+
+    public String getYouTrackUrl() {
+        return youTrackUrl.get();
     }
 
     public StringProperty youTrackUrlProperty() {
@@ -161,8 +174,16 @@ public class SettingsViewModel {
         return youTrackVersion;
     }
 
+    public String getYouTrackUsername() {
+        return youTrackUsername.get();
+    }
+
     public StringProperty youTrackUsernameProperty() {
         return youTrackUsername;
+    }
+
+    public String getYouTrackPermanentToken() {
+        return youTrackPermanentToken.get();
     }
 
     public StringProperty youTrackPermanentTokenProperty() {
@@ -177,96 +198,184 @@ public class SettingsViewModel {
         return theme;
     }
 
+    public int getWorkhours() {
+        return workhours.get();
+    }
+
     public IntegerProperty workhoursProperty() {
         return workhours;
+    }
+
+    public boolean isShowAllWorklogs() {
+        return showAllWorklogs.get();
     }
 
     public BooleanProperty showAllWorklogsProperty() {
         return showAllWorklogs;
     }
 
-    public boolean isShowAllWorklogs() {
-        return showAllWorklogsProperty().get();
+    public boolean isShowStatistics() {
+        return showStatistics.get();
     }
 
     public BooleanProperty showStatisticsProperty() {
         return showStatistics;
     }
 
-    public boolean isShowStatistics() {
-        return showStatisticsProperty().get();
+    public boolean isLoadDataAtStartup() {
+        return loadDataAtStartup.get();
     }
 
     public BooleanProperty loadDataAtStartupProperty() {
         return loadDataAtStartup;
     }
 
+    public boolean isShowDecimalsInExcel() {
+        return showDecimalsInExcel.get();
+    }
+
     public BooleanProperty showDecimalsInExcelProperty() {
         return showDecimalsInExcel;
+    }
+
+    public ReportTimerange getLastUsedReportTimerange() {
+        return lastUsedReportTimerange.get();
     }
 
     public ObjectProperty<ReportTimerange> lastUsedReportTimerangeProperty() {
         return lastUsedReportTimerange;
     }
 
+    public LocalDate getStartDate() {
+        return startDate.get();
+    }
+
+    public ObjectProperty<LocalDate> startDateProperty() {
+        return startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate.get();
+    }
+
+    public ObjectProperty<LocalDate> endDateProperty() {
+        return endDate;
+    }
+
+    public String getLastUsedGroupByCategoryId() {
+        return lastUsedGroupByCategoryId.get();
+    }
+
     public StringProperty lastUsedGroupByCategoryIdProperty() {
         return lastUsedGroupByCategoryId;
     }
 
-    public String getLastUsedGroupByCategoryId() {
-        return lastUsedGroupByCategoryIdProperty().get();
+    public boolean isCollapseStateMonday() {
+        return collapseStateMonday.get();
     }
 
     public BooleanProperty collapseStateMondayProperty() {
         return collapseStateMonday;
     }
 
+    public boolean isCollapseStateTuesday() {
+        return collapseStateTuesday.get();
+    }
+
     public BooleanProperty collapseStateTuesdayProperty() {
         return collapseStateTuesday;
+    }
+
+    public boolean isCollapseStateWednesday() {
+        return collapseStateWednesday.get();
     }
 
     public BooleanProperty collapseStateWednesdayProperty() {
         return collapseStateWednesday;
     }
 
+    public boolean isCollapseStateThursday() {
+        return collapseStateThursday.get();
+    }
+
     public BooleanProperty collapseStateThursdayProperty() {
         return collapseStateThursday;
+    }
+
+    public boolean isCollapseStateFriday() {
+        return collapseStateFriday.get();
     }
 
     public BooleanProperty collapseStateFridayProperty() {
         return collapseStateFriday;
     }
 
+    public boolean isCollapseStateSaturday() {
+        return collapseStateSaturday.get();
+    }
+
     public BooleanProperty collapseStateSaturdayProperty() {
         return collapseStateSaturday;
+    }
+
+    public boolean isCollapseStateSunday() {
+        return collapseStateSunday.get();
     }
 
     public BooleanProperty collapseStateSundayProperty() {
         return collapseStateSunday;
     }
 
+    public boolean isHighlightStateMonday() {
+        return highlightStateMonday.get();
+    }
+
     public BooleanProperty highlightStateMondayProperty() {
         return highlightStateMonday;
+    }
+
+    public boolean isHighlightStateTuesday() {
+        return highlightStateTuesday.get();
     }
 
     public BooleanProperty highlightStateTuesdayProperty() {
         return highlightStateTuesday;
     }
 
+    public boolean isHighlightStateWednesday() {
+        return highlightStateWednesday.get();
+    }
+
     public BooleanProperty highlightStateWednesdayProperty() {
         return highlightStateWednesday;
+    }
+
+    public boolean isHighlightStateThursday() {
+        return highlightStateThursday.get();
     }
 
     public BooleanProperty highlightStateThursdayProperty() {
         return highlightStateThursday;
     }
 
+    public boolean isHighlightStateFriday() {
+        return highlightStateFriday.get();
+    }
+
     public BooleanProperty highlightStateFridayProperty() {
         return highlightStateFriday;
     }
 
+    public boolean isHighlightStateSaturday() {
+        return highlightStateSaturday.get();
+    }
+
     public BooleanProperty highlightStateSaturdayProperty() {
         return highlightStateSaturday;
+    }
+
+    public boolean isHighlightStateSunday() {
+        return highlightStateSunday.get();
     }
 
     public BooleanProperty highlightStateSundayProperty() {

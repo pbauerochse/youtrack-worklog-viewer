@@ -25,6 +25,7 @@ import de.pbauerochse.worklogviewer.youtrack.TimeReport;
 import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 import de.pbauerochse.worklogviewer.youtrack.domain.NoSelectionGroupByCategory;
+import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.concurrent.WorkerStateEvent;
@@ -66,7 +67,6 @@ public class MainViewController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainViewController.class);
 
-    private static final int AMOUNT_OF_FIXED_TABS_BEFORE_PROJECT_TABS = 2;  // two fixed components (own and all)
     private static final String REQUIRED_FIELD_CLASS = "required";
 
     public static ThreadPoolExecutor EXECUTOR = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
@@ -207,22 +207,41 @@ public class MainViewController implements Initializable {
 
     private void initializeDatePickers() {
         // start and end datepicker are only editable if report timerange is CUSTOM
-        startDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
-        startDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) {
+        ChangeListener<LocalDate> startDateChangeListener = (observable, oldValue, newValue) -> {
+            LOGGER.info("Setting start date to {}", newValue);
+            if (newValue == null || (endDatePicker.getValue() != null && endDatePicker.getValue().isBefore(newValue))) {
                 startDatePicker.getStyleClass().add(REQUIRED_FIELD_CLASS);
             } else {
                 startDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
             }
-        });
-        endDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
-        endDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) {
+        };
+
+        ChangeListener<LocalDate> endDateChangeListener = (observable, oldValue, newValue) -> {
+            LOGGER.info("Setting end date to {}", newValue);
+            if (newValue == null || (startDatePicker.getValue() != null && startDatePicker.getValue().isAfter(newValue))) {
                 endDatePicker.getStyleClass().add(REQUIRED_FIELD_CLASS);
             } else {
                 endDatePicker.getStyleClass().remove(REQUIRED_FIELD_CLASS);
             }
-        });
+        };
+
+        startDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
+        startDatePicker.valueProperty().addListener(startDateChangeListener);
+
+        endDatePicker.disableProperty().bind(timerangeComboBox.getSelectionModel().selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM));
+        endDatePicker.valueProperty().addListener(endDateChangeListener);
+
+        // value listener
+        startDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> settingsModel.startDateProperty().set(newValue));
+        endDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> settingsModel.endDateProperty().set(newValue));
+
+        // set value
+        if (settingsModel.getLastUsedReportTimerange() == ReportTimerange.CUSTOM) {
+            startDatePicker.setValue(settingsModel.getStartDate());
+            endDatePicker.setValue(settingsModel.getEndDate());
+            startDateChangeListener.changed(startDatePicker.valueProperty(), null, startDatePicker.getValue());
+            endDateChangeListener.changed(endDatePicker.valueProperty(), null, endDatePicker.getValue());
+        }
     }
 
     private void initializeFetchWorklogsButton() {

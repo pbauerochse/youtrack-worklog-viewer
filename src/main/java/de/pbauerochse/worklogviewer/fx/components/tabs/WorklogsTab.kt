@@ -30,8 +30,8 @@ abstract class WorklogsTab(label: String) : Tab(label) {
 
     init {
         content = splitPane
-        selectedProperty().addListener({ _, _, _ -> renderContent() })
-        settingsModel.showStatisticsProperty().addListener({ _, _, showStatistics -> showStatisticsView(showStatistics) })
+        selectedProperty().addListener { _, _, _ -> renderContent() }
+        settingsModel.showStatisticsProperty().addListener { _, _, showStatistics -> showStatisticsView(showStatistics) }
         showStatisticsView(settingsModel.isShowStatistics)
     }
 

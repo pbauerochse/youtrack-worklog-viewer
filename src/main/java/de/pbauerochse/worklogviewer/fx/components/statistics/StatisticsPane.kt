@@ -13,6 +13,7 @@ class StatisticsPane : ScrollPane() {
         hbarPolicy = ScrollBarPolicy.NEVER
         isFitToWidth = true
         padding = Insets(7.0)
+        content = statisticsContainer
     }
 
     /**
