@@ -14,7 +14,7 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
 
     internal val numberOfProjects : Int by lazy {
         userStatistics
-            .flatMap { it.projectStatistics }
+            .flatMap { it.projectSummaries }
             .map { it.projectId }
             .distinct()
             .count()
@@ -36,7 +36,7 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
         }
     }
 
-    private fun getProjectStatistics(worklogsForUser: List<WorklogItem>): List<ProjectStatistic> {
+    private fun getProjectStatistics(worklogsForUser: List<WorklogItem>): List<ProjectSummary> {
         val distinctProjects = worklogsForUser
             .map { it.issue.project }
             .distinct()
@@ -54,7 +54,7 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
             val totalTimeSpentInMinutesOnThisProject = worklogsByProject[it]!!.map { it.durationInMinutes }.sum()
             val numberOfWorkedIssuesInThisProject = issuesByProject[it]!!.count()
             val percentOfTimeSpentOnThisProject = totalTimeSpentInMinutesOnThisProject.toDouble() / totalTimeSpentInTimerange.toDouble()
-            ProjectStatistic(it, percentOfTimeSpentOnThisProject, numberOfWorkedIssuesInThisProject, totalTimeSpentInMinutesOnThisProject)
+            ProjectSummary(it, percentOfTimeSpentOnThisProject, numberOfWorkedIssuesInThisProject, totalTimeSpentInMinutesOnThisProject)
         }
     }
 }

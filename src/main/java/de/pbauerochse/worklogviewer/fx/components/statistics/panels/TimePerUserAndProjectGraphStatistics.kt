@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.statistics.panels
 
-import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
+import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByProjectAndUserStatisticData
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.scene.chart.CategoryAxis
@@ -13,24 +13,22 @@ import javafx.scene.layout.VBox
 import org.slf4j.LoggerFactory
 
 /**
- * Displays the time spent on a project
- * as a bar graph. The bar contains a section
- * for each user that spent some time on
- * the project, according to the booked
- * worklog items
+ * Displays the time spent by a user as a bar graph
+ * Each bar is divided into sections fpr the different
+ * projects, the user worked on
  */
-class TimePerProjectAndUserGraphStatistics(
-    private val statisticsData: TaskCountByUserAndProjectStatisticData,
-    projectAxis: NumberAxis = NumberAxis()
-) : StackedBarChart<Number, String>(projectAxis, CategoryAxis()) {
+class TimePerUserAndProjectGraphStatistics(
+    private val statisticsData: TaskCountByProjectAndUserStatisticData,
+    employeeAxis: NumberAxis = NumberAxis()
+) : StackedBarChart<Number, String>(employeeAxis, CategoryAxis()) {
 
     private var alreadyRendered = false
 
     init {
-        title = getFormatted("view.statistics.byprojectandemployee")
-        prefHeight = (HEIGHT_PER_Y_AXIS_ELEMENT * statisticsData.numberOfProjects + HEIGHT_PER_X_AXIS_ELEMENT * statisticsData.userStatistics.size + ADDITIONAL_HEIGHT).toDouble()
+        title = getFormatted("view.statistics.byemployeeandproject")
+        prefHeight = (HEIGHT_PER_Y_AXIS_ELEMENT * statisticsData.numberOfUsers + HEIGHT_PER_X_AXIS_ELEMENT * statisticsData.projectStatistic.size + ADDITIONAL_HEIGHT).toDouble()
 
-        projectAxis.apply {
+        employeeAxis.apply {
             label = getFormatted("view.statistics.timespentinhours")
             tickLabelRotation = 90.0
         }
@@ -50,17 +48,17 @@ class TimePerProjectAndUserGraphStatistics(
     }
 
     private fun renderStatistics() {
-        statisticsData.userStatistics.forEach {
+        statisticsData.projectStatistic.forEach {
             val series = XYChart.Series<Number, String>()
-            series.name = it.userDisplayLabel
+            series.name = it.projectName
 
-            it.projectSummaries.forEach {
+            it.userStatistics.forEach {
                 val timeSpentInHours = it.timeSpentInMinutes.toDouble() / 60.0
                 val formattedTime = formatMinutes(it.timeSpentInMinutes)
-                val data = XYChart.Data<Number, String>(timeSpentInHours, it.projectId)
+                val data = XYChart.Data<Number, String>(timeSpentInHours, it.userDisplayName)
                 series.data.add(data)
 
-                data.nodeProperty().addListener {_, _, newNode -> Tooltip.install(newNode, Tooltip("${series.name} - $formattedTime"))}
+                data.nodeProperty().addListener { _, _, newNode -> Tooltip.install(newNode, Tooltip("${series.name} - $formattedTime")) }
             }
 
             data.add(series)
@@ -71,6 +69,6 @@ class TimePerProjectAndUserGraphStatistics(
         private const val HEIGHT_PER_Y_AXIS_ELEMENT = 40
         private const val HEIGHT_PER_X_AXIS_ELEMENT = 35
         private const val ADDITIONAL_HEIGHT = 150
-        private val LOGGER = LoggerFactory.getLogger(TimePerProjectAndUserGraphStatistics::class.java)
+        private val LOGGER = LoggerFactory.getLogger(TimePerUserAndProjectGraphStatistics::class.java)
     }
 }

@@ -2,17 +2,17 @@ package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
 internal data class UserStatistic(
     val userDisplayLabel : String,
-    val projectStatistics: List<ProjectStatistic>
+    val projectSummaries: List<ProjectSummary>
 ) {
 
     val totalNumberOfTickets : Int by lazy {
-        projectStatistics
+        projectSummaries
             .map { it.numberOfIssues }
             .sum()
     }
 
     val totalTimeSpent : Long by lazy {
-        projectStatistics
+        projectSummaries
             .map { it.timeSpentInMinutes }
             .sum()
     }
