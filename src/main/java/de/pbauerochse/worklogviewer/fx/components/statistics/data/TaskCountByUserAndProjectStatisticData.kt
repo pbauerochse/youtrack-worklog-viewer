@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.fx.components.statistics
+package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
 import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem
@@ -10,9 +10,17 @@ import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem
  */
 class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
 
-    val userStatistics : List<UserStatistic> = extractStatistics(issues)
+    internal val userStatistics : List<UserStatistic> by lazy { extractUserStatistics(issues) }
 
-    private fun extractStatistics(issues: List<Issue>): List<UserStatistic> {
+    internal val numberOfProjects : Int by lazy {
+        userStatistics
+            .flatMap { it.projectStatistics }
+            .map { it.projectId }
+            .distinct()
+            .count()
+    }
+
+    private fun extractUserStatistics(issues: List<Issue>): List<UserStatistic> {
         val worklogsGroupedByUserDisplayname = issues
             .flatMap { it.worklogItems }
             .groupBy { it.userDisplayname }
@@ -49,6 +57,4 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
             ProjectStatistic(it, percentOfTimeSpentOnThisProject, numberOfWorkedIssuesInThisProject, totalTimeSpentInMinutesOnThisProject)
         }
     }
-
-
 }

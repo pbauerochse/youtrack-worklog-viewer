@@ -1,6 +1,6 @@
-package de.pbauerochse.worklogviewer.fx.components.statistics
+package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
-data class UserStatistic(
+internal data class UserStatistic(
     val userDisplayLabel : String,
     val projectStatistics: List<ProjectStatistic>
 ) {

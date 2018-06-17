@@ -1,5 +1,8 @@
-package de.pbauerochse.worklogviewer.fx.components.statistics
+package de.pbauerochse.worklogviewer.fx.components.statistics.userprojecttable
 
+import de.pbauerochse.worklogviewer.fx.components.statistics.data.ProjectStatistic
+import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
+import de.pbauerochse.worklogviewer.fx.components.statistics.data.UserStatistic
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.*
 import javafx.geometry.HPos
@@ -9,7 +12,9 @@ import javafx.scene.layout.Priority
 import org.slf4j.LoggerFactory
 
 /**
- *
+ * Shows a table for each user containing an
+ * overview of the amount of tasks and spent
+ * time in each project
  */
 class TaskCountByUserAndProjectStatistics(private val data: TaskCountByUserAndProjectStatisticData) : GridPane() {
 

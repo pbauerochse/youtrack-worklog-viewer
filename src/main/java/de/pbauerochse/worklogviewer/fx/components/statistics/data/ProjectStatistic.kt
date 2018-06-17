@@ -1,6 +1,6 @@
-package de.pbauerochse.worklogviewer.fx.components.statistics
+package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
-data class ProjectStatistic(
+internal data class ProjectStatistic(
     val projectId: String,
     val percentage: Double,
     val numberOfIssues: Int,

@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs
 
-import de.pbauerochse.worklogviewer.fx.components.statistics.TaskCountByUserAndProjectStatisticData
-import de.pbauerochse.worklogviewer.fx.components.statistics.TaskCountByUserAndProjectStatistics
+import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
+import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
+import de.pbauerochse.worklogviewer.fx.components.statistics.userprojecttable.TaskCountByUserAndProjectStatistics
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.youtrack.TimeReport
 import de.pbauerochse.worklogviewer.youtrack.domain.Issue
@@ -28,7 +29,8 @@ internal class AllWorklogsTab : WorklogsTab(getFormatted("view.main.tabs.all")) 
         val data = TaskCountByUserAndProjectStatisticData(issues)
 
         return arrayListOf(
-            TaskCountByUserAndProjectStatistics(data)
+            TaskCountByUserAndProjectStatistics(data),
+            TimePerProjectAndUserGraphStatistics(data)
         )
     }
 
