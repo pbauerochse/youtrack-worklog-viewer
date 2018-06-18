@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.excel
 
 import de.pbauerochse.worklogviewer.domain.TimerangeProvider
-import de.pbauerochse.worklogviewer.excel.columns.TaskDescriptionExcelColumn
-import de.pbauerochse.worklogviewer.excel.columns.TaskStatusExcelColumn
+import de.pbauerochse.worklogviewer.excel.columns.IssueLinkExcelColumn
+import de.pbauerochse.worklogviewer.excel.columns.IssueStatusExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.TaskWorklogSummaryExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.WorklogExcelColumn
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData
@@ -21,7 +21,7 @@ object ExcelExporter {
     private val LOGGER = LoggerFactory.getLogger(ExcelExporter::class.java)
 
     @JvmStatic
-    fun createWorkbook(text: String, data : WorklogsTreeTableViewData): Workbook {
+    fun createWorkbook(text: String, data: WorklogsTreeTableViewData): Workbook {
         LOGGER.info("Creating workbook for ${data.issues.size} '$text' Issues")
         val workbook = HSSFWorkbook()
         val sheet = workbook.createSheet(text)
@@ -34,10 +34,17 @@ object ExcelExporter {
     private fun renderData(data: WorklogsTreeTableViewData, sheet: Sheet) {
         val cellWriters = getCellWriters(data.reportParameters.timerangeProvider)
         for (treeRow in data.treeRows) {
-            val row = sheet.createNextRow()
+            var row = sheet.createNextRow()
 
             cellWriters.forEachIndexed { index, renderer ->
                 renderer.write(row, index, treeRow.value)
+            }
+
+            treeRow.children.forEach {
+                row = sheet.createNextRow()
+                cellWriters.forEachIndexed { index, renderer ->
+                    renderer.write(row, index, it.value)
+                }
             }
         }
 
@@ -46,12 +53,12 @@ object ExcelExporter {
         }
     }
 
-    private fun getCellWriters(timerangeProvider: TimerangeProvider) : List<ExcelColumnRenderer> {
+    private fun getCellWriters(timerangeProvider: TimerangeProvider): List<ExcelColumnRenderer> {
         val startDate = timerangeProvider.startDate
         val endDate = timerangeProvider.endDate
         val renderers = arrayListOf(
-            TaskStatusExcelColumn(),
-            TaskDescriptionExcelColumn()
+            IssueStatusExcelColumn(),
+            IssueLinkExcelColumn()
         )
 
         val daysBetweenStartAndEndDate = ChronoUnit.DAYS

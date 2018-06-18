@@ -14,11 +14,16 @@ public abstract class ExcelColumnRenderer {
 
     private Font boldFont;
     private Font biggerBoldFont;
+    private Font strikethroughRegularFont;
+
     private CellStyle boldCellStyle;
     private CellStyle boldRightAlignedCellStyle;
     private CellStyle regularRightAlignedCellStyle;
     private CellStyle groupHeadlineCellStyle;
     private CellStyle groupHeadlineWorklogCellStyle;
+    private CellStyle strikethroughTextCellStyle;
+
+    protected abstract void write(@NotNull Row row, int columnIndex, @NotNull TreeTableRowModel value);
 
     protected void adjustRowHeight(Cell cellWithStyles) {
         Font font = cellWithStyles.getSheet().getWorkbook().getFontAt(cellWithStyles.getCellStyle().getFontIndex());
@@ -33,6 +38,15 @@ public abstract class ExcelColumnRenderer {
             row = sheet.createRow(rowIndex);
         }
         return row;
+    }
+
+    protected CellStyle getResolvedIssueCellStyle(Sheet sheet) {
+        if (strikethroughTextCellStyle == null) {
+            strikethroughTextCellStyle = sheet.getWorkbook().createCellStyle();
+            strikethroughTextCellStyle.setFont(getStrikethroughRegularFont(sheet));
+            strikethroughTextCellStyle.setVerticalAlignment(VerticalAlignment.TOP);
+        }
+        return strikethroughTextCellStyle;
     }
 
     protected CellStyle getHeadlineCellStyle(Sheet sheet) {
@@ -92,6 +106,14 @@ public abstract class ExcelColumnRenderer {
         return boldFont;
     }
 
+    private Font getStrikethroughRegularFont(Sheet sheet) {
+        if (strikethroughRegularFont == null) {
+            strikethroughRegularFont = sheet.getWorkbook().createFont();
+            strikethroughRegularFont.setStrikeout(true);
+        }
+        return strikethroughRegularFont;
+    }
+
     private Font getBiggerBoldFont(Sheet sheet) {
         if (biggerBoldFont == null) {
             biggerBoldFont = sheet.getWorkbook().createFont();
@@ -101,7 +123,5 @@ public abstract class ExcelColumnRenderer {
         return biggerBoldFont;
     }
 
-    public void write(@NotNull Row row, int columnIndex, @NotNull TreeTableRowModel value) {
 
-    }
 }

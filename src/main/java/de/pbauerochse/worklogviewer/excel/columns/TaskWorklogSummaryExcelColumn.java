@@ -1,10 +1,12 @@
 package de.pbauerochse.worklogviewer.excel.columns;
 
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer;
+import de.pbauerochse.worklogviewer.fx.components.treetable.TreeTableRowModel;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,7 +16,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TaskWorklogSummaryExcelColumn extends ExcelColumnRenderer {
 
-//    @Override
+    @Override
+    protected void write(@NotNull Row row, int columnIndex, @NotNull TreeTableRowModel value) {
+
+    }
+
+    //    @Override
 //    public void renderCells(int columnIndex, Sheet sheet, List<TreeItem<DisplayRow>> displayResult, boolean isGrouped) {
 //
 //        AtomicInteger currentRowIndex = new AtomicInteger(0);

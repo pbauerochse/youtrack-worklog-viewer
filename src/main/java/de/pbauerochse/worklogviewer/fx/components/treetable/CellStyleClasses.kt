@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.fx.tablecolumns
+package de.pbauerochse.worklogviewer.fx.components.treetable
 
 /**
  * Defines all used CSS classes to style

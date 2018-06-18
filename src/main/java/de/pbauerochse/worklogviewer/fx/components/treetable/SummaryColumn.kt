@@ -1,8 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses
-import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.GROUP_CELL
-import de.pbauerochse.worklogviewer.fx.tablecolumns.CellStyleClasses.SUMMARY_CELL
+import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.GROUP_CELL
+import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
 import javafx.beans.property.SimpleObjectProperty
