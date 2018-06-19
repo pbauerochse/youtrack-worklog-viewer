@@ -1,11 +1,11 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
 import de.pbauerochse.worklogviewer.WorklogViewer
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.ALL_WORKLOGVIEWER_CLASSES
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.GROUP_TITLE_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.ISSUE_LINK_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.RESOLVED_ISSUE_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.SUMMARY_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.ALL_WORKLOGVIEWER_CLASSES
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.GROUP_TITLE_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.ISSUE_LINK_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.RESOLVED_ISSUE_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty

@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.GROUP_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.SUMMARY_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.GROUP_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
 import javafx.beans.property.SimpleObjectProperty
@@ -28,7 +29,7 @@ class SummaryCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel>() {
     override fun updateItem(item: TreeTableRowModel?, empty: Boolean) {
         super.updateItem(item, empty)
 
-        styleClass.removeAll(CellStyleClasses.ALL_WORKLOGVIEWER_CLASSES)
+        styleClass.removeAll(ComponentStyleClasses.ALL_WORKLOGVIEWER_CLASSES)
         tooltip = null
         text = null
 

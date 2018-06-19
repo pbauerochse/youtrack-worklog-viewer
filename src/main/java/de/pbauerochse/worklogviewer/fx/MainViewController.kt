@@ -20,6 +20,7 @@ import de.pbauerochse.worklogviewer.youtrack.TimeReport
 import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory
 import de.pbauerochse.worklogviewer.youtrack.domain.NoSelectionGroupByCategory
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
 import javafx.concurrent.Task
 import javafx.concurrent.WorkerStateEvent
@@ -187,29 +188,21 @@ class MainViewController : Initializable {
 
     private fun initializeDatePickers() {
         // start and end datepicker are only editable if report timerange is CUSTOM
-        val startDateChangeListener = ChangeListener<LocalDate> { _, _, newStartDate ->
-            LOGGER.info("Setting start date to {}", newStartDate)
-            if (newStartDate == null || endDatePicker.value != null && endDatePicker.value.isBefore(newStartDate)) {
-                startDatePicker.styleClass.add(REQUIRED_FIELD_CLASS)
+        val dateChangeListener = ChangeListener<LocalDate> { observable, _, newDate ->
+            LOGGER.info("Setting start date to {} on {}", newDate, observable)
+            val datePicker = (observable as SimpleObjectProperty<*>).bean as DatePicker
+            if (newDate == null) {
+                datePicker.styleClass.add(REQUIRED_FIELD_CLASS)
             } else {
-                startDatePicker.styleClass.remove(REQUIRED_FIELD_CLASS)
-            }
-        }
-
-        val endDateChangeListener = ChangeListener<LocalDate> { _, _, newEndDate ->
-            LOGGER.info("Setting end date to {}", newEndDate)
-            if (newEndDate == null || startDatePicker.value != null && startDatePicker.value.isAfter(newEndDate)) {
-                endDatePicker.styleClass.add(REQUIRED_FIELD_CLASS)
-            } else {
-                endDatePicker.styleClass.remove(REQUIRED_FIELD_CLASS)
+                datePicker.styleClass.remove(REQUIRED_FIELD_CLASS)
             }
         }
 
         startDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM))
-        startDatePicker.valueProperty().addListener(startDateChangeListener)
+        startDatePicker.valueProperty().addListener(dateChangeListener)
 
         endDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM))
-        endDatePicker.valueProperty().addListener(endDateChangeListener)
+        endDatePicker.valueProperty().addListener(dateChangeListener)
 
         // value listener
         startDatePicker.valueProperty().addListener { _, _, newValue -> settingsModel.startDateProperty().set(newValue) }
@@ -219,8 +212,8 @@ class MainViewController : Initializable {
         if (settingsModel.lastUsedReportTimerange == ReportTimerange.CUSTOM) {
             startDatePicker.value = settingsModel.startDate
             endDatePicker.value = settingsModel.endDate
-            startDateChangeListener.changed(startDatePicker.valueProperty(), null, startDatePicker.value)
-            endDateChangeListener.changed(endDatePicker.valueProperty(), null, endDatePicker.value)
+            dateChangeListener.changed(startDatePicker.valueProperty(), null, startDatePicker.value)
+            dateChangeListener.changed(endDatePicker.valueProperty(), null, endDatePicker.value)
         }
     }
 

@@ -28,11 +28,12 @@ public class Rakete extends Application {
         Parent root = new BorderPane(tabbedPane);
         Scene scene = new Scene(root, 1024, 768);
         scene.getStylesheets().add("/fx/css/base-styling.css");
+        scene.getStylesheets().add("/fx/css/dark.css");
         primaryStage.setScene(scene);
         primaryStage.show();
 
         TimerangeProvider timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(ReportTimerange.LAST_WEEK, null, null);
-        CsvReportData csvReportData = CsvReportReader.processResponse(new FileInputStream("/home/patrick/IdeaProjects/youtrack-worklog-viewer/src/test/resources/report/example-response.csv"));
+        CsvReportData csvReportData = CsvReportReader.processResponse(new FileInputStream("/home/patrick/IdeaProjects-Private/youtrack-worklog-viewer/src/test/resources/report/example-response.csv"));
         TimeReport report = new TimeReport(new TimeReportParameters(timerangeProvider, null), csvReportData);
         tabbedPane.update(report);
     }

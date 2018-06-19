@@ -9,7 +9,7 @@
     -fx-progress-color: #a5cdff;
 }
 
-.ywlv-toolbar {
+.tool-bar {
     -fx-background-color: -fx-color;
     -fx-border-color: #ccc;
     -fx-border-width: 1px;
@@ -43,16 +43,6 @@
 }
 
 .tree-table-row-cell:selected {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-focus-color;
-    -fx-background-insets: 0, 1, 2;
-}
-
-.tree-table-row-cell:odd {
-    -fx-background-color: -fx-table-cell-border-color, derive(-fx-control-inner-background, -5%);
-    -fx-background-insets: 0, 0 0 1 0;
-}
-
-.tree-table-row-cell:selected:odd {
     -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-focus-color;
     -fx-background-insets: 0, 1, 2;
 }

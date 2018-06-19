@@ -7,8 +7,12 @@
 .root {
     -fx-base: derive(#3c3f41, -20%);
     -fx-accent: #245d81;
+    -fx-default-button: -fx-accent;
     -fx-light-text-color: derive(whitesmoke, -20%);
     -fx-control-inner-background: -fx-base;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-hover-base: derive(-fx-base, 10%);
 }
 
 .menu-bar {
@@ -17,6 +21,10 @@
 
 .menu-item {
     -fx-padding: 7px 20px 7px 20px;
+}
+
+.required {
+    -fx-border-color: red;
 }
 
 .tool-bar {
@@ -53,14 +61,76 @@
     -fx-background-color: derive(-fx-accent, 5%);
 }
 
+.tab-pane > .tab-header-area > .tab-header-background,
+.statistics,
+.statistics > *,
+.accordion > .titled-pane > *.content,
 #resultTabPane {
     -fx-background-color: #2a2a2a;
+}
+
+.tab-pane > .tab-content-area .split-pane {
+    -fx-background-color: derive(-fx-base, 10%);
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-radius: 0;
+    -fx-background-color: transparent, derive(-fx-base, 5%);
+    -fx-background-insets: 0, 0 3 0 0;
+    -fx-padding: 0.1em 0.7em 0.1em 0.5em;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected,
+.tab-pane > .tab-header-area > .headers-region > .tab:selected:hover {
+    -fx-background-color: transparent, -fx-accent, derive(-fx-base, 10%);
+    -fx-background-insets: 0, 0 3 0 0, 3 3 0 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label,
+.tab-pane > .tab-header-area > .headers-region > .tab:selected:hover > .tab-container > .tab-label {
+    -fx-text-fill: derive(-fx-accent, 60%);
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab:hover {
+    -fx-background-color: transparent, derive(-fx-base, 20%);
+    -fx-background-insets: 0, 0 3 0 0;
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0;
 }
 
 .progress-text {
     -fx-fill: -fx-light-text-color;
     -fx-font-size: 9pt;
 }
+
+.group-cell, .group-title-cell {
+    -fx-background-color: derive(-fx-accent, -30%) !important;
+    -fx-font-size: 12pt;
+    -fx-fill: derive(-fx-light-text-color, -60%);
+}
+
+.group-cell.today-highlight-cell, .group-title-cell.today-highlight-cell {
+    -fx-background-color: rgba(42, 178, 180, 0.2) !important;
+}
+
+.today-highlight-cell {
+    -fx-background-color: rgba(172, 225, 164, 0.3);
+}
+
+.highlight-cell {
+    -fx-background-color: rgba(36, 93, 126, 0.2);
+}
+
+/*.issue-cell {*/
+/*-fx-text-fill: -fx-accent;*/
+/*-fx-highlight-text-fill: derive(-fx-accent, -60%);*/
+/*}*/
+
+/*.resolved-issue-cell {*/
+/*-fx-text-fill: derive(-fx-accent, -20%);*/
+/*}*/
 
 .combo-box-popup > .list-view {
     -fx-background-color: -fx-base;
@@ -79,4 +149,14 @@
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
 .combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
     -fx-background-insets: 0;
+}
+
+.chart-plot-background, .chart-legend {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+}
+
+.chart-legend {
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-padding: 6px;
 }

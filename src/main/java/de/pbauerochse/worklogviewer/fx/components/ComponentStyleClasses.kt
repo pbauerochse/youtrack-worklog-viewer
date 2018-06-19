@@ -1,10 +1,10 @@
-package de.pbauerochse.worklogviewer.fx.components.treetable
+package de.pbauerochse.worklogviewer.fx.components
 
 /**
  * Defines all used CSS classes to style
  * the components in the worklog viewer
  */
-object CellStyleClasses {
+object ComponentStyleClasses {
 
     const val SUMMARY_CELL = "summary-cell"
     const val TIMESPENT_CELL = "timespent-cell"
@@ -14,6 +14,7 @@ object CellStyleClasses {
     const val TODAY_HIGHLIGHT_CELL = "today-highlight-cell"
     const val ISSUE_LINK_CELL = "issue-cell"
     const val RESOLVED_ISSUE_CELL = "resolved-issue-cell"
+    const val STATISTICS_PANEL = "statistics"
 
     val ALL_WORKLOGVIEWER_CLASSES: Set<String> = setOf(
         SUMMARY_CELL,
@@ -23,7 +24,8 @@ object CellStyleClasses {
         HIGHLIGHT_CELL,
         TODAY_HIGHLIGHT_CELL,
         ISSUE_LINK_CELL,
-        RESOLVED_ISSUE_CELL
+        RESOLVED_ISSUE_CELL,
+        STATISTICS_PANEL
     )
 
 }

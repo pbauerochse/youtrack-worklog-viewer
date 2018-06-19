@@ -1,11 +1,11 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.ALL_WORKLOGVIEWER_CLASSES
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.GROUP_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.HIGHLIGHT_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.SUMMARY_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.TIMESPENT_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.CellStyleClasses.TODAY_HIGHLIGHT_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.ALL_WORKLOGVIEWER_CLASSES
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.GROUP_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.HIGHLIGHT_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TIMESPENT_CELL
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TODAY_HIGHLIGHT_CELL
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatDate
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
