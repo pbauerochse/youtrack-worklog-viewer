@@ -6,7 +6,8 @@
 <?import javafx.scene.text.Font?>
 <AnchorPane maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.121"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.pbauerochse.worklogviewer.fx.AboutController">
+            fx:controller="de.pbauerochse.worklogviewer.fx.AboutController"
+            styleClass="about-dialog">
    <padding>
        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
    </padding>
