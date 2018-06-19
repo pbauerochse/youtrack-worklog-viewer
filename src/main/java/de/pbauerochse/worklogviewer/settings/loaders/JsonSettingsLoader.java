@@ -35,7 +35,7 @@ public class JsonSettingsLoader {
             LOG.debug("Loading settings from {}", jsonFile.getAbsolutePath());
             return objectMapper.readValue(jsonFile, Settings.class);
         } catch (IOException e) {
-            throw ExceptionUtil.getIllegalStateException("exceptions.settings.read", jsonFile.getAbsolutePath(), e);
+            throw ExceptionUtil.getIllegalStateException("exceptions.settings.read", e, jsonFile.getAbsolutePath());
         }
     }
 
@@ -46,7 +46,7 @@ public class JsonSettingsLoader {
         try (Writer writer = new OutputStreamWriter(new FileOutputStream(jsonFile))) {
             write(settings, writer);
         } catch (IOException e) {
-            throw ExceptionUtil.getIllegalStateException("exceptions.settings.write", jsonFile.getAbsolutePath(), e);
+            throw ExceptionUtil.getIllegalStateException("exceptions.settings.write", e, jsonFile.getAbsolutePath());
         }
     }
 
@@ -55,7 +55,7 @@ public class JsonSettingsLoader {
             FileUtils.forceMkdirParent(jsonFile);
             FileUtils.touch(jsonFile);
         } catch (IOException e) {
-            throw ExceptionUtil.getIllegalStateException("exceptions.settings.create", jsonFile.getAbsolutePath(), e);
+            throw ExceptionUtil.getIllegalStateException("exceptions.settings.create", e, jsonFile.getAbsolutePath());
         }
     }
 
@@ -63,7 +63,7 @@ public class JsonSettingsLoader {
         try {
             objectMapper.writeValue(writer, settings);
         } catch (IOException e) {
-            throw ExceptionUtil.getIllegalStateException("exceptions.settings.write", jsonFile.getAbsolutePath(), e);
+            throw ExceptionUtil.getIllegalStateException("exceptions.settings.write", e, jsonFile.getAbsolutePath());
         }
     }
 

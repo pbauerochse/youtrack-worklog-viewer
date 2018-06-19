@@ -45,7 +45,7 @@ public class WorklogViewer extends Application {
     @Override
     public void stop() {
         SettingsUtil.saveSettings();
-        MainViewController.EXECUTOR.shutdownNow();
+        MainViewController.Companion.getEXECUTOR().shutdownNow();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class WorklogViewer extends Application {
         FXMLLoader loader = new FXMLLoader(Charset.forName("utf-8"));
         loader.setResources(FormattingUtil.RESOURCE_BUNDLE);
 
-        Parent root = loader.load(WorklogViewer.class.getResource("/fx/views/main.fxml"), FormattingUtil.RESOURCE_BUNDLE);
+        Parent root = loader.load(WorklogViewer.class.getResource("/fx/views/main.fxml").openStream());
         Scene mainScene = new Scene(root, settings.getWindowSettings().getWidth(), settings.getWindowSettings().getHeight());
 
         mainScene.getStylesheets().add("/fx/css/base-styling.css");

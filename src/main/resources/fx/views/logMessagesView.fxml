@@ -4,15 +4,14 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.fx.LogViewController">
-   <children>
-      <TextArea fx:id="logMessageTextArea" editable="false" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <font>
-            <Font name="DejaVu Sans Mono" size="10.0" />
-         </font>
-      </TextArea>
-   </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.pbauerochse.worklogviewer.fx.LogViewController">
    <padding>
-      <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+      <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
    </padding>
+   <TextArea fx:id="logMessageTextArea" editable="false" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <font>
+         <Font name="DejaVu Sans Mono" size="10.0"/>
+      </font>
+   </TextArea>
 </AnchorPane>

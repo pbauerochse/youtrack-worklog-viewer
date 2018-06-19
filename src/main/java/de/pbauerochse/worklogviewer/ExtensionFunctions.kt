@@ -1,5 +1,8 @@
 package de.pbauerochse.worklogviewer
 
+import javafx.application.Platform
+import javafx.event.EventHandler
+import javafx.scene.control.Hyperlink
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -24,3 +27,7 @@ fun String.trimToNull() : String? {
 
 fun String.toLocalDate() : LocalDate? = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
 fun LocalDate.toFormattedString() : String = format(DateTimeFormatter.ISO_DATE)
+
+fun Hyperlink.setHref(url: String) {
+    onAction = EventHandler { _ -> Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(url) } }
+}

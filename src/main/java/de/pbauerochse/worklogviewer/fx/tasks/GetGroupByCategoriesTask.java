@@ -20,7 +20,7 @@ public class GetGroupByCategoriesTask extends Task<List<GroupByCategory>> {
 
     @Override
     protected List<GroupByCategory> call() {
-        YouTrackService youTrackService = YouTrackServiceFactory.INSTANCE.getYouTrackService();
+        YouTrackService youTrackService = YouTrackServiceFactory.getYouTrackService();
 
         updateProgress(0.5, 1);
         updateMessage(FormattingUtil.getFormatted("worker.progress.categories"));

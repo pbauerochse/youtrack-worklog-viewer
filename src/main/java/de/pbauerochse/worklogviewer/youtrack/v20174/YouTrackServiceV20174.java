@@ -239,7 +239,7 @@ public class YouTrackServiceV20174 implements YouTrackService {
         LOGGER.debug("Downloading report {} using url {}", reportId, url);
 
         HttpGet request = new HttpGet(url);
-        request.setConfig(RequestConfig.custom().setDecompressionEnabled(false).build());
+        request.setConfig(RequestConfig.custom().setContentCompressionEnabled(false).build());
 
         try (CloseableHttpClient httpClient = getHttpClient(urlBuilder)) {
             return httpClient.execute(request, response -> {

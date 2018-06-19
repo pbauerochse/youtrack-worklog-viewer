@@ -6,14 +6,6 @@ package de.pbauerochse.worklogviewer.util;
  */
 public class ExceptionUtil {
 
-    public static RuntimeException getRuntimeException(String messageKey, Object... params) {
-        return getRuntimeException(messageKey, null, params);
-    }
-
-    public static RuntimeException getRuntimeException(String messageKey, Throwable t) {
-        return new RuntimeException(FormattingUtil.getFormatted(messageKey), t);
-    }
-
     public static RuntimeException getRuntimeException(String messageKey, Throwable t, Object... params) {
         return new RuntimeException(FormattingUtil.getFormatted(messageKey, params), t);
     }
