@@ -15,11 +15,14 @@ class WorklogsTreeTableViewData(
 ) {
 
     internal val treeRows: List<TreeItem<TreeTableRowModel>> by lazy {
-        if (reportParameters.isDataGrouped) {
+        val data = if (reportParameters.isDataGrouped) {
             convertGrouped(reportParameters.groupByCategory!!, issues)
         } else {
-            convertDefault(issues)
-        }
+            convertDefault(issues).toMutableList()
+        }.toMutableList()
+        data.add(TreeItem(SummaryTreeTableRow(issues)))
+
+        return@lazy data
     }
 
     /**
@@ -79,8 +82,9 @@ class WorklogsTreeTableViewData(
      * Converts each Issue in the list to a
      * single row in the TreeView
      */
-    private fun convertDefault(issues: List<Issue>): List<TreeItem<TreeTableRowModel>> = issues
-        .map { IssueTreeTableRow(it) as TreeTableRowModel }
-        .map { TreeItem(it) }
+    private fun convertDefault(issues: List<Issue>): List<TreeItem<TreeTableRowModel>> {
+        val rowModels = issues.map { IssueTreeTableRow(it) as TreeTableRowModel }.toMutableList()
+        return rowModels.map { TreeItem(it) }
+    }
 
 }

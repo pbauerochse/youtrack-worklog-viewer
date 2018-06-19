@@ -22,8 +22,6 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
         selectionModel.clearSelection()
 
         root.children.addAll(data.treeRows)
-        root.children.add(getSummaryRow(data.issues))
-
         updateColumns(data)
     }
 
@@ -61,10 +59,6 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
     private fun removeExcessColumns(startIndexInclusive: Int, endIndexExclusive: Int) {
         LOGGER.debug("Removing excess columns from $startIndexInclusive to $endIndexExclusive")
         columns.remove(startIndexInclusive, endIndexExclusive)
-    }
-
-    private fun getSummaryRow(issues: List<Issue>): TreeItem<TreeTableRowModel> {
-        return TreeItem(SummaryTreeTableRow(issues))
     }
 
     companion object {

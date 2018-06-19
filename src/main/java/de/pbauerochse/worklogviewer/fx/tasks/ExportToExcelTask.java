@@ -11,8 +11,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 /**
- * @author Patrick Bauerochse
- * @since 06.07.15
+ * Task the triggers the Excel Report generation
+ * of the given data
  */
 public class ExportToExcelTask extends Task<File> {
 
