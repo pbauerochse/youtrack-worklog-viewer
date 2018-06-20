@@ -8,7 +8,7 @@ import de.pbauerochse.worklogviewer.youtrack.v20174.YouTrackServiceV20174
 import org.slf4j.LoggerFactory
 
 /**
- * Factory to get the YouTrackService
+ * Factory to get the YouTrackConnector
  * configured in the settings properties
  */
 object YouTrackServiceFactory {
@@ -29,7 +29,7 @@ object YouTrackServiceFactory {
 
         if (cachedInstance == null || authenticationMethodChanged(settings)) {
             cachedInstance = getYouTrackService(settings.youTrackConnectionSettings.version)
-            LOGGER.info("Created new YouTrackService instance of type {}", cachedInstance!!.javaClass.simpleName)
+            LOGGER.info("Created new YouTrackConnector instance of type {}", cachedInstance!!.javaClass.simpleName)
         }
 
         return cachedInstance!!

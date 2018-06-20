@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Task that loads the TimeReport
- * using the YouTrackService
+ * using the YouTrackConnector
  */
 public class FetchTimereportTask extends Task<TimeReport> {
 
