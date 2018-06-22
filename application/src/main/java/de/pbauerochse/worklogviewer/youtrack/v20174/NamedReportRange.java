@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
-
+@Deprecated
 public class NamedReportRange implements ReportRange {
 
     private final ReportTimerange reportTimerange;

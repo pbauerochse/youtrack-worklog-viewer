@@ -7,6 +7,7 @@ import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory
  * Contains all required parameters
  * to generate the TimeReport
  */
+@Deprecated("")
 data class TimeReportParameters(
     val timerangeProvider: TimerangeProvider,
     val groupByCategory: GroupByCategory?

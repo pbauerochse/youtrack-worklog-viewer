@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import de.pbauerochse.worklogviewer.connector.ProgressCallback;
 import de.pbauerochse.worklogviewer.util.DateUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
@@ -51,6 +52,7 @@ import static de.pbauerochse.worklogviewer.util.HttpClientUtil.isValidResponseCo
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+@Deprecated
 public class YouTrackServiceV20174 implements YouTrackService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(YouTrackServiceV20174.class);

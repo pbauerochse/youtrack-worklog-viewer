@@ -11,6 +11,7 @@ import java.util.List;
  * {"id":"PATRICK-1","entityId":"87-2","jiraId":null,"field":[],"comment":[],"tag":[]},
  * {"id":"PATRICK-2","entityId":"87-4","jiraId":null,"field":[{"name":"resolved","value":"1446292986266"}],"comment":[],"tag":[]}
  */
+@Deprecated
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IssueDetails {
 

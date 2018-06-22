@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+@Deprecated
 public class UrlBuilder implements YouTrackUrlBuilder {
 
     private final Supplier<String> baseUrlSupplier;

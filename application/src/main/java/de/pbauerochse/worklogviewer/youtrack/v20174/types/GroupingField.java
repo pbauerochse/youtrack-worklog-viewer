@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = PredefinedFilterField.class, name = "jetbrains.charisma.keyword.PredefinedFilterField"),
         @JsonSubTypes.Type(value = CustomFilterField.class, name = "jetbrains.charisma.keyword.CustomFilterField"),
 })
+@Deprecated
 public interface GroupingField {
 
     String getId();

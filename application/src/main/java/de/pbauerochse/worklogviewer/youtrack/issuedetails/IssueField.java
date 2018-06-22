@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Created by patrick on 31.10.15.
  * "field":[{"name":"resolved","value":"1446292986266"}]
  */
+@Deprecated
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IssueField {
 

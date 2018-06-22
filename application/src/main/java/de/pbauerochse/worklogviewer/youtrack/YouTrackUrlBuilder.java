@@ -4,6 +4,7 @@ import org.apache.http.NameValuePair;
 
 import java.util.List;
 
+@Deprecated
 public interface YouTrackUrlBuilder {
 
     String getGroupByCriteriaUrl();

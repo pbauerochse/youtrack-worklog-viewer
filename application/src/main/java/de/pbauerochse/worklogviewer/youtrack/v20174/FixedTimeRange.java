@@ -2,7 +2,7 @@ package de.pbauerochse.worklogviewer.youtrack.v20174;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-
+@Deprecated
 public class FixedTimeRange implements ReportRange {
 
     private static final ZoneId EXPECTED_TIMEZONE = ZoneId.of("UTC");

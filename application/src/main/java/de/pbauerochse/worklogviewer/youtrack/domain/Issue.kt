@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 /**
  * Represents a YouTrack issue
  */
+@Deprecated("")
 data class Issue(
     val issueId: String,
     val issueDescription: String,

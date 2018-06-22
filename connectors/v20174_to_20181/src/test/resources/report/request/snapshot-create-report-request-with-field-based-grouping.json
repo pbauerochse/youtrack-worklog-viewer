@@ -1,0 +1,36 @@
+{
+  "$type": "jetbrains.charisma.smartui.report.time.TimeReport",
+  "type": "time",
+  "own": true,
+  "range": {
+    "$type": "jetbrains.charisma.smartui.report.common.timeRange.FixedTimeRange",
+    "from": 1514764800000,
+    "to": 1515369600000
+  },
+  "grouping": {
+    "$type": "jetbrains.charisma.smartui.report.time.FieldBasedGrouping",
+    "field": {
+      "$type": "jetbrains.charisma.keyword.CustomFilterField",
+      "id": "40-5",
+      "presentation": "Bearbeiter",
+      "customField": {
+        "id": "40-5",
+        "name": "Assignee",
+        "fieldType": {
+          "id": "user[1]",
+          "$type": "jetbrains.charisma.persistence.customfields.FieldType"
+        },
+        "localizedName": "Bearbeiter",
+        "$type": "jetbrains.charisma.persistence.customfields.CustomField"
+      },
+      "projects": [],
+      "name": "Bearbeiter",
+      "aggregateable": false,
+      "sortable": true,
+      "label": "Bearbeiter"
+    },
+    "id": "40-5",
+    "presentation": "Bearbeiter"
+  },
+  "name": "YTWLV: 2018-01-01_2018-01-07"
+}

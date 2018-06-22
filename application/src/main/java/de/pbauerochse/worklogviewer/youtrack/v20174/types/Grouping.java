@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = FieldBasedGrouping.class, name = "jetbrains.charisma.smartui.report.time.FieldBasedGrouping")
 
 })
+@Deprecated
 public interface Grouping {
 
     String getId();

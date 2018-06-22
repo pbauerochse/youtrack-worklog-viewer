@@ -1,0 +1,39 @@
+{
+  "$type": "jetbrains.charisma.smartui.report.time.TimeReport",
+  "type": "time",
+  "own": true,
+  "range": {
+    "$type": "jetbrains.charisma.smartui.report.common.timeRange.FixedTimeRange",
+    "from": 1529020800000,
+    "to": 1529711999999
+  },
+  "projects": [],
+  "authors": [],
+  "workTypes": [],
+  "name": "test",
+  "grouping": {
+    "$type": "jetbrains.charisma.smartui.report.time.FieldBasedGrouping",
+    "field": {
+      "$type": "jetbrains.charisma.persistence.customfields.CustomField",
+      "customField": {
+        "fieldType": {
+          "id": "user[1]",
+          "$type": "jetbrains.charisma.persistence.customfields.FieldType"
+        },
+        "localizedName": "Bearbeiter",
+        "name": "Assignee",
+        "id": "40-5",
+
+      },
+      "id": "40-5",
+      "sortable": true,
+      "aggregateable": false,
+      "name": "Bearbeiter",
+      "$type": "jetbrains.charisma.keyword.CustomFilterField"
+    },
+    "id": "40-5",
+    "presentation": "Bearbeiter",
+    ,
+
+  }
+}

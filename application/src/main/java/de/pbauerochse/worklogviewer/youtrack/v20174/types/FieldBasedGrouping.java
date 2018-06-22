@@ -2,7 +2,7 @@ package de.pbauerochse.worklogviewer.youtrack.v20174.types;
 
 import com.fasterxml.jackson.annotation.*;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
-
+@Deprecated
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FieldBasedGrouping implements Grouping, GroupByCategory {

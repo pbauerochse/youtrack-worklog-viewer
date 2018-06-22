@@ -18,6 +18,6 @@ interface YouTrackConnector {
      * Creates and fetches the [TimeReport]
      * from the YouTrack instance
      */
-    fun getTimeReport(parameters : TimeReportParameters) : TimeReport
+    fun getTimeReport(parameters : TimeReportParameters, progressCallback: ProgressCallback) : TimeReport
 
 }

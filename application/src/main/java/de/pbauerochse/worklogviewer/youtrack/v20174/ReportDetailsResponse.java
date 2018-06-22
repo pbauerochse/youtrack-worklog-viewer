@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.pbauerochse.worklogviewer.youtrack.ReportDetails;
-
+@Deprecated
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReportDetailsResponse implements ReportDetails {
 

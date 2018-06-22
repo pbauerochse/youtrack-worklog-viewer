@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.youtrack;
 
+import de.pbauerochse.worklogviewer.connector.ProgressCallback;
 import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory;
 
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 /**
  * Allows the interaction with the YouTrack API
  */
+@Deprecated
 public interface YouTrackService {
 
     /**

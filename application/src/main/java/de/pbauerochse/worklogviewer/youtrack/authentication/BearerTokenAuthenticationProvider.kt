@@ -15,6 +15,7 @@ import org.apache.http.message.BasicHeader
  * The users needs to have "Read Service" role to
  * create a permanent token.
  */
+@Deprecated("")
 class BearerTokenAuthenticationProvider : YouTrackAuthenticationProvider {
 
     override fun getAuthenticationHeaders(clientBuilder: HttpClientBuilder, urlBuilder: YouTrackUrlBuilder): List<Header> {

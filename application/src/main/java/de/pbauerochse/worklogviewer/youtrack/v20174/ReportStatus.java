@@ -3,7 +3,7 @@ package de.pbauerochse.worklogviewer.youtrack.v20174;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+@Deprecated
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReportStatus {
 

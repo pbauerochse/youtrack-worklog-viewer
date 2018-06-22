@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-
+@Deprecated
 @SuppressWarnings("unused")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class CreateReportParameters {

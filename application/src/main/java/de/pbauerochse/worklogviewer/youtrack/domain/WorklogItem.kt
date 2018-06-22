@@ -6,6 +6,7 @@ import java.time.LocalDate
 /**
  * A single Worklog Item as retrieved from YouTrack
  */
+@Deprecated("")
 data class WorklogItem(
     val issue : Issue,
     val username: String,

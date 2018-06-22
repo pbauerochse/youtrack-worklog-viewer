@@ -1,0 +1,20 @@
+package de.pbauerochse.worklogviewer.connector.v2017.domain.groupby
+
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+class CustomField @JsonCreator constructor(
+    @JsonProperty("id") val id : String,
+    @JsonProperty("name") val name : String,
+    @JsonProperty("fieldType") val fieldType : FieldType,
+    @JsonProperty("localizedName") val localizedName : String?
+) {
+
+    @get:JsonProperty("\$type")
+    val type : String = "jetbrains.charisma.persistence.customfields.CustomField"
+
+}

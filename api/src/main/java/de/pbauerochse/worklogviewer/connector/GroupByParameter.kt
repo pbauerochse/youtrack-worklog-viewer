@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.connector
 
-/**
- * @author Patrick Brandes
- */
 interface GroupByParameter {
+    val id : String
+    fun getLabel() : String
 }

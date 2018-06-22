@@ -16,6 +16,7 @@ import java.io.InputStreamReader
  * Reader for the CSV time report as
  * returned by YouTrack
  */
+@Deprecated("")
 object CsvReportReader {
 
     private val LOGGER = LoggerFactory.getLogger(CsvReportReader::class.java)
@@ -75,37 +76,4 @@ object CsvReportReader {
             .withSkipLines(1)
             .build()
     }
-
-//    private fun getTaskWithWorklogs(result: WorklogReport, csvLine: Array<String>): TaskWithWorklogs {
-//        val taskId = csvLine[ISSUE_ID_COLUMN_INDEX]
-//
-//        var taskWithWorklogs: TaskWithWorklogs? = result.getWorklog(taskId)
-//        if (taskWithWorklogs == null) {
-//            LOGGER.debug("Found new task id {}", taskId)
-//
-//            taskWithWorklogs = TaskWithWorklogs()
-//            taskWithWorklogs.issue = taskId
-//            taskWithWorklogs.summary = csvLine[ISSUE_SUMMARY_COLUMN_INDEX]
-//
-//            val matcher = PROJECT_ID_PATTERN.matcher(taskId)
-//            if (matcher.matches()) {
-//                taskWithWorklogs.project = matcher.group(1)
-//            }
-//
-//            val timeEstimationAsString = csvLine[TIMEESTIMATION_COLUMN_INDEX]
-//
-//            if (StringUtils.isNotBlank(timeEstimationAsString)) {
-//                try {
-//                    taskWithWorklogs.estimatedWorktimeInMinutes = java.lang.Long.valueOf(timeEstimationAsString)
-//                } catch (e: NumberFormatException) {
-//                    LOGGER.warn("Could not parse long from estimated time {}", timeEstimationAsString, e)
-//                }
-//
-//            }
-//
-//            result.addWorklogSummary(taskWithWorklogs)
-//        }
-//
-//        return taskWithWorklogs
-//    }
 }

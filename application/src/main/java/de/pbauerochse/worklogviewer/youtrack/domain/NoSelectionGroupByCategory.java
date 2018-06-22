@@ -2,6 +2,7 @@ package de.pbauerochse.worklogviewer.youtrack.domain;
 
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 
+@Deprecated
 public class NoSelectionGroupByCategory implements GroupByCategory {
 
     @Override
