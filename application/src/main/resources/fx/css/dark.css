@@ -2,7 +2,7 @@
  * Dark theme for the YouTrack Worklog Viewer
  * For a full reference of the available properties
  * in a JavaFX application see modena.css or
- * https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
+ * https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
  */
 .root {
     -fx-base: derive(#3c3f41, -20%);
@@ -13,10 +13,13 @@
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
     -fx-hover-base: derive(-fx-base, 10%);
+
+    -ytwlv-border-color: derive(-fx-base, 20%);
+    -ytwlv-dark-background-color: #2a2a2a;
 }
 
 .menu-bar {
-    -fx-background-color: #2a2a2a;
+    -fx-background-color: -ytwlv-dark-background-color;
 }
 
 .menu-item {
@@ -24,13 +27,13 @@
 }
 
 .required {
-    -fx-border-color: red;
+    -fx-border-color: #94081c;
 }
 
 .tool-bar {
     -fx-background-color: -fx-base;
     -fx-border-width: 1px 0 1px 0;
-    -fx-border-color: derive(-fx-base, 20%);
+    -fx-border-color: -ytwlv-border-color;
     -fx-padding: 7px 18px 7px 18px;
 }
 
@@ -63,10 +66,11 @@
 
 .tab-pane > .tab-header-area > .tab-header-background,
 .statistics,
+.about-dialog,
 .statistics > *,
 .accordion > .titled-pane > *.content,
 #resultTabPane {
-    -fx-background-color: #2a2a2a;
+    -fx-background-color: -ytwlv-dark-background-color;
 }
 
 .tab-pane > .tab-content-area .split-pane {
@@ -92,7 +96,7 @@
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:hover {
-    -fx-background-color: transparent, derive(-fx-base, 20%);
+    -fx-background-color: transparent, -ytwlv-border-color;
     -fx-background-insets: 0, 0 3 0 0;
 }
 
@@ -159,4 +163,59 @@
     -fx-background-insets: 0;
     -fx-background-radius: 2;
     -fx-padding: 6px;
+}
+
+.date-picker-popup {
+    -fx-border-width: 1;
+    -fx-border-color: -ytwlv-border-color;
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: -fx-base;
+}
+
+.date-picker-popup > * > .spinner > .button:hover,
+.date-picker-popup > * > .spinner > .button:focused {
+    -fx-color: transparent;
+}
+
+.date-picker-popup > * > .spinner > .button > .left-arrow,
+.date-picker-popup > * > .spinner > .button > .right-arrow {
+    -fx-background-color: derive(-ytwlv-border-color, 20%);
+}
+
+.date-picker-popup > * > .spinner > .button:hover > .left-arrow,
+.date-picker-popup > * > .spinner > .button:hover > .right-arrow {
+    -fx-background-color: derive(-ytwlv-border-color, 80%);
+}
+
+.date-picker-popup > * > .spinner > .button:focused > .left-arrow,
+.date-picker-popup > * > .spinner > .button:focused > .right-arrow {
+    -fx-background-color: derive(-fx-accent, 40%);
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -ytwlv-border-color;
+}
+
+.date-picker-popup > * > .day-name-cell,
+.date-picker-popup > .calendar-grid {
+    -fx-background-color: -ytwlv-dark-background-color;
+    -fx-text-fill: -fx-accent;
+}
+
+.date-picker-popup > * > .day-cell {
+    -fx-border-color: -ytwlv-dark-background-color;
+}
+
+.date-picker-popup > * > .today {
+    /*-fx-text-fill: -fx-accent;*/
+    -fx-font-weight: bold;
+    -fx-background-color: -fx-accent, -fx-background;
+    -fx-background-insets: 0, 3;
+}
+
+.date-picker-popup > * > .selected {
+    -fx-background-color: -fx-accent;
 }
