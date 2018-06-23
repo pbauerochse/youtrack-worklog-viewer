@@ -4,11 +4,10 @@ import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableView
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData
 import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask
+import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
-import de.pbauerochse.worklogviewer.youtrack.TimeReport
-import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.Node
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory
 
 /**
  * Abstract class to display parts of the result
- * of a [TimeReport]
+ * of a [de.pbauerochse.worklogviewer.report.TimeReport]
  */
 abstract class WorklogsTab(label: String) : Tab(label) {
 
@@ -93,7 +92,7 @@ abstract class WorklogsTab(label: String) : Tab(label) {
 
     fun getDownloadAsExcelTask(): ExportToExcelTask? {
         // ask the user where to save the target file
-        val timerange = currentData!!.reportParameters.timerangeProvider
+        val timerange = currentData!!.reportParameters.timerange
 
         val fileChooser = FileChooser()
         fileChooser.title = FormattingUtil.getFormatted("view.menu.file.exportexcel")

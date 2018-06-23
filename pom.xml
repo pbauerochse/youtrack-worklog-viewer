@@ -130,6 +130,18 @@
             </dependency>
 
             <dependency>
+                <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+                <artifactId>v20174_to_20181</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+                <artifactId>v20182</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>${httpclient.version}</version>

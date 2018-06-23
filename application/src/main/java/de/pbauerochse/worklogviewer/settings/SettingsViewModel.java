@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.settings;
 
+import de.pbauerochse.worklogviewer.connector.YouTrackVersion;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.fx.Theme;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;

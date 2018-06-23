@@ -1,12 +1,9 @@
 package de.pbauerochse.worklogviewer.util;
 
-import de.pbauerochse.worklogviewer.youtrack.YouTrackUrlBuilder;
-import de.pbauerochse.worklogviewer.youtrack.authentication.BearerTokenAuthenticationProvider;
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
@@ -21,21 +18,6 @@ import java.util.List;
  */
 public class HttpClientUtil {
 
-    public static CloseableHttpClient getHttpClient(YouTrackUrlBuilder urlBuilder) {
-        HttpClientBuilder clientBuilder = HttpClientUtil.getDefaultClientBuilder(10);
-
-        BearerTokenAuthenticationProvider authenticationProvider = new BearerTokenAuthenticationProvider();
-        List<Header> authenticationHeaders = authenticationProvider.getAuthenticationHeaders(clientBuilder, urlBuilder);
-        List<Header> defaultHeaders = HttpClientUtil.getRegularBrowserHeaders();
-
-        List<Header> headers = new ArrayList<>();
-        headers.addAll(authenticationHeaders);
-        headers.addAll(defaultHeaders);
-
-        clientBuilder.setDefaultHeaders(headers);
-
-        return clientBuilder.build();
-    }
 
     public static HttpClientBuilder getDefaultClientBuilder(int connectTimeoutInSeconds) {
         RequestConfig config = RequestConfig
@@ -63,7 +45,6 @@ public class HttpClientUtil {
     public static boolean isValidResponseCode(StatusLine statusLine) {
         if (statusLine == null) throw ExceptionUtil.getIllegalArgumentException("exceptions.main.worker.nullstatus");
         int statusCode = statusLine.getStatusCode();
-
         return (statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_MULTIPLE_CHOICES);
     }
 

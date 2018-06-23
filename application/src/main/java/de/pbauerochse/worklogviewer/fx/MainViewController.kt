@@ -12,6 +12,7 @@ import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask
 import de.pbauerochse.worklogviewer.fx.tasks.VersionCheckerTask
 import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
+import de.pbauerochse.worklogviewer.isNoSelection
 import de.pbauerochse.worklogviewer.report.TimeRange
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
@@ -246,8 +247,8 @@ class MainViewController : Initializable {
     private fun addDownloadLinkToToolbarIfNeverVersionPresent(event: WorkerStateEvent) {
         val gitHubVersionOptional = (event.source as VersionCheckerTask).value
         gitHubVersionOptional.ifPresent { gitHubVersion ->
-            val currentVersion = Version(resources.getString("release.version"))
-            val mostRecentVersion = Version(gitHubVersion.version)
+            val currentVersion = Version.fromVersionString(resources.getString("release.version"))
+            val mostRecentVersion = Version.fromVersionString(gitHubVersion.version)
 
             LOGGER.debug("Most recent github version is {}, this version is {}", mostRecentVersion, currentVersion)
             if (mostRecentVersion.isNewerThan(currentVersion)) {
@@ -304,7 +305,7 @@ class MainViewController : Initializable {
         val groupByCategory = groupByCategoryComboBox.selectionModel.selectedItem
 
         val timeRange = TimeRange(selectedStartDate, selectedEndDate)
-        val parameters = TimeReportParameters(timeRange, groupByCategory)
+        val parameters = TimeReportParameters(timeRange, groupByCategory.takeIf { it.isNoSelection().not() })
 
         val task = FetchTimereportTask(parameters)
         task.setOnSucceeded { event -> displayWorklogResult(event.source.value as TimeReport) }

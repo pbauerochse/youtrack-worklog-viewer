@@ -19,12 +19,12 @@ internal class AllWorklogsTab : WorklogsTab(getFormatted("view.main.tabs.all")) 
 
     fun update(report: TimeReport) {
         LOGGER.debug("Showing all worklogs")
-        val allIssues = report.data.projects
-            .filter { it.hasTicketsWithOwnWorklogs() }
-            .flatMap { it.issues }
+        val allIssues = report.issues
+//            .filter { it.hasTicketsWithOwnWorklogs() } ???
+//            .flatMap { it.issues }
             .sorted()
 
-        update(text, report.parameters, allIssues)
+        update(text, report.reportParameters, allIssues)
     }
 
     override fun getStatistics(issues: List<Issue>): List<Node> {

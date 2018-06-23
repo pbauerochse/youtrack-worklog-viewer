@@ -1,10 +1,10 @@
 package de.pbauerochse.worklogviewer.settings.loaders;
 
+import de.pbauerochse.worklogviewer.connector.YouTrackVersion;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.util.EncryptionUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -87,12 +87,8 @@ public class PropertiesSettingsLoader {
         // youtrack version
         String youtrackVersionAsString = properties.getProperty(YOUTRACK_VERSION_PROPERTY);
         if (StringUtils.isNotBlank(youtrackVersionAsString)) {
-            try {
-                YouTrackVersion version = YouTrackVersion.valueOf(youtrackVersionAsString);
-                settings.getYouTrackConnectionSettings().setVersion(version);
-            } catch (IllegalArgumentException e) {
-                LOGGER.warn("Could not determine YouTrackVersion by settings value {}", youtrackVersionAsString);
-            }
+            YouTrackVersion version = getYouTrackVersion(youtrackVersionAsString);
+            settings.getYouTrackConnectionSettings().setVersion(version);
         }
 
         settings.getYouTrackConnectionSettings().setUrl(properties.getProperty(YOUTRACK_URL_PROPERTY));
@@ -106,6 +102,19 @@ public class PropertiesSettingsLoader {
                 LOGGER.error("Could not decrypt permanent token from settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.permanenttoken.decrypt", e);
             }
+        }
+    }
+
+    private YouTrackVersion getYouTrackVersion(String youtrackVersionAsString) {
+        switch (youtrackVersionAsString) {
+            case "PRE_2017":
+                return de.pbauerochse.worklogviewer.connector.v2017.SupportedVersions.getV2017_4();
+            case "POST_2017":
+            case "POST_2018":
+                return de.pbauerochse.worklogviewer.connector.v2017.SupportedVersions.getV2018_1();
+
+            default:
+                return null;
         }
     }
 

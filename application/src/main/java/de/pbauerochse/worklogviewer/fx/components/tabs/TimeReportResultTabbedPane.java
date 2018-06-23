@@ -1,17 +1,17 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs;
 
+import de.pbauerochse.worklogviewer.report.Issue;
 import de.pbauerochse.worklogviewer.report.TimeReport;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
-import de.pbauerochse.worklogviewer.youtrack.domain.Project;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -72,18 +72,20 @@ public class TimeReportResultTabbedPane extends TabPane {
     }
 
     private void updateProjectTabs(TimeReport timeReport) {
-        List<Project> projects = timeReport.getData().getProjects().stream()
-                .sorted(Comparator.comparing(Project::getId))
-                .collect(Collectors.toList());
+        Map<String, List<Issue>> projectToIssues = timeReport.getIssues().stream()
+                .collect(Collectors.groupingBy(Issue::getProject));
+
+        List<String> projectNamesSorted = projectToIssues.keySet().stream().sorted().collect(Collectors.toList());
 
         int firstProjectTabIndex = settingsViewModel.isShowAllWorklogs() ? 2 : 1;
-        for (int i = 0; i < projects.size(); i++) {
-            Project project = projects.get(i);
+        for (int i = 0; i < projectNamesSorted.size(); i++) {
+            String project = projectNamesSorted.get(i);
+            List<Issue> sortedIssues = projectToIssues.get(project).stream().sorted().collect(Collectors.toList());
             WorklogsTab tab = getOrCreateProjectTabAtIndex(firstProjectTabIndex + i);
-            tab.update(project.getId(), timeReport.getParameters(), project.getIssues());
+            tab.update(project, timeReport.getReportParameters(), sortedIssues);
         }
 
-        int numTotalRequiredTabs = firstProjectTabIndex + projects.size();
+        int numTotalRequiredTabs = firstProjectTabIndex + projectNamesSorted.size();
         for (int i = getTabs().size() - 1; i > numTotalRequiredTabs - 1; i--) {
             Tab tab = getTabs().get(i);
             LOGGER.debug("Removing not needed tab {}", tab.getText());

@@ -55,7 +55,7 @@ class TimePerUserAndProjectGraphStatistics(
             it.userStatistics.forEach {
                 val timeSpentInHours = it.timeSpentInMinutes.toDouble() / 60.0
                 val formattedTime = formatMinutes(it.timeSpentInMinutes)
-                val data = XYChart.Data<Number, String>(timeSpentInHours, it.userDisplayName)
+                val data = XYChart.Data<Number, String>(timeSpentInHours, it.user.displayName)
                 series.data.add(data)
 
                 data.nodeProperty().addListener { _, _, newNode -> Tooltip.install(newNode, Tooltip("${series.name} - $formattedTime")) }

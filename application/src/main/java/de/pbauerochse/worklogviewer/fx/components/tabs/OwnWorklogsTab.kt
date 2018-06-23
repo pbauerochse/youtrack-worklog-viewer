@@ -5,6 +5,8 @@ import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUse
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TaskCountByUserAndProjectStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserAndProjectGraphStatistics
+import de.pbauerochse.worklogviewer.hasOwnWorklogs
+import de.pbauerochse.worklogviewer.isOwn
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
@@ -19,7 +21,7 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
 
     fun update(report: TimeReport) {
         LOGGER.debug("Showing own worklogs")
-        update(LABEL, report.parameters, extractOwnWorklogs(report))
+        update(LABEL, report.reportParameters, extractOwnWorklogs(report))
     }
 
     override fun getStatistics(issues: List<Issue>): List<Node> {
@@ -33,18 +35,10 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
     }
 
     private fun extractOwnWorklogs(report: TimeReport): List<Issue> {
-        return report.data.projects
-            .filter { it.hasTicketsWithOwnWorklogs() }
-            .flatMap { getEntriesRelatedToUser(it) }
-            .sorted()
-    }
-
-    private fun getEntriesRelatedToUser(it: Project): List<Issue> {
-        return it.issues
+        return report.issues
             .filter { it.hasOwnWorklogs() }
-            .map {
-                Issue(it, it.worklogItems.filter { it.isOwn() })
-            }
+            .map { Issue(it, it.worklogItems.filter { it.isOwn() }) }
+            .sorted()
     }
 
     companion object {

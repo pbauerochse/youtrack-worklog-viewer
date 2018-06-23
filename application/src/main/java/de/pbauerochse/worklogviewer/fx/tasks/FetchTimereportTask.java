@@ -7,6 +7,8 @@ import de.pbauerochse.worklogviewer.report.TimeReportParameters;
 import javafx.concurrent.Task;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * Task that loads the TimeReport
  * using the YouTrackConnector
@@ -23,7 +25,7 @@ public class FetchTimereportTask extends Task<TimeReport> {
     @Override
     protected TimeReport call() {
         YouTrackConnector service = YouTrackConnectorLocator.getActiveConnector();
-        return service.getTimeReport(parameters, this::updateProgress);
+        return Objects.requireNonNull(service).getTimeReport(parameters, this::updateProgress);
     }
 
     private void updateProgress(String message, int amount) {

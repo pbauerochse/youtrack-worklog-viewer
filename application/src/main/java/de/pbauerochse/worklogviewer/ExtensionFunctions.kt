@@ -1,6 +1,9 @@
 package de.pbauerochse.worklogviewer
 
+import de.pbauerochse.worklogviewer.connector.GroupByParameter
+import de.pbauerochse.worklogviewer.fx.components.NoSelectionGroupByParameter
 import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import javafx.application.Platform
 import javafx.event.EventHandler
@@ -29,3 +32,26 @@ fun Issue.getYouTrackLink() : URL {
     val baseUrl = SettingsUtil.settings.youTrackConnectionSettings.url.removeSuffix("/")
     return URL("$baseUrl/issue/$id#tab=Time%%20Tracking")
 }
+
+/**
+ * Returns true if the username of any of the
+ * WorklogItems in this Issue matches the
+ * username defined in the Settings
+ */
+fun Issue.hasOwnWorklogs(): Boolean = worklogItems.any { it.isOwn() }
+
+/**
+ * Returns true when the username matches the username
+ * defined in the Settings dialog
+ */
+fun WorklogItem.isOwn(): Boolean {
+    val ownUsername = SettingsUtil.settings.youTrackConnectionSettings.username
+    return user.username == ownUsername
+}
+
+/**
+ * Returns true if this is the special "NoSelectionGroupByParameter" and
+ * therefore should not be passed as grouping criteria to YouTrack
+ */
+fun GroupByParameter.isNoSelection(): Boolean = this is NoSelectionGroupByParameter
+

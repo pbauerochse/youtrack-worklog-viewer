@@ -11,8 +11,15 @@ fun String.trimToNull() : String? {
     }
 }
 
-fun LocalDate.toUtcEpochMillis() : Long = this
+fun LocalDate.utcEpochMillisAtStartOfDay(): Long = this
     .atStartOfDay(ZoneId.of("UTC"))
+    .toInstant()
+    .toEpochMilli()
+
+fun LocalDate.utcEpochMillisAtEndOfDay(): Long = this
+    .atStartOfDay(ZoneId.of("UTC"))
+    .plusDays(1)
+    .minusNanos(1)
     .toInstant()
     .toEpochMilli()
 

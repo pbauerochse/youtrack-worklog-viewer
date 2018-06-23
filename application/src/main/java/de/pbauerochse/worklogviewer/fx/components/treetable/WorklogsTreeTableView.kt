@@ -34,9 +34,9 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
 
         val firstWorklogColumnIndex = 1 // 0 = IssueLink, 1 to n = Worklogs, n + 1 = Summary
 
-        val startDate = data.reportParameters.timerangeProvider.startDate
+        val startDate = data.reportParameters.timerange.start
         val daysBetweenStartAndEndDate = ChronoUnit.DAYS
-            .between(startDate, data.reportParameters.timerangeProvider.endDate)
+            .between(startDate, data.reportParameters.timerange.end)
             .toInt()
 
         for (days in 0..daysBetweenStartAndEndDate) {

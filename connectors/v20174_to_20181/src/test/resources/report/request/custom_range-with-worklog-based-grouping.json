@@ -1,0 +1,11 @@
+{
+  "$type": "jetbrains.charisma.smartui.report.time.TimeReport",
+  "type": "time",
+  "own": true,
+  "range": {
+    "$type": "jetbrains.charisma.smartui.report.common.timeRange.FixedTimeRange",
+    "from": 1528675200000,
+    "to": 1529279999999
+  },
+  "name": "YTWLV: 2018-06-11_2018-06-17"
+}

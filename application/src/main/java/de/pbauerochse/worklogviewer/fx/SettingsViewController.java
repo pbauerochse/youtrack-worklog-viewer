@@ -1,10 +1,11 @@
 package de.pbauerochse.worklogviewer.fx;
 
 import de.pbauerochse.worklogviewer.WorklogViewer;
+import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
+import de.pbauerochse.worklogviewer.connector.YouTrackVersion;
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackVersion;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -110,7 +111,7 @@ public class SettingsViewController implements Initializable {
         IntStream.range(1, 25).forEach(workhoursComboBox.getItems()::add);
 
         // Version Combobox Values
-        youtrackVersionField.getItems().addAll(YouTrackVersion.values());
+        youtrackVersionField.getItems().addAll(YouTrackConnectorLocator.getSupportedVersions());
         youtrackVersionField.setConverter(new YouTrackVersionStringConverter());
 
         // Theme Combobox

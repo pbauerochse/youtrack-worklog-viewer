@@ -15,7 +15,7 @@ class WorklogsTreeTableViewData(
 ) {
 
     internal val treeRows: List<TreeItem<TreeTableRowModel>> by lazy {
-        val data = if (reportParameters.isDataGrouped) {
+        val data = if (reportParameters.groupByParameter != null) {
             convertGrouped(reportParameters.groupByParameter!!, issues)
         } else {
             convertDefault(issues).toMutableList()

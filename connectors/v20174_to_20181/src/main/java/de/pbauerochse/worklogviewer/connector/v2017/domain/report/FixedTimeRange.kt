@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.connector.v2017.domain.report
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import de.pbauerochse.worklogviewer.connector.v2017.toUtcEpochMillis
+import de.pbauerochse.worklogviewer.connector.v2017.utcEpochMillisAtEndOfDay
+import de.pbauerochse.worklogviewer.connector.v2017.utcEpochMillisAtStartOfDay
 import java.time.LocalDate
 
 /**
@@ -18,12 +19,12 @@ data class FixedTimeRange(
 
     @get:JsonProperty("from")
     val from: Long by lazy {
-        start.toUtcEpochMillis()
+        start.utcEpochMillisAtStartOfDay()
     }
 
     @get:JsonProperty("to")
     val to: Long by lazy {
-        end.plusDays(1).toUtcEpochMillis()
+        end.utcEpochMillisAtEndOfDay()
     }
 
 }

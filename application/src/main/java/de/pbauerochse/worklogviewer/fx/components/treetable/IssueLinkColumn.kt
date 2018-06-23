@@ -6,6 +6,7 @@ import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.GROUP_TI
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.ISSUE_LINK_CELL
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.RESOLVED_ISSUE_CELL
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
+import de.pbauerochse.worklogviewer.getYouTrackLink
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -83,7 +84,7 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
         if (item != null && item.isIssueRow) {
             val issueTableRowModel = item as IssueTreeTableRow
             LOGGER.debug("Clicked cell ${issueTableRowModel.issue.id}")
-            Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(issueTableRowModel.issue.getYoutrackLink()) }
+            Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(issueTableRowModel.issue.getYouTrackLink().toExternalForm()) }
         }
     }
 

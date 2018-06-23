@@ -14,6 +14,15 @@ data class Issue(
     var resolutionDate : LocalDateTime? = null
 ) : Comparable<Issue> {
 
+    /**
+     * Allows "cloning" an Issue. The values, except
+     * the worklog items, from the other Issue are
+     * applied to the new instance
+     */
+    constructor(issue: Issue, worklogItems: List<WorklogItem>) : this(issue.id, issue.description, issue.estimateInMinutes, issue.resolutionDate) {
+        this.worklogItems.addAll(worklogItems)
+    }
+
     // must not be contained in constructor args
     // as it has a back reference to this issue
     // and will then be contained in hashCode, equals and toString
@@ -34,6 +43,15 @@ data class Issue(
      */
     fun getTimeSpentOn(date: LocalDate) = worklogItems
         .filter { it.date == date }
+        .map { it.durationInMinutes }
+        .sum()
+
+    /**
+     * Returns the total time in minutes that
+     * has been logged on this issue in the
+     * defined time period
+     */
+    fun getTotalTime(): Long = worklogItems
         .map { it.durationInMinutes }
         .sum()
 

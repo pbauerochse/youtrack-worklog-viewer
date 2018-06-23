@@ -6,6 +6,7 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import javafx.concurrent.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,13 +23,17 @@ public class GetGroupByCategoriesTask extends Task<List<GroupByParameter>> {
     protected List<GroupByParameter> call() {
         YouTrackConnector connector = YouTrackConnectorLocator.getActiveConnector();
 
-        updateProgress(0.5, 1);
-        updateMessage(FormattingUtil.getFormatted("worker.progress.categories"));
+        List<GroupByParameter> possibleGroupByCategories = new ArrayList<>();
 
-        List<GroupByParameter> possibleGroupByCategories = connector.getGroupByParameters();
+        if (connector != null) {
+            updateProgress(0.5, 1);
+            updateMessage(FormattingUtil.getFormatted("worker.progress.categories"));
 
-        updateProgress(1, 1);
-        updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
+            possibleGroupByCategories.addAll(connector.getGroupByParameters());
+
+            updateProgress(1, 1);
+            updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
+        }
 
         return possibleGroupByCategories;
     }

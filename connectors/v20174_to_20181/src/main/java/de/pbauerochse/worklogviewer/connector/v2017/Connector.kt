@@ -2,6 +2,7 @@ package de.pbauerochse.worklogviewer.connector.v2017
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.module.SimpleModule
 import de.pbauerochse.worklogviewer.connector.GroupByParameter
 import de.pbauerochse.worklogviewer.connector.ProgressCallback
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
@@ -9,9 +10,9 @@ import de.pbauerochse.worklogviewer.connector.v2017.csv.CsvReportReader
 import de.pbauerochse.worklogviewer.connector.v2017.domain.groupby.GroupByTypes
 import de.pbauerochse.worklogviewer.connector.v2017.domain.groupby.GroupingField
 import de.pbauerochse.worklogviewer.connector.v2017.domain.issuedetails.IssueDetailsResponse
-import de.pbauerochse.worklogviewer.connector.v2017.domain.report.CreateReportRequestParameters
-import de.pbauerochse.worklogviewer.connector.v2017.domain.report.ReportDetails
-import de.pbauerochse.worklogviewer.connector.v2017.domain.report.ReportStatus
+import de.pbauerochse.worklogviewer.connector.v2017.domain.issuedetails.IssueField
+import de.pbauerochse.worklogviewer.connector.v2017.domain.report.*
+import de.pbauerochse.worklogviewer.connector.v2017.jackson.IssueFieldDeserializer
 import de.pbauerochse.worklogviewer.connector.v2017.url.UrlBuilder
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.http.isValid
@@ -44,7 +45,10 @@ class Connector(
             throw IllegalStateException("Fetching GroupByParameters failed: ${response.error}")
         }
 
-        val groupingFields = OBJECT_MAPPER.readValue<List<GroupingField>>(response.content!!, object : TypeReference<List<GroupingField>>() {})
+        val groupingFields = OBJECT_MAPPER
+            .readValue<List<GroupingField>>(response.content!!, object : TypeReference<List<GroupingField>>() {})
+            .map { FieldBasedGrouping(it) }
+
         return CONSTANT_GROUP_BY_PARAMETERS + groupingFields
     }
 
@@ -181,11 +185,14 @@ class Connector(
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(Connector::class.java)
+
         private val OBJECT_MAPPER = ObjectMapper()
+            .registerModule(SimpleModule("IssueField").addDeserializer(IssueField::class.java, IssueFieldDeserializer()))
+
         private val CONSTANT_GROUP_BY_PARAMETERS = listOf<GroupByParameter>(
-            GroupByTypes("WORK_TYPE", Translations.i18n.get("grouping.worktype")),
-            GroupByTypes("WORK_AUTHOR", Translations.i18n.get("grouping.workauthor")),
-            GroupByTypes("WORK_AUTHOR_AND_DATE", Translations.i18n.get("grouping.workauthoranddate"))
+            WorkItemBasedGrouping(GroupByTypes("WORK_TYPE", Translations.i18n.get("grouping.worktype"))),
+            WorkItemBasedGrouping(GroupByTypes("WORK_AUTHOR", Translations.i18n.get("grouping.workauthor"))),
+            WorkItemBasedGrouping(GroupByTypes("WORK_AUTHOR_AND_DATE", Translations.i18n.get("grouping.workauthoranddate")))
         )
         private const val MAX_POLL_COUNT = 10
         private const val POLL_INTERVAL_IN_SECONDS = 2

@@ -1,6 +1,13 @@
 /**
  * YouTrack Worklog Viewer basic styling
  */
+#fetchWorklogButton {
+    -fx-background-image: url(../img/application_view_detail.png);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
 .resolved-issue-cell .text {
     -fx-strikethrough: true;
 }
