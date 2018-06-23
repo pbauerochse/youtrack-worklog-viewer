@@ -4,6 +4,7 @@ import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import org.apache.poi.common.usermodel.HyperlinkType
 import org.apache.poi.ss.usermodel.*
+import java.net.URL
 
 /**
  * Provides helper utilities for
@@ -93,9 +94,9 @@ class POIWorkbook(internal val workbook: Workbook) {
         }
     }
 
-    fun createHyperlink(url: String): Hyperlink {
+    fun createHyperlink(url: URL): Hyperlink {
         val link = workbook.creationHelper.createHyperlink(HyperlinkType.URL)
-        link.address = url
+        link.address = url.toExternalForm()
         return link
     }
 

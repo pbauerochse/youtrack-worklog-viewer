@@ -1,14 +1,12 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
-
 /**
  * Describes the DataContainer for the [WorklogsTreeTableView]
  * and represents a Row in the TreeTableView component.
  *
  * A table row might be:
- * - a row containing the [Issue] and its worklogs
- * - a headline for a [de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory]
+ * - a row containing the [de.pbauerochse.worklogviewer.report.Issue] and its worklogs
+ * - a headline for a [de.pbauerochse.worklogviewer.connector.GroupByParameter]
  * - a summary row which sums up the spent time
  */
 interface TreeTableRowModel {

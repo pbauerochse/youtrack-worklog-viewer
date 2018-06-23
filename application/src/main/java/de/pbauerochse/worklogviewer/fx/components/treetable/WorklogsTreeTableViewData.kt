@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters
-import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
+import de.pbauerochse.worklogviewer.connector.GroupByParameter
+import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import javafx.scene.control.TreeItem
 
 /**
@@ -16,7 +16,7 @@ class WorklogsTreeTableViewData(
 
     internal val treeRows: List<TreeItem<TreeTableRowModel>> by lazy {
         val data = if (reportParameters.isDataGrouped) {
-            convertGrouped(reportParameters.groupByCategory!!, issues)
+            convertGrouped(reportParameters.groupByParameter!!, issues)
         } else {
             convertDefault(issues).toMutableList()
         }.toMutableList()
@@ -30,7 +30,7 @@ class WorklogsTreeTableViewData(
      * introduces intermediate "folders" that contain
      * the actual issues
      */
-    private fun convertGrouped(groupByCategory: GroupByCategory, issues: List<Issue>): List<TreeItem<TreeTableRowModel>> {
+    private fun convertGrouped(groupByCategory: GroupByParameter, issues: List<Issue>): List<TreeItem<TreeTableRowModel>> {
         return getIssuesByGroup(issues)
             .map {
                 val groupedRow = GroupedIssuesTreeTableRow(groupByCategory, it.key, it.value)
@@ -75,8 +75,8 @@ class WorklogsTreeTableViewData(
      */
     private fun getGroupedWorklogItems(issues: List<Issue>) = issues
         .flatMap { it.worklogItems }
-        .sortedBy { it.group }
-        .groupBy { it.group }
+        .sortedBy { it.groupingKey }
+        .groupBy { it.groupingKey }
 
     /**
      * Converts each Issue in the list to a

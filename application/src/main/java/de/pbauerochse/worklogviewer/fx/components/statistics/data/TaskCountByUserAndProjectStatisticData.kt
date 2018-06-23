@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
-import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem
+import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.report.WorklogItem
 
 /**
  * Groups the found issues by user and
@@ -23,7 +23,7 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
     private fun extractUserStatistics(issues: List<Issue>): List<UserStatistic> {
         val worklogsGroupedByUserDisplayname = issues
             .flatMap { it.worklogItems }
-            .groupBy { it.userDisplayname }
+            .groupBy { it.user.displayName }
             .toSortedMap()
 
         return worklogsGroupedByUserDisplayname.map {

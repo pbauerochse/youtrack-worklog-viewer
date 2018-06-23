@@ -7,6 +7,7 @@ import de.pbauerochse.worklogviewer.fx.components.treetable.GroupedIssuesTreeTab
 import de.pbauerochse.worklogviewer.fx.components.treetable.IssueTreeTableRow
 import de.pbauerochse.worklogviewer.fx.components.treetable.SummaryTreeTableRow
 import de.pbauerochse.worklogviewer.fx.components.treetable.TreeTableRowModel
+import de.pbauerochse.worklogviewer.getYouTrackLink
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import org.apache.poi.ss.usermodel.Cell
 
@@ -34,8 +35,8 @@ class IssueLinkExcelColumn : ExcelColumnRenderer {
     }
 
     private fun renderIssue(workbook: POIWorkbook, cell: Cell, value: IssueTreeTableRow) {
-        val link = workbook.createHyperlink(value.issue.getYoutrackLink())
-        val cellStyle = if (value.issue.resolved != null) workbook.resolvedIssueStyle else workbook.regularIssueStyle
+        val link = workbook.createHyperlink(value.issue.getYouTrackLink())
+        val cellStyle = if (value.issue.resolutionDate != null) workbook.resolvedIssueStyle else workbook.regularIssueStyle
 
         cell.hyperlink = link
         cell.setCellValue(value.getLabel())

@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.report
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -27,14 +28,23 @@ data class Issue(
         "$id - $description"
     }
 
+    /**
+     * Returns the total time spent in this Issue
+     * on the given date
+     */
+    fun getTimeSpentOn(date: LocalDate) = worklogItems
+        .filter { it.date == date }
+        .map { it.durationInMinutes }
+        .sum()
+
     private val issueNumber: Long by lazy {
         PROJECT_ID_REGEX.matchEntire(id)!!.groupValues[2].toLong()
     }
 
     override fun compareTo(other: Issue): Int {
         val byProject = project.compareTo(other.project)
-        return when {
-            byProject == 0 -> issueNumber.compareTo(other.issueNumber)
+        return when (byProject) {
+            0 -> issueNumber.compareTo(other.issueNumber)
             else -> byProject
         }
     }

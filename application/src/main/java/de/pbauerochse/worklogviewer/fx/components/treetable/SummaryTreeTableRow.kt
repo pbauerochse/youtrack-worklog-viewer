@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
+import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import java.time.LocalDate
 
 /**

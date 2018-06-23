@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
-import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem
+import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.report.WorklogItem
+
 
 /**
  * Groups the found issues by user and
@@ -15,7 +16,7 @@ class TaskCountByProjectAndUserStatisticData(issues : List<Issue>) {
     internal val numberOfUsers : Int by lazy {
         projectStatistic
             .flatMap { it.userStatistics }
-            .map { it.userDisplayName }
+            .map { it.user.displayName }
             .distinct()
             .count()
     }
@@ -38,10 +39,8 @@ class TaskCountByProjectAndUserStatisticData(issues : List<Issue>) {
 
     private fun getUserSummaries(worklogsForProject: List<WorklogItem>): List<UserSummary> {
         return worklogsForProject
-            .groupBy { it.userDisplayname }
-            .toSortedMap()
-            .map {
-                UserSummary(it.key, it.value)
-            }
+            .groupBy { it.user }
+            .map { UserSummary(it.key, it.value) }
+            .sortedBy { it.user.displayName }
     }
 }

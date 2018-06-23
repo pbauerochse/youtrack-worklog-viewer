@@ -1,10 +1,10 @@
 package de.pbauerochse.worklogviewer.excel
 
-import de.pbauerochse.worklogviewer.domain.TimerangeProvider
 import de.pbauerochse.worklogviewer.excel.columns.IssueLinkExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.IssueTimeSpentExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.SummaryExcelColumn
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData
+import de.pbauerochse.worklogviewer.report.TimeRange
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Workbook
 import org.slf4j.LoggerFactory
@@ -30,7 +30,7 @@ object ExcelExporter {
     }
 
     private fun renderData(data: WorklogsTreeTableViewData, sheet: POISheet) {
-        val cellWriters = getCellWriters(data.reportParameters.timerangeProvider)
+        val cellWriters = getCellWriters(data.reportParameters.timerange)
         sheet.writeHeadlines(cellWriters.map { it.headline })
 
         for (treeRow in data.treeRows) {
@@ -57,9 +57,9 @@ object ExcelExporter {
         sheet.autoSizeColumns()
     }
 
-    private fun getCellWriters(timerangeProvider: TimerangeProvider): List<ExcelColumnRenderer> {
-        val startDate = timerangeProvider.startDate
-        val endDate = timerangeProvider.endDate
+    private fun getCellWriters(timeRange: TimeRange): List<ExcelColumnRenderer> {
+        val startDate = timeRange.start
+        val endDate = timeRange.end
 
         val renderers = arrayListOf<ExcelColumnRenderer>(IssueLinkExcelColumn())
 

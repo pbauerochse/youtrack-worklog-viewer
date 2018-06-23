@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
+import de.pbauerochse.worklogviewer.report.Issue
 
 /**
  * A row in the [WorklogsTreeTableView] containing

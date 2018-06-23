@@ -66,7 +66,7 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
                 tooltip = Tooltip(text)
                 styleClass.add(ISSUE_LINK_CELL)
 
-                issue.resolved?.let {
+                issue.resolutionDate?.let {
                     styleClass.add(RESOLVED_ISSUE_CELL)
                 }
             }
@@ -82,7 +82,7 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
     private fun openIssueLinkInBrowser() {
         if (item != null && item.isIssueRow) {
             val issueTableRowModel = item as IssueTreeTableRow
-            LOGGER.debug("Clicked cell ${issueTableRowModel.issue.issueId}")
+            LOGGER.debug("Clicked cell ${issueTableRowModel.issue.id}")
             Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(issueTableRowModel.issue.getYoutrackLink()) }
         }
     }

@@ -1,13 +1,12 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeTableView
 import org.slf4j.LoggerFactory
 import java.time.temporal.ChronoUnit
 
 /**
- * Displays the [Issue]s in a TreeTableView
+ * Displays the [de.pbauerochse.worklogviewer.report.Issue]s in a TreeTableView
  */
 class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
 

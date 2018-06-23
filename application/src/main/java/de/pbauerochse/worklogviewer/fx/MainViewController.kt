@@ -1,8 +1,10 @@
 package de.pbauerochse.worklogviewer.fx
 
 import de.pbauerochse.worklogviewer.WorklogViewer
+import de.pbauerochse.worklogviewer.connector.GroupByParameter
 import de.pbauerochse.worklogviewer.domain.ReportTimerange
 import de.pbauerochse.worklogviewer.domain.timerangeprovider.TimerangeProviderFactory
+import de.pbauerochse.worklogviewer.fx.components.NoSelectionGroupByParameter
 import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane
 import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter
@@ -10,16 +12,15 @@ import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask
 import de.pbauerochse.worklogviewer.fx.tasks.VersionCheckerTask
 import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
+import de.pbauerochse.worklogviewer.report.TimeRange
+import de.pbauerochse.worklogviewer.report.TimeReport
+import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.setHref
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
 import de.pbauerochse.worklogviewer.util.ExceptionUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.version.Version
-import de.pbauerochse.worklogviewer.youtrack.TimeReport
-import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters
-import de.pbauerochse.worklogviewer.youtrack.domain.GroupByCategory
-import de.pbauerochse.worklogviewer.youtrack.domain.NoSelectionGroupByCategory
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
 import javafx.concurrent.Task
@@ -56,7 +57,7 @@ class MainViewController : Initializable {
     private lateinit var timerangeComboBox: ComboBox<ReportTimerange>
 
     @FXML
-    private lateinit var groupByCategoryComboBox: ComboBox<GroupByCategory>
+    private lateinit var groupByCategoryComboBox: ComboBox<GroupByParameter>
 
     @FXML
     private lateinit var fetchWorklogButton: Button
@@ -161,11 +162,11 @@ class MainViewController : Initializable {
         val task = GetGroupByCategoriesTask()
         task.setOnSucceeded { event ->
             val worker = event.source as GetGroupByCategoriesTask
-            val categoryList = worker.value as List<GroupByCategory>
+            val categoryList = worker.value as List<GroupByParameter>
             LOGGER.info("{} succeeded with {} GroupByCategories", task.title, categoryList.size)
 
-            groupByCategoryComboBox.items.add(NoSelectionGroupByCategory())
-            groupByCategoryComboBox.items.addAll(categoryList.sortedBy { it.name })
+            groupByCategoryComboBox.items.add(NoSelectionGroupByParameter())
+            groupByCategoryComboBox.items.addAll(categoryList.sortedBy { it.getLabel() })
             groupByCategoryComboBox.selectionModel.selectedItemProperty().addListener { _, _, newValue ->
                 val lastUsed = newValue?.id
                 settingsModel.lastUsedGroupByCategoryIdProperty().value = lastUsed
@@ -300,9 +301,10 @@ class MainViewController : Initializable {
         val selectedStartDate = startDatePicker.value
         val selectedEndDate = endDatePicker.value
 
-        val timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(timerange, selectedStartDate, selectedEndDate)
         val groupByCategory = groupByCategoryComboBox.selectionModel.selectedItem
-        val parameters = TimeReportParameters(timerangeProvider, groupByCategory)
+
+        val timeRange = TimeRange(selectedStartDate, selectedEndDate)
+        val parameters = TimeReportParameters(timeRange, groupByCategory)
 
         val task = FetchTimereportTask(parameters)
         task.setOnSucceeded { event -> displayWorklogResult(event.source.value as TimeReport) }

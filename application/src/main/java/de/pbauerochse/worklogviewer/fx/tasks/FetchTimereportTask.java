@@ -1,9 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
-import de.pbauerochse.worklogviewer.youtrack.TimeReport;
-import de.pbauerochse.worklogviewer.youtrack.TimeReportParameters;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackService;
-import de.pbauerochse.worklogviewer.youtrack.YouTrackServiceFactory;
+import de.pbauerochse.worklogviewer.connector.YouTrackConnector;
+import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
+import de.pbauerochse.worklogviewer.report.TimeReport;
+import de.pbauerochse.worklogviewer.report.TimeReportParameters;
 import javafx.concurrent.Task;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,8 +22,8 @@ public class FetchTimereportTask extends Task<TimeReport> {
 
     @Override
     protected TimeReport call() {
-        YouTrackService service = YouTrackServiceFactory.getYouTrackService();
-        return service.getReport(parameters, this::updateProgress);
+        YouTrackConnector service = YouTrackConnectorLocator.getActiveConnector();
+        return service.getTimeReport(parameters, this::updateProgress);
     }
 
     private void updateProgress(String message, int amount) {

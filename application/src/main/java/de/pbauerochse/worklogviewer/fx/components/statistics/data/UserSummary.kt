@@ -1,9 +1,10 @@
 package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
-import de.pbauerochse.worklogviewer.youtrack.domain.WorklogItem
+import de.pbauerochse.worklogviewer.report.User
+import de.pbauerochse.worklogviewer.report.WorklogItem
 
 internal data class UserSummary(
-    val userDisplayName : String,
+    val user : User,
     val worklogs : List<WorklogItem>
 ) {
     val timeSpentInMinutes : Long by lazy {

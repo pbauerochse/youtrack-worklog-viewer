@@ -5,7 +5,7 @@ import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUse
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TaskCountByUserAndProjectStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserAndProjectGraphStatistics
-import de.pbauerochse.worklogviewer.youtrack.domain.Issue
+import de.pbauerochse.worklogviewer.report.Issue
 import javafx.scene.Node
 
 /**

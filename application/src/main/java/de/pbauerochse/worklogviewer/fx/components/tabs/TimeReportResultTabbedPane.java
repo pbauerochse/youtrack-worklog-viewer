@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs;
 
+import de.pbauerochse.worklogviewer.report.TimeReport;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
-import de.pbauerochse.worklogviewer.youtrack.TimeReport;
 import de.pbauerochse.worklogviewer.youtrack.domain.Project;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;

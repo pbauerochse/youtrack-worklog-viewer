@@ -97,7 +97,7 @@ private class TimeSpentColumn : TreeTableCell<TreeTableRowModel, TimeSpentColumn
         val timeSpentInMinutes = row.issue.getTimeSpentOn(date)
         if (timeSpentInMinutes > 0) {
             text = formatMinutes(timeSpentInMinutes)
-            tooltip = Tooltip("${tableColumn.text} - ${row.issue.issueId} : $text")
+            tooltip = Tooltip("${tableColumn.text} - ${row.issue.id} : $text")
             styleClass.add(TIMESPENT_CELL)
         }
     }
