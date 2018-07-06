@@ -1,0 +1,47 @@
+{
+  "underline": {
+    "query": "arbeits",
+    "ranges": [
+      {
+        "start": 0,
+        "end": 7,
+        "styleClass": "string",
+        "title": null
+      }
+    ]
+  },
+  "suggest": {
+    "query": "arbeits",
+    "caret": 7,
+    "items": [
+      {
+        "sep": false,
+        "o": "Arbeitsdatum",
+        "d": "von Arbeitsdatum",
+        "hd": false,
+        "c": false,
+        "pre": null,
+        "suf": ": ",
+        "cp": 14,
+        "cs": 0,
+        "ce": 7,
+        "ms": 0,
+        "me": 7
+      },
+      {
+        "sep": false,
+        "o": "Arbeitstyp",
+        "d": "von Arbeitstyp",
+        "hd": false,
+        "c": false,
+        "pre": null,
+        "suf": ": ",
+        "cp": 12,
+        "cs": 0,
+        "ce": 7,
+        "ms": 0,
+        "me": 7
+      }
+    ]
+  }
+}

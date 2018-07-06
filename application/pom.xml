@@ -55,12 +55,12 @@
 
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>v20174_to_20181</artifactId>
+            <artifactId>connector-v20174_to_20181</artifactId>
         </dependency>
 
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>v20182</artifactId>
+            <artifactId>connector-v20182</artifactId>
         </dependency>
 
         <dependency>

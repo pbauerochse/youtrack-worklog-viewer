@@ -19,6 +19,7 @@ import de.pbauerochse.worklogviewer.http.isValid
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
+import de.pbauerochse.worklogviewer.toLocalDateTime
 import org.apache.http.StatusLine
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.StringEntity

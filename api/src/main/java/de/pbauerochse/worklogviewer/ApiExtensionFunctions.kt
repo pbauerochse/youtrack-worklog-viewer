@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.connector.v2017
+package de.pbauerochse.worklogviewer
 
 import java.time.*
 
@@ -29,3 +29,9 @@ fun Long.toLocalDate() : LocalDate = toLocalDateTime()
 fun Long.toLocalDateTime() : LocalDateTime = ZonedDateTime
     .ofInstant(Instant.ofEpochMilli(this), ZoneId.of("UTC"))
     .toLocalDateTime()
+
+fun LocalDate.isSameDayOrAfter(other: LocalDate): Boolean = isSameDay(other) || isAfter(other)
+
+fun LocalDate.isSameDayOrBefore(other: LocalDate): Boolean = isSameDay(other) || isBefore(other)
+
+fun LocalDate.isSameDay(other: LocalDate) = isEqual(other)

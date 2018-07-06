@@ -4,7 +4,6 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnectionSettings
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorFactory
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion
-import de.pbauerochse.worklogviewer.http.Http
 import org.slf4j.LoggerFactory
 
 /**
@@ -17,8 +16,7 @@ class ConnectorFactory : YouTrackConnectorFactory {
 
     override fun createServiceInstance(settings: YouTrackConnectionSettings): YouTrackConnector {
         LOGGER.debug("Creating new connector for $settings")
-        val http = Http(settings)
-        return Connector(http)
+        return Connector(settings)
     }
 
     companion object {

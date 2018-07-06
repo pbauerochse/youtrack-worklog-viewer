@@ -10,12 +10,17 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>v20182</artifactId>
+    <artifactId>connector-v20182</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
             <artifactId>api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
     </dependencies>
 

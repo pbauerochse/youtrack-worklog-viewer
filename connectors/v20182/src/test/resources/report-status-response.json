@@ -1,0 +1,55 @@
+// http://localhost:8888/youtrack/api/reports/102-4?fields=$type,authors(fullName,id,login,ringId),data(duration(id,minutes,presentation),estimation(id,minutes,presentation),groups(duration(id,minutes,presentation),estimation(id,minutes,presentation),id,lines(description,duration(id,minutes,presentation),estimation(id,minutes,presentation),groupName,id,issueId,issueSummary,name,typeDurations(duration(id,minutes,presentation),workType),userName),name),perUser),effectiveQuery,effectiveQueryUrl,grouping(id,field(id,presentation)),id,invalidationInterval,name,own,owner(id,login),pinned,projects(id,name,shortName),query,range($type,from,range(id),to),sprint(id,name),status(calculationInProgress,error(id),errorMessage,isOutdated,lastCalculated,progress,wikifiedErrorMessage),visibleTo(id,name),wikifiedError,windowSize,workTypes(id,name)
+{
+  "grouping": null,
+  "authors": [],
+  "workTypes": [],
+  "data": {
+    "groups": [],
+    "estimation": {
+      "presentation": "0m",
+      "minutes": 0,
+      "id": "PT0S",
+      "$type": "jetbrains.youtrack.timetracking.periodField.PeriodValue"
+    },
+    "duration": {
+      "presentation": "0m",
+      "minutes": 0,
+      "id": "PT0S",
+      "$type": "jetbrains.youtrack.timetracking.periodField.PeriodValue"
+    },
+    "$type": "jetbrains.youtrack.reports.impl.time.gap.TimeReportData"
+  },
+  "range": {
+    "range": {
+      "id": "LAST_WEEK",
+      "$type": "jetbrains.charisma.persistent.NamedRange"
+    },
+    "$type": "jetbrains.youtrack.reports.impl.gap.ranges.NamedTimeRange"
+  },
+  "effectiveQueryUrl": "/youtrack/issues",
+  "query": null,
+  "projects": [],
+  "effectiveQuery": null,
+  "visibleTo": null,
+  "invalidationInterval": 0,
+  "pinned": true,
+  "owner": {
+    "login": "patrick",
+    "id": "1-2",
+    "$type": "jetbrains.charisma.persistence.user.User"
+  },
+  "own": true,
+  "status": {
+    "error": null,
+    "calculationInProgress": false,
+    "wikifiedErrorMessage": "",
+    "isOutdated": false,
+    "lastCalculated": 1529845588414,
+    "errorMessage": null,
+    "progress": -1,
+    "$type": "jetbrains.youtrack.reports.impl.gap.ReportStatus"
+  },
+  "name": "RAKETE",
+  "id": "102-4",
+  "$type": "jetbrains.youtrack.reports.impl.time.gap.TimeReport"
+}

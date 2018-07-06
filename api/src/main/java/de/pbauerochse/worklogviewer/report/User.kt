@@ -6,4 +6,8 @@ package de.pbauerochse.worklogviewer.report
 data class User(
     val username : String,
     val displayName : String
-)
+) {
+
+    constructor(username: String) : this(username, username)
+
+}

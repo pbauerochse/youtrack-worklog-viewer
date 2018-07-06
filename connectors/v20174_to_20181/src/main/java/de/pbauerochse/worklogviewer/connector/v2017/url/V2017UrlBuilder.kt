@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets
  * a 2017.4 YouTrack Version up to
  * but not including 2018.1
  */
-internal open class V2017UrlBuilder(private val baseUrl : URL) : UrlBuilder {
+open class V2017UrlBuilder(private val baseUrl: URL) : UrlBuilder {
 
     override fun getGroupByParametersUrl(): URL =
         generateUrl("/api/filterFields?fieldTypes=version%5B1%5D&fieldTypes=ownedField%5B1%5D&fieldTypes=state%5B1%5D&fieldTypes=user%5B1%5D&fieldTypes=enum%5B1%5D&fieldTypes=date&fieldTypes=integer&fieldTypes=float&fieldTypes=period&fieldTypes=project&fields=id,\$type,presentation,name,aggregateable,sortable,customField(id,fieldType(id),name,localizedName),projects(id,name)&includeNonFilterFields=true")

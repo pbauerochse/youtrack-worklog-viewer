@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.connector.v2017.domain.report
+package de.pbauerochse.worklogviewer.connector.v2018.domain.report
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.pbauerochse.worklogviewer.utcEpochMillisAtEndOfDay
@@ -15,7 +15,7 @@ data class FixedTimeRange(
 ) {
 
     @get:JsonProperty("\$type")
-    val youtrackType : String = "jetbrains.charisma.smartui.report.common.timeRange.FixedTimeRange"
+    val youtrackType: String = "jetbrains.youtrack.reports.impl.gap.ranges.FixedTimeRange"
 
     @get:JsonProperty("from")
     val from: Long by lazy {
