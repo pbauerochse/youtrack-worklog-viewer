@@ -5,6 +5,8 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnector;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import javafx.concurrent.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.List;
  * YouTrack
  */
 public class GetGroupByCategoriesTask extends Task<List<GroupByParameter>> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GetGroupByCategoriesTask.class);
 
     public GetGroupByCategoriesTask() {
         updateTitle("GetGroupByCategories-Task");
@@ -29,10 +33,12 @@ public class GetGroupByCategoriesTask extends Task<List<GroupByParameter>> {
             updateProgress(0.5, 1);
             updateMessage(FormattingUtil.getFormatted("worker.progress.categories"));
 
-            possibleGroupByCategories.addAll(connector.getGroupByParameters());
-
-            updateProgress(1, 1);
-            updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
+            try {
+                possibleGroupByCategories.addAll(connector.getGroupByParameters());
+                updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
+            } finally {
+                updateProgress(1, 1);
+            }
         }
 
         return possibleGroupByCategories;

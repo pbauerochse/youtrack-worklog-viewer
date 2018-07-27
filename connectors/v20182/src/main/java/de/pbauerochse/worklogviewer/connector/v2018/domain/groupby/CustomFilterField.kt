@@ -15,4 +15,15 @@ class CustomFilterField @JsonCreator constructor(
     @JsonProperty("name") val name: String,
     @JsonProperty("aggregateable") val aggregateable: Boolean,
     @JsonProperty("sortable") val sortable: Boolean
-) : GroupingField
+) : GroupingField {
+
+    override fun getPossibleNames(): Iterable<String> {
+        val names = mutableSetOf<String>()
+        names.add(id)
+        names.add(presentation)
+        names.add(customField.name)
+        customField.localizedName?.let { names.add(it) }
+        return names
+    }
+
+}

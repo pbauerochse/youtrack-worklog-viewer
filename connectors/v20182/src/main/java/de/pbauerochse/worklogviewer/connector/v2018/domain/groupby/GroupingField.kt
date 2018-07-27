@@ -16,4 +16,6 @@ interface GroupingField {
 
     fun getLabel(): String = presentation
 
+    fun getPossibleNames(): Iterable<String>
+
 }

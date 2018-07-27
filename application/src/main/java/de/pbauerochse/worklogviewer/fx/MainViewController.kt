@@ -107,13 +107,13 @@ class MainViewController : Initializable {
         this.resources = resources
         this.settingsModel = SettingsUtil.settingsViewModel
 
+        checkForUpdate()
+
         initializeTimerangeComboBox()
         initializeGroupByComboBox()
         initializeDatePickers()
         initializeFetchWorklogsButton()
         initializeMenuItems()
-
-        checkForUpdate()
 
         // workaround to detect whether the whole form has been rendered to screen yet
         progressBar.sceneProperty().addListener { _, oldValue, newValue ->

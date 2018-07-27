@@ -13,4 +13,8 @@ class PredefinedFilterField @JsonCreator constructor(
     @JsonProperty("name") val name: String,
     @JsonProperty("aggregateable") val aggregateable: Boolean,
     @JsonProperty("sortable") val sortable: Boolean
-) : GroupingField
+) : GroupingField {
+
+    override fun getPossibleNames(): Iterable<String> = arrayListOf(id, presentation, name)
+
+}

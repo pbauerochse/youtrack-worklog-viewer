@@ -8,11 +8,12 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnectionSettings
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
 import de.pbauerochse.worklogviewer.connector.v2018.domain.groupby.GroupByTypes
 import de.pbauerochse.worklogviewer.connector.v2018.domain.groupby.GroupingField
+import de.pbauerochse.worklogviewer.connector.v2018.domain.grouping.FieldBasedGrouping
+import de.pbauerochse.worklogviewer.connector.v2018.domain.grouping.Grouping
+import de.pbauerochse.worklogviewer.connector.v2018.domain.grouping.WorkItemBasedGrouping
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.IssueDetailsResponse
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackIssue
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackWorklogItem
-import de.pbauerochse.worklogviewer.connector.v2018.domain.report.FieldBasedGrouping
-import de.pbauerochse.worklogviewer.connector.v2018.domain.report.WorkItemBasedGrouping
 import de.pbauerochse.worklogviewer.connector.v2018.url.UrlFactory
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.isSameDayOrAfter
@@ -101,19 +102,20 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
             .filter {
                 it.localDate.isSameDayOrAfter(parameters.timerange.start) || it.localDate.isSameDayOrBefore(parameters.timerange.end)
             }
-            .map { WorklogItem(issue, User(it.author.login), it.localDate, it.duration, it.description, it.worktype?.name, getGroupingKey(it, issue, parameters)) }
+            .map {
+                val groupingKey = getGroupingKey(it, issue, youtrackIssue, parameters)
+                WorklogItem(issue, User(it.author.login), it.localDate, it.duration, it.description, it.worktype?.name, groupingKey)
+            }
             .forEach { issue.worklogItems.add(it) }
 
         return issue
     }
 
-    private fun getGroupingKey(worklogItem: YouTrackWorklogItem, issue: Issue, parameters: TimeReportParameters): String? {
-        if (parameters.groupByParameter != null) {
-            LOGGER.warn("Grouping...dont know how to handle it right now")
-            // TODO implement grouping key here
+    private fun getGroupingKey(worklogItem: YouTrackWorklogItem, issue: Issue, youtrackIssue: YouTrackIssue, parameters: TimeReportParameters): String? {
+        return when (parameters.groupByParameter) {
+            null -> null
+            else -> (parameters.groupByParameter as Grouping).getGroupingKey(worklogItem, issue, youtrackIssue)
         }
-
-        return null
     }
 
     companion object {

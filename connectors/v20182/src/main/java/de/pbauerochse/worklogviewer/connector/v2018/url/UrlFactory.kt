@@ -32,8 +32,8 @@ class UrlFactory(private val baseUrl: URL) {
     }
 
     companion object {
-        private const val WORK_DATE_FIELD = "work date"
-        //        private const val WORK_DATE_FIELD = "Arbeitsdatum" // use this for debugging with a german youtrack < build 43006 for now see https://youtrack.jetbrains.com/issue/JT-47943
+        //        private const val WORK_DATE_FIELD = "work date"
+        private const val WORK_DATE_FIELD = "Arbeitsdatum" // use this for debugging with a german youtrack < build 43006 for now see https://youtrack.jetbrains.com/issue/JT-47943
         private val QUERY_DATE_FORMAT = DateTimeFormatter.ISO_DATE
     }
 }
