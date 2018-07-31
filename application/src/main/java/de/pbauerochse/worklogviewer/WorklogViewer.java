@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -61,7 +62,7 @@ public class WorklogViewer extends Application {
         LOGGER.info("Default TimeZone: {}", TimeZone.getDefault().toZoneId());
         LOGGER.info("Theme: {}", settings.getTheme());
 
-        FXMLLoader loader = new FXMLLoader(Charset.forName("utf-8"));
+        FXMLLoader loader = new FXMLLoader(StandardCharsets.UTF_8);
         loader.setResources(FormattingUtil.RESOURCE_BUNDLE);
 
         Parent root = loader.load(WorklogViewer.class.getResource("/fx/views/main.fxml").openStream());
