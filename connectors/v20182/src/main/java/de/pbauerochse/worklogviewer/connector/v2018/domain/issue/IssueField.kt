@@ -31,7 +31,7 @@ class IssueField @JsonCreator constructor(
     private fun toGroupByKey(node: ArrayNode): String? = node
         .map { toGroupByKey(it) }
         .filter { it?.isNotBlank() ?: false }
-        .joinToString { "," }
+        .joinToString(",")
 
     private fun toGroupByKey(node: ObjectNode): String? {
         return when {

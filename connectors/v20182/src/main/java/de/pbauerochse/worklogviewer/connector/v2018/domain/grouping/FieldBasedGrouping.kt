@@ -25,9 +25,8 @@ class FieldBasedGrouping @JsonCreator constructor(
     override fun getGroupingKey(worklogItem: YouTrackWorklogItem, issue: Issue, youtrackIssue: YouTrackIssue): String? {
         LOGGER.debug("Determining groupingKey for field $field")
         val possibleFieldNames = field.getPossibleNames()
-        return youtrackIssue.fields
-            .find { possibleFieldNames.contains(it.name) }
-            ?.toGroupByKey()
+        val field = youtrackIssue.fields.find { possibleFieldNames.contains(it.name) }
+        return field?.toGroupByKey()
     }
 
     companion object {

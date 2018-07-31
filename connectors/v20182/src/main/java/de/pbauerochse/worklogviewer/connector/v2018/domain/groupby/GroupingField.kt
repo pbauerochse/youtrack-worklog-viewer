@@ -14,6 +14,13 @@ interface GroupingField {
     val id: String
     val presentation: String
 
+    /**
+     * Some GroupingFields supplied by YouTrack can not
+     * be reliably used to group the issues. So they need
+     * to be filtered out and / or replace by own implementations
+     */
+    fun isProcessableFieldGrouping(): Boolean = this !is PredefinedFilterField
+
     fun getLabel(): String = presentation
 
     fun getPossibleNames(): Iterable<String>

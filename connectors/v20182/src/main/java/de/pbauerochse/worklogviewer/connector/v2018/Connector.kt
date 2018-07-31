@@ -6,11 +6,8 @@ import de.pbauerochse.worklogviewer.connector.GroupByParameter
 import de.pbauerochse.worklogviewer.connector.ProgressCallback
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectionSettings
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
-import de.pbauerochse.worklogviewer.connector.v2018.domain.groupby.GroupByTypes
 import de.pbauerochse.worklogviewer.connector.v2018.domain.groupby.GroupingField
-import de.pbauerochse.worklogviewer.connector.v2018.domain.grouping.FieldBasedGrouping
-import de.pbauerochse.worklogviewer.connector.v2018.domain.grouping.Grouping
-import de.pbauerochse.worklogviewer.connector.v2018.domain.grouping.WorkItemBasedGrouping
+import de.pbauerochse.worklogviewer.connector.v2018.domain.grouping.*
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.IssueDetailsResponse
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackIssue
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackWorklogItem
@@ -40,6 +37,7 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
 
         val groupingFields = OBJECT_MAPPER
             .readValue<List<GroupingField>>(response.content!!, object : TypeReference<List<GroupingField>>() {})
+            .filter { it.isProcessableFieldGrouping() }
             .map { FieldBasedGrouping(it) }
 
         return CONSTANT_GROUP_BY_PARAMETERS + groupingFields
@@ -103,7 +101,7 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
                 it.localDate.isSameDayOrAfter(parameters.timerange.start) || it.localDate.isSameDayOrBefore(parameters.timerange.end)
             }
             .map {
-                val groupingKey = getGroupingKey(it, issue, youtrackIssue, parameters)
+                val groupingKey = getGroupingKey(it, issue, youtrackIssue, parameters) ?: "---"
                 WorklogItem(issue, User(it.author.login), it.localDate, it.duration, it.description, it.worktype?.name, groupingKey)
             }
             .forEach { issue.worklogItems.add(it) }
@@ -122,9 +120,7 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
         private val LOGGER = LoggerFactory.getLogger(Connector::class.java)
         private val OBJECT_MAPPER = ObjectMapper()
         private val CONSTANT_GROUP_BY_PARAMETERS = listOf<GroupByParameter>(
-            WorkItemBasedGrouping(GroupByTypes("WORK_TYPE", Translations.i18n.get("grouping.worktype"))),
-            WorkItemBasedGrouping(GroupByTypes("WORK_AUTHOR", Translations.i18n.get("grouping.workauthor"))),
-            WorkItemBasedGrouping(GroupByTypes("WORK_AUTHOR_AND_DATE", Translations.i18n.get("grouping.workauthoranddate")))
+            WorkItemTypeGrouping, WorkItemAuthorGrouping, ProjectGrouping
         )
     }
 }

@@ -9,7 +9,6 @@ import de.pbauerochse.worklogviewer.report.Issue
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "\$type")
 @JsonSubTypes(
-    JsonSubTypes.Type(value = WorkItemBasedGrouping::class, name = "jetbrains.youtrack.reports.impl.time.gap.WorkItemBasedGrouping"),
     JsonSubTypes.Type(value = FieldBasedGrouping::class, name = "jetbrains.youtrack.reports.impl.time.gap.FieldBasedGrouping")
 )
 interface Grouping : GroupByParameter {

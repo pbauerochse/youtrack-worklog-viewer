@@ -78,4 +78,16 @@ public class YouTrackConnectionSettings implements de.pbauerochse.worklogviewer.
 
         throw new IllegalStateException("YouTrack Url not set yet");
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("YouTrackConnectionSettings{");
+        sb.append("version=").append(version);
+        sb.append(", url='").append(url).append('\'');
+        sb.append(", username='").append(username).append('\'');
+        sb.append(", permanentToken='").append(permanentToken).append('\'');
+        sb.append(", baseUrl=").append(getBaseUrl());
+        sb.append('}');
+        return sb.toString();
+    }
 }

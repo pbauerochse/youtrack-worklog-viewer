@@ -30,7 +30,7 @@ fun Hyperlink.setHref(url: String) {
  */
 fun Issue.getYouTrackLink() : URL {
     val baseUrl = SettingsUtil.settings.youTrackConnectionSettings.url.removeSuffix("/")
-    return URL("$baseUrl/issue/$id#tab=Time%%20Tracking")
+    return URL("$baseUrl/issue/$id#tab=Time%20Tracking")
 }
 
 /**

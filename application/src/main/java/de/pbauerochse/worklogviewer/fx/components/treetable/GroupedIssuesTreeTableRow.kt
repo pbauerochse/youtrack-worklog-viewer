@@ -13,7 +13,7 @@ data class GroupedIssuesTreeTableRow(val groupCategory: GroupByParameter, val gr
     override val isSummaryRow: Boolean = false
     override val isIssueRow: Boolean = false
     override val isGroupByRow: Boolean = true
-    override fun getLabel(): String = "${groupCategory.getLabel()}: '$groupValue'"
+    override fun getLabel(): String = "${groupCategory.getLabel()}: $groupValue"
 
     fun totalTimeSpentOn(date: LocalDate): Long = issues
         .flatMap { it.worklogItems }
