@@ -108,7 +108,7 @@
     -fx-border-width: 0;
 }
 
-.progress-text {
+.progress-text, .task-name-text {
     -fx-fill: -fx-light-text-color;
     -fx-font-size: 9pt;
 }

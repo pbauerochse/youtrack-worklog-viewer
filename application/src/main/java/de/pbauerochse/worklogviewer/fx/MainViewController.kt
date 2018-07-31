@@ -34,7 +34,7 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.layout.StackPane
-import javafx.scene.text.Text
+import javafx.scene.layout.VBox
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
@@ -76,10 +76,7 @@ class MainViewController : Initializable {
     private lateinit var exitMenuItem: MenuItem
 
     @FXML
-    private lateinit var progressBar: ProgressBar
-
-    @FXML
-    private lateinit var progressText: Text
+    private lateinit var taskProgressContainer: VBox
 
     @FXML
     private lateinit var resultTabPane: TimeReportResultTabbedPane
@@ -105,7 +102,7 @@ class MainViewController : Initializable {
         LOGGER.debug("Initializing main view")
         this.resources = resources
         this.settingsModel = SettingsUtil.settingsViewModel
-        this.taskRunner = TaskRunner(progressText, progressBar, waitScreenOverlay)
+        this.taskRunner = TaskRunner(taskProgressContainer, waitScreenOverlay)
 
         checkForUpdate()
 
@@ -116,7 +113,7 @@ class MainViewController : Initializable {
         initializeMenuItems()
 
         // workaround to detect whether the whole form has been rendered to screen yet
-        progressBar.sceneProperty().addListener { _, oldValue, newValue ->
+        mainToolbar.sceneProperty().addListener { _, oldValue, newValue ->
             if (oldValue == null && newValue != null) {
                 onFormShown()
             }
@@ -186,7 +183,7 @@ class MainViewController : Initializable {
             groupByCategoryComboBox.selectionModel.select(selectedItemIndex)
         }
 
-        taskRunner.runTask(task)
+        taskRunner.startTask(task)
     }
 
     private fun initializeDatePickers() {
@@ -242,7 +239,7 @@ class MainViewController : Initializable {
     private fun checkForUpdate() {
         val versionCheckTask = VersionCheckerTask()
         versionCheckTask.onSucceeded = EventHandler { this.addDownloadLinkToToolbarIfNeverVersionPresent(it) }
-        taskRunner.runTask(versionCheckTask)
+        taskRunner.startTask(versionCheckTask)
     }
 
     private fun addDownloadLinkToToolbarIfNeverVersionPresent(event: WorkerStateEvent) {
@@ -287,9 +284,9 @@ class MainViewController : Initializable {
             task.setOnSucceeded { e ->
                 LOGGER.info("Excel creation succeeded")
                 val file = e.source.value as File
-                progressText.text = getFormatted("exceptions.excel.success", file.absolutePath)
+//                progressText.text = getFormatted("exceptions.excel.success", file.absolutePath)
             }
-            taskRunner.runTask(task)
+            taskRunner.startTask(task)
         }
     }
 
@@ -310,7 +307,7 @@ class MainViewController : Initializable {
 
         val task = FetchTimereportTask(parameters)
         task.setOnSucceeded { event -> displayWorklogResult(event.source.value as TimeReport) }
-        taskRunner.runTask(task)
+        taskRunner.startTask(task)
     }
 
     private fun displayWorklogResult(timeReport: TimeReport) {
@@ -354,7 +351,7 @@ class MainViewController : Initializable {
             settingsViewModel.themeProperty().addListener(themeChangeListener)
 
             val stage = Stage()
-            stage.initOwner(progressBar.scene.window)
+            stage.initOwner(mainToolbar.scene.window)
 
             if (modal) {
                 stage.initStyle(StageStyle.UTILITY)

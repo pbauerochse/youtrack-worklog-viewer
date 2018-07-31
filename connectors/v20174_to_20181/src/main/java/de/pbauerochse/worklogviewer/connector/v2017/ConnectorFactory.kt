@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
  * that can handle version 2017.4 to 2018.1
  * of the YouTrack API
  */
-class ConnectorFactory : YouTrackConnectorFactory {
+open class ConnectorFactory : YouTrackConnectorFactory {
 
     override val supportedVersions: List<YouTrackVersion> = listOf(
         SupportedVersions.v2017_4, SupportedVersions.v2018_1

@@ -1,12 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tasks
 
 import de.pbauerochse.worklogviewer.util.FormattingUtil
-import javafx.concurrent.Task
 import javafx.css.Styleable
-import javafx.scene.control.ProgressBar
+import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
-import javafx.scene.text.Text
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -17,57 +14,72 @@ import java.util.concurrent.TimeUnit
  * according to the Task state
  */
 class TaskRunner(
-    private val progressText: Text,
-    private val progressBar: ProgressBar,
+    private val parent: Pane,
     private val waitScreenOverlay: StackPane
 ) {
+
+    fun startTask(task: WorklogViewerTask<Any>) {
+        LOGGER.info("Starting task ${task.label}")
+        val progressBar = TaskProgressBar()
+        progressBar.taskName.text = task.label
+
+        val delegate = DelegatingTask(task)
+        bindOnRunning(delegate, progressBar)
+        bindOnSucceeded(delegate, progressBar)
+        bindOnFailed(delegate, progressBar)
+
+        delegate.stateProperty().addListener { _, oldValue, newValue -> LOGGER.debug("Task {} changed from {} to {}", task.label, oldValue, newValue) }
+
+        parent.children.add(progressBar)
+        EXECUTOR.submit(delegate)
+    }
 
     /**
      * Starts a thread performing the given task
      * @param task The task to perform
      */
-    fun runTask(task: Task<*>) {
-        LOGGER.info("Starting task {}", task.title)
-        bindOnRunning(task)
-        bindOnSucceeded(task)
-        bindOnFailed(task)
-
-        // state change listener just for logging purposes
-        task.stateProperty().addListener { _, oldValue, newValue -> LOGGER.debug("Task {} changed from {} to {}", task.title, oldValue, newValue) }
-
-        EXECUTOR.submit(task)
-    }
+//    fun runTask(task: Task<*>) {
+//        LOGGER.info("Starting task {}", task.title)
+//        bindOnRunning(task)
+//        bindOnSucceeded(task)
+//        bindOnFailed(task)
+//
+//        // state change listener just for logging purposes
+//        task.stateProperty().addListener { _, oldValue, newValue -> LOGGER.debug("Task {} changed from {} to {}", task.title, oldValue, newValue) }
+//
+//        EXECUTOR.submit(task)
+//    }
 
     /**
      * While the task is running, the waitScreenOverlay
      * will be shown and the progress bar and the text bound
      * to the Task
      */
-    private fun bindOnRunning(task: Task<*>) {
+    private fun bindOnRunning(task: DelegatingTask<*>, progressBar: TaskProgressBar) {
         val initialOnRunningHandler = task.onRunning
         task.setOnRunning { event ->
             waitScreenOverlay.isVisible = true
-            progressText.textProperty().bind(task.messageProperty())
-            progressBar.progressProperty().bind(task.progressProperty())
+            progressBar.progressText.textProperty().bind(task.messageProperty())
+            progressBar.progressBar.progressProperty().bind(task.progressProperty())
 
-            setStyle(RUNNING_CLASS, progressBar)
-            setStyle(RUNNING_CLASS, progressText)
+            setStyle(RUNNING_CLASS, progressBar.progressBar)
+            setStyle(RUNNING_CLASS, progressBar.progressText)
 
             initialOnRunningHandler?.handle(event)
         }
     }
 
-    private fun bindOnSucceeded(task: Task<*>) {
+    private fun bindOnSucceeded(task: DelegatingTask<*>, progressBar: TaskProgressBar) {
         val initialOnSucceededHandler = task.onSucceeded
         task.setOnSucceeded { event ->
             LOGGER.info("Task {} succeeded", task.title)
 
             // unbind progress indicators
-            progressText.textProperty().unbind()
-            progressBar.progressProperty().unbind()
+            progressBar.progressText.textProperty().unbind()
+            progressBar.progressBar.progressProperty().unbind()
 
-            setStyle(SUCCESSFUL_CLASS, progressBar)
-            setStyle(SUCCESSFUL_CLASS, progressText)
+            setStyle(SUCCESSFUL_CLASS, progressBar.progressBar)
+            setStyle(SUCCESSFUL_CLASS, progressBar.progressText)
 
             if (initialOnSucceededHandler != null) {
                 LOGGER.debug("Delegating Event to previous onSucceeded event handler")
@@ -78,17 +90,17 @@ class TaskRunner(
         }
     }
 
-    private fun bindOnFailed(task: Task<*>) {
+    private fun bindOnFailed(task: DelegatingTask<*>, progressBar: TaskProgressBar) {
         val initialOnFailedHandler = task.onFailed
         task.setOnFailed { event ->
             LOGGER.warn("Task {} failed", task.title)
 
             // unbind progress indicators
-            progressText.textProperty().unbind()
-            progressBar.progressProperty().unbind()
+            progressBar.progressText.textProperty().unbind()
+            progressBar.progressBar.progressProperty().unbind()
 
-            setStyle(ERROR_CLASS, progressBar)
-            setStyle(ERROR_CLASS, progressText)
+            setStyle(ERROR_CLASS, progressBar.progressBar)
+            setStyle(ERROR_CLASS, progressBar.progressText)
 
             if (initialOnFailedHandler != null) {
                 LOGGER.debug("Delegating Event to previous onFailed event handler")
@@ -96,18 +108,18 @@ class TaskRunner(
             }
 
             val throwable = event.source.exception
-            if (throwable != null && StringUtils.isNotBlank(throwable.message)) {
+            if (throwable != null && throwable.message.isNullOrBlank().not()) {
                 LOGGER.warn("Showing error to user", throwable)
-                progressText.text = throwable.message
+                progressBar.progressText.text = throwable.message
             } else {
                 if (throwable != null) {
                     LOGGER.warn("Error executing task {}", task.toString(), throwable)
                 }
 
-                progressText.text = FormattingUtil.getFormatted("exceptions.main.worker.unknown")
+                progressBar.progressText.text = FormattingUtil.getFormatted("exceptions.main.worker.unknown")
             }
 
-            progressBar.progress = 1.0
+            progressBar.progressBar.progress = 1.0
             waitScreenOverlay.isVisible = false
         }
     }
