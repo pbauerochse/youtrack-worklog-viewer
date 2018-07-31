@@ -10,6 +10,7 @@ import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask
+import de.pbauerochse.worklogviewer.fx.tasks.TaskRunner
 import de.pbauerochse.worklogviewer.fx.tasks.VersionCheckerTask
 import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
 import de.pbauerochse.worklogviewer.isNoSelection
@@ -24,7 +25,6 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.version.Version
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
-import javafx.concurrent.Task
 import javafx.concurrent.WorkerStateEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -45,9 +45,6 @@ import java.io.IOException
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
 
 /**
  * Java FX Controller for the main window
@@ -99,6 +96,8 @@ class MainViewController : Initializable {
     @FXML
     private lateinit var mainToolbar: ToolBar
 
+    private lateinit var taskRunner: TaskRunner
+
     private lateinit var resources: ResourceBundle
     private lateinit var settingsModel: SettingsViewModel
 
@@ -106,6 +105,7 @@ class MainViewController : Initializable {
         LOGGER.debug("Initializing main view")
         this.resources = resources
         this.settingsModel = SettingsUtil.settingsViewModel
+        this.taskRunner = TaskRunner(progressText, progressBar, waitScreenOverlay)
 
         checkForUpdate()
 
@@ -185,7 +185,8 @@ class MainViewController : Initializable {
 
             groupByCategoryComboBox.selectionModel.select(selectedItemIndex)
         }
-        startTask(task)
+
+        taskRunner.runTask(task)
     }
 
     private fun initializeDatePickers() {
@@ -241,7 +242,7 @@ class MainViewController : Initializable {
     private fun checkForUpdate() {
         val versionCheckTask = VersionCheckerTask()
         versionCheckTask.onSucceeded = EventHandler { this.addDownloadLinkToToolbarIfNeverVersionPresent(it) }
-        startTask(versionCheckTask)
+        taskRunner.runTask(versionCheckTask)
     }
 
     private fun addDownloadLinkToToolbarIfNeverVersionPresent(event: WorkerStateEvent) {
@@ -288,7 +289,7 @@ class MainViewController : Initializable {
                 val file = e.source.value as File
                 progressText.text = getFormatted("exceptions.excel.success", file.absolutePath)
             }
-            startTask(task)
+            taskRunner.runTask(task)
         }
     }
 
@@ -309,76 +310,7 @@ class MainViewController : Initializable {
 
         val task = FetchTimereportTask(parameters)
         task.setOnSucceeded { event -> displayWorklogResult(event.source.value as TimeReport) }
-        startTask(task)
-    }
-
-    /**
-     * Starts a thread performing the given task
-     *
-     * @param task The task to perform
-     */
-    private fun startTask(task: Task<*>) {
-        LOGGER.info("Starting task {}", task.title)
-        val initialOnRunningHandler = task.onRunning
-        task.setOnRunning { event ->
-            waitScreenOverlay.isVisible = true
-            progressText.textProperty().bind(task.messageProperty())
-            progressBar.progressProperty().bind(task.progressProperty())
-
-            initialOnRunningHandler?.handle(event)
-        }
-
-        // success handler
-        val onSucceededEventHandler = task.onSucceeded
-        task.setOnSucceeded { event ->
-            LOGGER.info("Task {} succeeded", task.title)
-
-            // unbind progress indicators
-            progressText.textProperty().unbind()
-            progressBar.progressProperty().unbind()
-
-            if (onSucceededEventHandler != null) {
-                LOGGER.debug("Delegating Event to previous onSucceeded event handler")
-                onSucceededEventHandler.handle(event)
-            }
-
-            waitScreenOverlay.isVisible = false
-        }
-
-        // error handler
-        val onFailedEventHandler = task.onFailed
-        task.setOnFailed { event ->
-            LOGGER.warn("Task {} failed", task.title)
-
-            // unbind progress indicators
-            progressText.textProperty().unbind()
-            progressBar.progressProperty().unbind()
-
-            if (onFailedEventHandler != null) {
-                LOGGER.debug("Delegating Event to previous onFailed event handler")
-                onFailedEventHandler.handle(event)
-            }
-
-            val throwable = event.source.exception
-            if (throwable != null && StringUtils.isNotBlank(throwable.message)) {
-                LOGGER.warn("Showing error to user", throwable)
-                progressText.text = throwable.message
-            } else {
-                if (throwable != null) {
-                    LOGGER.warn("Error executing task {}", task.toString(), throwable)
-                }
-
-                progressText.text = getFormatted("exceptions.main.worker.unknown")
-            }
-
-            progressBar.progress = 1.0
-            waitScreenOverlay.isVisible = false
-        }
-
-        // state change listener just for logging purposes
-        task.stateProperty().addListener { _, oldValue, newValue -> LOGGER.debug("Task {} changed from {} to {}", task.title, oldValue, newValue) }
-
-        EXECUTOR.submit(task)
+        taskRunner.runTask(task)
     }
 
     private fun displayWorklogResult(timeReport: TimeReport) {
@@ -452,6 +384,6 @@ class MainViewController : Initializable {
     companion object {
         private val LOGGER = LoggerFactory.getLogger(MainViewController::class.java)
         private const val REQUIRED_FIELD_CLASS = "required"
-        var EXECUTOR = ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES, LinkedBlockingQueue())
+
     }
 }

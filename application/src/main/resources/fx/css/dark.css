@@ -64,6 +64,10 @@
     -fx-background-color: derive(-fx-accent, 5%);
 }
 
+.progress-bar.error > .bar {
+    -fx-background-color: #b7444d;
+}
+
 .tab-pane > .tab-header-area > .tab-header-background,
 .statistics,
 .about-dialog,

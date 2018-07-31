@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer;
 
-import de.pbauerochse.worklogviewer.fx.MainViewController;
+import de.pbauerochse.worklogviewer.fx.tasks.TaskRunner;
 import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
@@ -45,7 +45,7 @@ public class WorklogViewer extends Application {
     @Override
     public void stop() {
         SettingsUtil.saveSettings();
-        MainViewController.Companion.getEXECUTOR().shutdownNow();
+        TaskRunner.getEXECUTOR().shutdownNow();
     }
 
     @Override
