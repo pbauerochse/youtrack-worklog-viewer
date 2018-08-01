@@ -76,6 +76,8 @@ public class WorklogViewer extends Application {
         primaryStage.setScene(mainScene);
         primaryStage.setX(settings.getWindowSettings().getPositionX());
         primaryStage.setY(settings.getWindowSettings().getPositionY());
+        primaryStage.setWidth(settings.getWindowSettings().getWidth());
+        primaryStage.setHeight(settings.getWindowSettings().getHeight());
         primaryStage.show();
 
         primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> settings.getWindowSettings().setWidth(newValue.intValue()));
