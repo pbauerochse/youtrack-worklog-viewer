@@ -180,9 +180,20 @@ class MainViewController : Initializable {
             }
 
             groupByCategoryComboBox.selectionModel.select(selectedItemIndex)
+            autoLoadLastUsedReport()
         }
+        task.setOnFailed { autoLoadLastUsedReport() }
 
         taskRunner.startTask(task)
+    }
+
+    private fun autoLoadLastUsedReport() {
+        // auto load data if a named timerange was selected
+        // and the user chose to load data at startup
+        if (timerangeComboBox.selectionModel.selectedItem != ReportTimerange.CUSTOM && settingsModel.loadDataAtStartupProperty().get()) {
+            LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.selectionModel.selectedItem.name)
+            fetchWorklogButton.fire()
+        }
     }
 
     private fun initializeDatePickers() {
@@ -258,17 +269,9 @@ class MainViewController : Initializable {
 
     private fun onFormShown() {
         LOGGER.debug("MainForm shown")
-
         if (settingsModel.hasMissingConnectionSettings!!) {
             LOGGER.info("No YouTrack connection settings defined yet. Opening settings dialogue")
             showSettingsDialogue()
-        }
-
-        // auto load data if a named timerange was selected
-        // and the user chose to load data at startup
-        if (timerangeComboBox.selectionModel.selectedItem != ReportTimerange.CUSTOM && settingsModel.loadDataAtStartupProperty().get()) {
-            LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.selectionModel.selectedItem.name)
-            fetchWorklogButton.fire()
         }
     }
 
