@@ -16,6 +16,8 @@
 
     -ytwlv-border-color: derive(-fx-base, 20%);
     -ytwlv-dark-background-color: #2a2a2a;
+
+    -fx-background-color: -ytwlv-dark-background-color;
 }
 
 .menu-bar {
@@ -49,23 +51,8 @@
     -fx-border-insets: 1 0 0 0;
 }
 
-/* http://blog.mynotiz.de/programmieren/java/javafx-progress-bar-css-styling-2271/ */
-.progress-bar > .track {
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
-    -fx-padding: 0;
-    -fx-background-color: derive(-fx-accent, -40%);
-}
-
-.progress-bar > .bar {
-    -fx-background-insets: 0;
-    -fx-background-radius: 0;
-    -fx-padding: 0.6em;
-    -fx-background-color: derive(-fx-accent, 5%);
-}
-
 .progress-bar.error > .bar {
-    -fx-background-color: #b7444d;
+    -fx-background-color: #8f2b3c;
 }
 
 .tab-pane > .tab-header-area > .tab-header-background,

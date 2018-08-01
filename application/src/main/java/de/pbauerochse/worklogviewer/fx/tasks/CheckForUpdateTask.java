@@ -1,15 +1,15 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.connector.ProgressCallback;
 import de.pbauerochse.worklogviewer.util.HttpClientUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.version.GitHubVersion;
-import javafx.concurrent.Task;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,28 +20,34 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
+
 /**
  * Fetches the most recent version of the
  * Worklog Viewer from Github
  */
-public class VersionCheckerTask extends Task<Optional<GitHubVersion>> {
+public class CheckForUpdateTask extends WorklogViewerTask<Optional<GitHubVersion>> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(VersionCheckerTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckForUpdateTask.class);
 
-    public VersionCheckerTask() {
-        updateTitle("VersionChecker-Task");
+    @NotNull
+    @Override
+    public String getLabel() {
+        return getFormatted("task.updatecheck");
     }
 
     @Override
-    protected Optional<GitHubVersion> call() throws Exception {
+    public Optional<GitHubVersion> start(@NotNull ProgressCallback progressCallback) {
+        progressCallback.setProgress(getFormatted("worker.updatecheck.checking"), 0);
 
-        updateMessage(FormattingUtil.getFormatted("worker.updatecheck.checking"));
-        updateProgress(0, 1);
-
-        Optional<GitHubVersion> version = getVersionFromGithub();
-
-        updateMessage(FormattingUtil.getFormatted("worker.progress.done"));
-        updateProgress(1, 1);
+        Optional<GitHubVersion> version = Optional.empty();
+        try {
+            version = getVersionFromGithub();
+        } catch (Exception e) {
+            LOGGER.warn("Could not get Version from Github", e);
+        } finally {
+            progressCallback.setProgress(getFormatted("worker.progress.done"), 100);
+        }
 
         return version;
     }

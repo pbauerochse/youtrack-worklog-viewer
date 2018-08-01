@@ -75,3 +75,18 @@
 .task-progress-bar > .task-name-text {
     -fx-start-margin: 5;
 }
+
+/* http://blog.mynotiz.de/programmieren/java/javafx-progress-bar-css-styling-2271/ */
+.progress-bar > .track {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+    -fx-background-color: derive(-fx-accent, -40%);
+}
+
+.progress-bar > .bar {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0.6em;
+    -fx-background-color: derive(-fx-accent, 5%);
+}

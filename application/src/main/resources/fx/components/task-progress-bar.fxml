@@ -6,10 +6,10 @@
 <?import javafx.scene.text.Text?>
 <fx:root prefWidth="500.0" styleClass="task-progress-bar" type="javafx.scene.layout.StackPane" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
     <ProgressBar fx:id="progressBar" maxWidth="Infinity" progress="0.0"/>
-    <Text fx:id="taskName" styleClass="task-name-text" text="[ Rakete ]" StackPane.alignment="CENTER_LEFT">
+    <Text fx:id="taskName" styleClass="task-name-text" StackPane.alignment="CENTER_LEFT">
         <StackPane.margin>
             <Insets left="5.0"/>
         </StackPane.margin>
     </Text>
-    <Text fx:id="progressText" styleClass="progress-text" text="Arbeite Dinge ab"/>
+    <Text fx:id="progressText" styleClass="progress-text"/>
 </fx:root>

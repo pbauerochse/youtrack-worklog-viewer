@@ -17,14 +17,14 @@ import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
  * Async task, that fetches the GroupByCategory List from
  * YouTrack
  */
-public class GetGroupByCategoriesTask implements WorklogViewerTask<List<GroupByParameter>> {
+public class GetGroupByCategoriesTask extends WorklogViewerTask<List<GroupByParameter>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(GetGroupByCategoriesTask.class);
 
     @NotNull
     @Override
     public String getLabel() {
-        return "GetGroupByCategories";
+        return getFormatted("task.groupby");
     }
 
     @Override

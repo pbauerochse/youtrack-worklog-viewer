@@ -8,10 +8,10 @@ import de.pbauerochse.worklogviewer.fx.components.NoSelectionGroupByParameter
 import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane
 import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter
+import de.pbauerochse.worklogviewer.fx.tasks.CheckForUpdateTask
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunner
-import de.pbauerochse.worklogviewer.fx.tasks.VersionCheckerTask
 import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
 import de.pbauerochse.worklogviewer.isNoSelection
 import de.pbauerochse.worklogviewer.report.TimeRange
@@ -40,7 +40,6 @@ import javafx.stage.Stage
 import javafx.stage.StageStyle
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
-import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.time.LocalDate
@@ -237,13 +236,13 @@ class MainViewController : Initializable {
     }
 
     private fun checkForUpdate() {
-        val versionCheckTask = VersionCheckerTask()
+        val versionCheckTask = CheckForUpdateTask()
         versionCheckTask.onSucceeded = EventHandler { this.addDownloadLinkToToolbarIfNeverVersionPresent(it) }
         taskRunner.startTask(versionCheckTask)
     }
 
     private fun addDownloadLinkToToolbarIfNeverVersionPresent(event: WorkerStateEvent) {
-        val gitHubVersionOptional = (event.source as VersionCheckerTask).value
+        val gitHubVersionOptional = (event.source as CheckForUpdateTask).value
         gitHubVersionOptional.ifPresent { gitHubVersion ->
             val currentVersion = Version.fromVersionString(resources.getString("release.version"))
             val mostRecentVersion = Version.fromVersionString(gitHubVersion.version)
@@ -279,14 +278,8 @@ class MainViewController : Initializable {
      */
     private fun startExportToExcelTask() {
         val tab = resultTabPane.currentlyVisibleTab
-        val task = tab.getDownloadAsExcelTask()
-        if (task != null) {
-            task.setOnSucceeded { e ->
-                LOGGER.info("Excel creation succeeded")
-                val file = e.source.value as File
-//                progressText.text = getFormatted("exceptions.excel.success", file.absolutePath)
-            }
-            taskRunner.startTask(task)
+        tab.getDownloadAsExcelTask()?.let {
+            taskRunner.startTask(it)
         }
     }
 
@@ -303,7 +296,7 @@ class MainViewController : Initializable {
         val groupByCategory = groupByCategoryComboBox.selectionModel.selectedItem
 
         val timeRange = TimeRange(selectedStartDate, selectedEndDate)
-        val parameters = TimeReportParameters(timeRange, groupByCategory.takeIf { it.isNoSelection().not() })
+        val parameters = TimeReportParameters(timeRange, groupByCategory?.takeIf { it.isNoSelection().not() })
 
         val task = FetchTimereportTask(parameters)
         task.setOnSucceeded { event -> displayWorklogResult(event.source.value as TimeReport) }

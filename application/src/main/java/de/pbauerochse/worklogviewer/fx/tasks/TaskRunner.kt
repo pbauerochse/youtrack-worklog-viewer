@@ -5,6 +5,7 @@ import javafx.css.Styleable
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Future
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
@@ -18,44 +19,32 @@ class TaskRunner(
     private val waitScreenOverlay: StackPane
 ) {
 
-    fun startTask(task: WorklogViewerTask<Any>) {
-        LOGGER.info("Starting task ${task.label}")
-        val progressBar = TaskProgressBar()
-        progressBar.taskName.text = task.label
-
-        val delegate = DelegatingTask(task)
-        bindOnRunning(delegate, progressBar)
-        bindOnSucceeded(delegate, progressBar)
-        bindOnFailed(delegate, progressBar)
-
-        delegate.stateProperty().addListener { _, oldValue, newValue -> LOGGER.debug("Task {} changed from {} to {}", task.label, oldValue, newValue) }
-
-        parent.children.add(progressBar)
-        EXECUTOR.submit(delegate)
-    }
-
     /**
      * Starts a thread performing the given task
      * @param task The task to perform
      */
-//    fun runTask(task: Task<*>) {
-//        LOGGER.info("Starting task {}", task.title)
-//        bindOnRunning(task)
-//        bindOnSucceeded(task)
-//        bindOnFailed(task)
-//
-//        // state change listener just for logging purposes
-//        task.stateProperty().addListener { _, oldValue, newValue -> LOGGER.debug("Task {} changed from {} to {}", task.title, oldValue, newValue) }
-//
-//        EXECUTOR.submit(task)
-//    }
+    @Suppress("UNCHECKED_CAST")
+    fun <T> startTask(task: WorklogViewerTask<T>): Future<T> {
+        LOGGER.info("Starting task ${task.label}")
+        val progressBar = TaskProgressBar(task)
+        task.stateProperty().addListener(progressBar)
+
+        bindOnRunning(task, progressBar)
+        bindOnSucceeded(task, progressBar)
+        bindOnFailed(task, progressBar)
+
+        task.stateProperty().addListener { _, oldValue, newValue -> LOGGER.debug("Task ${task.label} changed from $oldValue to $newValue") }
+
+        parent.children.add(progressBar)
+        return EXECUTOR.submit(task) as Future<T>
+    }
 
     /**
      * While the task is running, the waitScreenOverlay
      * will be shown and the progress bar and the text bound
      * to the Task
      */
-    private fun bindOnRunning(task: DelegatingTask<*>, progressBar: TaskProgressBar) {
+    private fun bindOnRunning(task: WorklogViewerTask<*>, progressBar: TaskProgressBar) {
         val initialOnRunningHandler = task.onRunning
         task.setOnRunning { event ->
             waitScreenOverlay.isVisible = true
@@ -69,7 +58,7 @@ class TaskRunner(
         }
     }
 
-    private fun bindOnSucceeded(task: DelegatingTask<*>, progressBar: TaskProgressBar) {
+    private fun bindOnSucceeded(task: WorklogViewerTask<*>, progressBar: TaskProgressBar) {
         val initialOnSucceededHandler = task.onSucceeded
         task.setOnSucceeded { event ->
             LOGGER.info("Task {} succeeded", task.title)
@@ -90,7 +79,7 @@ class TaskRunner(
         }
     }
 
-    private fun bindOnFailed(task: DelegatingTask<*>, progressBar: TaskProgressBar) {
+    private fun bindOnFailed(task: WorklogViewerTask<*>, progressBar: TaskProgressBar) {
         val initialOnFailedHandler = task.onFailed
         task.setOnFailed { event ->
             LOGGER.warn("Task {} failed", task.title)

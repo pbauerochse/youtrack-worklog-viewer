@@ -1,36 +1,38 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
+import de.pbauerochse.worklogviewer.connector.ProgressCallback;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
 import de.pbauerochse.worklogviewer.report.TimeReport;
 import de.pbauerochse.worklogviewer.report.TimeReportParameters;
-import javafx.concurrent.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+
+import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
 
 /**
  * Task that loads the TimeReport
  * using the YouTrackConnector
  */
-public class FetchTimereportTask extends Task<TimeReport> {
+public class FetchTimereportTask extends WorklogViewerTask<TimeReport> {
 
     private final TimeReportParameters parameters;
 
     public FetchTimereportTask(@NotNull TimeReportParameters parameters) {
-        updateTitle("FetchTimereport-Task");
         this.parameters = parameters;
     }
 
+    @NotNull
     @Override
-    protected TimeReport call() {
-        YouTrackConnector service = YouTrackConnectorLocator.getActiveConnector();
-        return Objects.requireNonNull(service).getTimeReport(parameters, this::updateProgress);
+    public String getLabel() {
+        return getFormatted("task.fetchworklogs");
     }
 
-    private void updateProgress(String message, int amount) {
-        updateProgress(amount, 100);
-        updateMessage(message);
+    @Override
+    public TimeReport start(@NotNull ProgressCallback progressCallback) {
+        YouTrackConnector service = YouTrackConnectorLocator.getActiveConnector();
+        return Objects.requireNonNull(service).getTimeReport(parameters, progressCallback);
     }
 
 }
