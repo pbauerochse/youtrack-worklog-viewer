@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
-import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +51,14 @@ public class JsonSettingsLoader {
 
     private void ensureFileExists() {
         try {
-            FileUtils.forceMkdirParent(jsonFile);
-            FileUtils.touch(jsonFile);
+            File jsonFileDirectory = jsonFile.getParentFile();
+            if (!jsonFileDirectory.exists() && !jsonFileDirectory.mkdirs()) {
+                throw new IOException("Could not create directory " + jsonFileDirectory.getAbsolutePath());
+            }
+
+            if (!jsonFile.exists() && !jsonFile.createNewFile()) {
+                throw new IOException("Could not create settings file " + jsonFile.getAbsolutePath());
+            }
         } catch (IOException e) {
             throw ExceptionUtil.getIllegalStateException("exceptions.settings.create", e, jsonFile.getAbsolutePath());
         }
