@@ -26,7 +26,6 @@
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
 
         <httpclient.version>4.5.5</httpclient.version>
-        <commons-io.version>2.6</commons-io.version>
         <opencsv.version>4.2</opencsv.version>
         <jackson.version>2.9.5</jackson.version>
         <poi.version>3.17</poi.version>
