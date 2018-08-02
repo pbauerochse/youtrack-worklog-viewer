@@ -16,6 +16,7 @@
 
     -ytwlv-border-color: derive(-fx-base, 20%);
     -ytwlv-dark-background-color: #2a2a2a;
+    -ytwlv-hightlight-cell-color: rgba(36, 93, 126, 0.2);
 
     -fx-background-color: -ytwlv-dark-background-color;
 }
@@ -115,7 +116,7 @@
 }
 
 .highlight-cell {
-    -fx-background-color: rgba(36, 93, 126, 0.2);
+    -fx-background-color: -ytwlv-hightlight-cell-color;
 }
 
 .issue-cell {
@@ -210,4 +211,26 @@
 
 .date-picker-popup > * > .selected {
     -fx-background-color: -fx-accent;
+}
+
+.list-cell:filled:selected,
+.tree-cell:filled:selected,
+.table-row-cell:filled:selected,
+.tree-table-row-cell:filled:selected,
+.table-row-cell:filled > .table-cell:selected,
+.tree-table-row-cell:filled > .tree-table-cell:selected,
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:focused,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:focused,
+.table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused,
+.tree-table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:focused,
+.table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .table-cell:focused,
+.tree-table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell:focused,
+.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected,
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
+.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
+    -fx-background: -ytwlv-hightlight-cell-color;
+    -fx-table-cell-border-color: transparent;
 }
