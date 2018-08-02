@@ -12,16 +12,14 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
 
     init {
         isShowRoot = false
-        root = TreeItem()
     }
 
     internal fun update(data: WorklogsTreeTableViewData) {
         LOGGER.debug("Showing ${data.issues.size} Issues")
-        root.children.clear()
-        selectionModel.clearSelection()
-
-        root.children.addAll(data.treeRows)
         updateColumns(data)
+        root = TreeItem<TreeTableRowModel>().apply {
+            children.setAll(data.treeRows)
+        }
     }
 
     private fun updateColumns(data: WorklogsTreeTableViewData) {
