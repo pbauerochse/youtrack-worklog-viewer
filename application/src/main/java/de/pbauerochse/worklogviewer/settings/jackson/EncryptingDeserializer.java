@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.settings.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import de.pbauerochse.worklogviewer.util.EncryptionUtil;
@@ -17,7 +16,7 @@ public class EncryptingDeserializer extends StdDeserializer<String> {
     }
 
     @Override
-    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         String encrytpedText = p.getText();
         try {
             return EncryptionUtil.decryptEncryptedString(encrytpedText);

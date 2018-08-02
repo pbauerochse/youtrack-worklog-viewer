@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.settings.jackson;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -20,7 +19,7 @@ public class WeekdaySettingsDeserializer extends StdDeserializer<WeekdaySettings
     }
 
     @Override
-    public WeekdaySettings deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public WeekdaySettings deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         if (!p.isExpectedStartArrayToken()) {
             return null;
         }

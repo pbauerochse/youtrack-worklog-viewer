@@ -16,7 +16,4 @@ data class TimeReport(
      * as retrieved from YouTrack
      */
     val issues : List<Issue>
-) {
-
-
-}
+)
