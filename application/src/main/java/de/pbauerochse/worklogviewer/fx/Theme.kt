@@ -1,9 +1,11 @@
-package de.pbauerochse.worklogviewer.fx;
+package de.pbauerochse.worklogviewer.fx
+
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 
 /**
  * Available themes for the WorklogViewer UI
  */
-public enum Theme {
+enum class Theme(val stylesheet: String) {
 
     /**
      * The light theme as it has always been
@@ -16,13 +18,7 @@ public enum Theme {
      */
     DARK("/fx/css/dark.css");
 
-    private final String stylesheet;
-
-    Theme(String stylesheet) {
-        this.stylesheet = stylesheet;
-    }
-
-    public String getStylesheet() {
-        return stylesheet;
+    override fun toString(): String {
+        return getFormatted("theme.${name.toLowerCase()}.label")
     }
 }
