@@ -55,11 +55,9 @@ abstract class WorklogsTab(label: String) : Tab(label) {
 
     private fun showStatisticsView(showStatistics: Boolean) {
         if (showStatistics && !splitPane.items.contains(statisticsPane)) {
-            LOGGER.debug("Showing '$text' with statistics panel")
             splitPane.items.add(statisticsPane)
             splitPane.setDividerPosition(0, 0.8)
         } else if (!showStatistics && splitPane.items.contains(statisticsPane)) {
-            LOGGER.debug("Showing '$text' without statistics")
             splitPane.items.remove(statisticsPane)
         }
     }

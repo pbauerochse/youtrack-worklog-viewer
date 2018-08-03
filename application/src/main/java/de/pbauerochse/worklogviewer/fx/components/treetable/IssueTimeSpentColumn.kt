@@ -15,7 +15,6 @@ import javafx.scene.control.Tooltip
 import javafx.scene.control.TreeTableCell
 import javafx.scene.control.TreeTableColumn
 import javafx.util.Callback
-import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
 /**
@@ -69,7 +68,6 @@ private class TimeSpentColumn : TreeTableCell<TreeTableRowModel, TimeSpentColumn
         styleClass.removeAll(ALL_WORKLOGVIEWER_CLASSES)
 
         if (!empty && item != null) {
-            LOGGER.debug("Showing for $item")
             val date = item.dateProperty.get()
 
             when {
@@ -113,8 +111,4 @@ private class TimeSpentColumn : TreeTableCell<TreeTableRowModel, TimeSpentColumn
     private fun isToday(date: LocalDate): Boolean = date.isEqual(LocalDate.now())
 
     private fun isHighlighted(date: LocalDate): Boolean = SettingsUtil.settings.highlightState.isSet(date.dayOfWeek)
-
-    companion object {
-        private val LOGGER = LoggerFactory.getLogger(TimeSpentColumn::class.java)
-    }
 }
