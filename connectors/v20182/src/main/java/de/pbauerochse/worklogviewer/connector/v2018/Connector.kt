@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory
  */
 class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTrackConnector {
 
-    private val urlFactory = UrlFactory(youTrackConnectionSettings.baseUrl)
+    private val urlFactory = UrlFactory(youTrackConnectionSettings.baseUrl, youTrackConnectionSettings.workdateFieldName)
     private val http: Http = Http(youTrackConnectionSettings)
 
     override fun getGroupByParameters(): List<GroupByParameter> {

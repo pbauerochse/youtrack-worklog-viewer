@@ -14,4 +14,7 @@ interface YouTrackConnectionSettings {
 
     val permanentToken : String
 
+    // TODO temporary field, can be removed once https://youtrack.jetbrains.com/issue/JT-47943 is released
+    val workdateFieldName: String
+
 }

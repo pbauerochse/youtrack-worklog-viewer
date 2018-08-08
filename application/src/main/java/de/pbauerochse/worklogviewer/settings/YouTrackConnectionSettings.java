@@ -27,6 +27,7 @@ public class YouTrackConnectionSettings implements de.pbauerochse.worklogviewer.
     private String url;
     private String username;
     private String permanentToken;
+    private String workdateFieldName;
 
     @Nullable
     @JsonSerialize(using = YouTrackVersionSerializer.class)
@@ -63,6 +64,14 @@ public class YouTrackConnectionSettings implements de.pbauerochse.worklogviewer.
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getWorkdateFieldName() {
+        return workdateFieldName;
+    }
+
+    public void setWorkdateFieldName(String workdateFieldName) {
+        this.workdateFieldName = workdateFieldName;
     }
 
     @NotNull

@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.fx;
 import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion;
+import de.pbauerochse.worklogviewer.connector.v2018.SupportedVersions;
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
@@ -94,6 +95,20 @@ public class SettingsViewController implements Initializable {
     @FXML
     private CheckBox sundayHighlightCheckbox;
 
+
+    // TODO remove once https://youtrack.jetbrains.com/oauth?state=%2Fissue%2FJT-47943 is published
+    @FXML
+    private Label youtrackWorklogFielNameLabel;
+
+    @FXML
+    private TextField youtrackWorklogFielNameField;
+
+    @FXML
+    private Hyperlink youtrackWorklogFielNameHelpLink;
+
+    @FXML
+    private Label youtrackWorklogFielNameHint;
+
     private ResourceBundle resourceBundle;
 
     @Override
@@ -102,9 +117,26 @@ public class SettingsViewController implements Initializable {
         this.resourceBundle = resources;
 
         SettingsViewModel viewModel = SettingsUtil.getSettingsViewModel();
+
+        bindYouTrackWorklogFieldNameProperties(viewModel);
+
         attachListeners(viewModel);
         initializeDefaultValues();
         bindInputElements(viewModel);
+    }
+
+    private void bindYouTrackWorklogFieldNameProperties(SettingsViewModel viewModel) {
+        youtrackWorklogFielNameLabel.visibleProperty().bind(viewModel.youTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
+        youtrackWorklogFielNameField.visibleProperty().bind(viewModel.youTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
+        youtrackWorklogFielNameHelpLink.visibleProperty().bind(viewModel.youTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
+        youtrackWorklogFielNameHint.visibleProperty().bind(viewModel.youTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
+
+        youtrackWorklogFielNameField.textProperty().bindBidirectional(viewModel.youTrackWorkdateFieldNameProperty());
+        youtrackWorklogFielNameHelpLink.setOnAction(event -> {
+            String helpUrl = "https://github.com/pbauerochse/youtrack-worklog-viewer/wiki/Work-Date-Field-Help";
+            LOGGER.debug("Opening page {} in browser", helpUrl);
+            Platform.runLater(() -> WorklogViewer.getInstance().getHostServices().showDocument(helpUrl));
+        });
     }
 
     private void initializeDefaultValues() {

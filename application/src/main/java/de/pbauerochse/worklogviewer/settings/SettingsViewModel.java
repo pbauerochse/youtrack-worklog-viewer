@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.settings;
 
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion;
+import de.pbauerochse.worklogviewer.connector.v2018.SupportedVersions;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.fx.Theme;
 import javafx.beans.binding.BooleanBinding;
@@ -24,6 +25,7 @@ public class SettingsViewModel {
     private final ObjectProperty<YouTrackVersion> youTrackVersion = new SimpleObjectProperty<>();
     private final StringProperty youTrackUsername = new SimpleStringProperty();
     private final StringProperty youTrackPermanentToken = new SimpleStringProperty();
+    private final StringProperty youTrackWorkdateFieldName = new SimpleStringProperty();
 
     private final ObjectProperty<Theme> theme = new SimpleObjectProperty<>();
     private final IntegerProperty workhours = new SimpleIntegerProperty();
@@ -64,7 +66,8 @@ public class SettingsViewModel {
         return youTrackUrl.isEmpty()
                 .or(youTrackVersion.isNull())
                 .or(youTrackUsername.isEmpty())
-                .or(youTrackPermanentToken.isEmpty());
+                .or(youTrackPermanentToken.isEmpty())
+                .or(youTrackVersion.isEqualTo(SupportedVersions.getV2018_2()).and(youTrackWorkdateFieldName.isEmpty()));
     }
 
     public void saveChanges() {
@@ -72,6 +75,7 @@ public class SettingsViewModel {
         settings.getYouTrackConnectionSettings().setVersion(getYouTrackVersion());
         settings.getYouTrackConnectionSettings().setUsername(youTrackUsernameProperty().get());
         settings.getYouTrackConnectionSettings().setPermanentToken(youTrackPermanentTokenProperty().get());
+        settings.getYouTrackConnectionSettings().setWorkdateFieldName(youTrackWorkdateFieldNameProperty().get());
 
         settings.setTheme(themeProperty().get());
         settings.setWorkHoursADay(workhoursProperty().get());
@@ -112,6 +116,7 @@ public class SettingsViewModel {
         youTrackVersionProperty().set(settings.getYouTrackConnectionSettings().getVersion());
         youTrackUsernameProperty().set(settings.getYouTrackConnectionSettings().getUsername());
         youTrackPermanentTokenProperty().set(settings.getYouTrackConnectionSettings().getPermanentToken());
+        youTrackWorkdateFieldNameProperty().set(settings.getYouTrackConnectionSettings().getWorkdateFieldName());
 
         themeProperty().set(settings.getTheme());
         workhoursProperty().set(settings.getWorkHoursADay());
@@ -188,6 +193,18 @@ public class SettingsViewModel {
 
     public StringProperty youTrackPermanentTokenProperty() {
         return youTrackPermanentToken;
+    }
+
+    public Settings getSettings() {
+        return settings;
+    }
+
+    public String getYouTrackWorkdateFieldName() {
+        return youTrackWorkdateFieldName.get();
+    }
+
+    public StringProperty youTrackWorkdateFieldNameProperty() {
+        return youTrackWorkdateFieldName;
     }
 
     public Theme getTheme() {

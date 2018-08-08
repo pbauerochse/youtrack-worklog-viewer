@@ -4,7 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.fx.SettingsViewController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.pbauerochse.worklogviewer.fx.SettingsViewController">
 
     <center>
         <Accordion maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
@@ -16,7 +17,6 @@
                             <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
                         </columnConstraints>
                         <rowConstraints>
-                            <RowConstraints vgrow="NEVER" />
                             <RowConstraints vgrow="NEVER" />
                             <RowConstraints vgrow="NEVER" />
                             <RowConstraints vgrow="NEVER" />
@@ -58,10 +58,29 @@
                             <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
                         </TextField>
 
-                        <Label text="%view.settings.youtrackpermanenttoken" GridPane.rowIndex="9"/>
-                        <PasswordField fx:id="youtrackPermanentTokenField" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                        <Label text="%view.settings.youtrackpermanenttoken" GridPane.rowIndex="5"/>
+                        <PasswordField fx:id="youtrackPermanentTokenField" GridPane.columnIndex="1" GridPane.rowIndex="5">
                             <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
                         </PasswordField>
+
+                        <Label fx:id="youtrackWorklogFielNameLabel" text="%connector.v20182.worklogfield.label" GridPane.rowIndex="6"/>
+                        <TextField fx:id="youtrackWorklogFielNameField" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                            <GridPane.margin>
+                                <Insets bottom="2.0" top="2.0"/>
+                            </GridPane.margin>
+                        </TextField>
+
+                        <Label fx:id="youtrackWorklogFielNameHint" GridPane.columnIndex="1" GridPane.rowIndex="7" text="%connector.v20182.worklogfield.hint" wrapText="true">
+                            <GridPane.margin>
+                                <Insets bottom="2.0" top="2.0"/>
+                            </GridPane.margin>
+                        </Label>
+
+                        <Hyperlink fx:id="youtrackWorklogFielNameHelpLink" text="%connector.v20182.worklogfield.help" GridPane.columnIndex="1" GridPane.rowIndex="8">
+                            <GridPane.margin>
+                                <Insets bottom="2.0" top="2.0"/>
+                            </GridPane.margin>
+                        </Hyperlink>
 
                     </GridPane>
                 </TitledPane>
@@ -86,8 +105,8 @@
                         <padding>
                             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                         </padding>
-                        <Label text="%view.settings.theme"/>
-                        <ComboBox fx:id="themeComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1"/>
+                        <Label text="%view.settings.theme" GridPane.rowIndex="0"/>
+                        <ComboBox fx:id="themeComboBox" maxWidth="1.7976931348623157E308" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
                         <Label text="%view.settings.workhours" GridPane.rowIndex="1"/>
                         <ComboBox fx:id="workhoursComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
