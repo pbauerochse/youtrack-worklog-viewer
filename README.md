@@ -54,5 +54,6 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 There are several reasons, why this might be the case:
 
 * **You entered a wrong username in the settings** - *This tool checks your personal worklog by comparing your username from the settings screen, with the worklog author name from the report. YouTrack seems to allow you to have a different username than the login name. Please make sure, that in your YouTrack profile, the login name is the same as your actual username*
+* **You selected the wrong connector version** - *Jetbrains is constantly working on their product. To adapt to the changes, you need to specify the matching connector version in the settings dialog. Please check, if you have selected an outdated version in the settings*
 * **You entered a wrong work date field in the settings** - *There is a bug in YouTrack version 2018.2 which requires you the specify the field name for the work date query. Please check out [the Wiki](https://github.com/pbauerochse/youtrack-worklog-viewer/wiki/Work-Date-Field-Help) for help.*
 * **There simply are no tracked work items in the specified time range**
