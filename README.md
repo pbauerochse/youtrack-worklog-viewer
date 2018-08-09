@@ -2,9 +2,9 @@ YouTrack Worklog Viewer
 =======================
 
 # About this software
-YouTrack is a commercial issue tracker created by [Jetbrains](https://www.jetbrains.com/youtrack/) where you also have the possibility to log your time spent on each individual issue/task. Unfortunately, if you are like me and don't book your time right away, there is limited options to get an overview of how much time you have already booked on every single day of the week (addressed in [this issue](https://youtrack.jetbrains.com/issue/JT-29224)).
+YouTrack is a commercial issue tracker created by [Jetbrains](https://www.jetbrains.com/youtrack/) where you also have the possibility to track the time you spent on each individual issue. Unfortunately, if you are like me and don't book your time right away, there is limited options to get an overview of how much time you have already booked on every single day of the week (addressed in [this issue](https://youtrack.jetbrains.com/issue/JT-29224)).
 
-With this tool you can now overcome this issue. It let's you create your personal time tracking report as depicted in this screenshot
+With this tool you can see the time you spent on each project and individual task as depicted in the following screenshot.
 
 ![Screenshot of the report](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/screenshot.png) (*Issues column has been obfuscated for the screenshot*)
 
@@ -12,9 +12,13 @@ With this tool you can now overcome this issue. It let's you create your persona
 
 [Download v2.4.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.0)
 
+Most parts of the Worklog Viewer have been rewritten for the 2.4.0 release. If you ever experience any trouble, please file an issue here at the Github Project and let me know about it.
+
 Please note, that authentication support for OAuth2 and Password authentication has been droped, as well
 as the support for any YouTrack version less than 2018.1. If you have an older version of YouTrack please use
-on of the older releases of the YouTrack Worklog Viewer.
+any of the older releases of the YouTrack Worklog Viewer.
+
+If you need help, on how to configure token authentication, please head over to the [Wiki page](https://github.com/pbauerochse/youtrack-worklog-viewer/wiki/Authentication-with-YouTrack).
 
 ## How does it work?
 You simply enter the URL to your YouTrack installation, and your own login data at the settings screen, select the reporting range in the main window and click on the "Download worklogs" button. That's it!
@@ -31,15 +35,15 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **Where are the settings stored?**
 
-*The worklog viewer creates a file in your user home directory with the name `youtrack-worklog.properties`. All your settings are in there. Though - or because - it is a plain text file, your YouTrack password will not be stored in cleartext, instead it will be encrypted before storing it in that file. Please note: even though the password is encrypted, it is not impossible for anyone with access to your computer to decrypt the password*
+*The worklog viewer creates a file in your user home directory with the name `.youtrack-worklog-viewer.json`. All your settings are in there. Though - or because - it is a plain text file, your YouTrack credentials will not be stored in cleartext, instead they will be encrypted before storing them in that file. Please note: even though the credentials are encrypted, it is not impossible for anyone with access to your computer to decrypt them again*
 
 **Which YouTrack versions are supported?**
 
-*It has been tested with YouTrack Version 6 up to YouTrack 2017.4*
+*Support for YouTrack versions older than 2017.4 have been dropped in the Worklog Viewer version 2.4.0. If you have a YouTrack version between 6 and 2017.4, please use any YouTrack WorklogViewer release before 2.4.0*
 
 **How does the tool get the data from YouTrack?**
 
-*The application logs on to your YouTrack installation using the regular YouTrack API and the data provided by you in the settings screen. It then creates a temporary time report and downloads it as .csv file. The data in that file is being processed and displayed in the main window. After retrieving the data, the temporarily created report will be deleted to prevent polluting your reports section*
+*Depending on your YouTrack version, the WorklogViewer creates and downloads a TimeReport on your behalf, or executes a query and downloads the results.*
 
 **What reporting options are available?**
 
@@ -47,4 +51,8 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **I just get a blank report. What's wrong?**
 
-*This tool checks your personal worklog by comparing your username from the settings screen, with the worklog author name from the report. YouTrack seems to allow you to have a different username than the login name. Please make sure, that in your YouTrack profile, the login name is the same as your actual username*
+There are several reasons, why this might be the case:
+
+* **You entered a wrong username in the settings** - *This tool checks your personal worklog by comparing your username from the settings screen, with the worklog author name from the report. YouTrack seems to allow you to have a different username than the login name. Please make sure, that in your YouTrack profile, the login name is the same as your actual username*
+* **You entered a wrong work date field in the settings** - *There is a bug in YouTrack version 2018.2 which requires you the specify the field name for the work date query. Please check out [the Wiki](https://github.com/pbauerochse/youtrack-worklog-viewer/wiki/Work-Date-Field-Help) for help.*
+* **There simply are no tracked work items in the specified time range**
