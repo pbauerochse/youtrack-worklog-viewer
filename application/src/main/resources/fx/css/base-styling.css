@@ -1,0 +1,92 @@
+/**
+ * YouTrack Worklog Viewer basic styling
+ */
+#fetchWorklogButton {
+    -fx-background-image: url(../img/application_view_detail.png);
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: auto;
+}
+
+.resolved-issue-cell .text {
+    -fx-strikethrough: true;
+}
+
+.issue-cell:hover {
+    -fx-cursor: hand;
+}
+
+.timespent-cell {
+    -fx-alignment: center-right;
+}
+
+.summary-cell {
+    -fx-font-weight: bold;
+    -fx-alignment: center-right;
+}
+
+.group-cell, .group-title-cell {
+    -fx-font-weight: bold;
+}
+
+.group-cell {
+    -fx-alignment: center-right;
+}
+
+.scroll-bar {
+    -fx-unit-increment: 100.0;
+    -fx-block-increment: 500.0;
+}
+
+.task-by-user-statistics-username {
+    -fx-padding: 20 0 0 0;
+}
+
+.task-by-user-statistics-percentage {
+    -fx-alignment: center-right;
+    -fx-padding: 0 0 0 20;
+    -fx-column-halignment: right;
+}
+
+.task-by-user-statistics-total-spent-time-label,
+.task-by-user-statistics-username,
+.task-by-user-statistics-project,
+.task-by-user-statistics-percentage,
+.task-by-user-statistics-total-spent-time {
+    -fx-font-weight: bold;
+}
+
+.tree-table-row-cell:odd {
+    -fx-background-color: -fx-table-cell-border-color, derive(-fx-control-inner-background, -5%);
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.tree-table-row-cell:selected:odd {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-focus-color;
+    -fx-background-insets: 0, 1, 2;
+}
+
+.task-progress-bar > .task-name-text, .task-progress-bar > .progress-text {
+    -fx-font-size: 10.0;
+    -fx-stroke-type: OUTSIDE;
+    -fx-stroke-width: 0.0;
+}
+
+.task-progress-bar > .task-name-text {
+    -fx-start-margin: 5;
+}
+
+/* http://blog.mynotiz.de/programmieren/java/javafx-progress-bar-css-styling-2271/ */
+.progress-bar > .track {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+    -fx-background-color: derive(-fx-accent, -40%);
+}
+
+.progress-bar > .bar {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 0.6em;
+    -fx-background-color: derive(-fx-accent, 5%);
+}

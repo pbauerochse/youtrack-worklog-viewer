@@ -1,0 +1,21 @@
+package de.pbauerochse.worklogviewer.connector.v2017.domain.issuedetails
+
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+
+/**
+ * Additional details for an Issue
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class IssueDetails @JsonCreator constructor(
+    @JsonProperty("id") val issueId : String,
+    @JsonProperty("entityId") val entityId : String,
+    @JsonProperty("field") val fields : List<IssueField>
+) {
+
+    val isResolved: Boolean by lazy {
+        fields.any { it.isResolvedField }
+    }
+
+}
