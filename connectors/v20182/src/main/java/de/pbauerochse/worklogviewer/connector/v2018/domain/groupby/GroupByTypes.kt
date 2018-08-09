@@ -13,5 +13,6 @@ class GroupByTypes @JsonCreator constructor(
 ) : GroupingField {
 
     override fun getPossibleNames(): Iterable<String> = arrayListOf(id, presentation)
+    override val isProcessableFieldGrouping: Boolean = true
 
 }

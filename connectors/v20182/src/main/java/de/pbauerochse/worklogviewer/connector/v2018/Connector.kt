@@ -37,7 +37,7 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
 
         val groupingFields = OBJECT_MAPPER
             .readValue<List<GroupingField>>(response.content!!, object : TypeReference<List<GroupingField>>() {})
-            .filter { it.isProcessableFieldGrouping() }
+            .filter { it.isProcessableFieldGrouping }
             .map { FieldBasedGrouping(it) }
 
         return CONSTANT_GROUP_BY_PARAMETERS + groupingFields

@@ -17,4 +17,6 @@ class PredefinedFilterField @JsonCreator constructor(
 
     override fun getPossibleNames(): Iterable<String> = arrayListOf(id, presentation, name)
 
+    override val isProcessableFieldGrouping: Boolean = false
+
 }

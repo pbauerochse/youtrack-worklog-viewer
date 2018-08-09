@@ -15,4 +15,8 @@ class CustomFilterField @JsonCreator constructor(
     @JsonProperty("name") val name : String,
     @JsonProperty("aggregateable") val aggregateable : Boolean,
     @JsonProperty("sortable") val sortable : Boolean
-) : GroupingField
+) : GroupingField {
+
+    override val isProcessableFieldGrouping: Boolean = true
+
+}

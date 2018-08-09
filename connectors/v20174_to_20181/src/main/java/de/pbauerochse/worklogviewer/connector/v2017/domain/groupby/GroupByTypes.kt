@@ -10,4 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 class GroupByTypes @JsonCreator constructor(
     @JsonProperty("id") override val id : String,
     @JsonProperty("presentation") override val presentation: String
-) : GroupingField
+) : GroupingField {
+
+    override val isProcessableFieldGrouping: Boolean = true
+}

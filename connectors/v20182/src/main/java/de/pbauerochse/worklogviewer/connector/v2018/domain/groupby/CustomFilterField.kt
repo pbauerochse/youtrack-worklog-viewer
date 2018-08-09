@@ -26,4 +26,6 @@ class CustomFilterField @JsonCreator constructor(
         return names
     }
 
+    override val isProcessableFieldGrouping: Boolean = true
+
 }
