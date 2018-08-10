@@ -27,8 +27,8 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **What are the requirements?**
 
-* At least a Java 8 Runtime. Please note: if you are using Linux and installed the OpenJDK via the package manager, you might need to install openjfx too (e.g. `sudo apt install openjfx`)
-* Of course you need a valid YouTrack account for the instance you want to fetch the worklogs from
+* *At least a Java 8 Runtime. Please note: if you are using Linux and installed the OpenJDK via the package manager, you might need to install openjfx too (e.g. `sudo apt install openjfx`)*
+* *Of course you need a valid YouTrack account for the instance you want to fetch the worklogs from*
 
 **How do I start the application?**
 
