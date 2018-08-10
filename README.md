@@ -27,7 +27,8 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **What are the requirements?**
 
-*You need to have Java 8 installed. The application has been tested with a Java version >= 1.8.0_25 on a Mac and Linux computer. Also you need an account to the YouTrack installation you want to access, with the right to create a time report*
+* At least a Java 8 Runtime. Please note: if you are using Linux and installed the OpenJDK via the package manager, you might need to install openjfx too (e.g. `sudo apt install openjfx`)
+* Of course you need a valid YouTrack account for the instance you want to fetch the worklogs from
 
 **How do I start the application?**
 
