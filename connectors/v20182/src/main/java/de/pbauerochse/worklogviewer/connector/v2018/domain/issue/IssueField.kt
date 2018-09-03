@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-class IssueField @JsonCreator constructor(
+data class IssueField @JsonCreator constructor(
     @JsonProperty("name") val name: String,
     @JsonProperty("value") val value: JsonNode
 ) {

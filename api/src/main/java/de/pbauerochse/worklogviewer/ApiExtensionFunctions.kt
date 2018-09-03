@@ -23,6 +23,12 @@ fun LocalDate.utcEpochMillisAtEndOfDay(): Long = this
     .toInstant()
     .toEpochMilli()
 
+fun Long.toLocalDateUsingUserTimeZone(): LocalDate = toLocalDateTimeUsingUserTimeZone().toLocalDate()
+
+fun Long.toLocalDateTimeUsingUserTimeZone(): LocalDateTime = ZonedDateTime
+    .ofInstant(Instant.ofEpochMilli(this), ZoneId.systemDefault())
+    .toLocalDateTime()
+
 fun Long.toLocalDate() : LocalDate = toLocalDateTime()
     .toLocalDate()
 

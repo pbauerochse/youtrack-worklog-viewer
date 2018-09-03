@@ -53,14 +53,12 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
 
         item?.let {
             if (it.isGroupByRow) {
-                LOGGER.debug("Showing GroupBy Item $it")
                 text = it.getLabel()
                 tooltip = Tooltip(text)
                 styleClass.add(GROUP_TITLE_CELL)
             }
 
             if (it.isIssueRow) {
-                LOGGER.debug("Showing Issue Item $it")
                 val issue = (it as IssueTreeTableRow).issue
 
                 text = it.getLabel()
@@ -73,7 +71,6 @@ private class IssueLinkCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel
             }
 
             if (it.isSummaryRow) {
-                LOGGER.debug("Showing Summary Item $it")
                 text = it.getLabel()
                 styleClass.add(SUMMARY_CELL)
             }

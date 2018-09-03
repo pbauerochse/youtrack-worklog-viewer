@@ -20,8 +20,8 @@ abstract class WorklogViewerTask<T> : Task<T>(), ProgressCallback {
 
     override fun call(): T = start(this)
 
-    override fun setProgress(message: String, amount: Int) {
-        updateProgress(amount.toLong(), 100)
+    override fun setProgress(message: String, amount: Double) {
+        updateProgress(amount, 100.toDouble())
         updateMessage(message)
     }
 }

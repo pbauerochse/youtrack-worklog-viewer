@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import de.pbauerochse.worklogviewer.toLocalDate
+import de.pbauerochse.worklogviewer.toLocalDateUsingUserTimeZone
 import java.time.LocalDate
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -17,6 +17,6 @@ data class YouTrackWorklogItem @JsonCreator constructor(
     @JsonProperty("worktype") val worktype: WorklogItemWorktype?
 ) {
 
-    val localDate: LocalDate = date.toLocalDate()
+    val localDate: LocalDate = date.toLocalDateUsingUserTimeZone()
 
 }

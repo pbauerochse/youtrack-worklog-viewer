@@ -11,6 +11,10 @@ interface ProgressCallback {
      * @param message the message to display
      * @param amount the amount of progress in percent
      */
-    fun setProgress(message: String, amount: Int)
+    fun setProgress(message: String, amount: Double)
+
+    fun setProgress(message: String, amount: Int) {
+        setProgress(message, amount.toDouble())
+    }
 
 }

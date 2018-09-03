@@ -48,10 +48,11 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
         val youtrackIssues = fetchYouTrackIssues(parameters)
 
         val remainingProgress = 80.0
-        val increment = if (youtrackIssues.isNotEmpty()) remainingProgress / youtrackIssues.size else 80.0
-        val progressPerIssue = Math.max(increment.toInt(), 1)
+        val progressPerIssue = if (youtrackIssues.isNotEmpty()) remainingProgress / youtrackIssues.size else 80.0
 
-        val issues = youtrackIssues.mapIndexed { index, it ->
+        // TODO speed up by going parallel
+        val issues = youtrackIssues
+            .mapIndexed { index, it ->
             progressCallback.setProgress(Translations.i18n.get("fetchingworklogs", youtrackIssues.size), 20 + ((index + 1) * progressPerIssue))
             fetchWithWorklogItems(it, parameters)
         }
@@ -98,7 +99,7 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
 
         worklogItems
             .filter {
-                it.localDate.isSameDayOrAfter(parameters.timerange.start) || it.localDate.isSameDayOrBefore(parameters.timerange.end)
+                it.localDate.isSameDayOrAfter(parameters.timerange.start) && it.localDate.isSameDayOrBefore(parameters.timerange.end)
             }
             .map {
                 val groupingKey = getGroupingKey(it, issue, youtrackIssue, parameters) ?: "---"
