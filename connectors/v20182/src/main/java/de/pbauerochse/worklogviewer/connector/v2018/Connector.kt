@@ -17,6 +17,8 @@ import de.pbauerochse.worklogviewer.isSameDayOrAfter
 import de.pbauerochse.worklogviewer.isSameDayOrBefore
 import de.pbauerochse.worklogviewer.report.*
 import org.slf4j.LoggerFactory
+import java.util.concurrent.CountDownLatch
+import java.util.stream.Collectors
 
 /**
  * YouTrackConnector for YouTrack 2018.2
@@ -50,12 +52,20 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
         val remainingProgress = 80.0
         val progressPerIssue = if (youtrackIssues.isNotEmpty()) remainingProgress / youtrackIssues.size else 80.0
 
-        // TODO speed up by going parallel
+        val countDownLatch = CountDownLatch(youtrackIssues.size)
         val issues = youtrackIssues
-            .mapIndexed { index, it ->
-            progressCallback.setProgress(Translations.i18n.get("fetchingworklogs", youtrackIssues.size), 20 + ((index + 1) * progressPerIssue))
-            fetchWithWorklogItems(it, parameters)
-        }
+            .parallelStream()
+            .map {
+                val issue = fetchWithWorklogItems(it, parameters)
+                countDownLatch.countDown()
+
+                val remaining = countDownLatch.count
+                val processed = youtrackIssues.size - remaining
+
+                progressCallback.setProgress(Translations.i18n.get("fetchingworklogs", youtrackIssues.size), 20 + (processed * progressPerIssue))
+                return@map issue
+            }
+            .collect(Collectors.toList())
 
         progressCallback.setProgress(Translations.i18n.get("done"), 100)
         return TimeReport(parameters, issues)
