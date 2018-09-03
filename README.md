@@ -10,7 +10,7 @@ With this tool you can see the time you spent on each project and individual tas
 
 ## Latest Version
 
-[Download v2.4.1](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.1)
+[Download v2.4.2](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.2)
 
 Most parts of the Worklog Viewer have been rewritten for the 2.4.0 release. If you ever experience any trouble, please file an issue here at the Github Project and let me know about it.
 
