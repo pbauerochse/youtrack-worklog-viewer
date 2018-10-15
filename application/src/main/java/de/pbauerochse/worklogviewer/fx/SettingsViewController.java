@@ -95,7 +95,6 @@ public class SettingsViewController implements Initializable {
     @FXML
     private CheckBox sundayHighlightCheckbox;
 
-
     // TODO remove once https://youtrack.jetbrains.com/oauth?state=%2Fissue%2FJT-47943 is published
     @FXML
     private Label youtrackWorklogFielNameLabel;
