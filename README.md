@@ -7,7 +7,7 @@ YouTrack Worklog Viewer
 
 If you find this tool useful and would like to show me your appreciation [buy me a beer](https://www.paypal.me/patrickbrandes)
 
-## About the Worklog Viewer
+## About this software
 
 YouTrack is a commercial issue tracker created by [Jetbrains](https://www.jetbrains.com/youtrack/) where you also have the possibility to track the time you spent on each individual issue. Unfortunately, if you are like me and don't book your time right away, there is limited options to get an overview of how much time you have already booked on every single day of the week (addressed in [this issue](https://youtrack.jetbrains.com/issue/JT-29224)).
 
