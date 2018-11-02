@@ -57,6 +57,7 @@ public class WorklogViewer extends Application {
         Settings settings = SettingsUtil.getSettings();
         SettingsViewModel settingsViewModel = SettingsUtil.getSettingsViewModel();
 
+        LOGGER.info("Java Version: {}", System.getProperty("java.version"));
         LOGGER.info("Default Locale: {}", Locale.getDefault());
         LOGGER.info("Default Charset: {}", Charset.defaultCharset());
         LOGGER.info("Default TimeZone: {}", TimeZone.getDefault().toZoneId());

@@ -10,7 +10,7 @@ With this tool you can see the time you spent on each project and individual tas
 
 ## Latest Version
 
-[Download v2.5.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.5.0)
+[Download v2.4.4](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.4)
 
 Most parts of the Worklog Viewer have been rewritten for the 2.4.0 release. If you ever experience any trouble, please file an issue here at the Github Project and let me know about it.
 
@@ -27,7 +27,7 @@ You simply enter the URL to your YouTrack installation, and your own login data 
 
 **What are the requirements?**
 
-* *At least a Java 8 Runtime. Please note: if you are using Linux and installed the OpenJDK via the package manager, you might need to install openjfx too (e.g. `sudo apt install openjfx`)*
+* *At least a Java 8 Runtime.*
 * *Of course you need a valid YouTrack account for the instance you want to fetch the worklogs from*
 
 **How do I start the application?**
