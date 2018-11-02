@@ -1,16 +1,19 @@
 YouTrack Worklog Viewer
 =======================
 
-# About this software
+## Latest Version
+
+[Download v2.4.4](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.4)
+
+If you find this tool useful and would like to show me your appreciation [buy me a beer](https://www.paypal.me/patrickbrandes)
+
+## About the Worklog Viewer
+
 YouTrack is a commercial issue tracker created by [Jetbrains](https://www.jetbrains.com/youtrack/) where you also have the possibility to track the time you spent on each individual issue. Unfortunately, if you are like me and don't book your time right away, there is limited options to get an overview of how much time you have already booked on every single day of the week (addressed in [this issue](https://youtrack.jetbrains.com/issue/JT-29224)).
 
 With this tool you can see the time you spent on each project and individual task as depicted in the following screenshot.
 
 ![Screenshot of the report](https://raw.githubusercontent.com/pbauerochse/youtrack-worklog-viewer/master/screenshot.png) (*Issues column has been obfuscated for the screenshot*)
-
-## Latest Version
-
-[Download v2.4.4](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.4)
 
 Most parts of the Worklog Viewer have been rewritten for the 2.4.0 release. If you ever experience any trouble, please file an issue here at the Github Project and let me know about it.
 
