@@ -17,7 +17,6 @@ import de.pbauerochse.worklogviewer.fx.tasks.CheckForUpdateTask
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
 import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunner
-import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.isNoSelection
 import de.pbauerochse.worklogviewer.logging.ProcessPendingLogsService
@@ -30,7 +29,6 @@ import de.pbauerochse.worklogviewer.setHref
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
 import de.pbauerochse.worklogviewer.tasks.AsyncTask
-import de.pbauerochse.worklogviewer.util.ExceptionUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
 import de.pbauerochse.worklogviewer.version.Version
@@ -39,23 +37,16 @@ import javafx.beans.value.ChangeListener
 import javafx.concurrent.WorkerStateEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
-import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
-import javafx.scene.Parent
-import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.FileChooser
-import javafx.stage.Modality
-import javafx.stage.Stage
-import javafx.stage.StageStyle
 import javafx.util.Duration
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.IOException
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
@@ -166,7 +157,7 @@ class MainViewController : Initializable, PluginActionContext {
     }
 
     override fun showInPopup(fxmlUrl: URL, specs: PopupSpecification) {
-        openDialogue(fxmlUrl.toExternalForm(), specs.title, specs.modal, specs.onClose)
+        mainToolbar.scene.openDialog(fxmlUrl, specs)
     }
 
     override fun showSaveFileDialog(spec: FileChooserSpec): File? {
@@ -430,61 +421,26 @@ class MainViewController : Initializable, PluginActionContext {
 
         // pass in a handler to fetch the group by categories if connection
         // parameters get set
-        openDialogue("/fx/views/settings.fxml", "view.settings.title", true) {
-            if (!settingsModel.hasMissingConnectionSettings.get() && groupByCategoryComboBox.items.size == 0) {
-                LOGGER.debug("Settings window closed, connection settings set and groupBy combobox empty -> trying to fetch groupByCategories")
-                loadGroupByCriteriaFromYouTrack()
+        mainToolbar.scene.openDialog("/fx/views/settings.fxml", PopupSpecification(
+            title = getFormatted("view.settings.title"),
+            modal = true,
+            onClose = {
+                if (!settingsModel.hasMissingConnectionSettings.get() && groupByCategoryComboBox.items.size == 0) {
+                    LOGGER.debug("Settings window closed, connection settings set and groupBy combobox empty -> trying to fetch groupByCategories")
+                    loadGroupByCriteriaFromYouTrack()
+                }
             }
-        }
+        ))
     }
 
     private fun showLogMessagesDialogue() {
         LOGGER.debug("Showing log messages dialogue")
-        openDialogue("/fx/views/logMessagesView.fxml", "view.menu.help.logs")
+        mainToolbar.scene.openDialog("/fx/views/logMessagesView.fxml", PopupSpecification(getFormatted("view.menu.help.logs")))
     }
 
     private fun showAboutDialogue() {
         LOGGER.debug("Showing log messages dialogue")
-        openDialogue("/fx/views/about.fxml", "view.menu.help.about")
-    }
-
-    private fun openDialogue(view: String, titleResourceKey: String, modal: Boolean = false, onCloseCallback: (() -> Unit)? = null) {
-        try {
-            val content = FXMLLoader.load<Parent>(MainViewController::class.java.getResource(view), resources)
-            val settingsViewModel = SettingsUtil.settingsViewModel
-
-            val scene = Scene(content)
-            scene.stylesheets.add("/fx/css/base-styling.css")
-            scene.stylesheets.add(settingsViewModel.themeProperty.get().stylesheet)
-
-            val themeChangeListener = ThemeChangeListener(scene)
-            settingsViewModel.themeProperty.addListener(themeChangeListener)
-
-            val stage = Stage()
-            stage.initOwner(mainToolbar.scene.window)
-
-            if (modal) {
-                stage.initStyle(StageStyle.UTILITY)
-                stage.initModality(Modality.APPLICATION_MODAL)
-                stage.isResizable = false
-            }
-
-            stage.title = getFormatted(titleResourceKey)
-            stage.scene = scene
-
-            if (onCloseCallback != null) {
-                stage.setOnCloseRequest {
-                    LOGGER.debug("View {} got close request. Notifying callback", view)
-                    settingsViewModel.themeProperty.removeListener(themeChangeListener)
-                    onCloseCallback()
-                }
-            }
-
-            stage.showAndWait()
-        } catch (e: IOException) {
-            LOGGER.error("Could not open dialogue {}", view, e)
-            throw ExceptionUtil.getRuntimeException("exceptions.view.io", e, view)
-        }
+        mainToolbar.scene.openDialog("/fx/views/about.fxml", PopupSpecification(getFormatted("view.menu.help.about")))
     }
 
     companion object {

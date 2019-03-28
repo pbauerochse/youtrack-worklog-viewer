@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
         <kotlin-compiler-java-target.version>1.8</kotlin-compiler-java-target.version>
-        <kotlin.version>1.3.21</kotlin.version>
+        <kotlin.version>1.3.31</kotlin.version>
         <openjfx.version>11</openjfx.version>
 
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
@@ -242,6 +242,7 @@
                 <classifier>linux</classifier>
                 <version>${openjfx.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>

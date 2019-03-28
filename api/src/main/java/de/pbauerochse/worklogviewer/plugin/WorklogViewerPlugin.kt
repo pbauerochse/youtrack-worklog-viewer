@@ -9,6 +9,7 @@ import de.pbauerochse.worklogviewer.version.Version
 interface WorklogViewerPlugin {
 
     val name : String
+    val description : String
     val version : Version
     val vendor : Vendor
 
