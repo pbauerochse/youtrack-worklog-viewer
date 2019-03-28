@@ -3,7 +3,6 @@ package de.pbauerochse.worklogviewer.connector.v2018
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import de.pbauerochse.worklogviewer.connector.GroupByParameter
-import de.pbauerochse.worklogviewer.connector.ProgressCallback
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectionSettings
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
 import de.pbauerochse.worklogviewer.connector.v2018.domain.groupby.GroupingField
@@ -16,6 +15,7 @@ import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.isSameDayOrAfter
 import de.pbauerochse.worklogviewer.isSameDayOrBefore
 import de.pbauerochse.worklogviewer.report.*
+import de.pbauerochse.worklogviewer.tasks.ProgressCallback
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CountDownLatch
 import java.util.stream.Collectors

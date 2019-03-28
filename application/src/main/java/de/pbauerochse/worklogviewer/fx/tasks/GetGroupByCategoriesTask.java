@@ -1,9 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
 import de.pbauerochse.worklogviewer.connector.GroupByParameter;
-import de.pbauerochse.worklogviewer.connector.ProgressCallback;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
+import de.pbauerochse.worklogviewer.tasks.ProgressCallback;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

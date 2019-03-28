@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.tasks
 
-import de.pbauerochse.worklogviewer.connector.ProgressCallback
+import de.pbauerochse.worklogviewer.tasks.ProgressCallback
 import javafx.concurrent.Task
 
 abstract class WorklogViewerTask<T> : Task<T>(), ProgressCallback {

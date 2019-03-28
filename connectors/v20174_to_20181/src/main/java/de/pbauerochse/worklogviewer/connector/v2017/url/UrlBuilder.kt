@@ -21,4 +21,6 @@ interface UrlBuilder {
 
     fun getIssueDetailsUrl(requestParams: List<NameValuePair>): URL
 
+    fun generateUrl(path : String) : URL
+
 }

@@ -6,8 +6,9 @@ import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -18,7 +19,7 @@ public class TimerangeProviderFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimerangeProviderFactory.class);
 
-    private static final Map<ReportTimerange, Class<? extends TimerangeProvider>> REPORT_TIMERANGE_TO_PROVIDER_CLASS = new HashMap<>(4);
+    private static final Map<ReportTimerange, Class<? extends TimerangeProvider>> REPORT_TIMERANGE_TO_PROVIDER_CLASS = new EnumMap<>(ReportTimerange.class);
     static {
         REPORT_TIMERANGE_TO_PROVIDER_CLASS.put(ReportTimerange.LAST_MONTH, LastMonthTimerangeProvider.class);
         REPORT_TIMERANGE_TO_PROVIDER_CLASS.put(ReportTimerange.LAST_WEEK, LastWeekTimerangeProvider.class);
@@ -33,8 +34,8 @@ public class TimerangeProviderFactory {
 
         if (timerangeProviderClass != null) {
             try {
-                timerangeProvider = timerangeProviderClass.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                timerangeProvider = timerangeProviderClass.getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 LOGGER.error("Could not instanttiate class {}", timerangeProviderClass.getName(), e);
                 throw ExceptionUtil.getIllegalArgumentException("exceptions.internal", e);
             }

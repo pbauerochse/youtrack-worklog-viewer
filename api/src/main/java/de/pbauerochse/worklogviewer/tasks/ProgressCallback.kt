@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.connector
+package de.pbauerochse.worklogviewer.tasks
 
 /**
  * Interface that allows updating the progress

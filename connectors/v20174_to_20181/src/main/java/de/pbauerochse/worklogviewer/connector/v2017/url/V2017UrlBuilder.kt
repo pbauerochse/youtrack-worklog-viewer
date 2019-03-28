@@ -32,7 +32,7 @@ open class V2017UrlBuilder(private val baseUrl: URL) : UrlBuilder {
         return generateUrl("/rest/issue?$urlEncoded")
     }
 
-    internal fun generateUrl(path : String) : URL {
+    override fun generateUrl(path : String) : URL {
         val baseUrlAsString = baseUrl.toExternalForm().trimEnd('/')
         val pathCleansed = path.trim().trimStart('/')
         return URL("$baseUrlAsString/$pathCleansed")

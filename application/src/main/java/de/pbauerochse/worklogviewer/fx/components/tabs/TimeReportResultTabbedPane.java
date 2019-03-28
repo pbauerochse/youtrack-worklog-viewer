@@ -48,7 +48,7 @@ public class TimeReportResultTabbedPane extends TabPane {
     }
 
     private void updateAllWorklogs(TimeReport timeReport) {
-        if (settingsViewModel.isShowAllWorklogs()) {
+        if (settingsViewModel.getShowAllWorklogsProperty().get()) {
             getAllWorklogsTab().update(timeReport);
         } else {
             removeAllWorklogsTab();
@@ -77,7 +77,7 @@ public class TimeReportResultTabbedPane extends TabPane {
 
         List<String> projectNamesSorted = projectToIssues.keySet().stream().sorted().collect(Collectors.toList());
 
-        int firstProjectTabIndex = settingsViewModel.isShowAllWorklogs() ? 2 : 1;
+        int firstProjectTabIndex = settingsViewModel.getShowAllWorklogsProperty().get() ? 2 : 1;
         for (int i = 0; i < projectNamesSorted.size(); i++) {
             String project = projectNamesSorted.get(i);
             List<Issue> sortedIssues = projectToIssues.get(project).stream().sorted().collect(Collectors.toList());

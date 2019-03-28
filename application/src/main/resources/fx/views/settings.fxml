@@ -100,11 +100,13 @@
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
                         </rowConstraints>
 
                         <padding>
                             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                         </padding>
+
                         <Label text="%view.settings.theme" GridPane.rowIndex="0"/>
                         <ComboBox fx:id="themeComboBox" maxWidth="1.7976931348623157E308" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
@@ -122,6 +124,9 @@
 
                         <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="5"/>
                         <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+                        <Label text="%view.settings.enablePlugins" GridPane.rowIndex="6"/>
+                        <CheckBox fx:id="enablePlugins" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
                     </GridPane>
                 </TitledPane>

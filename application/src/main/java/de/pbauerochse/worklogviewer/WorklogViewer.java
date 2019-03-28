@@ -70,8 +70,8 @@ public class WorklogViewer extends Application {
         Scene mainScene = new Scene(root, settings.getWindowSettings().getWidth(), settings.getWindowSettings().getHeight());
 
         mainScene.getStylesheets().add("/fx/css/base-styling.css");
-        mainScene.getStylesheets().add(settingsViewModel.getTheme().getStylesheet());
-        settingsViewModel.themeProperty().addListener(new ThemeChangeListener(mainScene));
+        mainScene.getStylesheets().add(settingsViewModel.getThemeProperty().get().getStylesheet());
+        settingsViewModel.getThemeProperty().addListener(new ThemeChangeListener(mainScene));
 
         primaryStage.setTitle("YouTrack Worklog Viewer " + FormattingUtil.getFormatted("release.version"));
         primaryStage.setScene(mainScene);

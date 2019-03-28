@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.pbauerochse.worklogviewer.connector.ProgressCallback;
+import de.pbauerochse.worklogviewer.tasks.ProgressCallback;
 import de.pbauerochse.worklogviewer.util.HttpClientUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.version.GitHubVersion;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import de.pbauerochse.worklogviewer.connector.GroupByParameter
-import de.pbauerochse.worklogviewer.connector.ProgressCallback
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
 import de.pbauerochse.worklogviewer.connector.v2017.csv.CsvReportReader
 import de.pbauerochse.worklogviewer.connector.v2017.domain.groupby.GroupByTypes
@@ -19,6 +18,7 @@ import de.pbauerochse.worklogviewer.http.isValid
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
+import de.pbauerochse.worklogviewer.tasks.ProgressCallback
 import de.pbauerochse.worklogviewer.toLocalDateTime
 import org.apache.http.StatusLine
 import org.apache.http.entity.ContentType

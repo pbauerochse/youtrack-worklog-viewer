@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
-import de.pbauerochse.worklogviewer.connector.ProgressCallback;
 import de.pbauerochse.worklogviewer.excel.ExcelExporter;
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData;
+import de.pbauerochse.worklogviewer.tasks.ProgressCallback;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

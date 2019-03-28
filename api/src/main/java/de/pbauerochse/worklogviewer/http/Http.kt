@@ -26,9 +26,19 @@ class Http(
     private val connectTimeoutInSeconds: Int = 10
 ) {
 
+    fun get(path : String) : HttpResponse {
+        val url = buildUrl(path)
+        return get(url)
+    }
+
     fun get(url: URL): HttpResponse {
         val request = HttpGet(url.toURI())
         return execute(request)
+    }
+
+    fun post(path : String, payload: HttpEntity) : HttpResponse {
+        val url = buildUrl(path)
+        return post(url, payload)
     }
 
     fun post(url: URL, payload: HttpEntity): HttpResponse {
@@ -37,9 +47,19 @@ class Http(
         return execute(request)
     }
 
+    fun delete(path : String) {
+        val url = buildUrl(path)
+        delete(url)
+    }
+
     fun delete(url: URL) {
         val request = HttpDelete(url.toURI())
         execute(request)
+    }
+
+    fun <T> download(path : String, handler : (org.apache.http.HttpResponse) -> T) : T {
+        val url = buildUrl(path)
+        return download(url, handler)
     }
 
     fun <T> download(url : URL, handler : (org.apache.http.HttpResponse) -> T) : T {
@@ -48,6 +68,12 @@ class Http(
         return execute(request) { it ->
             handler.invoke(it)
         }
+    }
+
+    fun buildUrl(path: String): URL {
+        val baseUrlAsString = params.baseUrl.toExternalForm().trimEnd('/')
+        val pathCleansed = path.trim().trimStart('/')
+        return URL("$baseUrlAsString/$pathCleansed")
     }
 
     private fun execute(request : HttpUriRequest) : HttpResponse {

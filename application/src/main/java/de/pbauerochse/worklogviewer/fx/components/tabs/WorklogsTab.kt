@@ -28,14 +28,14 @@ abstract class WorklogsTab(label: String) : Tab(label) {
     private val splitPane = SplitPane(getWorklogsTableView()).apply { orientation = Orientation.HORIZONTAL }
     private val settingsModel = SettingsUtil.settingsViewModel
 
-    private var currentData : WorklogsTreeTableViewData? = null
+    var currentData : WorklogsTreeTableViewData? = null
     private var nextData : WorklogsTreeTableViewData? = null
 
     init {
         content = splitPane
         selectedProperty().addListener { _, _, _ -> renderContent() }
-        settingsModel.showStatisticsProperty().addListener { _, _, showStatistics -> showStatisticsView(showStatistics) }
-        showStatisticsView(settingsModel.isShowStatistics)
+        settingsModel.showStatisticsProperty.addListener { _, _, showStatistics -> showStatisticsView(showStatistics) }
+        showStatisticsView(settingsModel.showStatisticsProperty.get())
     }
 
     fun update(label: String, reportParameters: TimeReportParameters, issues: List<Issue>) {

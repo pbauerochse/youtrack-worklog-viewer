@@ -1,6 +1,8 @@
 package de.pbauerochse.worklogviewer.settings
 
 import de.pbauerochse.worklogviewer.settings.loaders.JsonSettingsLoader
+import de.pbauerochse.worklogviewer.util.ExceptionUtil
+import de.pbauerochse.worklogviewer.util.FormattingUtil
 import java.io.File
 
 /**
@@ -13,7 +15,8 @@ import java.io.File
 object SettingsUtil {
 
     private val OLD_SETTINGS_PROPERTIES_FILE = File(System.getProperty("user.home"), "youtrack-worklog.properties")
-    private val SETTINGS_JSON_FILE = File(System.getProperty("user.home"), ".youtrack-worklog-viewer.json")
+    private val OLD_SETTINGS_JSON_FILE = File(System.getProperty("user.home"), ".youtrack-worklog-viewer.json")
+    private val SETTINGS_JSON_FILE = File(System.getProperty("user.home"), ".youtrack-worklog-viewer/settings.json")
 
     @JvmStatic
     val settings: Settings by lazy {
@@ -31,8 +34,9 @@ object SettingsUtil {
     }
 
     private fun loadSettings(): Settings {
-        if (needsMigrationOfOldSettingsFile()) {
-            migrateOldSettingsToNewSettings()
+        when {
+            needsMigrationOfOldSettingsFile() -> migrateOldSettingsToNewSettings()
+            needsMovingOfOldJsonSettingsFile() -> moveOldJsonSettingsFile()
         }
 
         return JsonSettingsLoader(SETTINGS_JSON_FILE).load()
@@ -42,6 +46,19 @@ object SettingsUtil {
 
     private fun migrateOldSettingsToNewSettings() {
         SettingsMigrator(OLD_SETTINGS_PROPERTIES_FILE).migrateTo(SETTINGS_JSON_FILE)
+    }
+
+    private fun needsMovingOfOldJsonSettingsFile(): Boolean = OLD_SETTINGS_JSON_FILE.exists() && SETTINGS_JSON_FILE.exists().not()
+
+    private fun moveOldJsonSettingsFile() {
+        val worklogViewerDirectory = SETTINGS_JSON_FILE.parentFile
+        if (worklogViewerDirectory.exists().not() && worklogViewerDirectory.mkdirs().not()) {
+            throw ExceptionUtil.getIllegalStateException("exceptions.settings.create", SETTINGS_JSON_FILE.absolutePath)
+        }
+
+        check(SETTINGS_JSON_FILE.createNewFile()) { FormattingUtil.getFormatted("exceptions.settings.create", SETTINGS_JSON_FILE.absolutePath) }
+        OLD_SETTINGS_JSON_FILE.copyTo(SETTINGS_JSON_FILE, true)
+        OLD_SETTINGS_JSON_FILE.delete()
     }
 
 }

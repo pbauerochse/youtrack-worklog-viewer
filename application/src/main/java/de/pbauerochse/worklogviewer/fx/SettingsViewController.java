@@ -60,6 +60,9 @@ public class SettingsViewController implements Initializable {
     private CheckBox showDecimalsInExcel;
 
     @FXML
+    private CheckBox enablePlugins;
+
+    @FXML
     private Button saveSettingsButton;
 
     @FXML
@@ -125,12 +128,12 @@ public class SettingsViewController implements Initializable {
     }
 
     private void bindYouTrackWorklogFieldNameProperties(SettingsViewModel viewModel) {
-        youtrackWorklogFielNameLabel.visibleProperty().bind(viewModel.youTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
-        youtrackWorklogFielNameField.visibleProperty().bind(viewModel.youTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
-        youtrackWorklogFielNameHelpLink.visibleProperty().bind(viewModel.youTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
-        youtrackWorklogFielNameHint.visibleProperty().bind(viewModel.youTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
+        youtrackWorklogFielNameLabel.visibleProperty().bind(viewModel.getYouTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
+        youtrackWorklogFielNameField.visibleProperty().bind(viewModel.getYouTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
+        youtrackWorklogFielNameHelpLink.visibleProperty().bind(viewModel.getYouTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
+        youtrackWorklogFielNameHint.visibleProperty().bind(viewModel.getYouTrackVersionProperty().isEqualTo(SupportedVersions.getV2018_2()));
 
-        youtrackWorklogFielNameField.textProperty().bindBidirectional(viewModel.youTrackWorkdateFieldNameProperty());
+        youtrackWorklogFielNameField.textProperty().bindBidirectional(viewModel.getYouTrackWorkdateFieldNameProperty());
         youtrackWorklogFielNameHelpLink.setOnAction(event -> {
             String helpUrl = "https://github.com/pbauerochse/youtrack-worklog-viewer/wiki/Work-Date-Field-Help";
             LOGGER.debug("Opening page {} in browser", helpUrl);
@@ -150,41 +153,42 @@ public class SettingsViewController implements Initializable {
     }
 
     private void bindInputElements(SettingsViewModel viewModel) {
-        youtrackUrlField.textProperty().bindBidirectional(viewModel.youTrackUrlProperty());
-        youtrackVersionField.valueProperty().bindBidirectional(viewModel.youTrackVersionProperty());
-        youtrackUsernameField.textProperty().bindBidirectional(viewModel.youTrackUsernameProperty());
-        youtrackPermanentTokenField.textProperty().bindBidirectional(viewModel.youTrackPermanentTokenProperty());
+        youtrackUrlField.textProperty().bindBidirectional(viewModel.getYouTrackUrlProperty());
+        youtrackVersionField.valueProperty().bindBidirectional(viewModel.getYouTrackVersionProperty());
+        youtrackUsernameField.textProperty().bindBidirectional(viewModel.getYouTrackUsernameProperty());
+        youtrackPermanentTokenField.textProperty().bindBidirectional(viewModel.getYouTrackPermanentTokenProperty());
 
-        themeComboBox.valueProperty().bindBidirectional(viewModel.themeProperty());
-        workhoursComboBox.valueProperty().bindBidirectional(viewModel.workhoursProperty().asObject());
-        showAllWorklogsCheckBox.selectedProperty().bindBidirectional(viewModel.showAllWorklogsProperty());
-        showStatisticsCheckBox.selectedProperty().bindBidirectional(viewModel.showStatisticsProperty());
-        loadDataAtStartupCheckBox.selectedProperty().bindBidirectional(viewModel.loadDataAtStartupProperty());
-        showDecimalsInExcel.selectedProperty().bindBidirectional(viewModel.showDecimalsInExcelProperty());
+        themeComboBox.valueProperty().bindBidirectional(viewModel.getThemeProperty());
+        workhoursComboBox.valueProperty().bindBidirectional(viewModel.getWorkhoursProperty().asObject());
+        showAllWorklogsCheckBox.selectedProperty().bindBidirectional(viewModel.getShowAllWorklogsProperty());
+        showStatisticsCheckBox.selectedProperty().bindBidirectional(viewModel.getShowStatisticsProperty());
+        loadDataAtStartupCheckBox.selectedProperty().bindBidirectional(viewModel.getLoadDataAtStartupProperty());
+        showDecimalsInExcel.selectedProperty().bindBidirectional(viewModel.getShowDecimalsInExcelProperty());
+        enablePlugins.selectedProperty().bindBidirectional(viewModel.getEnablePluginsProperty());
 
-        mondayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateMondayProperty());
-        tuesdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateTuesdayProperty());
-        wednesdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateWednesdayProperty());
-        thursdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateThursdayProperty());
-        fridayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateFridayProperty());
-        saturdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateSaturdayProperty());
-        sundayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.collapseStateSundayProperty());
+        mondayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.getCollapseStateMondayProperty());
+        tuesdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.getCollapseStateTuesdayProperty());
+        wednesdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.getCollapseStateWednesdayProperty());
+        thursdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.getCollapseStateThursdayProperty());
+        fridayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.getCollapseStateFridayProperty());
+        saturdayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.getCollapseStateSaturdayProperty());
+        sundayCollapseCheckbox.selectedProperty().bindBidirectional(viewModel.getCollapseStateSundayProperty());
 
-        mondayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateMondayProperty());
-        tuesdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateTuesdayProperty());
-        wednesdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateWednesdayProperty());
-        thursdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateThursdayProperty());
-        fridayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateFridayProperty());
-        saturdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateSaturdayProperty());
-        sundayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateSundayProperty());
+        mondayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.getHighlightStateMondayProperty());
+        tuesdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.getHighlightStateTuesdayProperty());
+        wednesdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.getHighlightStateWednesdayProperty());
+        thursdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.getHighlightStateThursdayProperty());
+        fridayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.getHighlightStateFridayProperty());
+        saturdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.getHighlightStateSaturdayProperty());
+        sundayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.getHighlightStateSundayProperty());
     }
 
     private void attachListeners(SettingsViewModel viewModel) {
-        SimpleBooleanProperty hadMissingSettingsWhenOpened = new SimpleBooleanProperty(viewModel.getHasMissingConnectionSettings());
+        SimpleBooleanProperty hadMissingSettingsWhenOpened = new SimpleBooleanProperty(viewModel.getHasMissingConnectionSettings().get());
 
         // enable cancel button only when settings are valid or have been valid
         // when the form was shown, to allow the user cancel invalid inputs
-        cancelSettingsButton.disableProperty().bind(hadMissingSettingsWhenOpened.and(viewModel.hasMissingConnectionSettingsProperty()));
+        cancelSettingsButton.disableProperty().bind(hadMissingSettingsWhenOpened.and(viewModel.getHasMissingConnectionSettings()));
 
         cancelSettingsButton.setOnAction(event -> {
             LOGGER.debug("Cancel clicked");
@@ -192,7 +196,7 @@ public class SettingsViewController implements Initializable {
             closeSettingsDialogue();
         });
 
-        saveSettingsButton.disableProperty().bind(viewModel.hasMissingConnectionSettingsProperty());
+        saveSettingsButton.disableProperty().bind(viewModel.getHasMissingConnectionSettings());
         saveSettingsButton.setOnAction(event -> {
             LOGGER.debug("Save settings clicked");
             viewModel.saveChanges();

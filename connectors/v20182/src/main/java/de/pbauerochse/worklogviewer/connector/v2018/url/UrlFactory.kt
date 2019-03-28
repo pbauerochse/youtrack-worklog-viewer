@@ -25,7 +25,7 @@ class UrlFactory(private val baseUrl: URL, private val workDateField: String) {
     fun getWorkItemsUrl(issue: YouTrackIssue): URL =
         generateUrl("/rest/issue/${issue.id}/timetracking/workitem")
 
-    private fun generateUrl(path: String): URL {
+    internal fun generateUrl(path: String): URL {
         val baseUrlAsString = baseUrl.toExternalForm().trimEnd('/')
         val pathCleansed = path.trim().trimStart('/')
         return URL("$baseUrlAsString/$pathCleansed")

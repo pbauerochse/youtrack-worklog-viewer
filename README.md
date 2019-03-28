@@ -9,12 +9,14 @@ With this tool you can see the time you spent on each project and individual tas
 
 ## Latest Version
 
-[Download v2.5.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.5.0)
+[Download v3.0.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/3.0.0)
 
 If you find this tool useful and would like to show me your appreciation [buy me a beer](https://www.paypal.me/patrickbrandes)
 
 ## Important changes
 
+* **v3.0.0**
+  * Added a plugin mechanism, that allows you to extend the Worklog Viewer with own functionality
 * **v2.5.0**
   * Switching to Java 11 as minimum required Java version. If you need to stick to Java < 11 please use the [v2.4.3 release](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.3) 
 * **v2.4.0**
