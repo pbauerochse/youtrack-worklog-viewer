@@ -20,6 +20,7 @@ import de.pbauerochse.worklogviewer.fx.tasks.TaskRunner
 import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.isNoSelection
+import de.pbauerochse.worklogviewer.logging.ProcessPendingLogsService
 import de.pbauerochse.worklogviewer.plugin.FileChooserSpec
 import de.pbauerochse.worklogviewer.plugin.PluginActionContext
 import de.pbauerochse.worklogviewer.plugin.PopupSpecification
@@ -53,6 +54,7 @@ import javafx.stage.FileChooser
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import javafx.util.Duration
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -60,7 +62,6 @@ import java.io.IOException
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * Java FX Controller for the main window
@@ -126,6 +127,7 @@ class MainViewController : Initializable, PluginActionContext {
         this.settingsModel = SettingsUtil.settingsViewModel
         this.taskRunner = TaskRunner(taskProgressContainer, waitScreenOverlay)
 
+        startLogTask()
         checkForUpdate()
 
         initializeTimerangeComboBox()
@@ -156,10 +158,11 @@ class MainViewController : Initializable, PluginActionContext {
             TabContext(it.reportParameters, it.issues)
         }
 
-    override fun <T> triggerTask(task: AsyncTask<T>): T? {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> triggerTask(task: AsyncTask<T>, callback: ((T?) -> Unit)?) {
         val pluginTask = PluginTask(task)
-        val result = taskRunner.startTask(pluginTask)
-        return result.get(30, TimeUnit.SECONDS)
+        pluginTask.setOnSucceeded { callback?.invoke(it.source.value as T?) }
+        taskRunner.startTask(pluginTask)
     }
 
     override fun showInPopup(fxmlUrl: URL, specs: PopupSpecification) {
@@ -172,6 +175,14 @@ class MainViewController : Initializable, PluginActionContext {
 
     override fun showOpenFileDialog(spec: FileChooserSpec): File? {
         return fileChooser(spec).showOpenDialog(resultTabPane.scene.window)
+    }
+
+    private fun startLogTask() {
+        val service = ProcessPendingLogsService()
+        service.delay = Duration.millis(1.0)
+        service.period = Duration.seconds(1.0)
+        service.restartOnFailure = true
+        taskRunner.startService(service)
     }
 
     private fun fileChooser(spec: FileChooserSpec): FileChooser {
@@ -481,6 +492,5 @@ class MainViewController : Initializable, PluginActionContext {
     companion object {
         private val LOGGER = LoggerFactory.getLogger(MainViewController::class.java)
         private const val REQUIRED_FIELD_CLASS = "required"
-
     }
 }

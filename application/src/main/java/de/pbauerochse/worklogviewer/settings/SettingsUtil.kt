@@ -1,9 +1,11 @@
 package de.pbauerochse.worklogviewer.settings
 
+import de.pbauerochse.worklogviewer.settings.WorklogViewerFiles.OLD_SETTINGS_JSON_FILE
+import de.pbauerochse.worklogviewer.settings.WorklogViewerFiles.OLD_SETTINGS_PROPERTIES_FILE
+import de.pbauerochse.worklogviewer.settings.WorklogViewerFiles.SETTINGS_JSON_FILE
 import de.pbauerochse.worklogviewer.settings.loaders.JsonSettingsLoader
 import de.pbauerochse.worklogviewer.util.ExceptionUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
-import java.io.File
 
 /**
  * Loads and stores the Settings object
@@ -13,10 +15,6 @@ import java.io.File
  * of the Settings or SettingsViewModel instance
  */
 object SettingsUtil {
-
-    private val OLD_SETTINGS_PROPERTIES_FILE = File(System.getProperty("user.home"), "youtrack-worklog.properties")
-    private val OLD_SETTINGS_JSON_FILE = File(System.getProperty("user.home"), ".youtrack-worklog-viewer.json")
-    private val SETTINGS_JSON_FILE = File(System.getProperty("user.home"), ".youtrack-worklog-viewer/settings.json")
 
     @JvmStatic
     val settings: Settings by lazy {

@@ -8,19 +8,29 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    
-    <appender name="logWindowAppender" class="de.pbauerochse.worklogviewer.logging.ListenableLimitedLogMessagesAppender">
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${user.home}/.youtrack-worklog-viewer/logs/worklog-viewer.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="logWindowAppender" class="de.pbauerochse.worklogviewer.logging.WorklogViewerAppender">
         <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         <maxLogLines>2500</maxLogLines>
     </appender>
 
     <logger name="org.apache.http" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
         <appender-ref ref="logWindowAppender"/>
     </logger>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
         <appender-ref ref="logWindowAppender"/>
     </root>
 </configuration>

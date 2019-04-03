@@ -20,7 +20,7 @@ fun String.toLocalDate() : LocalDate? = LocalDate.parse(this, DateTimeFormatter.
 fun LocalDate.toFormattedString() : String = format(DateTimeFormatter.ISO_DATE)
 
 fun Hyperlink.setHref(url: String) {
-    onAction = EventHandler { _ -> Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(url) } }
+    onAction = EventHandler { Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(url) } }
 }
 
 /**

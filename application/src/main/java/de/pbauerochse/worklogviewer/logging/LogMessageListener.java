@@ -1,14 +1,16 @@
 package de.pbauerochse.worklogviewer.logging;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
- * @author Patrick Bauerochse
- * @since 01.07.15
+ * Listener that gets notified in regular intervals
+ * of the most recent log messages
  */
 @FunctionalInterface
 public interface LogMessageListener {
 
-    void onLogMessage(String formattedLogMessage, ILoggingEvent originalEvent);
+    void onLogMessage(@NotNull List<String> messages);
 
 }

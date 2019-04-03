@@ -46,7 +46,7 @@ public class WorklogViewer extends Application {
     @Override
     public void stop() {
         SettingsUtil.saveSettings();
-        TaskRunner.getEXECUTOR().shutdownNow();
+        TaskRunner.shutdownNow();
     }
 
     @Override

@@ -13,7 +13,7 @@ interface PluginActionContext {
     val currentTimeReport : TimeReport?
     val currentlyVisibleIssues : TabContext?
 
-    fun <T> triggerTask(task : AsyncTask<T>) : T?
+    fun <T> triggerTask(task : AsyncTask<T>, callback : ((T?) -> Unit)? = null)
     fun showInPopup(fxmlUrl : URL, specs : PopupSpecification)
     fun showSaveFileDialog(spec : FileChooserSpec) : File?
     fun showOpenFileDialog(spec : FileChooserSpec) : File?

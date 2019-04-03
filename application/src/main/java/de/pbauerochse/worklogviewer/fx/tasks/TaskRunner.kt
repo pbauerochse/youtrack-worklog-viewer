@@ -1,14 +1,13 @@
 package de.pbauerochse.worklogviewer.fx.tasks
 
 import de.pbauerochse.worklogviewer.util.FormattingUtil
+import javafx.concurrent.Service
 import javafx.css.Styleable
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
 import java.util.concurrent.Future
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit
 
 /**
  * Starts async Tasks and sets the UI state
@@ -18,6 +17,11 @@ class TaskRunner(
     private val parent: Pane,
     private val waitScreenOverlay: StackPane
 ) {
+
+    fun <T> startService(service : Service<T>) {
+        service.executor = EXECUTOR
+        service.start()
+    }
 
     /**
      * Starts a thread performing the given task
@@ -125,8 +129,12 @@ class TaskRunner(
         private const val RUNNING_CLASS = "running"
         private const val SUCCESSFUL_CLASS = "success"
 
+        private val EXECUTOR = Executors.newFixedThreadPool(5)
+
         @JvmStatic
-        val EXECUTOR = ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES, LinkedBlockingQueue())
+        fun shutdownNow() {
+            EXECUTOR.shutdownNow()
+        }
     }
 
 }
