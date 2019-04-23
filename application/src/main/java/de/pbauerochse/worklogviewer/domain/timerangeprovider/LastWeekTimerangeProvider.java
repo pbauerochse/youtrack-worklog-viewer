@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.domain.timerangeprovider;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
+import de.pbauerochse.worklogviewer.report.TimeRange;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -14,12 +15,9 @@ import java.time.temporal.ChronoUnit;
  */
 public class LastWeekTimerangeProvider extends BaseTimerangeProvider {
 
-    LastWeekTimerangeProvider() {
-        LocalDate now = LocalDate.now(ZoneId.systemDefault());
-        LocalDate lastWeek = now.minus(1, ChronoUnit.WEEKS);
-
-        startDate = lastWeek.with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.getValue());
-        endDate = lastWeek.with(ChronoField.DAY_OF_WEEK, DayOfWeek.SUNDAY.getValue());
+    @Override
+    public TimeRange getTimeRange() {
+        return TimeRange.lastWeek();
     }
 
     @Override

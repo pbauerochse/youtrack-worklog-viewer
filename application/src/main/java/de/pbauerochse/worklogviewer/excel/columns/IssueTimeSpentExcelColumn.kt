@@ -42,7 +42,7 @@ class IssueTimeSpentExcelColumn(private val date: LocalDate) : ExcelColumnRender
     }
 
     private fun renderIssueSummary(workbook: POIWorkbook, cell: Cell, value: IssueTreeTableRow) {
-        val timeSpentInMinutes = value.issue.getTimeSpentOn(date)
+        val timeSpentInMinutes = value.issue.getTimeInMinutesSpentOn(date)
         if (timeSpentInMinutes > 0) {
             cell.setTimeSpent(timeSpentInMinutes)
             cell.cellStyle = workbook.issueTimeSpentStyle

@@ -13,5 +13,5 @@ data class IssueTreeTableRow(val issue: Issue) : TreeTableRowModel {
     override val isGroupByRow: Boolean = false
     override fun getLabel(): String = issue.fullTitle
 
-    override fun getTotalTimeSpent(): Long = issue.getTotalTime()
+    override fun getTotalTimeSpent(): Long = issue.getTotalTimeInMinutes()
 }

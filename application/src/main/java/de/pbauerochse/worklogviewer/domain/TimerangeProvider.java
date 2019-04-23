@@ -1,17 +1,12 @@
 package de.pbauerochse.worklogviewer.domain;
 
-import java.time.LocalDate;
+import de.pbauerochse.worklogviewer.report.TimeRange;
 
 /**
  * Provides the start- and enddate
  * for a given timerange
  */
 public interface TimerangeProvider {
-
-    LocalDate getStartDate();
-
-    LocalDate getEndDate();
-
+    TimeRange getTimeRange();
     ReportTimerange getReportTimerange();
-
 }

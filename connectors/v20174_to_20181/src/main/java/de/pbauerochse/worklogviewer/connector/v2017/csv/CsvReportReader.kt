@@ -40,7 +40,7 @@ object CsvReportReader {
             it.forEach {
                 val issueId = it[ISSUE_ID_COLUMN_INDEX]
                 val issueDescription = it[ISSUE_SUMMARY_COLUMN_INDEX]
-                val issue = issueIdToIssue.computeIfAbsent(issueId) { id -> Issue(id, issueDescription) }
+                val issue = issueIdToIssue.computeIfAbsent(issueId) { id -> Issue(id, issueDescription, null, emptyList()) }
                 val user = User(it[USER_LOGINNAME_COLUMN_INDEX], it[USER_DISPLAYNAME_COLUMN_INDEX])
                 issue.worklogItems.add(
                     WorklogItem(

@@ -21,10 +21,7 @@ import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.isNoSelection
 import de.pbauerochse.worklogviewer.logging.ProcessPendingLogsService
-import de.pbauerochse.worklogviewer.plugin.FileChooserSpec
-import de.pbauerochse.worklogviewer.plugin.PluginActionContext
-import de.pbauerochse.worklogviewer.plugin.PopupSpecification
-import de.pbauerochse.worklogviewer.plugin.TabContext
+import de.pbauerochse.worklogviewer.plugin.*
 import de.pbauerochse.worklogviewer.plugins.PluginLoader
 import de.pbauerochse.worklogviewer.report.TimeRange
 import de.pbauerochse.worklogviewer.report.TimeReport
@@ -36,6 +33,7 @@ import de.pbauerochse.worklogviewer.tasks.AsyncTask
 import de.pbauerochse.worklogviewer.util.ExceptionUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
+import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
 import de.pbauerochse.worklogviewer.version.Version
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
@@ -158,6 +156,9 @@ class MainViewController : Initializable, PluginActionContext {
             TabContext(it.reportParameters, it.issues)
         }
 
+    override val timesFormatter: WorktimeFormatter
+        get() = WorklogTimeFormatter(settingsModel.workhoursProperty.get())
+
     @Suppress("UNCHECKED_CAST")
     override fun <T> triggerTask(task: AsyncTask<T>, callback: ((T?) -> Unit)?) {
         val pluginTask = PluginTask(task)
@@ -210,8 +211,8 @@ class MainViewController : Initializable, PluginActionContext {
     private fun timerangeChanged(newValue: ReportTimerange) {
         // prepopulate start and end datepickers and remove error labels
         val timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, startDatePicker.value, endDatePicker.value)
-        startDatePicker.value = timerangeProvider.startDate
-        endDatePicker.value = timerangeProvider.endDate
+        startDatePicker.value = timerangeProvider.timeRange.start
+        endDatePicker.value = timerangeProvider.timeRange.end
         settingsModel.lastUsedReportTimerangeProperty.set(newValue)
     }
 
@@ -343,7 +344,7 @@ class MainViewController : Initializable, PluginActionContext {
         LOGGER.debug("Found ${plugins.size} active Plugins")
 
         if (plugins.isEmpty()) {
-            val noActivePluginsMenuItem = MenuItem(FormattingUtil.getFormatted("plugins.nonefound")).apply { isDisable = true }
+            val noActivePluginsMenuItem = MenuItem(getFormatted("plugins.nonefound")).apply { isDisable = true }
             pluginsMenu.items.add(noActivePluginsMenuItem)
         }
 

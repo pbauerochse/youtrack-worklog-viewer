@@ -1,10 +1,7 @@
 package de.pbauerochse.worklogviewer.domain.timerangeprovider;
 
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
+import de.pbauerochse.worklogviewer.report.TimeRange;
 
 /**
  * @author Patrick Bauerochse
@@ -12,11 +9,9 @@ import java.time.temporal.ChronoUnit;
  */
 public class LastMonthTimerangeProvider extends BaseTimerangeProvider {
 
-    LastMonthTimerangeProvider() {
-        LocalDate now = LocalDate.now(ZoneId.systemDefault());
-        LocalDate lastMonth = now.minus(1, ChronoUnit.MONTHS);
-        startDate = lastMonth.withDayOfMonth(1);
-        endDate = lastMonth.withDayOfMonth(lastMonth.getMonth().length(lastMonth.isLeapYear()));
+    @Override
+    public TimeRange getTimeRange() {
+        return TimeRange.lastMonth();
     }
 
     @Override

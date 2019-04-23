@@ -30,6 +30,6 @@ data class SummaryTreeTableRow(val issues: List<Issue>) : TreeTableRowModel {
      * on the contained issues
      */
     override fun getTotalTimeSpent(): Long = issues
-        .map { it.getTotalTime() }
+        .map { it.getTotalTimeInMinutes() }
         .sum()
 }

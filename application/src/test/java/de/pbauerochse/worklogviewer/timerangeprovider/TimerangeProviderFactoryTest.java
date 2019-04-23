@@ -24,8 +24,8 @@ public class TimerangeProviderFactoryTest {
             Assert.assertNotNull("TimerangeProvider for timerange " + reportTimerange.name() + " was null", timerangeProvider);
 
             if (reportTimerange == ReportTimerange.CUSTOM) {
-                Assert.assertEquals(now, timerangeProvider.getStartDate());
-                Assert.assertEquals(now, timerangeProvider.getEndDate());
+                Assert.assertEquals(now, timerangeProvider.getTimeRange().getStart());
+                Assert.assertEquals(now, timerangeProvider.getTimeRange().getEnd());
             }
         }
     }

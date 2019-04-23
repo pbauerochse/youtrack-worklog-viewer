@@ -103,7 +103,8 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
             throw IllegalStateException("Fetching work items for Issue ${youtrackIssue.id} failed: ${response.error}")
         }
 
-        val issue = Issue(youtrackIssue.id, youtrackIssue.description, youtrackIssue.resolutionDate)
+        val fields = youtrackIssue.fields.map { Field(it.name, it.toGroupByKey()) }
+        val issue = Issue(youtrackIssue.id, youtrackIssue.description, youtrackIssue.resolutionDate, fields)
 
         val worklogItems: List<YouTrackWorklogItem> = OBJECT_MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorklogItem>>() {})
 

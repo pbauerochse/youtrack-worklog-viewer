@@ -8,9 +8,10 @@ import java.time.LocalDateTime
  * having WorklogEntries
  */
 data class Issue(
-    val id : String,
-    val description : String,
-    var resolutionDate : LocalDateTime? = null
+        val id: String,
+        val description: String,
+        var resolutionDate: LocalDateTime? = null,
+        val fields: List<Field>
 ) : Comparable<Issue> {
 
     /**
@@ -18,7 +19,7 @@ data class Issue(
      * the worklog items, from the other Issue are
      * applied to the new instance
      */
-    constructor(issue: Issue, worklogItems: List<WorklogItem>) : this(issue.id, issue.description, issue.resolutionDate) {
+    constructor(issue: Issue, fields: List<Field>, worklogItems: List<WorklogItem>) : this(issue.id, issue.description, issue.resolutionDate, fields) {
         this.worklogItems.addAll(worklogItems)
     }
 
@@ -26,13 +27,13 @@ data class Issue(
     // as it has a back reference to this issue
     // and will then be contained in hashCode, equals and toString
     // which leads to an infinite loop
-    val worklogItems : MutableList<WorklogItem> = mutableListOf()
+    val worklogItems: MutableList<WorklogItem> = mutableListOf()
 
     val project: String by lazy {
         PROJECT_ID_REGEX.matchEntire(id)!!.groupValues[1]
     }
 
-    val fullTitle : String by lazy {
+    val fullTitle: String by lazy {
         "$id - $description"
     }
 
@@ -40,7 +41,7 @@ data class Issue(
      * Returns the total time spent in this Issue
      * on the given date
      */
-    fun getTimeSpentOn(date: LocalDate) = worklogItems
+    fun getTimeInMinutesSpentOn(date: LocalDate) = worklogItems
         .filter { it.date == date }
         .map { it.durationInMinutes }
         .sum()
@@ -50,7 +51,7 @@ data class Issue(
      * has been logged on this issue in the
      * defined time period
      */
-    fun getTotalTime(): Long = worklogItems
+    fun getTotalTimeInMinutes(): Long = worklogItems
         .map { it.durationInMinutes }
         .sum()
 

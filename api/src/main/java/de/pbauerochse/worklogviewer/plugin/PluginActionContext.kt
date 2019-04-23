@@ -12,6 +12,7 @@ interface PluginActionContext {
     val connector : YouTrackConnector?
     val currentTimeReport : TimeReport?
     val currentlyVisibleIssues : TabContext?
+    val timesFormatter : WorktimeFormatter
 
     fun <T> triggerTask(task : AsyncTask<T>, callback : ((T?) -> Unit)? = null)
     fun showInPopup(fxmlUrl : URL, specs : PopupSpecification)

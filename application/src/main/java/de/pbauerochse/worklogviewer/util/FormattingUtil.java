@@ -21,56 +21,14 @@ public class FormattingUtil {
 
     private static DateTimeFormatter dateFormatter;
     private static DateTimeFormatter dateTimeFormatter;
-
     private static NumberFormat percentageFormatter;
-    private static final int MINUTES_PER_HOUR = 60;
-
 
     public static String formatMinutes(long minutes) {
         return formatMinutes(minutes, false);
     }
 
-    /**
-     * Formats the given amount of minutes in Jira Style format
-     */
     public static String formatMinutes(long minutes, boolean full) {
-        StringBuilder worklogFormatted = new StringBuilder();
-
-        int workhours = SettingsUtil.getSettings().getWorkHoursADay();
-
-        if (workhours == 0) {
-            throw ExceptionUtil.getIllegalStateException("exceptions.main.workhours.zero");
-        }
-
-        final int minutesPerWorkday = workhours * MINUTES_PER_HOUR;
-
-        long days = minutes / minutesPerWorkday;
-        long remainingMinutes = minutes % minutesPerWorkday;
-
-        long hours = remainingMinutes / MINUTES_PER_HOUR;
-        remainingMinutes = remainingMinutes % MINUTES_PER_HOUR;
-
-        if (days > 0) {
-            worklogFormatted.append(days).append('d');
-        }
-
-        if (hours > 0 || (full && days > 0)) {
-            if (worklogFormatted.length() > 0) {
-                worklogFormatted.append(' ');
-            }
-
-            worklogFormatted.append(hours).append('h');
-        }
-
-        if (remainingMinutes > 0 || (full && (hours > 0 || days > 0))) {
-            if (worklogFormatted.length() > 0) {
-                worklogFormatted.append(' ');
-            }
-
-            worklogFormatted.append(remainingMinutes).append('m');
-        }
-
-        return worklogFormatted.toString();
+        return new WorklogTimeFormatter(SettingsUtil.getSettingsViewModel().getWorkhoursProperty().get()).getFormatted(minutes, full);
     }
 
     public static String getFormatted(String messageKey) {

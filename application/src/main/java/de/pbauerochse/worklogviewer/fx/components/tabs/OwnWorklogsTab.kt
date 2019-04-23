@@ -37,7 +37,7 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
     private fun extractOwnWorklogs(report: TimeReport): List<Issue> {
         return report.issues
             .filter { it.hasOwnWorklogs() }
-            .map { Issue(it, it.worklogItems.filter { it.isOwn() }) }
+            .map { Issue(it, it.fields, it.worklogItems.filter { it.isOwn() }) }
             .sorted()
     }
 
