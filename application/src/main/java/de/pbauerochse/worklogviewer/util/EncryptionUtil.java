@@ -7,17 +7,14 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 
-/**
- * @author Patrick Bauerochse
- * @since 13.04.15
- */
 public class EncryptionUtil {
 
     private static final String ENCRYPTION = "PBEWithMD5AndDES";
-    private static final Charset UTF8 = Charset.forName("utf-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     private static final String FIXED_PREFIX = "YouTrackTimelogger::";
 
     private static final byte[] SALT = new byte[] {
@@ -43,6 +40,7 @@ public class EncryptionUtil {
         return cipher;
     }
 
+    @SuppressWarnings("StringBufferReplaceableByString")
     private static char[] getSystemPassword() {
         return new StringBuilder(FIXED_PREFIX)
                 .append(System.getProperty("user.name"))
