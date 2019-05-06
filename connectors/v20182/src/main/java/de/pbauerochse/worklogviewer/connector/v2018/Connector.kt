@@ -15,7 +15,7 @@ import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.isSameDayOrAfter
 import de.pbauerochse.worklogviewer.isSameDayOrBefore
 import de.pbauerochse.worklogviewer.report.*
-import de.pbauerochse.worklogviewer.tasks.ProgressCallback
+import de.pbauerochse.worklogviewer.tasks.Progress
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CountDownLatch
 import java.util.stream.Collectors
@@ -45,8 +45,8 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
         return CONSTANT_GROUP_BY_PARAMETERS + groupingFields
     }
 
-    override fun getTimeReport(parameters: TimeReportParameters, progressCallback: ProgressCallback): TimeReport {
-        progressCallback.setProgress(Translations.i18n.get("fetchingissues"), 0)
+    override fun getTimeReport(parameters: TimeReportParameters, progress: Progress): TimeReport {
+        progress.setProgress(Translations.i18n.get("fetchingissues"), 0)
         val youtrackIssues = fetchYouTrackIssues(parameters)
 
         val remainingProgress = 80.0
@@ -62,12 +62,12 @@ class Connector(youTrackConnectionSettings: YouTrackConnectionSettings) : YouTra
                 val remaining = countDownLatch.count
                 val processed = youtrackIssues.size - remaining
 
-                progressCallback.setProgress(Translations.i18n.get("fetchingworklogs", youtrackIssues.size), 20 + (processed * progressPerIssue))
+                progress.setProgress(Translations.i18n.get("fetchingworklogs", youtrackIssues.size), 20 + (processed * progressPerIssue))
                 return@map issue
             }
             .collect(Collectors.toList())
 
-        progressCallback.setProgress(Translations.i18n.get("done"), 100)
+        progress.setProgress(Translations.i18n.get("done"), 100)
         return TimeReport(parameters, issues)
     }
 

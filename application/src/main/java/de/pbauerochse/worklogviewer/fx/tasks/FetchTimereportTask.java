@@ -4,7 +4,7 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnector;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
 import de.pbauerochse.worklogviewer.report.TimeReport;
 import de.pbauerochse.worklogviewer.report.TimeReportParameters;
-import de.pbauerochse.worklogviewer.tasks.ProgressCallback;
+import de.pbauerochse.worklogviewer.tasks.Progress;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -20,19 +20,14 @@ public class FetchTimereportTask extends WorklogViewerTask<TimeReport> {
     private final TimeReportParameters parameters;
 
     public FetchTimereportTask(@NotNull TimeReportParameters parameters) {
+        super(getFormatted("task.fetchworklogs"));
         this.parameters = parameters;
     }
 
-    @NotNull
     @Override
-    public String getLabel() {
-        return getFormatted("task.fetchworklogs");
-    }
-
-    @Override
-    public TimeReport start(@NotNull ProgressCallback progressCallback) {
+    public TimeReport start(@NotNull Progress progress) {
         YouTrackConnector service = YouTrackConnectorLocator.getActiveConnector();
-        return Objects.requireNonNull(service).getTimeReport(parameters, progressCallback);
+        return Objects.requireNonNull(service).getTimeReport(parameters, progress);
     }
 
 }

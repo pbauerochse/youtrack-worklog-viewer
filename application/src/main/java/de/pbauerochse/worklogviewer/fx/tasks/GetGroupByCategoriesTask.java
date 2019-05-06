@@ -3,7 +3,7 @@ package de.pbauerochse.worklogviewer.fx.tasks;
 import de.pbauerochse.worklogviewer.connector.GroupByParameter;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
-import de.pbauerochse.worklogviewer.tasks.ProgressCallback;
+import de.pbauerochse.worklogviewer.tasks.Progress;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,26 +21,24 @@ public class GetGroupByCategoriesTask extends WorklogViewerTask<List<GroupByPara
 
     private static final Logger LOG = LoggerFactory.getLogger(GetGroupByCategoriesTask.class);
 
-    @NotNull
-    @Override
-    public String getLabel() {
-        return getFormatted("task.groupby");
+    public GetGroupByCategoriesTask() {
+        super(getFormatted("task.groupby"));
     }
 
     @Override
-    public List<GroupByParameter> start(@NotNull ProgressCallback progressCallback) {
+    public List<GroupByParameter> start(@NotNull Progress progress) {
         YouTrackConnector connector = YouTrackConnectorLocator.getActiveConnector();
         List<GroupByParameter> possibleGroupByCategories = new ArrayList<>();
 
         LOG.info("Fetching GroupByParameters from Connector {}", connector);
 
         if (connector != null) {
-            progressCallback.setProgress(getFormatted("worker.progress.categories"), 50);
+            progress.setProgress(getFormatted("worker.progress.categories"), 50);
 
             try {
                 possibleGroupByCategories.addAll(connector.getGroupByParameters());
             } finally {
-                progressCallback.setProgress(getFormatted("worker.progress.done"), 100);
+                progress.setProgress(getFormatted("worker.progress.done"), 100);
             }
         }
 

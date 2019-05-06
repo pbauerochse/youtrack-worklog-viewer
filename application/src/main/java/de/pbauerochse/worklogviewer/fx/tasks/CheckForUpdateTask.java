@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.pbauerochse.worklogviewer.tasks.ProgressCallback;
+import de.pbauerochse.worklogviewer.tasks.Progress;
 import de.pbauerochse.worklogviewer.util.HttpClientUtil;
 import de.pbauerochse.worklogviewer.util.JacksonUtil;
 import de.pbauerochse.worklogviewer.version.GitHubVersion;
@@ -30,15 +30,13 @@ public class CheckForUpdateTask extends WorklogViewerTask<Optional<GitHubVersion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckForUpdateTask.class);
 
-    @NotNull
-    @Override
-    public String getLabel() {
-        return getFormatted("task.updatecheck");
+    public CheckForUpdateTask() {
+        super(getFormatted("task.updatecheck"));
     }
 
     @Override
-    public Optional<GitHubVersion> start(@NotNull ProgressCallback progressCallback) {
-        progressCallback.setProgress(getFormatted("worker.updatecheck.checking"), 0);
+    public Optional<GitHubVersion> start(@NotNull Progress progress) {
+        progress.setProgress(getFormatted("worker.updatecheck.checking"), 0);
 
         Optional<GitHubVersion> version = Optional.empty();
         try {
@@ -46,7 +44,7 @@ public class CheckForUpdateTask extends WorklogViewerTask<Optional<GitHubVersion
         } catch (Exception e) {
             LOGGER.warn("Could not get Version from Github", e);
         } finally {
-            progressCallback.setProgress(getFormatted("worker.progress.done"), 100);
+            progress.setProgress(getFormatted("worker.progress.done"), 100);
         }
 
         return version;
@@ -62,7 +60,8 @@ public class CheckForUpdateTask extends WorklogViewerTask<Optional<GitHubVersion
                 if (HttpClientUtil.isValidResponseCode(response.getStatusLine())) {
                     String jsonResponse = EntityUtils.toString(response.getEntity());
 
-                    List<GitHubVersion> versions = JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<List<GitHubVersion>>() {});
+                    List<GitHubVersion> versions = JacksonUtil.parseValue(new StringReader(jsonResponse), new TypeReference<>() {
+                    });
 
                     return Optional.ofNullable(versions)
                             .orElse(Collections.emptyList()).stream()

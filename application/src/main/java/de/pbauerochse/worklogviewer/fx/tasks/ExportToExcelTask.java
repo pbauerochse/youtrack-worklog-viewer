@@ -2,7 +2,7 @@ package de.pbauerochse.worklogviewer.fx.tasks;
 
 import de.pbauerochse.worklogviewer.excel.ExcelExporter;
 import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData;
-import de.pbauerochse.worklogviewer.tasks.ProgressCallback;
+import de.pbauerochse.worklogviewer.tasks.Progress;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -28,30 +28,24 @@ public class ExportToExcelTask extends WorklogViewerTask<File> {
     private final File targetFile;
 
     public ExportToExcelTask(String text, WorklogsTreeTableViewData data, File targetFile) {
-        super();
+        super(getFormatted("task.excelexport", text));
         this.text = text;
         this.data = data;
         this.targetFile = targetFile;
     }
 
-    @NotNull
     @Override
-    public String getLabel() {
-        return getFormatted("task.excelexport", text);
-    }
-
-    @Override
-    public File start(@NotNull ProgressCallback progressCallback) {
+    public File start(@NotNull Progress progress) {
         Workbook workbook = ExcelExporter.createWorkbook(text, data);
 
-        progressCallback.setProgress(getFormatted("worker.excel.exporting"), 50);
+        progress.setProgress(getFormatted("worker.excel.exporting"), 50);
 
         try (OutputStream outputStream = new FileOutputStream(targetFile)) {
             workbook.write(outputStream);
         } catch (IOException e) {
             LOG.warn("Could not write Excel to " + targetFile.getAbsolutePath(), e);
         } finally {
-            progressCallback.setProgress(getFormatted("exceptions.excel.success", targetFile.getAbsolutePath()), 100);
+            progress.setProgress(getFormatted("exceptions.excel.success", targetFile.getAbsolutePath()), 100);
         }
 
         return targetFile;

@@ -1,27 +1,21 @@
 package de.pbauerochse.worklogviewer.fx.tasks
 
-import de.pbauerochse.worklogviewer.tasks.ProgressCallback
+import de.pbauerochse.worklogviewer.tasks.Progress
 import javafx.concurrent.Task
 
-abstract class WorklogViewerTask<T> : Task<T>(), ProgressCallback {
+abstract class WorklogViewerTask<T>(val label: String) : Task<T>() {
 
     init {
-        this.updateTitle(this.label)
+        this.updateTitle(label)
     }
 
-    /**
-     * The display label of this Task.
-     * Will be shown in the corresponding
-     * [TaskProgressBar]
-     */
-    abstract val label: String
+    abstract fun start(progress: Progress): T
 
-    abstract fun start(progressCallback: ProgressCallback): T
+    override fun call(): T {
+        val progress = ProgressHandler()
+        progress.currentMessageProperty().addListener { _, _, newValue -> updateMessage(newValue) }
+        progress.currentValueProperty().addListener { _, _, newValue -> updateProgress(newValue.toDouble(), 100.0) }
 
-    override fun call(): T = start(this)
-
-    override fun setProgress(message: String, amount: Double) {
-        updateProgress(amount, 100.toDouble())
-        updateMessage(message)
+        return start(progress)
     }
 }

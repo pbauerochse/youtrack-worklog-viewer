@@ -18,7 +18,7 @@ import de.pbauerochse.worklogviewer.http.isValid
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
-import de.pbauerochse.worklogviewer.tasks.ProgressCallback
+import de.pbauerochse.worklogviewer.tasks.Progress
 import de.pbauerochse.worklogviewer.toLocalDateTime
 import org.apache.http.StatusLine
 import org.apache.http.entity.ContentType
@@ -54,27 +54,27 @@ class Connector(
         return CONSTANT_GROUP_BY_PARAMETERS + groupingFields
     }
 
-    override fun getTimeReport(parameters: TimeReportParameters, progressCallback: ProgressCallback): TimeReport {
-        return downloadReportCsv(parameters, progressCallback).use {
-            progressCallback.setProgress(Translations.i18n.get("report.csv.processing"), 70)
+    override fun getTimeReport(parameters: TimeReportParameters, progress: Progress): TimeReport {
+        return downloadReportCsv(parameters, progress).use {
+            progress.setProgress(Translations.i18n.get("report.csv.processing"), 70)
             val csvReportData = CsvReportReader.read(it)
 
-            progressCallback.setProgress(Translations.i18n.get("report.csv.processing"), 80)
+            progress.setProgress(Translations.i18n.get("report.csv.processing"), 80)
             val timeReport = processCsvReport(parameters, csvReportData)
 
-            progressCallback.setProgress(Translations.i18n.get("done"), 100)
+            progress.setProgress(Translations.i18n.get("done"), 100)
             return@use timeReport
         }
     }
 
-    private fun downloadReportCsv(parameters: TimeReportParameters, progressCallback: ProgressCallback): InputStream {
-        progressCallback.setProgress(Translations.i18n.get("report.create"), 0)
+    private fun downloadReportCsv(parameters: TimeReportParameters, progress: Progress): InputStream {
+        progress.setProgress(Translations.i18n.get("report.create"), 0)
 
         var reportDetail = triggerTimeReportCreation(parameters)
         var pollCount = 0
 
         try {
-            progressCallback.setProgress(Translations.i18n.get("report.waiting"), 30)
+            progress.setProgress(Translations.i18n.get("report.waiting"), 30)
             while (reportDetail.inProgress && pollCount++ < MAX_POLL_COUNT) {
                 waitUntilNextPoll()
                 reportDetail = getReportDetail(reportDetail)
@@ -84,10 +84,10 @@ class Connector(
                 throw IllegalStateException(Translations.i18n.get("report.toolong", MAX_POLL_COUNT))
             }
 
-            progressCallback.setProgress(Translations.i18n.get("report.downloading", reportDetail.id), 50)
+            progress.setProgress(Translations.i18n.get("report.downloading", reportDetail.id), 50)
             return downloadReport(reportDetail)
         } finally {
-            progressCallback.setProgress(Translations.i18n.get("report.deleting", reportDetail.id), 60)
+            progress.setProgress(Translations.i18n.get("report.deleting", reportDetail.id), 60)
             deleteReport(reportDetail)
         }
     }
