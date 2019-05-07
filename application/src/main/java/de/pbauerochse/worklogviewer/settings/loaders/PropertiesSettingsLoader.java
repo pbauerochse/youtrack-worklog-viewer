@@ -1,6 +1,5 @@
 package de.pbauerochse.worklogviewer.settings.loaders;
 
-import de.pbauerochse.worklogviewer.connector.YouTrackVersion;
 import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.settings.Settings;
 import de.pbauerochse.worklogviewer.util.EncryptionUtil;
@@ -26,7 +25,10 @@ import static java.lang.Integer.parseInt;
 /**
  * Loads the old properties settings
  * file into an Settings object
+ *
+ * @deprecated Properties file is not supported anymore. JSON configuration file is used instead. This loader will be removed soon
  */
+@Deprecated
 public class PropertiesSettingsLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesSettingsLoader.class);
@@ -36,7 +38,6 @@ public class PropertiesSettingsLoader {
     private static final String WINDOW_WIDTH_PROPERTY = "window.width";
     private static final String WINDOW_HEIGHT_PROPERTY = "window.height";
     private static final String WORK_HOURS_PROPERTY = "workhours";
-    private static final String YOUTRACK_VERSION_PROPERTY = "youtrackversion";
     private static final String YOUTRACK_USERNAME_PROPERTY = "username";
     private static final String YOUTRACK_URL_PROPERTY = "youtrackurl";
     private static final String YOUTRACK_PERMANENT_TOKEN = "permanent_token";
@@ -85,12 +86,6 @@ public class PropertiesSettingsLoader {
 
     private void applyYouTrackConnectionSettings(Settings settings, Properties properties) {
         // youtrack version
-        String youtrackVersionAsString = properties.getProperty(YOUTRACK_VERSION_PROPERTY);
-        if (StringUtils.isNotBlank(youtrackVersionAsString)) {
-            YouTrackVersion version = getYouTrackVersion(youtrackVersionAsString);
-            settings.getYouTrackConnectionSettings().setVersion(version);
-        }
-
         settings.getYouTrackConnectionSettings().setUrl(properties.getProperty(YOUTRACK_URL_PROPERTY));
         settings.getYouTrackConnectionSettings().setUsername(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
 
@@ -102,19 +97,6 @@ public class PropertiesSettingsLoader {
                 LOGGER.error("Could not decrypt permanent token from settings file", e);
                 throw ExceptionUtil.getIllegalStateException("exceptions.settings.permanenttoken.decrypt", e);
             }
-        }
-    }
-
-    private YouTrackVersion getYouTrackVersion(String youtrackVersionAsString) {
-        switch (youtrackVersionAsString) {
-            case "PRE_2017":
-                return de.pbauerochse.worklogviewer.connector.v2017.SupportedVersions.getV2017_4();
-            case "POST_2017":
-            case "POST_2018":
-                return de.pbauerochse.worklogviewer.connector.v2017.SupportedVersions.getV2018_1();
-
-            default:
-                return null;
         }
     }
 

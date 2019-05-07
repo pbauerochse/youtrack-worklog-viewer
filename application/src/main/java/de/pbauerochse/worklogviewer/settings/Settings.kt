@@ -32,7 +32,7 @@ class Settings {
      * Any settings required to access the YouTrack API
      */
     @JsonProperty("youtrack")
-    var youTrackConnectionSettings = YouTrackConnectionSettings()
+    var youTrackConnectionSettings : YouTrackConnectionSettingsImpl = YouTrackConnectionSettingsImpl()
 
     var theme = Theme.DARK
 

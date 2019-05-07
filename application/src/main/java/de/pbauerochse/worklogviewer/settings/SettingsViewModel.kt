@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.settings
 
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion
-import de.pbauerochse.worklogviewer.connector.v2018.SupportedVersions
 import de.pbauerochse.worklogviewer.domain.ReportTimerange
 import de.pbauerochse.worklogviewer.fx.Theme
 import javafx.beans.binding.BooleanBinding
@@ -23,7 +22,6 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val youTrackVersionProperty = SimpleObjectProperty<YouTrackVersion>()
     val youTrackUsernameProperty = SimpleStringProperty()
     val youTrackPermanentTokenProperty = SimpleStringProperty()
-    val youTrackWorkdateFieldNameProperty = SimpleStringProperty()
 
     val themeProperty = SimpleObjectProperty<Theme>()
     val workhoursProperty = SimpleIntegerProperty()
@@ -62,10 +60,9 @@ class SettingsViewModel internal constructor(val settings: Settings) {
 
     fun saveChanges() {
         settings.youTrackConnectionSettings.url = youTrackUrlProperty.get()
-        settings.youTrackConnectionSettings.setVersion(youTrackVersionProperty.get())
+        settings.youTrackConnectionSettings.version = youTrackVersionProperty.get()
         settings.youTrackConnectionSettings.username = youTrackUsernameProperty.get()
-        settings.youTrackConnectionSettings.setPermanentToken(youTrackPermanentTokenProperty.get())
-        settings.youTrackConnectionSettings.setWorkdateFieldName(youTrackWorkdateFieldNameProperty.get())
+        settings.youTrackConnectionSettings.permanentToken = youTrackPermanentTokenProperty.get()
 
         settings.theme = themeProperty.get()
         settings.workHoursADay = workhoursProperty.get()
@@ -107,7 +104,6 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         youTrackVersionProperty.set(settings.youTrackConnectionSettings.version)
         youTrackUsernameProperty.set(settings.youTrackConnectionSettings.username)
         youTrackPermanentTokenProperty.set(settings.youTrackConnectionSettings.permanentToken)
-        youTrackWorkdateFieldNameProperty.set(settings.youTrackConnectionSettings.workdateFieldName)
 
         themeProperty.set(settings.theme)
         workhoursProperty.set(settings.workHoursADay)
@@ -143,7 +139,6 @@ class SettingsViewModel internal constructor(val settings: Settings) {
             .or(youTrackVersionProperty.isNull)
             .or(youTrackUsernameProperty.isEmpty)
             .or(youTrackPermanentTokenProperty.isEmpty)
-            .or(youTrackVersionProperty.isEqualTo(SupportedVersions.v2018_2).and(youTrackWorkdateFieldNameProperty.isEmpty))
 
     /**
      * These settings are applied to the persistent settings
