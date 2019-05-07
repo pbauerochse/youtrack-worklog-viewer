@@ -31,7 +31,6 @@ import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
 import de.pbauerochse.worklogviewer.tasks.AsyncTask
 import de.pbauerochse.worklogviewer.util.ExceptionUtil
-import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
 import de.pbauerochse.worklogviewer.version.Version
@@ -338,8 +337,6 @@ class MainViewController : Initializable, PluginActionContext {
         pluginsToolbarButtons.children.clear()
         pluginsMenu.items.clear()
 
-        // TODO Exception handling from plugins
-
         val plugins = PluginLoader.getPlugins()
         LOGGER.debug("Found ${plugins.size} active Plugins")
 
@@ -350,7 +347,7 @@ class MainViewController : Initializable, PluginActionContext {
 
         plugins
             .groupBy { it.vendor }
-            .forEach { vendor, vendorPlugins ->
+            .forEach { (vendor, vendorPlugins) ->
                 val parent = when (vendorPlugins.size) {
                     1 -> pluginsMenu
                     else -> Menu(vendor.name).apply { pluginsMenu.items.add(this) }

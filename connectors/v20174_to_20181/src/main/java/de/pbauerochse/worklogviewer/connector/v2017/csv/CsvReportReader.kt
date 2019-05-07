@@ -23,7 +23,6 @@ object CsvReportReader {
     private const val DESCRIPTION_COLUMN_INDEX = 0
     private const val DATE_COLUMN_INDEX = 1
     private const val DURATION_COLUMN_INDEX = 2
-    //    private const val TIMEESTIMATION_COLUMN_INDEX = 3
     private const val USER_LOGINNAME_COLUMN_INDEX = 4
     private const val USER_DISPLAYNAME_COLUMN_INDEX = 5
     private const val ISSUE_ID_COLUMN_INDEX = 6

@@ -24,8 +24,6 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
 
     private fun updateColumns(data: WorklogsTreeTableViewData) {
         if (columns.isEmpty()) {
-            // add standard columns
-            // columns.add(IssueStatusColumn())
             columns.add(IssueLinkColumn())
             columns.add(SummaryColumn())
         }

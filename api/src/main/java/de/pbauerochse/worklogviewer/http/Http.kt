@@ -5,10 +5,7 @@ import org.apache.http.Header
 import org.apache.http.HttpEntity
 import org.apache.http.HttpHeaders
 import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.HttpDelete
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.client.methods.HttpUriRequest
+import org.apache.http.client.methods.*
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner
@@ -77,7 +74,7 @@ class Http(
     }
 
     private fun execute(request : HttpUriRequest) : HttpResponse {
-        return execute(request) { it ->
+        return execute(request) {
             if (it.statusLine.isValid().not()) {
                 EntityUtils.consumeQuietly(it.entity)
                 HttpResponse(it.statusLine)
@@ -88,8 +85,12 @@ class Http(
     }
 
     private fun <T> execute(request : HttpUriRequest, handler : (org.apache.http.HttpResponse) -> T) : T {
-        return httpClientBuilder.build().use {
-            it.execute(request) { response -> handler.invoke(response) }
+        return httpClientBuilder.build().use { client ->
+            client.execute(request) { response ->
+                (response as CloseableHttpResponse).use {
+                    handler.invoke(it)
+                }
+            }
         }
     }
 

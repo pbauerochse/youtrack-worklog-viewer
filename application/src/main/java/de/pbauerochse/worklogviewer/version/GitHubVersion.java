@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.version;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -11,47 +12,40 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GitHubVersion {
 
-    @JsonProperty("html_url")
-    private String url;
+    private final String url;
+    private final String version;
+    private final boolean draft;
+    private final Date published;
 
-    @JsonProperty("tag_name")
-    private String version;
-
-    @JsonProperty("draft")
-    private boolean draft;
-
-    @JsonProperty("published_at")
-    private Date published;
+    @JsonCreator
+    public GitHubVersion(@JsonProperty("html_url") String url,
+                         @JsonProperty("tag_name") String version,
+                         @JsonProperty("draft") boolean draft,
+                         @JsonProperty("published_at") Date published) {
+        this.url = url;
+        this.version = version;
+        this.draft = draft;
+        this.published = published;
+    }
 
     public String getUrl() {
         return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
     public boolean isDraft() {
         return draft;
     }
 
-    public void setDraft(boolean draft) {
-        this.draft = draft;
+    public boolean isRelease() {
+        return !isDraft();
     }
 
     public Date getPublished() {
         return published;
     }
 
-    public void setPublished(Date published) {
-        this.published = published;
-    }
 }
