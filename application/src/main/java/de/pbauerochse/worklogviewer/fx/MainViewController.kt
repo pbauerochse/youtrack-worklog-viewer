@@ -1,36 +1,26 @@
 package de.pbauerochse.worklogviewer.fx
 
 import de.pbauerochse.worklogviewer.WorklogViewer
-import de.pbauerochse.worklogviewer.connector.GroupByParameter
-import de.pbauerochse.worklogviewer.connector.YouTrackConnector
-import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
 import de.pbauerochse.worklogviewer.domain.ReportTimerange
 import de.pbauerochse.worklogviewer.domain.timerangeprovider.TimerangeProviderFactory
-import de.pbauerochse.worklogviewer.fx.components.NoSelectionGroupByParameter
 import de.pbauerochse.worklogviewer.fx.components.plugins.PluginMenu
-import de.pbauerochse.worklogviewer.fx.components.plugins.PluginTask
 import de.pbauerochse.worklogviewer.fx.components.plugins.PluginToolbarActionGroup
 import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane
-import de.pbauerochse.worklogviewer.fx.converter.GroupByCategoryStringConverter
 import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter
+import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.tasks.CheckForUpdateTask
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
-import de.pbauerochse.worklogviewer.fx.tasks.GetGroupByCategoriesTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunner
-import de.pbauerochse.worklogviewer.http.Http
-import de.pbauerochse.worklogviewer.isNoSelection
 import de.pbauerochse.worklogviewer.logging.ProcessPendingLogsService
-import de.pbauerochse.worklogviewer.plugin.*
 import de.pbauerochse.worklogviewer.plugins.PluginLoader
+import de.pbauerochse.worklogviewer.plugins.dialog.DialogSpecification
 import de.pbauerochse.worklogviewer.report.TimeRange
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.setHref
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
-import de.pbauerochse.worklogviewer.tasks.AsyncTask
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
-import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
 import de.pbauerochse.worklogviewer.version.Version
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
@@ -42,11 +32,8 @@ import javafx.scene.control.*
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
-import javafx.stage.FileChooser
 import javafx.util.Duration
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
-import java.io.File
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
@@ -54,13 +41,13 @@ import java.util.*
 /**
  * Java FX Controller for the main window
  */
-class MainViewController : Initializable, PluginActionContext {
+class MainViewController : Initializable {
 
     @FXML
     private lateinit var timerangeComboBox: ComboBox<ReportTimerange>
 
-    @FXML
-    private lateinit var groupByCategoryComboBox: ComboBox<GroupByParameter>
+//    @FXML
+//    private lateinit var groupByCategoryComboBox: ComboBox<GroupByParameter>
 
     @FXML
     private lateinit var fetchWorklogButton: Button
@@ -117,6 +104,7 @@ class MainViewController : Initializable, PluginActionContext {
 
         startLogTask()
         checkForUpdate()
+        autoLoadLastUsedReport()
 
         initializeTimerangeComboBox()
         initializeGroupByComboBox()
@@ -133,57 +121,12 @@ class MainViewController : Initializable, PluginActionContext {
         }
     }
 
-    override val http: Http
-        get() = Http(settingsModel.settings.youTrackConnectionSettings)
-
-    override val connector: YouTrackConnector?
-        get() = YouTrackConnectorLocator.getActiveConnector()
-
-    override var currentTimeReport: TimeReport? = null
-
-    override val currentlyVisibleIssues: TabContext?
-        get() = resultTabPane.currentlyVisibleTab.currentData?.let {
-            TabContext(it.reportParameters, it.issues)
-        }
-
-    override val timesFormatter: WorktimeFormatter
-        get() = WorklogTimeFormatter(settingsModel.workhoursProperty.get())
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T> triggerTask(task: AsyncTask<T>, callback: ((T?) -> Unit)?) {
-        val pluginTask = PluginTask(task)
-        pluginTask.setOnSucceeded { callback?.invoke(it.source.value as T?) }
-        taskRunner.startTask(pluginTask)
-    }
-
-    override fun showInPopup(fxmlUrl: URL, specs: PopupSpecification) {
-        mainToolbar.scene.openDialog(fxmlUrl, specs)
-    }
-
-    override fun showSaveFileDialog(spec: FileChooserSpec): File? {
-        return fileChooser(spec).showSaveDialog(resultTabPane.scene.window)
-    }
-
-    override fun showOpenFileDialog(spec: FileChooserSpec): File? {
-        return fileChooser(spec).showOpenDialog(resultTabPane.scene.window)
-    }
-
     private fun startLogTask() {
         val service = ProcessPendingLogsService()
         service.delay = Duration.millis(1.0)
         service.period = Duration.seconds(1.0)
         service.restartOnFailure = true
         taskRunner.startService(service)
-    }
-
-    private fun fileChooser(spec: FileChooserSpec): FileChooser {
-        return FileChooser().apply {
-            title = spec.title
-            initialFileName = spec.initialFileName
-            selectedExtensionFilter = spec.fileType?.let {
-                FileChooser.ExtensionFilter(it.description, it.extension)
-            }
-        }
     }
 
     private fun initializeTimerangeComboBox() {
@@ -207,52 +150,17 @@ class MainViewController : Initializable, PluginActionContext {
     }
 
     private fun initializeGroupByComboBox() {
-        groupByCategoryComboBox.apply {
-            disableProperty().bind(groupByCategoryComboBox.itemsProperty().isNull)
-            converter = GroupByCategoryStringConverter(groupByCategoryComboBox)
-        }
-
-        // load group by criteria when connection parameters are present
-        if (!settingsModel.hasMissingConnectionSettings.get()) {
-            loadGroupByCriteriaFromYouTrack()
-        }
+//        groupByCategoryComboBox.apply {
+//            disableProperty().bind(groupByCategoryComboBox.itemsProperty().isNull)
+//            converter = GroupByCategoryStringConverter(groupByCategoryComboBox)
+//        }
+//
+//        // load group by criteria when connection parameters are present
+//        if (!settingsModel.hasMissingConnectionSettings.get()) {
+//            loadGroupByCriteriaFromYouTrack()
+//        }
     }
 
-    /**
-     * Fetches groupBy criteria from YouTrack
-     */
-    private fun loadGroupByCriteriaFromYouTrack() {
-        LOGGER.info("Fetching GroupByCategories")
-        val task = GetGroupByCategoriesTask()
-        task.setOnSucceeded { event ->
-            val worker = event.source as GetGroupByCategoriesTask
-            val categoryList = worker.value as List<GroupByParameter>
-            LOGGER.info("{} succeeded with {} GroupByCategories", task.title, categoryList.size)
-
-            groupByCategoryComboBox.items.add(NoSelectionGroupByParameter())
-            groupByCategoryComboBox.items.addAll(categoryList.sortedBy { it.getLabel() })
-            groupByCategoryComboBox.selectionModel.selectedItemProperty().addListener { _, _, newValue ->
-                val lastUsed = newValue?.id
-                settingsModel.lastUsedGroupByCategoryIdProperty.value = lastUsed
-            }
-
-            val lastUsedGroupById = settingsModel.lastUsedGroupByCategoryIdProperty
-            var selectedItemIndex = 0
-
-            for (i in 0 until groupByCategoryComboBox.items.size) {
-                if (StringUtils.equals(groupByCategoryComboBox.items[i].id, lastUsedGroupById.get())) {
-                    selectedItemIndex = i
-                    break
-                }
-            }
-
-            groupByCategoryComboBox.selectionModel.select(selectedItemIndex)
-            autoLoadLastUsedReport()
-        }
-        task.setOnFailed { autoLoadLastUsedReport() }
-
-        taskRunner.startTask(task)
-    }
 
     private fun autoLoadLastUsedReport() {
         // auto load data if a named timerange was selected
@@ -337,16 +245,16 @@ class MainViewController : Initializable, PluginActionContext {
         }
 
         plugins
-            .groupBy { it.vendor }
-            .forEach { (vendor, vendorPlugins) ->
-                val parent = when (vendorPlugins.size) {
+            .groupBy { it.author }
+            .forEach { (author, authorPlugins) ->
+                val parent = when (authorPlugins.size) {
                     1 -> pluginsMenu
-                    else -> Menu(vendor.name).apply { pluginsMenu.items.add(this) }
+                    else -> Menu(author.name).apply { pluginsMenu.items.add(this) }
                 }
 
-                vendorPlugins.forEach {
-                    parent.items.add(PluginMenu(it, this))
-                    pluginsToolbarButtons.children.add(PluginToolbarActionGroup(it, this))
+                authorPlugins.forEach {
+                    parent.items.add(PluginMenu(it, PluginActionContextAdapter()))
+                    pluginsToolbarButtons.children.add(PluginToolbarActionGroup(it, PluginActionContextAdapter()))
                 }
             }
     }
@@ -400,10 +308,8 @@ class MainViewController : Initializable, PluginActionContext {
         val selectedStartDate = startDatePicker.value
         val selectedEndDate = endDatePicker.value
 
-        val groupByCategory = groupByCategoryComboBox.selectionModel.selectedItem
-
         val timeRange = TimeRange(selectedStartDate, selectedEndDate)
-        val parameters = TimeReportParameters(timeRange, groupByCategory?.takeIf { it.isNoSelection().not() })
+        val parameters = TimeReportParameters(timeRange)
 
         val task = FetchTimereportTask(parameters)
         task.setOnSucceeded { event -> displayWorklogResult(event.source.value as TimeReport) }
@@ -413,7 +319,6 @@ class MainViewController : Initializable, PluginActionContext {
     private fun displayWorklogResult(timeReport: TimeReport) {
         LOGGER.info("Presenting TimeReport to the user")
         resultTabPane.update(timeReport)
-        currentTimeReport = timeReport
     }
 
     private fun showSettingsDialogue() {
@@ -421,26 +326,22 @@ class MainViewController : Initializable, PluginActionContext {
 
         // pass in a handler to fetch the group by categories if connection
         // parameters get set
-        mainToolbar.scene.openDialog("/fx/views/settings.fxml", PopupSpecification(
-            title = getFormatted("view.settings.title"),
-            modal = true,
-            onClose = {
-                if (!settingsModel.hasMissingConnectionSettings.get() && groupByCategoryComboBox.items.size == 0) {
-                    LOGGER.debug("Settings window closed, connection settings set and groupBy combobox empty -> trying to fetch groupByCategories")
-                    loadGroupByCriteriaFromYouTrack()
-                }
-            }
-        ))
+        mainToolbar.scene.openDialog(
+            "/fx/views/settings.fxml", DialogSpecification(
+                title = getFormatted("view.settings.title"),
+                modal = true
+            )
+        )
     }
 
     private fun showLogMessagesDialogue() {
         LOGGER.debug("Showing log messages dialogue")
-        mainToolbar.scene.openDialog("/fx/views/logMessagesView.fxml", PopupSpecification(getFormatted("view.menu.help.logs")))
+        mainToolbar.scene.openDialog("/fx/views/logMessagesView.fxml", DialogSpecification(getFormatted("view.menu.help.logs")))
     }
 
     private fun showAboutDialogue() {
         LOGGER.debug("Showing log messages dialogue")
-        mainToolbar.scene.openDialog("/fx/views/about.fxml", PopupSpecification(getFormatted("view.menu.help.about")))
+        mainToolbar.scene.openDialog("/fx/views/about.fxml", DialogSpecification(getFormatted("view.menu.help.about")))
     }
 
     companion object {

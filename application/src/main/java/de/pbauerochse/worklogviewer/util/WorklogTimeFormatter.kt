@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.util
 
-import de.pbauerochse.worklogviewer.plugin.WorktimeFormatter
+import de.pbauerochse.worklogviewer.plugins.formatter.YouTrackWorktimeFormatter
 
-class WorklogTimeFormatter(private val workhoursADay: Int) : WorktimeFormatter {
+class WorklogTimeFormatter(private val workhoursADay: Int) : YouTrackWorktimeFormatter {
 
     init {
         require(workhoursADay > 0) { FormattingUtil.getFormatted("exceptions.main.workhours.zero") }

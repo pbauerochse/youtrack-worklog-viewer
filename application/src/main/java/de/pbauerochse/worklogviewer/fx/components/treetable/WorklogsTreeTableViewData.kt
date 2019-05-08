@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.connector.GroupByParameter
+import de.pbauerochse.worklogviewer.domain.GroupByParameter
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import javafx.scene.control.TreeItem
@@ -15,11 +15,14 @@ class WorklogsTreeTableViewData(
 ) {
 
     internal val treeRows: List<TreeItem<TreeTableRowModel>> by lazy {
-        val data = if (reportParameters.groupByParameter != null) {
-            convertGrouped(reportParameters.groupByParameter!!, issues)
-        } else {
-            convertDefault(issues).toMutableList()
-        }.toMutableList()
+        /// TODO grouping
+//        val data = if (reportParameters.groupByParameter != null) {
+//            convertGrouped(reportParameters.groupByParameter!!, issues)
+//        } else {
+//            convertDefault(issues).toMutableList()
+//        }.toMutableList()
+
+        val data = convertDefault(issues).toMutableList()
         data.add(TreeItem(SummaryTreeTableRow(issues)))
 
         return@lazy data

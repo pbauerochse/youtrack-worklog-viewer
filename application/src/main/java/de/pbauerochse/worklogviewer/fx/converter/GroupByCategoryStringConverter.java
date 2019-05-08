@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.converter;
 
-import de.pbauerochse.worklogviewer.connector.GroupByParameter;
+import de.pbauerochse.worklogviewer.domain.GroupByParameter;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
 import javafx.scene.control.ComboBox;
 import javafx.util.StringConverter;

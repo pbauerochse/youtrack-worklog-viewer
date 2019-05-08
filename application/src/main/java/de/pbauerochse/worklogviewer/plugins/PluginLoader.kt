@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.plugins
 
 import de.pbauerochse.worklogviewer.WorklogViewer
-import de.pbauerochse.worklogviewer.plugin.WorklogViewerPlugin
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL

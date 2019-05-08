@@ -1,7 +1,5 @@
 package de.pbauerochse.worklogviewer
 
-import de.pbauerochse.worklogviewer.connector.GroupByParameter
-import de.pbauerochse.worklogviewer.fx.components.NoSelectionGroupByParameter
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
@@ -16,8 +14,9 @@ import java.time.format.DateTimeFormatter
  * Kotlin convenience extension functions
  */
 
-fun String.toLocalDate() : LocalDate? = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
-fun LocalDate.toFormattedString() : String = format(DateTimeFormatter.ISO_DATE)
+fun String.toLocalDate(): LocalDate? = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
+
+fun LocalDate.toFormattedString(): String = format(DateTimeFormatter.ISO_DATE)
 
 fun Hyperlink.setHref(url: String) {
     onAction = EventHandler { Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(url) } }
@@ -28,7 +27,7 @@ fun Hyperlink.setHref(url: String) {
  * by taking the base URL from the Settings
  * and adding the issue path
  */
-fun Issue.getYouTrackLink() : URL {
+fun Issue.getYouTrackLink(): URL {
     return URL(SettingsUtil.settings.youTrackConnectionSettings.baseUrl, "/issue/$id#tab=Time%20Tracking")
 }
 
@@ -48,10 +47,4 @@ fun WorklogItem.isOwn(): Boolean {
     return user.username == ownUsername
 }
 
-/**
- * Returns true if this is the special "NoSelectionGroupByParameter" and
- * therefore should not be passed as grouping criteria to YouTrack
- */
-fun GroupByParameter.isNoSelection(): Boolean = this is NoSelectionGroupByParameter
-
-fun String.toURL() : URL = URL(this)
+fun String.toURL(): URL = URL(this)

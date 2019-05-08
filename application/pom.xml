@@ -61,7 +61,17 @@
     <dependencies>
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>common-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+            <artifactId>connector-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+            <artifactId>plugin-api</artifactId>
         </dependency>
 
         <dependency>

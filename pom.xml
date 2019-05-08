@@ -10,8 +10,12 @@
     <version>3.0.0-SNAPSHOT</version>
 
     <modules>
-        <module>api</module>
+        <module>common-api</module>
+        <module>plugin-api</module>
         <module>application</module>
+
+        <module>connectors/connector-api</module>
+        <module>connectors/dummy-data-connector</module>
     </modules>
 
     <properties>
@@ -163,7 +167,19 @@
 
             <dependency>
                 <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-                <artifactId>api</artifactId>
+                <artifactId>common-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+                <artifactId>connector-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+                <artifactId>plugin-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

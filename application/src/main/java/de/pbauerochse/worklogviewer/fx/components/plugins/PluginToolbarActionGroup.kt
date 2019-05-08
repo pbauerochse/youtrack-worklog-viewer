@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.components.plugins
 
-import de.pbauerochse.worklogviewer.plugin.PluginActionContext
-import de.pbauerochse.worklogviewer.plugin.PluginToolbarButton
-import de.pbauerochse.worklogviewer.plugin.WorklogViewerPlugin
+import de.pbauerochse.worklogviewer.plugins.WorklogViewerPlugin
+import de.pbauerochse.worklogviewer.plugins.actions.PluginActionContext
+import de.pbauerochse.worklogviewer.plugins.actions.PluginToolbarButton
 import javafx.event.EventHandler
 import javafx.scene.control.Button
 import javafx.scene.control.Tooltip

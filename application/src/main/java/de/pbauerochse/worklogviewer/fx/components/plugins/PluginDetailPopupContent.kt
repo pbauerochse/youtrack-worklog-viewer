@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.components.plugins
 
 import de.pbauerochse.worklogviewer.WorklogViewer
-import de.pbauerochse.worklogviewer.plugin.WorklogViewerPlugin
+import de.pbauerochse.worklogviewer.plugins.WorklogViewerPlugin
 import de.pbauerochse.worklogviewer.setHref
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
@@ -39,10 +39,10 @@ class PluginDetailPopupContent(private val plugin: WorklogViewerPlugin) : VBox()
     override fun initialize(p0: URL?, p1: ResourceBundle?) {
         pluginNameLabel.text = plugin.name
         pluginVersionLabel.text = plugin.version.toString()
-        pluginVendorLink.text = plugin.vendor.name
+        pluginVendorLink.text = plugin.author.name
         pluginDescriptionLabel.text = plugin.description
 
-        plugin.vendor.website?.let {
+        plugin.author.website?.let {
             pluginVendorLink.setHref(it.toExternalForm())
         }
     }

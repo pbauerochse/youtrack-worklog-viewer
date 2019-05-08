@@ -1,10 +1,10 @@
 package de.pbauerochse.worklogviewer.fx.components.plugins
 
 import de.pbauerochse.worklogviewer.fx.openDialog
-import de.pbauerochse.worklogviewer.plugin.PluginActionContext
-import de.pbauerochse.worklogviewer.plugin.PluginMenuItem
-import de.pbauerochse.worklogviewer.plugin.PopupSpecification
-import de.pbauerochse.worklogviewer.plugin.WorklogViewerPlugin
+import de.pbauerochse.worklogviewer.plugins.WorklogViewerPlugin
+import de.pbauerochse.worklogviewer.plugins.actions.PluginActionContext
+import de.pbauerochse.worklogviewer.plugins.actions.PluginMenuItem
+import de.pbauerochse.worklogviewer.plugins.dialog.DialogSpecification
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import javafx.event.EventHandler
 import javafx.scene.control.Menu
@@ -50,7 +50,7 @@ class PluginMenu(private val plugin: WorklogViewerPlugin, private val pluginActi
 
     private fun showPluginInfoPopup() {
         LOGGER.info("Showing Plugin Popup for ${plugin.name}")
-        parentPopup.scene.openDialog(PluginDetailPopupContent(plugin), PopupSpecification(plugin.name))
+        parentPopup.scene.openDialog(PluginDetailPopupContent(plugin), DialogSpecification(plugin.name))
     }
 
     companion object {

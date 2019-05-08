@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.connector.GroupByParameter
+import de.pbauerochse.worklogviewer.domain.GroupByParameter
 import de.pbauerochse.worklogviewer.report.Issue
 import java.time.LocalDate
 
@@ -13,7 +13,7 @@ data class GroupedIssuesTreeTableRow(val groupCategory: GroupByParameter, val gr
     override val isSummaryRow: Boolean = false
     override val isIssueRow: Boolean = false
     override val isGroupByRow: Boolean = true
-    override fun getLabel(): String = "${groupCategory.getLabel()}: $groupValue"
+    override fun getLabel(): String = "${groupCategory.label}: $groupValue"
 
     fun totalTimeSpentOn(date: LocalDate): Long = issues
         .flatMap { it.worklogItems }
