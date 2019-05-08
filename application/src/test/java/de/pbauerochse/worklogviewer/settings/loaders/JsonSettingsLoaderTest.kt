@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.settings.loaders
 
 import de.pbauerochse.worklogviewer.settings.Settings
+import de.pbauerochse.worklogviewer.toURL
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.isEmptyOrNullString
 import org.hamcrest.Matchers.not
@@ -20,7 +21,7 @@ internal class JsonSettingsLoaderTest {
 
         // and
         val settings = Settings().apply {
-            youTrackConnectionSettings.url = "http://localhost"
+            youTrackConnectionSettings.baseUrl = "http://localhost".toURL()
         }
 
         // when

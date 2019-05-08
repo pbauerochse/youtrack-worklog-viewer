@@ -29,8 +29,7 @@ fun Hyperlink.setHref(url: String) {
  * and adding the issue path
  */
 fun Issue.getYouTrackLink() : URL {
-    val baseUrl = SettingsUtil.settings.youTrackConnectionSettings.url.removeSuffix("/")
-    return URL("$baseUrl/issue/$id#tab=Time%20Tracking")
+    return URL(SettingsUtil.settings.youTrackConnectionSettings.baseUrl, "/issue/$id#tab=Time%20Tracking")
 }
 
 /**
@@ -55,3 +54,4 @@ fun WorklogItem.isOwn(): Boolean {
  */
 fun GroupByParameter.isNoSelection(): Boolean = this is NoSelectionGroupByParameter
 
+fun String.toURL() : URL = URL(this)

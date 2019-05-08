@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.settings
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion
 import de.pbauerochse.worklogviewer.domain.ReportTimerange
 import de.pbauerochse.worklogviewer.fx.Theme
+import de.pbauerochse.worklogviewer.toURL
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
@@ -59,7 +60,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     }
 
     fun saveChanges() {
-        settings.youTrackConnectionSettings.url = youTrackUrlProperty.get()
+        settings.youTrackConnectionSettings.baseUrl = youTrackUrlProperty.get().toURL()
         settings.youTrackConnectionSettings.version = youTrackVersionProperty.get()
         settings.youTrackConnectionSettings.username = youTrackUsernameProperty.get()
         settings.youTrackConnectionSettings.permanentToken = youTrackPermanentTokenProperty.get()
@@ -100,7 +101,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     }
 
     private fun applyPropertiesFromSettings() {
-        youTrackUrlProperty.set(settings.youTrackConnectionSettings.url)
+        youTrackUrlProperty.set(settings.youTrackConnectionSettings.baseUrl?.toExternalForm())
         youTrackVersionProperty.set(settings.youTrackConnectionSettings.version)
         youTrackUsernameProperty.set(settings.youTrackConnectionSettings.username)
         youTrackPermanentTokenProperty.set(settings.youTrackConnectionSettings.permanentToken)

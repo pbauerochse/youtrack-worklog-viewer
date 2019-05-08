@@ -67,8 +67,8 @@ class Http(
         }
     }
 
-    fun buildUrl(path: String): URL {
-        val baseUrlAsString = params.baseUrl.toExternalForm().trimEnd('/')
+    private fun buildUrl(path: String): URL {
+        val baseUrlAsString = params.baseUrl!!.toExternalForm().trimEnd('/')
         val pathCleansed = path.trim().trimStart('/')
         return URL("$baseUrlAsString/$pathCleansed")
     }

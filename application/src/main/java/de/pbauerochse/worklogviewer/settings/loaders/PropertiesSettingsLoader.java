@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.time.DayOfWeek;
 import java.util.Arrays;
@@ -86,7 +88,12 @@ public class PropertiesSettingsLoader {
 
     private void applyYouTrackConnectionSettings(Settings settings, Properties properties) {
         // youtrack version
-        settings.getYouTrackConnectionSettings().setUrl(properties.getProperty(YOUTRACK_URL_PROPERTY));
+        String urlProperty = properties.getProperty(YOUTRACK_URL_PROPERTY);
+        try {
+            settings.getYouTrackConnectionSettings().setBaseUrl(new URL(urlProperty));
+        } catch (MalformedURLException e) {
+            LOGGER.error("Invalid URL '{}' defined in properties", urlProperty, e);
+        }
         settings.getYouTrackConnectionSettings().setUsername(properties.getProperty(YOUTRACK_USERNAME_PROPERTY));
 
         String encryptedPermanentToken = properties.getProperty(YOUTRACK_PERMANENT_TOKEN);

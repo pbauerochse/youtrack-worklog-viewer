@@ -7,7 +7,7 @@ import java.net.URL
  * authenticate with a YouTrack instance
  */
 interface YouTrackConnectionSettings {
-    val version : YouTrackVersion
-    val baseUrl : URL
-    val permanentToken : String
+    var version : YouTrackVersion?
+    var baseUrl : URL?
+    var permanentToken : String?
 }

@@ -89,7 +89,7 @@ public class SettingsViewController implements Initializable {
     @FXML
     private CheckBox wednesdayHighlightCheckbox;
     @FXML
-    private CheckBox thursdayHighlightyouTrackUrlProperty.get()Checkbox;
+    private CheckBox thursdayHighlightCheckbox;
     @FXML
     private CheckBox fridayHighlightCheckbox;
     @FXML
