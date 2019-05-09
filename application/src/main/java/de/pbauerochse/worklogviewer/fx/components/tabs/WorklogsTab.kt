@@ -1,13 +1,15 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
-import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableView
-import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData
+import de.pbauerochse.worklogviewer.fx.components.treetable.TimeReportTreeTableView
 import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
+import de.pbauerochse.worklogviewer.view.ReportView
+import de.pbauerochse.worklogviewer.view.ReportViewFactory
+import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import javafx.geometry.Insets
 import javafx.geometry.Orientation
 import javafx.scene.Node
@@ -23,13 +25,13 @@ import org.slf4j.LoggerFactory
  */
 abstract class WorklogsTab(label: String) : Tab(label) {
 
-    private val worklogsTableView = WorklogsTreeTableView()
+    private val worklogsTableView = TimeReportTreeTableView()
     private val statisticsPane = StatisticsPane()
     private val splitPane = SplitPane(getWorklogsTableView()).apply { orientation = Orientation.HORIZONTAL }
     private val settingsModel = SettingsUtil.settingsViewModel
 
-    var currentData : WorklogsTreeTableViewData? = null
-    private var nextData : WorklogsTreeTableViewData? = null
+    var currentData : ReportView? = null
+    private var nextData : ReportView? = null
 
     init {
         content = splitPane
@@ -38,9 +40,9 @@ abstract class WorklogsTab(label: String) : Tab(label) {
         showStatisticsView(settingsModel.showStatisticsProperty.get())
     }
 
-    fun update(label: String, reportParameters: TimeReportParameters, issues: List<Issue>) {
+    fun update(label: String, filteredIssues : List<Issue>, reportParameters: TimeReportParameters, grouping: Grouping) {
         text = label
-        nextData = WorklogsTreeTableViewData(reportParameters, issues)
+        nextData = ReportViewFactory.convert(filteredIssues, reportParameters, grouping)
 
         if (isSelected) {
             renderContent()
@@ -100,7 +102,8 @@ abstract class WorklogsTab(label: String) : Tab(label) {
         val targetFile = fileChooser.showSaveDialog(content.scene.window)
         return targetFile?.let {
             LOGGER.debug("Exporting tab {} to excel {}", text, it.absoluteFile)
-            return ExportToExcelTask(text, currentData!!, it)
+            return null // TODO
+//            return ExportToExcelTask(text, currentData!!, it)
         }
     }
 

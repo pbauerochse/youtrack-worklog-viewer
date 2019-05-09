@@ -8,6 +8,7 @@ import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserA
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
+import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import javafx.scene.Node
 import org.slf4j.LoggerFactory
 
@@ -17,14 +18,9 @@ import org.slf4j.LoggerFactory
  */
 internal class AllWorklogsTab : WorklogsTab(getFormatted("view.main.tabs.all")) {
 
-    fun update(report: TimeReport) {
+    fun update(report: TimeReport, grouping: Grouping) {
         LOGGER.debug("Showing all worklogs")
-        val allIssues = report.issues
-//            .filter { it.hasTicketsWithOwnWorklogs() } ???
-//            .flatMap { it.issues }
-            .sorted()
-
-        update(text, report.reportParameters, allIssues)
+        update(text, report.issues, report.reportParameters, grouping)
     }
 
     override fun getStatistics(issues: List<Issue>): List<Node> {

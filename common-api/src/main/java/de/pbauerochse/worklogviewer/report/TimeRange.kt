@@ -6,6 +6,8 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+import java.time.temporal.WeekFields
+import java.util.*
 
 data class TimeRange(val start: LocalDate, val end: LocalDate) {
 
@@ -40,6 +42,12 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
 
         @JvmStatic
         fun currentWeek(): TimeRange {
+            val weekFields = WeekFields.of(Locale.getDefault())
+            val firstDayOfTheWeekForLocale = weekFields.firstDayOfWeek
+            val lastDayOfTheWeekForLocale = firstDayOfTheWeekForLocale.plus(6)
+
+            // TODO use first and last day of week instead of hardcoding it
+
             val now = LocalDate.now(ZoneId.systemDefault())
 
             val startDate = now.with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.value.toLong())
@@ -49,6 +57,12 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
 
         @JvmStatic
         fun lastWeek(): TimeRange {
+            val weekFields = WeekFields.of(Locale.getDefault())
+            val firstDayOfTheWeekForLocale = weekFields.firstDayOfWeek
+            val lastDayOfTheWeekForLocale = firstDayOfTheWeekForLocale.plus(6)
+
+            // TODO use first and last day of week instead of hardcoding it
+
             val now = LocalDate.now(ZoneId.systemDefault())
             val lastWeek = now.minus(1, ChronoUnit.WEEKS)
 

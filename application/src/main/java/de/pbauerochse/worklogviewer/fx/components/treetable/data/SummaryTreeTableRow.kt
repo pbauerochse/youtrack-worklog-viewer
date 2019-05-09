@@ -1,14 +1,14 @@
-package de.pbauerochse.worklogviewer.fx.components.treetable
+package de.pbauerochse.worklogviewer.fx.components.treetable.data
 
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import java.time.LocalDate
 
 /**
- * A row in the [WorklogsTreeTableView] containing
+ * A row in the [TimeReportTreeTableView] containing
  * the worlogs for a certain [Issue]
  */
-data class SummaryTreeTableRow(val issues: List<Issue>) : TreeTableRowModel {
+data class SummaryTreeTableRow(val issues: List<Issue>) : TimeReportRowModel {
 
     override val isSummaryRow: Boolean = true
     override val isIssueRow: Boolean = false

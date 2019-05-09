@@ -73,7 +73,7 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>) : StackPane(), Cha
                 toValue = 0.0
             }
         )
-        transition.onFinished = EventHandler { _ -> removeFromParent() }
+        transition.onFinished = EventHandler { removeFromParent() }
 
         transition.play()
     }

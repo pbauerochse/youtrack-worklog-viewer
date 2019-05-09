@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.settings
 
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion
-import de.pbauerochse.worklogviewer.domain.ReportTimerange
 import de.pbauerochse.worklogviewer.fx.Theme
+import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import de.pbauerochse.worklogviewer.toURL
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleBooleanProperty
@@ -31,7 +31,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val loadDataAtStartupProperty = SimpleBooleanProperty()
     val showDecimalsInExcelProperty = SimpleBooleanProperty()
     val enablePluginsProperty = SimpleBooleanProperty()
-    val lastUsedReportTimerangeProperty = SimpleObjectProperty<ReportTimerange>()
+    val lastUsedReportTimerangeProperty = SimpleObjectProperty<TimerangeProvider>()
     val startDateProperty = SimpleObjectProperty<LocalDate>()
     val endDateProperty = SimpleObjectProperty<LocalDate>()
     val lastUsedGroupByCategoryIdProperty = SimpleStringProperty()

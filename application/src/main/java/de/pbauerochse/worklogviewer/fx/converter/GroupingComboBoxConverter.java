@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.converter;
 
-import de.pbauerochse.worklogviewer.domain.GroupByParameter;
 import de.pbauerochse.worklogviewer.util.FormattingUtil;
+import de.pbauerochse.worklogviewer.view.grouping.Grouping;
 import javafx.scene.control.ComboBox;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
@@ -12,25 +12,25 @@ import java.util.Optional;
  * @author Patrick Bauerochse
  * @since 08.07.15
  */
-public class GroupByCategoryStringConverter extends StringConverter<GroupByParameter> {
+public class GroupingComboBoxConverter extends StringConverter<Grouping> {
 
-    private ComboBox<GroupByParameter> categoryComboBox;
+    private ComboBox<Grouping> categoryComboBox;
 
-    public GroupByCategoryStringConverter(ComboBox<GroupByParameter> categoryComboBox) {
+    public GroupingComboBoxConverter(ComboBox<Grouping> categoryComboBox) {
         this.categoryComboBox = categoryComboBox;
     }
 
     @Override
-    public String toString(GroupByParameter category) {
+    public String toString(Grouping category) {
         return Optional.ofNullable(category)
-                .map(GroupByParameter::getLabel)
-                .orElseGet(() -> FormattingUtil.getFormatted("view.main.groupby.nogroupby"));
+                .map(Grouping::getLabel)
+                .orElseGet(() -> FormattingUtil.getFormatted("grouping.none"));
     }
 
     @Override
-    public GroupByParameter fromString(String categoryName) {
+    public Grouping fromString(String categoryName) {
         // special "nothing-selected" item
-        if (StringUtils.equals(FormattingUtil.getFormatted("view.main.groupby.nogroupby"), categoryName)) {
+        if (StringUtils.equals(FormattingUtil.getFormatted("grouping.none"), categoryName)) {
             return null;
         }
 

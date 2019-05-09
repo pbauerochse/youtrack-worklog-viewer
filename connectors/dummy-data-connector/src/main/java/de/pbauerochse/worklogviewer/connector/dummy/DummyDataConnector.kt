@@ -38,7 +38,7 @@ class DummyDataConnector : YouTrackConnector {
     }
 
     private fun generateRandomUsers(): List<User> {
-        val amount = Random.nextInt(1, 25)
+        val amount = Random.nextInt(5, 25)
         LOGGER.info("Generating $amount Users")
         return (1 .. amount).map {
             User("User $it", "Firstname Lastname #$it")

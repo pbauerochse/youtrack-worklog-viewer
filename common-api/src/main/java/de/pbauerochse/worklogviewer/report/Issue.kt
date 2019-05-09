@@ -60,8 +60,7 @@ data class Issue(
     }
 
     override fun compareTo(other: Issue): Int {
-        val byProject = project.compareTo(other.project)
-        return when (byProject) {
+        return when (val byProject = project.compareTo(other.project)) {
             0 -> issueNumber.compareTo(other.issueNumber)
             else -> byProject
         }

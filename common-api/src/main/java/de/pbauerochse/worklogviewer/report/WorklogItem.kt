@@ -3,7 +3,7 @@ package de.pbauerochse.worklogviewer.report
 import java.time.LocalDate
 
 /**
- * Represents a single
+ * Represents a single time booking entry
  */
 data class WorklogItem(
     val issue : Issue,
@@ -12,5 +12,5 @@ data class WorklogItem(
     val durationInMinutes : Long,
     val description : String?,
     val workType : String?,
-    val groupingKey : String?
+    @Deprecated ("grouping will be done via 'views'") val groupingKey : String? // TODO remove this field
 )

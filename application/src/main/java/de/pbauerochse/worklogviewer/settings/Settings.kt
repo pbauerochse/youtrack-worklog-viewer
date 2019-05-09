@@ -5,12 +5,10 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import de.pbauerochse.worklogviewer.domain.ReportTimerange
 import de.pbauerochse.worklogviewer.fx.Theme
-import de.pbauerochse.worklogviewer.settings.jackson.LocalDateDeserializer
-import de.pbauerochse.worklogviewer.settings.jackson.LocalDateSerializer
-import de.pbauerochse.worklogviewer.settings.jackson.WeekdaySettingsDeserializer
-import de.pbauerochse.worklogviewer.settings.jackson.WeekdaySettingsSerializer
+import de.pbauerochse.worklogviewer.settings.jackson.*
+import de.pbauerochse.worklogviewer.timerange.CurrentWeekTimerangeProvider
+import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import java.time.DayOfWeek.SATURDAY
 import java.time.DayOfWeek.SUNDAY
 import java.time.LocalDate
@@ -48,7 +46,9 @@ class Settings {
      */
     var workHoursADay = 8
 
-    var lastUsedReportTimerange = ReportTimerange.THIS_WEEK
+    @JsonSerialize(using = TimerangeProviderSerializer::class)
+    @JsonDeserialize(using = TimerangeProviderDeserializer::class)
+    var lastUsedReportTimerange : TimerangeProvider = CurrentWeekTimerangeProvider
 
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonDeserialize(using = LocalDateDeserializer::class)

@@ -3,8 +3,8 @@ package de.pbauerochse.worklogviewer.excel
 import de.pbauerochse.worklogviewer.excel.columns.IssueLinkExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.IssueTimeSpentExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.SummaryExcelColumn
-import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData
 import de.pbauerochse.worklogviewer.report.TimeRange
+import de.pbauerochse.worklogviewer.view.ReportView
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Workbook
 import org.slf4j.LoggerFactory
@@ -19,7 +19,7 @@ object ExcelExporter {
     private val LOGGER = LoggerFactory.getLogger(ExcelExporter::class.java)
 
     @JvmStatic
-    fun createWorkbook(text: String, data: WorklogsTreeTableViewData): Workbook {
+    fun createWorkbook(text: String, data: ReportView): Workbook {
         LOGGER.info("Creating workbook for ${data.issues.size} '$text' Issues")
         val workbookWrapper = POIWorkbook(HSSFWorkbook())
         val sheet = workbookWrapper.createSheet(text)
@@ -29,30 +29,31 @@ object ExcelExporter {
         return workbookWrapper.workbook
     }
 
-    private fun renderData(data: WorklogsTreeTableViewData, sheet: POISheet) {
+    private fun renderData(data: ReportView, sheet: POISheet) {
         val cellWriters = getCellWriters(data.reportParameters.timerange)
         sheet.writeHeadlines(cellWriters.map { it.headline })
 
-        for (treeRow in data.treeRows) {
-            var row = sheet.createNextRow()
-
-            cellWriters.forEachIndexed { index, renderer ->
-                renderer.write(row, index, treeRow.value)
-            }
-            row.adjustHeight()
-
-            if (treeRow.value.isGroupByRow) {
-                treeRow.children.forEach {
-                    row = sheet.createNextRow()
-                    cellWriters.forEachIndexed { index, renderer ->
-                        renderer.write(row, index, it.value)
-                    }
-                    row.adjustHeight()
-                }
-
-                sheet.addSpacing(2)
-            }
-        }
+        // TODO
+//        for (treeRow in data.treeRows) {
+//            var row = sheet.createNextRow()
+//
+//            cellWriters.forEachIndexed { index, renderer ->
+//                renderer.write(row, index, treeRow.value)
+//            }
+//            row.adjustHeight()
+//
+//            if (treeRow.value.isGroupByRow) {
+//                treeRow.children.forEach {
+//                    row = sheet.createNextRow()
+//                    cellWriters.forEachIndexed { index, renderer ->
+//                        renderer.write(row, index, it.value)
+//                    }
+//                    row.adjustHeight()
+//                }
+//
+//                sheet.addSpacing(2)
+//            }
+//        }
 
         sheet.autoSizeColumns()
     }

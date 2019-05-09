@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.settings.loaders;
 
-import de.pbauerochse.worklogviewer.domain.ReportTimerange;
 import de.pbauerochse.worklogviewer.settings.Settings;
+import de.pbauerochse.worklogviewer.timerange.TimerangeProvider;
+import de.pbauerochse.worklogviewer.timerange.TimerangeProviders;
 import de.pbauerochse.worklogviewer.util.EncryptionUtil;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -183,8 +184,10 @@ public class PropertiesSettingsLoader {
         String autoloadDataTimerangeAsString = properties.getProperty(AUTOLOAD_DATA_TIMERANGE_PROPERTY);
         if (StringUtils.isNotBlank(autoloadDataTimerangeAsString)) {
             try {
-                ReportTimerange reportTimerange = ReportTimerange.valueOf(autoloadDataTimerangeAsString);
-                settings.setLastUsedReportTimerange(reportTimerange);
+                TimerangeProvider timerangeProvider = TimerangeProviders.fromKey(autoloadDataTimerangeAsString);
+                if (timerangeProvider != null) {
+                    settings.setLastUsedReportTimerange(timerangeProvider);
+                }
             } catch (IllegalArgumentException e) {
                 LOGGER.warn("Could not determine ReportTimerange by settings value {}", autoloadDataTimerangeAsString);
             }

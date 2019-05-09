@@ -1,9 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
 import de.pbauerochse.worklogviewer.excel.ExcelExporter;
-import de.pbauerochse.worklogviewer.fx.components.treetable.WorklogsTreeTableViewData;
 import de.pbauerochse.worklogviewer.tasks.Progress;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
+import de.pbauerochse.worklogviewer.view.ReportView;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -25,10 +25,10 @@ public class ExportToExcelTask extends WorklogViewerTask<File> {
     private static final Logger LOG = LoggerFactory.getLogger(ExportToExcelTask.class);
 
     private final String text;
-    private final WorklogsTreeTableViewData data;
+    private final ReportView data;
     private final File targetFile;
 
-    public ExportToExcelTask(String text, WorklogsTreeTableViewData data, File targetFile) {
+    public ExportToExcelTask(String text, ReportView data, File targetFile) {
         super(getFormatted("task.excelexport", text));
         this.text = text;
         this.data = data;

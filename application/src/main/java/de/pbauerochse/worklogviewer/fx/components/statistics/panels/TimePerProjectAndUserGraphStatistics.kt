@@ -6,7 +6,6 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.StackedBarChart
-import javafx.scene.chart.XYChart
 import javafx.scene.control.Tooltip
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
@@ -51,13 +50,13 @@ class TimePerProjectAndUserGraphStatistics(
 
     private fun renderStatistics() {
         statisticsData.userStatistics.forEach {
-            val series = XYChart.Series<Number, String>()
+            val series = Series<Number, String>()
             series.name = it.userDisplayLabel
 
             it.projectSummaries.forEach {
                 val timeSpentInHours = it.timeSpentInMinutes.toDouble() / 60.0
                 val formattedTime = formatMinutes(it.timeSpentInMinutes)
-                val data = XYChart.Data<Number, String>(timeSpentInHours, it.projectId)
+                val data = Data<Number, String>(timeSpentInHours, it.projectId)
                 series.data.add(data)
 
                 data.nodeProperty().addListener {_, _, newNode -> Tooltip.install(newNode, Tooltip("${series.name} - $formattedTime"))}

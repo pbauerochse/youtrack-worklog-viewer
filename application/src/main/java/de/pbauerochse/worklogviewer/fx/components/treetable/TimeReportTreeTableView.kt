@@ -1,6 +1,11 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import javafx.scene.control.TreeItem
+import de.pbauerochse.worklogviewer.fx.components.treetable.columns.IssueLinkColumn
+import de.pbauerochse.worklogviewer.fx.components.treetable.columns.IssueTimeSpentColumn
+import de.pbauerochse.worklogviewer.fx.components.treetable.columns.SummaryColumn
+import de.pbauerochse.worklogviewer.fx.components.treetable.data.TreeItemConverter
+import de.pbauerochse.worklogviewer.view.ReportGroup
+import de.pbauerochse.worklogviewer.view.ReportView
 import javafx.scene.control.TreeTableView
 import org.slf4j.LoggerFactory
 import java.time.temporal.ChronoUnit
@@ -8,21 +13,19 @@ import java.time.temporal.ChronoUnit
 /**
  * Displays the [de.pbauerochse.worklogviewer.report.Issue]s in a TreeTableView
  */
-class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
+class TimeReportTreeTableView : TreeTableView<ReportGroup>() {
 
     init {
         isShowRoot = false
     }
 
-    internal fun update(data: WorklogsTreeTableViewData) {
-        LOGGER.debug("Showing ${data.issues.size} Issues")
-        updateColumns(data)
-        root = TreeItem<TreeTableRowModel>().apply {
-            children.setAll(data.treeRows)
-        }
+    internal fun update(reportView: ReportView) {
+        LOGGER.debug("Showing ${reportView.issues.size} Issues")
+        updateColumns(reportView)
+        root = TreeItemConverter.convert(reportView)
     }
 
-    private fun updateColumns(data: WorklogsTreeTableViewData) {
+    private fun updateColumns(data: ReportView) {
         if (columns.isEmpty()) {
             columns.add(IssueLinkColumn())
             columns.add(SummaryColumn())
@@ -57,7 +60,7 @@ class WorklogsTreeTableView : TreeTableView<TreeTableRowModel>() {
     }
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(WorklogsTreeTableView::class.java)
+        private val LOGGER = LoggerFactory.getLogger(TimeReportTreeTableView::class.java)
     }
 
 }

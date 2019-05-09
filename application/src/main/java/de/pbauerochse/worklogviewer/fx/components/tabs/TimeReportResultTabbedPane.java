@@ -4,6 +4,7 @@ import de.pbauerochse.worklogviewer.report.Issue;
 import de.pbauerochse.worklogviewer.report.TimeReport;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
+import de.pbauerochse.worklogviewer.view.grouping.Grouping;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Extension of the TabPane that provides
@@ -28,15 +31,15 @@ public class TimeReportResultTabbedPane extends TabPane {
     /**
      * Updates this Pane with the given data
      */
-    public void update(@NotNull TimeReport timeReport) {
+    public void update(@NotNull TimeReport timeReport, @NotNull Grouping grouping) {
         LOGGER.debug("Updating data");
-        updateOwnWorklogs(timeReport);
-        updateAllWorklogs(timeReport);
-        updateProjectTabs(timeReport);
+        updateOwnWorklogs(timeReport, grouping);
+        updateAllWorklogs(timeReport, grouping);
+        updateProjectTabs(timeReport, grouping);
     }
 
-    private void updateOwnWorklogs(@NotNull TimeReport timeReport) {
-        getOwnWorklogsTab().update(timeReport);
+    private void updateOwnWorklogs(@NotNull TimeReport timeReport, @NotNull Grouping grouping) {
+        getOwnWorklogsTab().update(timeReport, grouping);
     }
 
     private OwnWorklogsTab getOwnWorklogsTab() {
@@ -47,9 +50,9 @@ public class TimeReportResultTabbedPane extends TabPane {
         return (OwnWorklogsTab) getTabs().get(0);
     }
 
-    private void updateAllWorklogs(TimeReport timeReport) {
+    private void updateAllWorklogs(TimeReport timeReport, @NotNull Grouping grouping) {
         if (settingsViewModel.getShowAllWorklogsProperty().get()) {
-            getAllWorklogsTab().update(timeReport);
+            getAllWorklogsTab().update(timeReport, grouping);
         } else {
             removeAllWorklogsTab();
         }
@@ -71,9 +74,9 @@ public class TimeReportResultTabbedPane extends TabPane {
         }
     }
 
-    private void updateProjectTabs(TimeReport timeReport) {
+    private void updateProjectTabs(@NotNull TimeReport timeReport, @NotNull Grouping grouping) {
         Map<String, List<Issue>> projectToIssues = timeReport.getIssues().stream()
-                .collect(Collectors.groupingBy(Issue::getProject));
+                .collect(groupingBy(Issue::getProject));
 
         List<String> projectNamesSorted = projectToIssues.keySet().stream().sorted().collect(Collectors.toList());
 
@@ -82,7 +85,7 @@ public class TimeReportResultTabbedPane extends TabPane {
             String project = projectNamesSorted.get(i);
             List<Issue> sortedIssues = projectToIssues.get(project).stream().sorted().collect(Collectors.toList());
             WorklogsTab tab = getOrCreateProjectTabAtIndex(firstProjectTabIndex + i);
-            tab.update(project, timeReport.getReportParameters(), sortedIssues);
+            tab.update(project, sortedIssues, timeReport.getReportParameters(), grouping);
         }
 
         int numTotalRequiredTabs = firstProjectTabIndex + projectNamesSorted.size();

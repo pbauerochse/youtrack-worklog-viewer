@@ -3,10 +3,10 @@ package de.pbauerochse.worklogviewer.excel.columns
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer
 import de.pbauerochse.worklogviewer.excel.POIRow
 import de.pbauerochse.worklogviewer.excel.POIWorkbook
-import de.pbauerochse.worklogviewer.fx.components.treetable.GroupedIssuesTreeTableRow
-import de.pbauerochse.worklogviewer.fx.components.treetable.IssueTreeTableRow
-import de.pbauerochse.worklogviewer.fx.components.treetable.SummaryTreeTableRow
-import de.pbauerochse.worklogviewer.fx.components.treetable.TreeTableRowModel
+import de.pbauerochse.worklogviewer.fx.components.treetable.columns.GroupedIssuesTreeTableRow
+import de.pbauerochse.worklogviewer.fx.components.treetable.data.IssueTreeTableRow
+import de.pbauerochse.worklogviewer.fx.components.treetable.data.SummaryTreeTableRow
+import de.pbauerochse.worklogviewer.fx.components.treetable.data.TimeReportRowModel
 import de.pbauerochse.worklogviewer.getYouTrackLink
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import org.apache.poi.ss.usermodel.Cell
@@ -18,7 +18,7 @@ class IssueLinkExcelColumn : ExcelColumnRenderer {
 
     override val headline: String = getFormatted("view.main.issue")
 
-    override fun write(row: POIRow, columnIndex: Int, value: TreeTableRowModel) {
+    override fun write(row: POIRow, columnIndex: Int, value: TimeReportRowModel) {
         val cell = row.createCell(columnIndex)
         val workbook = row.sheet.workbook
 

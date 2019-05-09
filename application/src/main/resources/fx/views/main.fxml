@@ -46,12 +46,16 @@
                                 <ComboBox fx:id="timerangeComboBox" prefWidth="150.0" />
                                 <DatePicker fx:id="startDatePicker" prefWidth="120.0" promptText="%view.main.startdate.prompt" />
                                 <DatePicker fx:id="endDatePicker" prefWidth="120.0" promptText="%view.main.enddate.prompt" />
-                                <ComboBox fx:id="groupByCategoryComboBox" prefWidth="220.0" promptText="%view.main.groupby.prompt" />
                                 <Button fx:id="fetchWorklogButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0">
                                     <tooltip>
                                         <Tooltip text="%view.main.download" />
                                     </tooltip>
                                 </Button>
+
+                                <Separator orientation="VERTICAL" />
+                                <ComboBox fx:id="groupByCategoryComboBox" prefWidth="220.0" promptText="%view.main.groupby.prompt" />
+
+                                <Separator orientation="VERTICAL" />
                                 <HBox fx:id="pluginsToolbarButtons" />
                             </items>
                         </ToolBar>

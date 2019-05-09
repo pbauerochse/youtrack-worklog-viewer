@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.fx.components.treetable
+package de.pbauerochse.worklogviewer.fx.components.treetable.columns
 
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.ALL_WORKLOGVIEWER_CLASSES
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.GROUP_CELL
@@ -6,9 +6,12 @@ import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.HIGHLIGH
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TIMESPENT_CELL
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TODAY_HIGHLIGHT_CELL
+import de.pbauerochse.worklogviewer.fx.components.treetable.data.IssueTreeTableRow
+import de.pbauerochse.worklogviewer.fx.components.treetable.data.SummaryTreeTableRow
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatDate
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
+import de.pbauerochse.worklogviewer.view.ReportGroup
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.Tooltip
@@ -21,14 +24,14 @@ import java.time.LocalDate
  * Displays the total spent time at a given
  * day for the Issue
  */
-internal class IssueTimeSpentColumn : TreeTableColumn<TreeTableRowModel, TimeSpentColumnData>() {
+internal class IssueTimeSpentColumn : TreeTableColumn<ReportGroup, TimeSpentColumnData>() {
 
     private val columnDateProperty = SimpleObjectProperty<LocalDate>()
 
     init {
         isSortable = false
         cellValueFactory = Callback { col -> SimpleObjectProperty(TimeSpentColumnData(columnDateProperty, col.value.value)) }
-        cellFactory = Callback { _ -> TimeSpentColumn() }
+        cellFactory = Callback { TimeSpentColumn() }
     }
 
     fun update(date: LocalDate) {
@@ -55,10 +58,10 @@ internal class IssueTimeSpentColumn : TreeTableColumn<TreeTableRowModel, TimeSpe
  */
 data class TimeSpentColumnData(
     val dateProperty: ReadOnlyObjectProperty<LocalDate>,
-    val rowModel: TreeTableRowModel
+    val rowModel: ReportGroup
 )
 
-private class TimeSpentColumn : TreeTableCell<TreeTableRowModel, TimeSpentColumnData>() {
+private class TimeSpentColumn : TreeTableCell<ReportGroup, TimeSpentColumnData>() {
 
     override fun updateItem(item: TimeSpentColumnData?, empty: Boolean) {
         super.updateItem(item, empty)
@@ -70,11 +73,12 @@ private class TimeSpentColumn : TreeTableCell<TreeTableRowModel, TimeSpentColumn
         if (!empty && item != null) {
             val date = item.dateProperty.get()
 
-            when {
-                item.rowModel.isGroupByRow -> handleGroupBy(date, item.rowModel as GroupedIssuesTreeTableRow)
-                item.rowModel.isIssueRow -> handleIssue(date, item.rowModel as IssueTreeTableRow)
-                item.rowModel.isSummaryRow -> handleSummary(date, item.rowModel as SummaryTreeTableRow)
-            }
+//            TODO
+//            when {
+//                item.rowModel.isGroupByRow -> handleGroupBy(date, item.rowModel as GroupedIssuesTreeTableRow)
+//                item.rowModel.isIssueRow -> handleIssue(date, item.rowModel as IssueTreeTableRow)
+//                item.rowModel.isSummaryRow -> handleSummary(date, item.rowModel as SummaryTreeTableRow)
+//            }
 
             when {
                 isHighlighted(date) -> styleClass.add(HIGHLIGHT_CELL)

@@ -1,10 +1,9 @@
-package de.pbauerochse.worklogviewer.fx.components.treetable
+package de.pbauerochse.worklogviewer.fx.components.treetable.columns
 
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.GROUP_CELL
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
-import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
+import de.pbauerochse.worklogviewer.view.ReportGroup
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.TreeTableCell
 import javafx.scene.control.TreeTableColumn
@@ -15,18 +14,18 @@ import javafx.util.Callback
  * for each Issue, as well as a total time
  * spent within the timerange row
  */
-internal class SummaryColumn : TreeTableColumn<TreeTableRowModel, TreeTableRowModel>(FormattingUtil.getFormatted("view.main.summary")) {
+internal class SummaryColumn : TreeTableColumn<ReportGroup, ReportGroup>(getFormatted("view.main.summary")) {
     init {
         isSortable = false
         cellValueFactory = Callback { col -> SimpleObjectProperty(col.value.value) }
-        cellFactory = Callback { _ -> SummaryCell() }
+        cellFactory = Callback { SummaryCell() }
         prefWidth = 120.0
     }
 }
 
-class SummaryCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel>() {
+class SummaryCell : TreeTableCell<ReportGroup, ReportGroup>() {
 
-    override fun updateItem(item: TreeTableRowModel?, empty: Boolean) {
+    override fun updateItem(item: ReportGroup?, empty: Boolean) {
         super.updateItem(item, empty)
 
         styleClass.removeAll(ComponentStyleClasses.ALL_WORKLOGVIEWER_CLASSES)
@@ -34,16 +33,16 @@ class SummaryCell : TreeTableCell<TreeTableRowModel, TreeTableRowModel>() {
         text = null
 
         if (!empty && item != null) {
-            val timeInMinutes = item.getTotalTimeSpent()
+            val timeInMinutes = item.totalDurationInMinutes
             if (timeInMinutes > 0) {
                 text = formatMinutes(timeInMinutes)
             }
-
-            when {
-                item.isSummaryRow -> styleClass.add(SUMMARY_CELL)
-                item.isIssueRow -> styleClass.add(SUMMARY_CELL)
-                item.isGroupByRow -> styleClass.add(GROUP_CELL)
-            }
+//          TODO
+//            when {
+//                item.isSummaryRow -> styleClass.add(SUMMARY_CELL)
+//                item.isIssueRow -> styleClass.add(SUMMARY_CELL)
+//                item.isGroupByRow -> styleClass.add(GROUP_CELL)
+//            }
         }
     }
 }

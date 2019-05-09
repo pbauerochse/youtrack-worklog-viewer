@@ -1,12 +1,11 @@
 package de.pbauerochse.worklogviewer.fx
 
 import de.pbauerochse.worklogviewer.WorklogViewer
-import de.pbauerochse.worklogviewer.domain.ReportTimerange
-import de.pbauerochse.worklogviewer.domain.timerangeprovider.TimerangeProviderFactory
 import de.pbauerochse.worklogviewer.fx.components.plugins.PluginMenu
 import de.pbauerochse.worklogviewer.fx.components.plugins.PluginToolbarActionGroup
 import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane
-import de.pbauerochse.worklogviewer.fx.converter.ReportTimerangeStringConverter
+import de.pbauerochse.worklogviewer.fx.converter.GroupingComboBoxConverter
+import de.pbauerochse.worklogviewer.fx.converter.TimerangeProviderStringConverter
 import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.tasks.CheckForUpdateTask
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
@@ -20,8 +19,14 @@ import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.setHref
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
+import de.pbauerochse.worklogviewer.timerange.CustomTimerangeProvider
+import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
+import de.pbauerochse.worklogviewer.timerange.TimerangeProviders
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.version.Version
+import de.pbauerochse.worklogviewer.view.grouping.Grouping
+import de.pbauerochse.worklogviewer.view.grouping.GroupingFactory
+import de.pbauerochse.worklogviewer.view.grouping.NoopGrouping
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
 import javafx.concurrent.WorkerStateEvent
@@ -44,10 +49,10 @@ import java.util.*
 class MainViewController : Initializable {
 
     @FXML
-    private lateinit var timerangeComboBox: ComboBox<ReportTimerange>
+    private lateinit var timerangeComboBox: ComboBox<TimerangeProvider>
 
-//    @FXML
-//    private lateinit var groupByCategoryComboBox: ComboBox<GroupByParameter>
+    @FXML
+    private lateinit var groupByCategoryComboBox: ComboBox<Grouping>
 
     @FXML
     private lateinit var fetchWorklogButton: Button
@@ -91,6 +96,8 @@ class MainViewController : Initializable {
     @FXML
     private lateinit var mainToolbar: ToolBar
 
+    private val currentTimeReportProperty = SimpleObjectProperty<TimeReport?>(null)
+
     private lateinit var taskRunner: TaskRunner
 
     private lateinit var resources: ResourceBundle
@@ -107,11 +114,11 @@ class MainViewController : Initializable {
         autoLoadLastUsedReport()
 
         initializeTimerangeComboBox()
-        initializeGroupByComboBox()
         initializeDatePickers()
         initializeFetchWorklogsButton()
         initializeMenuItems()
         initializePluginsMenu()
+        initializeGroupingComboBox()
 
         // workaround to detect whether the whole form has been rendered to screen yet
         mainToolbar.sceneProperty().addListener { _, oldValue, newValue ->
@@ -131,8 +138,8 @@ class MainViewController : Initializable {
 
     private fun initializeTimerangeComboBox() {
         timerangeComboBox.apply {
-            converter = ReportTimerangeStringConverter()
-            items.addAll(*ReportTimerange.values())
+            converter = TimerangeProviderStringConverter()
+            items.addAll(TimerangeProviders.allTimerangeProviders)
             selectionModel.select(settingsModel.lastUsedReportTimerangeProperty.get())
             selectionModel.selectedItemProperty().addListener { _, _, selectedTimerange -> timerangeChanged(selectedTimerange) }
         }
@@ -141,32 +148,41 @@ class MainViewController : Initializable {
         timerangeChanged(settingsModel.lastUsedReportTimerangeProperty.value)
     }
 
-    private fun timerangeChanged(newValue: ReportTimerange) {
+    private fun timerangeChanged(timerangeProvider: TimerangeProvider) {
         // prepopulate start and end datepickers and remove error labels
-        val timerangeProvider = TimerangeProviderFactory.getTimerangeProvider(newValue, startDatePicker.value, endDatePicker.value)
-        startDatePicker.value = timerangeProvider.timeRange.start
-        endDatePicker.value = timerangeProvider.timeRange.end
-        settingsModel.lastUsedReportTimerangeProperty.set(newValue)
+        val timerange = timerangeProvider.buildTimeRange(startDatePicker.value, endDatePicker.value)
+        startDatePicker.value = timerange.start
+        endDatePicker.value = timerange.end
+        settingsModel.lastUsedReportTimerangeProperty.set(timerangeProvider)
     }
 
-    private fun initializeGroupByComboBox() {
-//        groupByCategoryComboBox.apply {
-//            disableProperty().bind(groupByCategoryComboBox.itemsProperty().isNull)
-//            converter = GroupByCategoryStringConverter(groupByCategoryComboBox)
-//        }
-//
-//        // load group by criteria when connection parameters are present
-//        if (!settingsModel.hasMissingConnectionSettings.get()) {
-//            loadGroupByCriteriaFromYouTrack()
-//        }
+    private fun initializeGroupingComboBox() {
+        groupByCategoryComboBox.apply {
+            disableProperty().bind(currentTimeReportProperty.isNull)
+            converter = GroupingComboBoxConverter(groupByCategoryComboBox)
+            selectionModel.selectedItemProperty().addListener { _, _, groupByCategory -> updateDataView(groupByCategory) }
+        }
+
+        currentTimeReportProperty.apply {
+            addListener { _, _, newValue ->
+                groupByCategoryComboBox.items.clear()
+                newValue?.let { groupByCategoryComboBox.items.addAll(GroupingFactory.getAvailableGroupings(it)) }
+                // TODO set to last grouping value if present
+            }
+        }
     }
 
+    private fun updateDataView(grouping: Grouping) {
+        LOGGER.info("Changing Grouping to $grouping")
+        val timereport = currentTimeReportProperty.value!!
+        displayWorklogResult(timereport)
+    }
 
     private fun autoLoadLastUsedReport() {
         // auto load data if a named timerange was selected
         // and the user chose to load data at startup
-        if (timerangeComboBox.selectionModel.selectedItem != ReportTimerange.CUSTOM && settingsModel.loadDataAtStartupProperty.get()) {
-            LOGGER.debug("loadDataAtStartup set. Loading report for {}", timerangeComboBox.selectionModel.selectedItem.name)
+        if (settingsModel.loadDataAtStartupProperty.get()) {
+            LOGGER.debug("loadDataAtStartup set. Loading report for ${timerangeComboBox.selectionModel.selectedItem.settingsKey}")
             fetchWorklogButton.fire()
         }
     }
@@ -183,10 +199,10 @@ class MainViewController : Initializable {
             }
         }
 
-        startDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM))
+        startDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isEqualTo(CustomTimerangeProvider))
         startDatePicker.valueProperty().addListener(dateChangeListener)
 
-        endDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isNotEqualTo(ReportTimerange.CUSTOM))
+        endDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isNotEqualTo(CustomTimerangeProvider))
         endDatePicker.valueProperty().addListener(dateChangeListener)
 
         // value listener
@@ -194,7 +210,7 @@ class MainViewController : Initializable {
         endDatePicker.valueProperty().addListener { _, _, newValue -> settingsModel.endDateProperty.set(newValue) }
 
         // set value
-        if (settingsModel.lastUsedReportTimerangeProperty.get() == ReportTimerange.CUSTOM) {
+        if (settingsModel.lastUsedReportTimerangeProperty.get() == CustomTimerangeProvider) {
             startDatePicker.value = settingsModel.startDateProperty.get()
             endDatePicker.value = settingsModel.endDateProperty.get()
             dateChangeListener.changed(startDatePicker.valueProperty(), null, startDatePicker.value)
@@ -266,15 +282,14 @@ class MainViewController : Initializable {
     }
 
     private fun addDownloadLinkToToolbarIfNeverVersionPresent(event: WorkerStateEvent) {
-        val gitHubVersionOptional = (event.source as CheckForUpdateTask).value
-        gitHubVersionOptional.ifPresent { gitHubVersion ->
+        (event.source as CheckForUpdateTask).value?.let {
             val currentVersion = Version.fromVersionString(resources.getString("release.version"))
-            val mostRecentVersion = Version.fromVersionString(gitHubVersion.version)
+            val mostRecentVersion = Version.fromVersionString(it.version)
 
             LOGGER.debug("Most recent github version is {}, this version is {}", mostRecentVersion, currentVersion)
             if (mostRecentVersion.isNewerThan(currentVersion)) {
                 val link = Hyperlink(getFormatted("worker.updatecheck.available", mostRecentVersion.toString()))
-                link.setHref(gitHubVersion.url)
+                link.setHref(it.url)
                 mainToolbar.items.add(link)
             }
         }
@@ -318,7 +333,9 @@ class MainViewController : Initializable {
 
     private fun displayWorklogResult(timeReport: TimeReport) {
         LOGGER.info("Presenting TimeReport to the user")
-        resultTabPane.update(timeReport)
+        currentTimeReportProperty.value = timeReport
+        val grouping : Grouping = groupByCategoryComboBox.value ?: NoopGrouping
+        resultTabPane.update(timeReport, grouping)
     }
 
     private fun showSettingsDialogue() {

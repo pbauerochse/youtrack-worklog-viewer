@@ -1,14 +1,15 @@
-package de.pbauerochse.worklogviewer.fx.components.treetable
+package de.pbauerochse.worklogviewer.fx.components.treetable.columns
 
-import de.pbauerochse.worklogviewer.domain.GroupByParameter
+import de.pbauerochse.worklogviewer.fx.components.treetable.data.TimeReportRowModel
 import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import java.time.LocalDate
 
 /**
  * A headline, collapsable row in the [WorklogsTreeTableView] containing
  * one or more [Issue]s that belong to this group
  */
-data class GroupedIssuesTreeTableRow(val groupCategory: GroupByParameter, val groupValue: String?, val issues: List<Issue>) : TreeTableRowModel {
+data class GroupedIssuesTreeTableRow(val groupCategory: Grouping, val groupValue: String?, val issues: List<Issue>) : TimeReportRowModel {
 
     override val isSummaryRow: Boolean = false
     override val isIssueRow: Boolean = false

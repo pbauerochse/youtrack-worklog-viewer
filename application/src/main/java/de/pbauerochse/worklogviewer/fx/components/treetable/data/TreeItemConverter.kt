@@ -1,31 +1,32 @@
-package de.pbauerochse.worklogviewer.fx.components.treetable
+package de.pbauerochse.worklogviewer.fx.components.treetable.data
 
-import de.pbauerochse.worklogviewer.domain.GroupByParameter
+import de.pbauerochse.worklogviewer.fx.components.treetable.columns.GroupedIssuesTreeTableRow
 import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.TimeReportParameters
+import de.pbauerochse.worklogviewer.view.ReportGroup
+import de.pbauerochse.worklogviewer.view.ReportView
+import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import javafx.scene.control.TreeItem
 
 /**
  * Contains the data required for the [WorklogsTreeTableView]
  * to render the results
  */
-class WorklogsTreeTableViewData(
-    val reportParameters: TimeReportParameters,
-    val issues: List<Issue>
-) {
+object TreeItemConverter {
 
-    internal val treeRows: List<TreeItem<TreeTableRowModel>> by lazy {
-        /// TODO grouping
-//        val data = if (reportParameters.groupByParameter != null) {
-//            convertGrouped(reportParameters.groupByParameter!!, issues)
-//        } else {
-//            convertDefault(issues).toMutableList()
-//        }.toMutableList()
+    fun convert(reportView: ReportView): TreeItem<ReportGroup> {
+        val root: TreeItem<ReportGroup> = TreeItem()
+        convertAndAdd(root, reportView.groups)
+        return root
+    }
 
-        val data = convertDefault(issues).toMutableList()
-        data.add(TreeItem(SummaryTreeTableRow(issues)))
-
-        return@lazy data
+    private fun convertAndAdd(parent: TreeItem<ReportGroup>, groups: List<ReportGroup>) {
+        groups.asSequence()
+            .map {
+                val treeItem = TreeItem(it)
+                convertAndAdd(treeItem, it.children)
+                return@map treeItem
+            }
+            .forEach { parent.children.add(it) }
     }
 
     /**
@@ -33,11 +34,11 @@ class WorklogsTreeTableViewData(
      * introduces intermediate "folders" that contain
      * the actual issues
      */
-    private fun convertGrouped(groupByCategory: GroupByParameter, issues: List<Issue>): List<TreeItem<TreeTableRowModel>> {
+    private fun convertGrouped(groupByCategory: Grouping, issues: List<Issue>): List<TreeItem<TimeReportRowModel>> {
         return getIssuesByGroup(issues)
             .map {
                 val groupedRow = GroupedIssuesTreeTableRow(groupByCategory, it.key, it.value)
-                val groupTreeItem = TreeItem<TreeTableRowModel>(groupedRow)
+                val groupTreeItem = TreeItem<TimeReportRowModel>(groupedRow)
                 groupTreeItem.isExpanded = true
 
                 val childItems = convertDefault(it.value)
@@ -85,8 +86,8 @@ class WorklogsTreeTableViewData(
      * Converts each Issue in the list to a
      * single row in the TreeView
      */
-    private fun convertDefault(issues: List<Issue>): List<TreeItem<TreeTableRowModel>> {
-        val rowModels = issues.map { IssueTreeTableRow(it) as TreeTableRowModel }.toMutableList()
+    private fun convertDefault(issues: List<Issue>): List<TreeItem<TimeReportRowModel>> {
+        val rowModels = issues.map { IssueTreeTableRow(it) as TimeReportRowModel }.toMutableList()
         return rowModels.map { TreeItem(it) }
     }
 
