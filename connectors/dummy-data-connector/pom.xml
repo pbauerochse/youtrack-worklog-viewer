@@ -11,6 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dummy-data-connector</artifactId>
+    <name>YouTrack Worklog Viewer - Dummy Data Connector</name>
 
     <dependencies>
         <dependency>

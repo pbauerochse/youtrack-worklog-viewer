@@ -5,18 +5,15 @@ import de.pbauerochse.worklogviewer.view.grouping.Grouping;
 import javafx.scene.control.ComboBox;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-/**
- * @author Patrick Bauerochse
- * @since 08.07.15
- */
 public class GroupingComboBoxConverter extends StringConverter<Grouping> {
 
-    private ComboBox<Grouping> categoryComboBox;
+    private final ComboBox<Grouping> categoryComboBox;
 
-    public GroupingComboBoxConverter(ComboBox<Grouping> categoryComboBox) {
+    public GroupingComboBoxConverter(@NotNull ComboBox<Grouping> categoryComboBox) {
         this.categoryComboBox = categoryComboBox;
     }
 

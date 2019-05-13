@@ -48,7 +48,7 @@ class Settings {
 
     @JsonSerialize(using = TimerangeProviderSerializer::class)
     @JsonDeserialize(using = TimerangeProviderDeserializer::class)
-    var lastUsedReportTimerange : TimerangeProvider = CurrentWeekTimerangeProvider
+    var lastUsedReportTimerange: TimerangeProvider = CurrentWeekTimerangeProvider
 
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonDeserialize(using = LocalDateDeserializer::class)
@@ -59,6 +59,7 @@ class Settings {
     var endDate: LocalDate? = null
 
     var lastUsedGroupByCategoryId: String? = null
+    var lastUsedFilePath: String? = null
     var isLoadDataAtStartup = false
     var isShowStatistics = true
     var isShowAllWorklogs = true

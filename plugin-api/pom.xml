@@ -24,6 +24,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+            <artifactId>connector-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 

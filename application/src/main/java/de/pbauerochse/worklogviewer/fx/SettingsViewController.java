@@ -21,8 +21,7 @@ import java.util.ResourceBundle;
 import java.util.stream.IntStream;
 
 /**
- * FX Controller for the settings
- * dialog
+ * FX Controller for the settings dialog
  */
 public class SettingsViewController implements Initializable {
 

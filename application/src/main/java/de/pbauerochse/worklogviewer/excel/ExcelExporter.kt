@@ -4,7 +4,7 @@ import de.pbauerochse.worklogviewer.excel.columns.IssueLinkExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.IssueTimeSpentExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.SummaryExcelColumn
 import de.pbauerochse.worklogviewer.report.TimeRange
-import de.pbauerochse.worklogviewer.view.ReportView
+import de.pbauerochse.worklogviewer.report.view.ReportView
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Workbook
 import org.slf4j.LoggerFactory
@@ -33,30 +33,30 @@ object ExcelExporter {
         val cellWriters = getCellWriters(data.reportParameters.timerange)
         sheet.writeHeadlines(cellWriters.map { it.headline })
 
-        // TODO
-//        for (treeRow in data.treeRows) {
-//            var row = sheet.createNextRow()
-//
-//            cellWriters.forEachIndexed { index, renderer ->
-//                renderer.write(row, index, treeRow.value)
-//            }
-//            row.adjustHeight()
-//
-//            if (treeRow.value.isGroupByRow) {
-//                treeRow.children.forEach {
-//                    row = sheet.createNextRow()
-//                    cellWriters.forEachIndexed { index, renderer ->
-//                        renderer.write(row, index, it.value)
-//                    }
-//                    row.adjustHeight()
-//                }
-//
-//                sheet.addSpacing(2)
-//            }
-//        }
+        data.rows.forEach { dataRow ->
+            var excelRow = sheet.createNextRow()
+
+            cellWriters.forEachIndexed { index, columnRenderer ->
+                columnRenderer.write(excelRow, index, dataRow)
+            }
+            excelRow.adjustHeight()
+
+            if (dataRow.isGrouping) {
+                dataRow.children.forEach { childRow ->
+                    excelRow = sheet.createNextRow()
+                    cellWriters.forEachIndexed { innerIndex, innerColumnRenderer ->
+                        innerColumnRenderer.write(excelRow, innerIndex, childRow)
+                    }
+                    excelRow.adjustHeight()
+                }
+
+                sheet.addSpacing(2)
+            }
+        }
 
         sheet.autoSizeColumns()
     }
+
 
     private fun getCellWriters(timeRange: TimeRange): List<ExcelColumnRenderer> {
         val startDate = timeRange.start

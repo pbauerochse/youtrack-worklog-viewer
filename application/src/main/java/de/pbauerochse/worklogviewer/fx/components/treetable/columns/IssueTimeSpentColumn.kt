@@ -6,12 +6,13 @@ import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.HIGHLIGH
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TIMESPENT_CELL
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TODAY_HIGHLIGHT_CELL
-import de.pbauerochse.worklogviewer.fx.components.treetable.data.IssueTreeTableRow
-import de.pbauerochse.worklogviewer.fx.components.treetable.data.SummaryTreeTableRow
+import de.pbauerochse.worklogviewer.report.view.ReportRow
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatDate
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
-import de.pbauerochse.worklogviewer.view.ReportGroup
+import de.pbauerochse.worklogviewer.view.GroupReportRow
+import de.pbauerochse.worklogviewer.view.IssueReportRow
+import de.pbauerochse.worklogviewer.view.SummaryReportRow
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.Tooltip
@@ -24,7 +25,7 @@ import java.time.LocalDate
  * Displays the total spent time at a given
  * day for the Issue
  */
-internal class IssueTimeSpentColumn : TreeTableColumn<ReportGroup, TimeSpentColumnData>() {
+internal class IssueTimeSpentColumn : TreeTableColumn<ReportRow, TimeSpentColumnData>() {
 
     private val columnDateProperty = SimpleObjectProperty<LocalDate>()
 
@@ -58,10 +59,10 @@ internal class IssueTimeSpentColumn : TreeTableColumn<ReportGroup, TimeSpentColu
  */
 data class TimeSpentColumnData(
     val dateProperty: ReadOnlyObjectProperty<LocalDate>,
-    val rowModel: ReportGroup
+    val reportRow: ReportRow
 )
 
-private class TimeSpentColumn : TreeTableCell<ReportGroup, TimeSpentColumnData>() {
+private class TimeSpentColumn : TreeTableCell<ReportRow, TimeSpentColumnData>() {
 
     override fun updateItem(item: TimeSpentColumnData?, empty: Boolean) {
         super.updateItem(item, empty)
@@ -73,12 +74,11 @@ private class TimeSpentColumn : TreeTableCell<ReportGroup, TimeSpentColumnData>(
         if (!empty && item != null) {
             val date = item.dateProperty.get()
 
-//            TODO
-//            when {
-//                item.rowModel.isGroupByRow -> handleGroupBy(date, item.rowModel as GroupedIssuesTreeTableRow)
-//                item.rowModel.isIssueRow -> handleIssue(date, item.rowModel as IssueTreeTableRow)
-//                item.rowModel.isSummaryRow -> handleSummary(date, item.rowModel as SummaryTreeTableRow)
-//            }
+            when {
+                item.reportRow.isGrouping -> handleGroupBy(date, item.reportRow as GroupReportRow)
+                item.reportRow.isIssue -> handleIssue(date, item.reportRow as IssueReportRow)
+                item.reportRow.isSummary -> handleSummary(date, item.reportRow as SummaryReportRow)
+            }
 
             when {
                 isHighlighted(date) -> styleClass.add(HIGHLIGHT_CELL)
@@ -87,15 +87,15 @@ private class TimeSpentColumn : TreeTableCell<ReportGroup, TimeSpentColumnData>(
         }
     }
 
-    private fun handleGroupBy(date: LocalDate, row: GroupedIssuesTreeTableRow) {
-        val totalTimeSpentInMinutes = row.totalTimeSpentOn(date)
+    private fun handleGroupBy(date: LocalDate, row: GroupReportRow) {
+        val totalTimeSpentInMinutes = row.getDurationInMinutes(date)
         if (totalTimeSpentInMinutes > 0) {
             text = formatMinutes(totalTimeSpentInMinutes)
         }
         styleClass.add(GROUP_CELL)
     }
 
-    private fun handleIssue(date: LocalDate, row: IssueTreeTableRow) {
+    private fun handleIssue(date: LocalDate, row: IssueReportRow) {
         val timeSpentInMinutes = row.issue.getTimeInMinutesSpentOn(date)
         if (timeSpentInMinutes > 0) {
             text = formatMinutes(timeSpentInMinutes)
@@ -104,8 +104,8 @@ private class TimeSpentColumn : TreeTableCell<ReportGroup, TimeSpentColumnData>(
         }
     }
 
-    private fun handleSummary(date: LocalDate, row: SummaryTreeTableRow) {
-        val totalTimeSpentInMinutes = row.getTotalTimeSpentOn(date)
+    private fun handleSummary(date: LocalDate, row: SummaryReportRow) {
+        val totalTimeSpentInMinutes = row.getDurationInMinutes(date)
         if (totalTimeSpentInMinutes > 0) {
             text = formatMinutes(totalTimeSpentInMinutes)
             styleClass.add(SUMMARY_CELL)

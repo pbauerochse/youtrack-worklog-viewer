@@ -1,59 +1,26 @@
 package de.pbauerochse.worklogviewer.fx.plugins
 
+import de.pbauerochse.worklogviewer.connector.YouTrackConnector
+import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
 import de.pbauerochse.worklogviewer.plugins.actions.PluginActionContext
+import de.pbauerochse.worklogviewer.plugins.dialog.WorklogViewerDialog
+import de.pbauerochse.worklogviewer.plugins.formatter.YouTrackWorktimeFormatter
 import de.pbauerochse.worklogviewer.plugins.state.WorklogViewerState
-import de.pbauerochse.worklogviewer.plugins.tools.WorklogViewerTools
+import de.pbauerochse.worklogviewer.plugins.tasks.TaskRunner
+import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.util.ExceptionUtil
+import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
 
-class PluginActionContextAdapter : PluginActionContext {
+class PluginActionContextAdapter(
+    override val taskRunner: TaskRunner,
+    override val dialog: WorklogViewerDialog,
     override val state: WorklogViewerState
-        get() = WorklogViewerStateAdapter()
+) : PluginActionContext {
 
-    override val tools: WorklogViewerTools
-        get() = WorklogViewerToolsAdapter()
+    override val connector: YouTrackConnector
+        get() = YouTrackConnectorLocator.getActiveConnector() ?: throw ExceptionUtil.getIllegalStateException("exceptions.notsetyet", YouTrackConnector::class.java.simpleName)
 
+    override val timesFormatter: YouTrackWorktimeFormatter
+        get() = WorklogTimeFormatter(SettingsUtil.settingsViewModel.workhoursProperty.value)
 
-//    override val http: Http
-//        get() = Http(settingsModel.settings.youTrackConnectionSettings)
-//
-//    override val connector: YouTrackConnector?
-//        get() = YouTrackConnectorLocator.getActiveConnector()
-//
-//    override var currentTimeReport: TimeReport? = null
-//
-//    override val currentlyVisibleIssues: TabContext?
-//        get() = resultTabPane.currentlyVisibleTab.currentData?.let {
-//            TabContext(it.reportParameters, it.issues)
-//        }
-//
-//    override val timesFormatter: WorktimeFormatter
-//        get() = WorklogTimeFormatter(settingsModel.workhoursProperty.get())
-//
-//    @Suppress("UNCHECKED_CAST")
-//    override fun <T> triggerTask(task: AsyncTask<T>, callback: ((T?) -> Unit)?) {
-//        val pluginTask = PluginTask(task)
-//        pluginTask.setOnSucceeded { callback?.invoke(it.source.value as T?) }
-//        taskRunner.startTask(pluginTask)
-//    }
-//
-//    override fun showInPopup(fxmlUrl: URL, specs: PopupSpecification) {
-//        mainToolbar.scene.openDialog(fxmlUrl, specs)
-//    }
-//
-//    override fun showSaveFileDialog(spec: FileChooserSpec): File? {
-//        return fileChooser(spec).showSaveDialog(resultTabPane.scene.window)
-//    }
-//
-//    override fun showOpenFileDialog(spec: FileChooserSpec): File? {
-//        return fileChooser(spec).showOpenDialog(resultTabPane.scene.window)
-//    }
-
-//    private fun fileChooser(spec: FileChooserSpecification): FileChooser {
-//        return FileChooser().apply {
-//            title = spec.title
-//            initialFileName = spec.initialFileName
-//            selectedExtensionFilter = spec.fileType?.let {
-//                FileChooser.ExtensionFilter(it.description, it.extension)
-//            }
-//        }
-//    }
 }

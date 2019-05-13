@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.plugins
 
-import de.pbauerochse.worklogviewer.fx.openDialog
+import de.pbauerochse.worklogviewer.fx.dialog.Dialog
 import de.pbauerochse.worklogviewer.plugins.WorklogViewerPlugin
 import de.pbauerochse.worklogviewer.plugins.actions.PluginActionContext
 import de.pbauerochse.worklogviewer.plugins.actions.PluginMenuItem
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
  *
  * Will also contain all MenuItems for each [WorklogViewerPlugin.menuItems]
  */
-class PluginMenu(private val plugin: WorklogViewerPlugin, private val pluginActionContext: PluginActionContext) : Menu(plugin.name) {
+class PluginMenu(private val plugin: WorklogViewerPlugin, private val pluginContextFactory: () -> PluginActionContext) : Menu(plugin.name) {
 
     init {
         addPluginActions()
@@ -45,12 +45,12 @@ class PluginMenu(private val plugin: WorklogViewerPlugin, private val pluginActi
 
     private fun triggerMenuItemAction(pluginMenuItem: PluginMenuItem) {
         LOGGER.debug("Plugin Action triggered: ${plugin.name} -> ${pluginMenuItem.name}")
-        pluginMenuItem.actionHandler.onAction(pluginActionContext)
+        pluginMenuItem.actionHandler.onAction(pluginContextFactory.invoke())
     }
 
     private fun showPluginInfoPopup() {
         LOGGER.info("Showing Plugin Popup for ${plugin.name}")
-        parentPopup.scene.openDialog(PluginDetailPopupContent(plugin), DialogSpecification(plugin.name))
+        Dialog(parentPopup.scene).openDialog(PluginDetailPopupContent(plugin), DialogSpecification(plugin.name))
     }
 
     companion object {

@@ -21,11 +21,14 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
 
     override fun getTimeReport(parameters: TimeReportParameters, progress: Progress): TimeReport {
         LOGGER.info("Fetching TimeReport for ${parameters.timerange}")
-        val issues = fetchIssuesWithWorkItems(parameters.timerange, progress)
+        val workItems = fetchWorkItems(parameters.timerange, progress.subProgress(70))
+        val issues = createIssues(workItems, progress.subProgress(30))
+
+        progress.setProgress(i18n("done"), 100)
         return TimeReport(parameters, issues)
     }
 
-    private fun fetchIssuesWithWorkItems(timerange: TimeRange, progress: Progress): List<Issue> {
+    private fun fetchWorkItems(timerange: TimeRange, progress: Progress): List<YouTrackWorkItem> {
         LOGGER.info("Fetching WorkItems for $timerange")
         progress.setProgress(i18n("fetching.workitems", timerange.formattedForLocale), 1)
 
@@ -47,18 +50,25 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
             val currentWorkItemsBatch: List<YouTrackWorkItem> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorkItem>>() {})
             LOGGER.debug("Got ${currentWorkItemsBatch.size} WorkItems")
 
-            progress.setProgress(i18n("fetching.workitems", timerange.formattedForLocale), 1)
+            progress.setProgress(i18n("fetching.workitems", timerange.formattedForLocale), 10)
             workItems.addAll(currentWorkItemsBatch)
             keepOnFetching = currentWorkItemsBatch.size == MAX_WORKITEMS_PER_BATCH
         }
 
-        return createIssues(workItems)
+        progress.setProgress(i18n("done"), 100)
+        return workItems
     }
 
-    private fun createIssues(workItems: List<YouTrackWorkItem>): List<Issue> {
+    private fun createIssues(workItems: List<YouTrackWorkItem>, progress: Progress): List<Issue> {
+        val subprogress = progress.subProgress(workItems.size)
+
         return workItems.asSequence()
             .groupBy { it.issue.id }
-            .map { createIssue(it.value[0].issue, it.value) }
+            .map {
+                val youtrackIssue = it.value[0].issue
+                subprogress.incrementProgress(i18n("converting.issues", youtrackIssue.id), 1)
+                createIssue(youtrackIssue, it.value)
+            }
     }
 
     private fun createIssue(youtrackIssue: YouTrackIssue, workItems: List<YouTrackWorkItem>): Issue {

@@ -18,8 +18,8 @@ public class ProgressHandler implements Progress {
     @Nullable
     private final ProgressHandler parentProgressHandler;
 
-    private DoubleProperty currentValue = new SimpleDoubleProperty(0.0);
-    private StringProperty currentMessage = new SimpleStringProperty("");
+    private final DoubleProperty currentValue = new SimpleDoubleProperty(0.0);
+    private final StringProperty currentMessage = new SimpleStringProperty("");
 
     public ProgressHandler() {
         this(100d, null);

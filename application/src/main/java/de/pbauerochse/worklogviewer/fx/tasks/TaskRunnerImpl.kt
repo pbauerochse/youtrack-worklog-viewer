@@ -1,5 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tasks
 
+import de.pbauerochse.worklogviewer.plugins.tasks.PluginTask
+import de.pbauerochse.worklogviewer.plugins.tasks.TaskCallback
+import de.pbauerochse.worklogviewer.plugins.tasks.TaskRunner
+import de.pbauerochse.worklogviewer.tasks.Progress
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import javafx.concurrent.Service
 import javafx.css.Styleable
@@ -13,10 +17,19 @@ import java.util.concurrent.Future
  * Starts async Tasks and sets the UI state
  * according to the Task state
  */
-class TaskRunner(
+class TaskRunnerImpl(
     private val parent: Pane,
     private val waitScreenOverlay: StackPane
-) {
+) : TaskRunner {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> start(task: PluginTask<T>, callback: TaskCallback<T>?) {
+        val pluginTask = object : WorklogViewerTask<T?>(task.label) {
+            override fun start(progress: Progress): T? = task.run(progress)
+        }
+        pluginTask.setOnSucceeded { callback?.invoke(it.source.value as T?) }
+        startTask(pluginTask)
+    }
 
     fun <T> startService(service : Service<T>) {
         service.executor = EXECUTOR
@@ -123,7 +136,7 @@ class TaskRunner(
     }
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(TaskRunner::class.java)
+        private val LOGGER = LoggerFactory.getLogger(TaskRunnerImpl::class.java)
 
         private const val ERROR_CLASS = "error"
         private const val RUNNING_CLASS = "running"

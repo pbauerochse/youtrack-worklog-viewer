@@ -3,11 +3,12 @@ package de.pbauerochse.worklogviewer.fx.components.tabs
 import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
 import de.pbauerochse.worklogviewer.fx.components.treetable.TimeReportTreeTableView
 import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask
+import de.pbauerochse.worklogviewer.plugins.state.TabContext
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
+import de.pbauerochse.worklogviewer.report.view.ReportView
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
-import de.pbauerochse.worklogviewer.view.ReportView
 import de.pbauerochse.worklogviewer.view.ReportViewFactory
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import javafx.geometry.Insets
@@ -18,12 +19,13 @@ import javafx.scene.control.Tab
 import javafx.scene.layout.AnchorPane
 import javafx.stage.FileChooser
 import org.slf4j.LoggerFactory
+import java.io.File
 
 /**
  * Abstract class to display parts of the result
  * of a [de.pbauerochse.worklogviewer.report.TimeReport]
  */
-abstract class WorklogsTab(label: String) : Tab(label) {
+abstract class WorklogsTab(label: String) : Tab(label), TabContext {
 
     private val worklogsTableView = TimeReportTreeTableView()
     private val statisticsPane = StatisticsPane()
@@ -98,14 +100,18 @@ abstract class WorklogsTab(label: String) : Tab(label) {
         fileChooser.title = FormattingUtil.getFormatted("view.menu.file.exportexcel")
         fileChooser.initialFileName = "${text}_$timerange.xls"
         fileChooser.selectedExtensionFilter = FileChooser.ExtensionFilter("Microsoft Excel", "*.xls")
+        fileChooser.initialDirectory = settingsModel.lastUsedFilePath.get()?.let { File(it) } ?: File(System.getProperty("user.home"))
 
         val targetFile = fileChooser.showSaveDialog(content.scene.window)
         return targetFile?.let {
             LOGGER.debug("Exporting tab {} to excel {}", text, it.absoluteFile)
-            return null // TODO
-//            return ExportToExcelTask(text, currentData!!, it)
+            settingsModel.lastUsedFilePath.set(targetFile.parentFile.absolutePath)
+            return ExportToExcelTask(text, currentData!!, it)
         }
     }
+
+    override val view: ReportView
+        get() = this.currentData!!
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(WorklogsTab::class.java)

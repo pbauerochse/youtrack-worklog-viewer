@@ -14,7 +14,7 @@ internal class TimerangeProvidersTest {
     private lateinit var end: LocalDate
 
     @BeforeEach
-    internal fun setup() {
+    fun setup() {
         start = LocalDate.now().minusDays(Random.nextLong(5, 50))
         end = LocalDate.now().plusDays(Random.nextLong(5, 50))
     }

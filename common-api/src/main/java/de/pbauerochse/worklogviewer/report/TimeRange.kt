@@ -1,8 +1,5 @@
 package de.pbauerochse.worklogviewer.report
 
-import de.pbauerochse.worklogviewer.isSameDayOrAfter
-import de.pbauerochse.worklogviewer.isSameDayOrBefore
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -19,10 +16,6 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
 
     override fun toString(): String {
         return "${start.format(ISO_DATE_FORMATTER)} - ${end.format(ISO_DATE_FORMATTER)}"
-    }
-
-    fun isIncluded(date: LocalDate): Boolean {
-        return date.isSameDayOrAfter(start) && date.isSameDayOrBefore(end)
     }
 
     companion object {
@@ -55,12 +48,10 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
             val firstDayOfTheWeekForLocale = weekFields.firstDayOfWeek
             val lastDayOfTheWeekForLocale = firstDayOfTheWeekForLocale.plus(6)
 
-            // TODO use first and last day of week instead of hardcoding it
-
             val now = LocalDate.now(ZoneId.systemDefault())
 
-            val startDate = now.with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.value.toLong())
-            val endDate = now.with(ChronoField.DAY_OF_WEEK, DayOfWeek.SUNDAY.value.toLong())
+            val startDate = now.with(ChronoField.DAY_OF_WEEK, firstDayOfTheWeekForLocale.value.toLong())
+            val endDate = now.with(ChronoField.DAY_OF_WEEK, lastDayOfTheWeekForLocale.value.toLong())
             return TimeRange(startDate, endDate)
         }
 
@@ -70,13 +61,11 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
             val firstDayOfTheWeekForLocale = weekFields.firstDayOfWeek
             val lastDayOfTheWeekForLocale = firstDayOfTheWeekForLocale.plus(6)
 
-            // TODO use first and last day of week instead of hardcoding it
-
             val now = LocalDate.now(ZoneId.systemDefault())
             val lastWeek = now.minus(1, ChronoUnit.WEEKS)
 
-            val startDate = lastWeek.with(ChronoField.DAY_OF_WEEK, DayOfWeek.MONDAY.value.toLong())
-            val endDate = lastWeek.with(ChronoField.DAY_OF_WEEK, DayOfWeek.SUNDAY.value.toLong())
+            val startDate = lastWeek.with(ChronoField.DAY_OF_WEEK, firstDayOfTheWeekForLocale.value.toLong())
+            val endDate = lastWeek.with(ChronoField.DAY_OF_WEEK, lastDayOfTheWeekForLocale.value.toLong())
             return TimeRange(startDate, endDate)
         }
 

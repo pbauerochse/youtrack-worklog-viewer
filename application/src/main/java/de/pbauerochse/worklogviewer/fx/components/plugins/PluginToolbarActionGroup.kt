@@ -11,7 +11,7 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.HBox
 import org.slf4j.LoggerFactory
 
-class PluginToolbarActionGroup(private val plugin: WorklogViewerPlugin, private val pluginActionContext: PluginActionContext) : HBox() {
+class PluginToolbarActionGroup(private val plugin: WorklogViewerPlugin, private val contextFactory : () -> PluginActionContext) : HBox() {
 
     init {
         isVisible = plugin.toolbarButtons.isNotEmpty()
@@ -34,7 +34,7 @@ class PluginToolbarActionGroup(private val plugin: WorklogViewerPlugin, private 
 
     private fun triggerToolbarAction(pluginToolbarButton: PluginToolbarButton) {
         LOGGER.debug("Plugin Toolbar Action triggered: ${plugin.name} -> ${pluginToolbarButton.tooltip}")
-        pluginToolbarButton.actionHandler.onAction(pluginActionContext)
+        pluginToolbarButton.actionHandler.onAction(contextFactory.invoke())
     }
 
     companion object {

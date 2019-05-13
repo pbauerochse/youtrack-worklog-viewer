@@ -3,9 +3,8 @@ package de.pbauerochse.worklogviewer.fx.components.treetable
 import de.pbauerochse.worklogviewer.fx.components.treetable.columns.IssueLinkColumn
 import de.pbauerochse.worklogviewer.fx.components.treetable.columns.IssueTimeSpentColumn
 import de.pbauerochse.worklogviewer.fx.components.treetable.columns.SummaryColumn
-import de.pbauerochse.worklogviewer.fx.components.treetable.data.TreeItemConverter
-import de.pbauerochse.worklogviewer.view.ReportGroup
-import de.pbauerochse.worklogviewer.view.ReportView
+import de.pbauerochse.worklogviewer.report.view.ReportRow
+import de.pbauerochse.worklogviewer.report.view.ReportView
 import javafx.scene.control.TreeTableView
 import org.slf4j.LoggerFactory
 import java.time.temporal.ChronoUnit
@@ -13,7 +12,7 @@ import java.time.temporal.ChronoUnit
 /**
  * Displays the [de.pbauerochse.worklogviewer.report.Issue]s in a TreeTableView
  */
-class TimeReportTreeTableView : TreeTableView<ReportGroup>() {
+class TimeReportTreeTableView : TreeTableView<ReportRow>() {
 
     init {
         isShowRoot = false

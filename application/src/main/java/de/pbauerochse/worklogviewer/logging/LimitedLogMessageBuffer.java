@@ -10,7 +10,7 @@ import java.util.List;
  */
 class LimitedLogMessageBuffer implements LogMessageListener {
 
-    private LinkedList<String> logMessages;
+    private final LinkedList<String> logMessages;
     private int maxLogLines;
 
     LimitedLogMessageBuffer(int maxLogLines) {

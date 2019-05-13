@@ -10,6 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <name>YouTrack Worklog Viewer - 2019.x Connector</name>
     <artifactId>connector-2019.x</artifactId>
 
     <dependencies>

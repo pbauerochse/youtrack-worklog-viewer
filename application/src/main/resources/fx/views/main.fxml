@@ -51,8 +51,6 @@
                                         <Tooltip text="%view.main.download" />
                                     </tooltip>
                                 </Button>
-
-                                <Separator orientation="VERTICAL" />
                                 <ComboBox fx:id="groupByCategoryComboBox" prefWidth="220.0" promptText="%view.main.groupby.prompt" />
 
                                 <Separator orientation="VERTICAL" />

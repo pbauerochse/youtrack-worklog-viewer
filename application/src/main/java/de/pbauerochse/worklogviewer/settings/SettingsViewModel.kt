@@ -12,7 +12,6 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ChangeListener
 import java.time.DayOfWeek.*
 import java.time.LocalDate
-import java.util.function.Consumer
 
 /**
  * Java FX Model for the settings screen
@@ -35,6 +34,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val startDateProperty = SimpleObjectProperty<LocalDate>()
     val endDateProperty = SimpleObjectProperty<LocalDate>()
     val lastUsedGroupByCategoryIdProperty = SimpleStringProperty()
+    val lastUsedFilePath = SimpleStringProperty()
 
     val collapseStateMondayProperty = SimpleBooleanProperty()
     val collapseStateTuesdayProperty = SimpleBooleanProperty()
@@ -114,6 +114,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         showDecimalsInExcelProperty.set(settings.isShowDecimalHourTimesInExcelReport)
         enablePluginsProperty.set(settings.isEnablePlugins)
         lastUsedReportTimerangeProperty.set(settings.lastUsedReportTimerange)
+        lastUsedFilePath.set(settings.lastUsedFilePath)
         startDateProperty.set(settings.startDate)
         endDateProperty.set(settings.endDate)
         lastUsedGroupByCategoryIdProperty.set(settings.lastUsedGroupByCategoryId)
@@ -148,14 +149,15 @@ class SettingsViewModel internal constructor(val settings: Settings) {
      * in the settings view.
      */
     private fun bindAutoUpdatingProperties() {
-        lastUsedReportTimerangeProperty.addListener(invokeSetter(Consumer { settings.lastUsedReportTimerange = it }))
-        lastUsedGroupByCategoryIdProperty.addListener(invokeSetter(Consumer { settings.lastUsedGroupByCategoryId = it }))
-        startDateProperty.addListener(invokeSetter(Consumer { settings.startDate = it }))
-        endDateProperty.addListener(invokeSetter(Consumer { settings.endDate = it }))
+        lastUsedReportTimerangeProperty.addListener(invokeSetter { settings.lastUsedReportTimerange = it })
+        lastUsedGroupByCategoryIdProperty.addListener(invokeSetter { settings.lastUsedGroupByCategoryId = it })
+        startDateProperty.addListener(invokeSetter { settings.startDate = it })
+        endDateProperty.addListener(invokeSetter { settings.endDate = it })
+        lastUsedFilePath.addListener(invokeSetter { settings.lastUsedFilePath = it })
     }
 
-    private fun <T> invokeSetter(setter: Consumer<T>): ChangeListener<T> {
-        return ChangeListener { _, _, newValue -> setter.accept(newValue) }
+    private fun <T> invokeSetter(block: (t : T) -> Unit): ChangeListener<T> {
+        return ChangeListener { _, _, newValue -> block.invoke(newValue) }
     }
 
 }

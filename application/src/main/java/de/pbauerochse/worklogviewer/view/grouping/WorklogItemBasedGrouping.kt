@@ -2,17 +2,18 @@ package de.pbauerochse.worklogviewer.view.grouping
 
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.WorklogItem
+import de.pbauerochse.worklogviewer.report.view.ReportRow
 import de.pbauerochse.worklogviewer.view.GroupReportRow
-import de.pbauerochse.worklogviewer.view.IssueReportGroup
-import de.pbauerochse.worklogviewer.view.ReportGroup
+import de.pbauerochse.worklogviewer.view.IssueReportRow
 import de.pbauerochse.worklogviewer.view.grouping.Grouping.Companion.UNGROUPED
 
 internal class WorklogItemBasedGrouping(
+    override val id: String,
     override val label: String,
     private val worklogItemGroupingKeyExtractor: (WorklogItem) -> String?
 ) : Grouping {
 
-    override fun group(issues: List<Issue>): List<ReportGroup> {
+    override fun rows(issues: List<Issue>): List<ReportRow> {
         val groupedWorklogs = groupedWorklogs(issues)
 
         return groupedWorklogs.map {
@@ -28,5 +29,7 @@ internal class WorklogItemBasedGrouping(
     private fun issueRows(worklogItems: List<WorklogItem>) = worklogItems.asSequence()
         .groupBy { it.issue }
         .map { Issue(it.key, it.key.fields, it.value) }
-        .map { IssueReportGroup(it) }
+        .map { IssueReportRow(it) }
+
+    override fun toString(): String = "${javaClass.name} for $label"
 }
