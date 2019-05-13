@@ -22,6 +22,9 @@ internal class FieldBasedGrouping(private val field: Field) : Grouping {
         }
 
     private fun getFieldValue(issue: Issue): String {
-        return issue.fields.find { it.name == field.name }?.value ?: UNGROUPED
+        return issue.fields
+            .find { it.name == field.name }
+            ?.value?.sorted()
+            ?.joinToString(", ") ?: UNGROUPED
     }
 }

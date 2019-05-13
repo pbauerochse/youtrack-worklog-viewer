@@ -11,6 +11,5 @@ data class WorklogItem(
     val date : LocalDate,
     val durationInMinutes : Long,
     val description : String?,
-    val workType : String?,
-    @Deprecated ("grouping will be done via 'views'") val groupingKey : String? // TODO remove this field
+    val workType : String?
 )

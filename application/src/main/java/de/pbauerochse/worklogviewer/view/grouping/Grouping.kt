@@ -6,7 +6,7 @@ import de.pbauerochse.worklogviewer.view.ReportGroup
 
 interface Grouping {
     companion object {
-        val UNGROUPED = getFormatted("grouping.none")
+        val UNGROUPED : String = getFormatted("grouping.none")
     }
 
     val label : String

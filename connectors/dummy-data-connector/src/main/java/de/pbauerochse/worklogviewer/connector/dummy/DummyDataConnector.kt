@@ -82,15 +82,22 @@ class DummyDataConnector : YouTrackConnector {
             val durationInMinutes = durationInQuarterHours * 15
             val workType = getRandomWorkType()
 
-            val worklogItem = WorklogItem(issue, user, currentDate, durationInMinutes, "Working for $durationInMinutes minutes", workType, null)
+            val worklogItem = WorklogItem(issue, user, currentDate, durationInMinutes, "Working for $durationInMinutes minutes", workType)
             issue.worklogItems.add(worklogItem)
         }
     }
 
     private fun getRandomWorkType(): String? = listOf(null, "Development", "Testing", "Analysis", "Communication").random()
 
-    private fun fieldsWithValues(possibleFields: List<DummyProjectField>): List<Field> = possibleFields.map {
-        Field(it.name, it.possibleValues.random())
+    private fun fieldsWithValues(possibleFields: List<DummyProjectField>): List<Field> = possibleFields.map { field ->
+        val isMultiValueField = Random.nextBoolean()
+        val numValues = if (isMultiValueField) Random.nextInt(0, field.possibleValues.size) else Random.nextInt(0, 1)
+
+        val values = (0 until numValues).map {
+            field.possibleValues.random()
+        }
+
+        Field(field.name, values)
     }
 
     private fun generateRandomProjects(allFields : List<DummyProjectField>): List<DummyProject> {

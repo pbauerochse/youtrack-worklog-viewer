@@ -80,6 +80,11 @@
         </dependency>
 
         <dependency>
+            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+            <artifactId>connector-2019.x</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
