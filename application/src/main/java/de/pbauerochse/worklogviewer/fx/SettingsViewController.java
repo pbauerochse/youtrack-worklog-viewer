@@ -115,7 +115,7 @@ public class SettingsViewController implements Initializable {
 
         // Version Combobox Values
         youtrackVersionField.getItems().addAll(YouTrackConnectorLocator.getSupportedVersions());
-        youtrackVersionField.setConverter(new YouTrackVersionStringConverter());
+        youtrackVersionField.setConverter(YouTrackVersionStringConverter.INSTANCE);
 
         // Theme Combobox
         themeComboBox.getItems().addAll(Theme.values());

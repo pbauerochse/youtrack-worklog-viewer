@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.util;
 
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
-import org.apache.commons.lang3.StringUtils;
 
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
@@ -48,7 +47,7 @@ public class FormattingUtil {
     }
 
     public static String formatDate(LocalDate date) {
-        if (date == null) return StringUtils.EMPTY;
+        if (date == null) return "";
 
         if (dateFormatter == null) {
             dateFormatter = DateTimeFormatter.ofPattern(getFormatted("date.column.format"));
@@ -57,7 +56,7 @@ public class FormattingUtil {
     }
 
     public static String formatDateTime(LocalDateTime date) {
-        if (date == null) return StringUtils.EMPTY;
+        if (date == null) return "";
 
         if (dateTimeFormatter == null) {
             dateTimeFormatter = DateTimeFormatter.ofPattern(getFormatted("datetime.column.format"));
