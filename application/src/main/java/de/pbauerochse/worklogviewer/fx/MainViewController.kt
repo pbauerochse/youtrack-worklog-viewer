@@ -307,8 +307,10 @@ class MainViewController : Initializable {
             disableProperty().bind(currentTimeReportProperty.isNull)
             converter = GroupingComboBoxConverter(groupByCategoryComboBox)
             selectionModel.selectedItemProperty().addListener { _, _, groupByCategory ->
-                settingsModel.lastUsedGroupByCategoryIdProperty.set(groupByCategory.id)
-                displayWorklogResult()
+                groupByCategory?.let {
+                    settingsModel.lastUsedGroupByCategoryIdProperty.set(groupByCategory.id)
+                    displayWorklogResult()
+                }
             }
         }
 
@@ -320,7 +322,6 @@ class MainViewController : Initializable {
                     groupByCategoryComboBox.items.clear()
                     groupByCategoryComboBox.items.addAll(allGroupings)
                     groupByCategoryComboBox.selectionModel.select(selectedGrouping)
-                    displayWorklogResult()
                 }
             }
         }

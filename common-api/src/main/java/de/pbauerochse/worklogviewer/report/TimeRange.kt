@@ -50,8 +50,9 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
 
             val now = LocalDate.now(ZoneId.systemDefault())
 
-            val startDate = now.with(ChronoField.DAY_OF_WEEK, firstDayOfTheWeekForLocale.value.toLong())
             val endDate = now.with(ChronoField.DAY_OF_WEEK, lastDayOfTheWeekForLocale.value.toLong())
+            val startDateCandidate = now.with(ChronoField.DAY_OF_WEEK, firstDayOfTheWeekForLocale.value.toLong())
+            val startDate = if (startDateCandidate.isBefore(endDate)) startDateCandidate else startDateCandidate.minusWeeks(1)
             return TimeRange(startDate, endDate)
         }
 
@@ -64,8 +65,10 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
             val now = LocalDate.now(ZoneId.systemDefault())
             val lastWeek = now.minus(1, ChronoUnit.WEEKS)
 
-            val startDate = lastWeek.with(ChronoField.DAY_OF_WEEK, firstDayOfTheWeekForLocale.value.toLong())
+            val startDateCandidate = lastWeek.with(ChronoField.DAY_OF_WEEK, firstDayOfTheWeekForLocale.value.toLong())
+
             val endDate = lastWeek.with(ChronoField.DAY_OF_WEEK, lastDayOfTheWeekForLocale.value.toLong())
+            val startDate = if (startDateCandidate.isBefore(endDate)) startDateCandidate else startDateCandidate.minusWeeks(1)
             return TimeRange(startDate, endDate)
         }
 
