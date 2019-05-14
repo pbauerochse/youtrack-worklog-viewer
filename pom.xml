@@ -18,6 +18,7 @@
 
         <module>connectors/connector-api</module>
         <module>connectors/dummy-data-connector</module>
+        <module>connectors/connector-2018.2</module>
         <module>connectors/connector-2019.x</module>
     </modules>
 
@@ -196,6 +197,12 @@
             <dependency>
                 <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
                 <artifactId>dummy-data-connector</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+                <artifactId>connector-2018.2</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

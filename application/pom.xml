@@ -82,6 +82,11 @@
 
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+            <artifactId>connector-2018.2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
             <artifactId>connector-2019.x</artifactId>
         </dependency>
 
