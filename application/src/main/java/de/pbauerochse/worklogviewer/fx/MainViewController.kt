@@ -38,6 +38,9 @@ import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyCodeCombination
+import javafx.scene.input.KeyCombination
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
@@ -217,7 +220,7 @@ class MainViewController : Initializable {
         exportToExcelMenuItem.disableProperty().bind(resultTabPane.selectionModel.selectedItemProperty().isNull)
         exportToExcelMenuItem.setOnAction { startExportToExcelTask() }
         settingsMenuItem.setOnAction { showSettingsDialogue() }
-        exitMenuItem.setOnAction { WorklogViewer.getInstance().requestShutdown() }
+        exitMenuItem.setOnAction { exitWorklogViewer() }
         logMessagesMenuItem.setOnAction { showLogMessagesDialogue() }
         aboutMenuItem.setOnAction { showAboutDialogue() }
     }
@@ -351,10 +354,19 @@ class MainViewController : Initializable {
     private fun onFormShown() {
         LOGGER.debug("MainForm shown")
         this.dialog = Dialog(mainToolbar.scene)
+        setupKeyboardShortcuts()
+
         if (settingsModel.hasMissingConnectionSettings.get()) {
             LOGGER.info("No YouTrack connection settings defined yet. Opening settings dialogue")
             showSettingsDialogue()
         }
+    }
+
+    private fun setupKeyboardShortcuts() {
+        mainToolbar.scene.accelerators[KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN)] = Runnable { fetchWorklogs() }
+        mainToolbar.scene.accelerators[KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN)] = Runnable { fetchWorklogs() }
+        mainToolbar.scene.accelerators[KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN)] = Runnable { showSettingsDialogue() }
+        mainToolbar.scene.accelerators[KeyCodeCombination(KeyCode.Q, KeyCombination.SHORTCUT_DOWN)] = Runnable { exitWorklogViewer() }
     }
 
     /**
@@ -380,6 +392,10 @@ class MainViewController : Initializable {
         val timeReport = currentTimeReportProperty.value!!
         val grouping = groupByCategoryComboBox.selectionModel.selectedItem
         resultTabPane.update(timeReport, grouping)
+    }
+
+    private fun exitWorklogViewer() {
+        WorklogViewer.getInstance().requestShutdown()
     }
 
     companion object {
