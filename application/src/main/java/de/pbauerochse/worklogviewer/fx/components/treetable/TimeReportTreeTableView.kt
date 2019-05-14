@@ -5,6 +5,7 @@ import de.pbauerochse.worklogviewer.fx.components.treetable.columns.IssueTimeSpe
 import de.pbauerochse.worklogviewer.fx.components.treetable.columns.SummaryColumn
 import de.pbauerochse.worklogviewer.report.view.ReportRow
 import de.pbauerochse.worklogviewer.report.view.ReportView
+import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import javafx.scene.control.TreeTableView
 import org.slf4j.LoggerFactory
 import java.time.temporal.ChronoUnit
@@ -16,12 +17,17 @@ class TimeReportTreeTableView : TreeTableView<ReportRow>() {
 
     init {
         isShowRoot = false
+        addListeners()
     }
 
     internal fun update(reportView: ReportView) {
         LOGGER.debug("Showing ${reportView.issues.size} Issues")
         updateColumns(reportView)
         root = TreeItemConverter.convert(reportView)
+    }
+
+    private fun addListeners() {
+        SettingsUtil.settingsViewModel.workhoursProperty.addListener { _, _, _ -> this.refresh() }
     }
 
     private fun updateColumns(data: ReportView) {

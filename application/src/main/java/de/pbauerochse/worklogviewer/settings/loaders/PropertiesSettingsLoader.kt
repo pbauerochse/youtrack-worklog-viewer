@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
+import java.lang.Float.parseFloat
 import java.lang.Integer.parseInt
 import java.net.MalformedURLException
 import java.net.URL
@@ -121,7 +122,7 @@ class PropertiesSettingsLoader(private val propertiesFile: File) {
 
         if (workHoursAsString.isNullOrBlank().not()) {
             try {
-                settings.workHoursADay = parseInt(workHoursAsString)
+                settings.workHoursADay = parseFloat(workHoursAsString)
             } catch (e: NumberFormatException) {
                 // ignore
                 LOGGER.warn("Could not convert {} to Integer for setting {}", workHoursAsString, WORK_HOURS_PROPERTY)

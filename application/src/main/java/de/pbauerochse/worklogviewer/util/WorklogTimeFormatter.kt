@@ -2,7 +2,7 @@ package de.pbauerochse.worklogviewer.util
 
 import de.pbauerochse.worklogviewer.plugins.formatter.YouTrackWorktimeFormatter
 
-class WorklogTimeFormatter(private val workhoursADay: Int) : YouTrackWorktimeFormatter {
+class WorklogTimeFormatter(private val workhoursADay: Float) : YouTrackWorktimeFormatter {
 
     init {
         require(workhoursADay > 0) { FormattingUtil.getFormatted("exceptions.main.workhours.zero") }
@@ -11,7 +11,7 @@ class WorklogTimeFormatter(private val workhoursADay: Int) : YouTrackWorktimeFor
     override fun getFormatted(durationInMinutes: Long, full: Boolean): String {
         val worklogFormatted = StringBuilder()
 
-        val minutesPerWorkday = workhoursADay * MINUTES_PER_HOUR
+        val minutesPerWorkday = (workhoursADay * MINUTES_PER_HOUR).toLong()
 
         val days = durationInMinutes / minutesPerWorkday
         var remainingMinutes = durationInMinutes % minutesPerWorkday

@@ -6,7 +6,7 @@ import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import de.pbauerochse.worklogviewer.toURL
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleFloatProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ChangeListener
@@ -24,7 +24,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val youTrackPermanentTokenProperty = SimpleStringProperty()
 
     val themeProperty = SimpleObjectProperty<Theme>()
-    val workhoursProperty = SimpleIntegerProperty()
+    val workhoursProperty = SimpleFloatProperty()
     val showAllWorklogsProperty = SimpleBooleanProperty()
     val showStatisticsProperty = SimpleBooleanProperty()
     val loadDataAtStartupProperty = SimpleBooleanProperty()

@@ -44,7 +44,7 @@ class Settings {
      * - 9h booked hours on a 6h workday -> 1d 3h
      * - 9h booked hours on a 9h workday -> 1d
      */
-    var workHoursADay = 8
+    var workHoursADay = 8.0f
 
     @JsonSerialize(using = TimerangeProviderSerializer::class)
     @JsonDeserialize(using = TimerangeProviderDeserializer::class)

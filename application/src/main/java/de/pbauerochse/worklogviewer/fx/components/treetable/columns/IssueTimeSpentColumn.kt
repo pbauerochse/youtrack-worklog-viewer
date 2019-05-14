@@ -31,8 +31,8 @@ internal class IssueTimeSpentColumn : TreeTableColumn<ReportRow, TimeSpentColumn
 
     init {
         isSortable = false
-        cellValueFactory = Callback { col -> SimpleObjectProperty(TimeSpentColumnData(columnDateProperty, col.value.value)) }
-        cellFactory = Callback { TimeSpentColumn() }
+        cellValueFactory = Callback { SimpleObjectProperty(TimeSpentColumnData(columnDateProperty, it.value.value)) }
+        cellFactory = Callback { TimeSpentColumnCell() }
     }
 
     fun update(date: LocalDate) {
@@ -62,7 +62,7 @@ data class TimeSpentColumnData(
     val reportRow: ReportRow
 )
 
-private class TimeSpentColumn : TreeTableCell<ReportRow, TimeSpentColumnData>() {
+private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData>() {
 
     override fun updateItem(item: TimeSpentColumnData?, empty: Boolean) {
         super.updateItem(item, empty)

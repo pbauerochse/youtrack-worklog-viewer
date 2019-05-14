@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.fx;
 import de.pbauerochse.worklogviewer.WorklogViewer;
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator;
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion;
+import de.pbauerochse.worklogviewer.fx.converter.WorkhoursStringConverter;
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * FX Controller for the settings dialog
@@ -40,7 +41,7 @@ public class SettingsViewController implements Initializable {
     private PasswordField youtrackPermanentTokenField;
 
     @FXML
-    private ComboBox<Integer> workhoursComboBox;
+    private ComboBox<Float> workhoursComboBox;
 
     @FXML
     private ComboBox<Theme> themeComboBox;
@@ -111,7 +112,9 @@ public class SettingsViewController implements Initializable {
     }
 
     private void initializeDefaultValues() {
-        IntStream.range(1, 25).forEach(workhoursComboBox.getItems()::add);
+        // Workhours Combobox
+        Stream.iterate(1f, n -> n <= 25f, n -> n + 0.25f).forEach(workhoursComboBox.getItems()::add);
+        workhoursComboBox.setConverter(WorkhoursStringConverter.INSTANCE);
 
         // Version Combobox Values
         youtrackVersionField.getItems().addAll(YouTrackConnectorLocator.getSupportedVersions());
