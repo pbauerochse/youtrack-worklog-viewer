@@ -42,7 +42,25 @@ class WorklogTimeFormatter(private val workhoursADay: Float) : YouTrackWorktimeF
         return worklogFormatted.toString()
     }
 
+    override fun parseDurationInMinutes(value : String) : Long? {
+        val matchGroup = WORKTIME_PATTERN.matchEntire(value)
+
+        val days : Long? = matchGroup?.groupValues?.get(2)?.takeIf { it.isNotBlank() }?.toLong()
+        val hours : Long? = matchGroup?.groupValues?.get(4)?.takeIf { it.isNotBlank() }?.toLong()
+        val minutes : Long? = matchGroup?.groupValues?.get(6)?.takeIf { it.isNotBlank() }?.toLong()
+
+        return if (days == null && hours == null && minutes == null) {
+            null
+        } else {
+            val daysInMinutes = ((days ?: 0) * workhoursADay).toLong() * MINUTES_PER_HOUR
+            val hoursInMinutes = (hours ?: 0) * MINUTES_PER_HOUR
+            val minutesSanitized = minutes ?: 0
+            return daysInMinutes + hoursInMinutes + minutesSanitized
+        }
+    }
+
     companion object {
         private const val MINUTES_PER_HOUR = 60
+        private val WORKTIME_PATTERN = Regex("((\\d+)d)?\\s*((\\d+)h)?\\s*((\\d+)m)?")
     }
 }

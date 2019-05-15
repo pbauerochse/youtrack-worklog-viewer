@@ -1,5 +1,7 @@
 package de.pbauerochse.worklogviewer.connector
 
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.tasks.Progress
@@ -14,5 +16,10 @@ interface YouTrackConnector {
      * from the YouTrack instance
      */
     fun getTimeReport(parameters : TimeReportParameters, progress: Progress) : TimeReport
+
+    /**
+     * Tries to submit a new WorkItem to YouTrack
+     */
+    fun addWorkItem(request : AddWorkItemRequest) : AddWorkItemResult
 
 }

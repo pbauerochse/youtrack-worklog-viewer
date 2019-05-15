@@ -18,4 +18,11 @@ interface YouTrackWorktimeFormatter {
      */
     fun getFormatted(durationInMinutes : Long, full : Boolean = false) : String
 
+    /**
+     * Tries to parseDurationInMinutes a duration string
+     * in the YouTrack / JIRA format to a duration
+     * in minutes
+     */
+    fun parseDurationInMinutes(value : String) : Long?
+
 }

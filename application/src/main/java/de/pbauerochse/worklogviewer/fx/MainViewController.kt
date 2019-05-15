@@ -9,6 +9,7 @@ import de.pbauerochse.worklogviewer.fx.converter.TimerangeProviderStringConverte
 import de.pbauerochse.worklogviewer.fx.dialog.Dialog
 import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogViewerStateAdapter
+import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder.currentTimeReportProperty
 import de.pbauerochse.worklogviewer.fx.tasks.CheckForUpdateTask
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
@@ -103,13 +104,11 @@ class MainViewController : Initializable {
     @FXML
     private lateinit var mainToolbar: ToolBar
 
-    private val currentTimeReportProperty = SimpleObjectProperty<TimeReport?>(null)
-
-    private lateinit var taskRunner : TaskRunnerImpl
+    private lateinit var taskRunner: TaskRunnerImpl
 
     private lateinit var resources: ResourceBundle
     private lateinit var settingsModel: SettingsViewModel
-    private lateinit var dialog : Dialog
+    private lateinit var dialog: Dialog
 
     override fun initialize(location: URL?, resources: ResourceBundle) {
         LOGGER.debug("Initializing main view")
@@ -240,10 +239,12 @@ class MainViewController : Initializable {
 
         // pass in a handler to fetch the group by categories if connection
         // parameters get set
-        dialog.openDialog("/fx/views/settings.fxml", DialogSpecification(
-            title = getFormatted("view.settings.title"),
-            modal = true
-        ))
+        dialog.openDialog(
+            "/fx/views/settings.fxml", DialogSpecification(
+                title = getFormatted("view.settings.title"),
+                modal = true
+            )
+        )
     }
 
     private fun showLogMessagesDialogue() {
@@ -317,15 +318,13 @@ class MainViewController : Initializable {
             }
         }
 
-        currentTimeReportProperty.apply {
-            addListener { _, _, newTimeReport ->
-                newTimeReport?.let { report ->
-                    val allGroupings = GroupingFactory.getAvailableGroupings(report)
-                    val selectedGrouping = getSelectedGrouping(allGroupings)
-                    groupByCategoryComboBox.items.clear()
-                    groupByCategoryComboBox.items.addAll(allGroupings)
-                    groupByCategoryComboBox.selectionModel.select(selectedGrouping)
-                }
+        currentTimeReportProperty.addListener { _, _, newTimeReport ->
+            newTimeReport?.let { report ->
+                val allGroupings = GroupingFactory.getAvailableGroupings(report)
+                val selectedGrouping = getSelectedGrouping(allGroupings)
+                groupByCategoryComboBox.items.clear()
+                groupByCategoryComboBox.items.addAll(allGroupings)
+                groupByCategoryComboBox.selectionModel.select(selectedGrouping)
             }
         }
     }

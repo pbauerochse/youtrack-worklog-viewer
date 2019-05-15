@@ -9,6 +9,7 @@ import de.pbauerochse.worklogviewer.plugins.dialog.WorklogViewerDialog
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import javafx.application.Platform
+import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
@@ -60,7 +61,18 @@ class Dialog(private val scene: Scene) : WorklogViewerDialog {
             }
         }
 
+        stage.onShown = EventHandler { centerDialog(it.source as Stage) }
         stage.showAndWait()
+    }
+
+    private fun centerDialog(newStage: Stage) {
+        val mainWindowSettingsViewController = SettingsUtil.settings.windowSettings
+
+        val widthDifference = mainWindowSettingsViewController.width - newStage.width
+        val heightDifference = mainWindowSettingsViewController.height - newStage.height
+
+        newStage.x = mainWindowSettingsViewController.positionX + (widthDifference / 2)
+        newStage.y = mainWindowSettingsViewController.positionY + (heightDifference / 2)
     }
 
     override fun showSaveFileDialog(specification: FileChooserSpecification, callback: DialogCallback) {

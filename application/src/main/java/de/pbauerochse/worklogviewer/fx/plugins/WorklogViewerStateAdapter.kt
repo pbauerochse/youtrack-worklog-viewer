@@ -7,5 +7,4 @@ import de.pbauerochse.worklogviewer.report.TimeReport
 class WorklogViewerStateAdapter(
     override val currentTimeReport: TimeReport?,
     override val currentlyVisibleTab: TabContext?
-
 ) : WorklogViewerState

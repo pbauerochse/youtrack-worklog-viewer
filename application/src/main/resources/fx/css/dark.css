@@ -234,3 +234,8 @@
     -fx-background: -ytwlv-hightlight-cell-color;
     -fx-table-cell-border-color: transparent;
 }
+
+.error-label {
+    -fx-text-fill: #d2394d;
+    -fx-font-weight: bold;
+}

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class YouTrackUser @JsonCreator constructor(
+    @JsonProperty("id") val id : String,
     @JsonProperty("login") val login : String?,
     @JsonProperty("fullName") val fullName : String?,
     @JsonProperty("email") val email : String?

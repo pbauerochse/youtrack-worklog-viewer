@@ -170,3 +170,8 @@
 .progress-bar.error > .bar {
     -fx-background-color: #dd3e3b;
 }
+
+.error-label {
+    -fx-text-fill: #dd3e3b;
+    -fx-font-weight: bold;
+}

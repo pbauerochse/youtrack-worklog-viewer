@@ -4,15 +4,22 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectionSettings
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
+import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackCreateWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackIssue
 import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackUser
 import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackWorkItem
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.http.HttpParams
 import de.pbauerochse.worklogviewer.i18n.I18n
 import de.pbauerochse.worklogviewer.report.*
 import de.pbauerochse.worklogviewer.tasks.Progress
+import org.apache.http.HttpHeaders
+import org.apache.http.entity.StringEntity
+import org.apache.http.message.BasicHeader
 import org.slf4j.LoggerFactory
+import java.nio.charset.StandardCharsets
 import java.time.format.DateTimeFormatter
 
 class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
@@ -26,6 +33,45 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
 
         progress.setProgress(i18n("done"), 100)
         return TimeReport(parameters, issues)
+    }
+
+    override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
+        val url = "/api/issues/${request.issueId}/timeTracking/workItems?fields=$WORKITEM_FIELDS"
+
+        val user = getMe()
+        val youtrackRequest = YouTrackCreateWorkItemRequest(request.date, request.durationInMinutes, user, request.description)
+        val serialized = MAPPER.writeValueAsString(youtrackRequest)
+
+        val payload = StringEntity(serialized, StandardCharsets.UTF_8)
+        payload.contentType = BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+        payload.contentEncoding = BasicHeader(HttpHeaders.CONTENT_ENCODING, StandardCharsets.UTF_8.name())
+        val response = http.post(url, payload)
+        if (response.isError) {
+            LOGGER.error("Got Error Response Message from YouTrack while pushing WorkItem $serialized to URL $url: ${response.statusLine.statusCode} ${response.error}")
+            throw IllegalStateException(i18n("addworkitem.post.error", response.error))
+        }
+
+        val newYouTrackWorkItem = MAPPER.readValue(response.content!!, YouTrackWorkItem::class.java)
+        return AddWorkItemResult(
+            newYouTrackWorkItem.issue.id,
+            getUser(newYouTrackWorkItem.author),
+            newYouTrackWorkItem.date!!.toLocalDate(),
+            newYouTrackWorkItem.duration.minutes,
+            newYouTrackWorkItem.text,
+            newYouTrackWorkItem.type?.name
+        )
+    }
+
+    private fun getMe(): YouTrackUser {
+        LOGGER.debug("Getting myself as YouTrack User")
+        val url = "/api/admin/users/me?fields=$USER_FIELDS"
+        val response = http.get(url)
+        if (response.isError) {
+            LOGGER.error("Got Error Response Message from YouTrack while fetching Me $url: ${response.statusLine.statusCode} ${response.error}")
+            throw IllegalStateException(i18n("addworkitem.getme.error", response.error))
+        }
+
+        return MAPPER.readValue(response.content!!, YouTrackUser::class.java)
     }
 
     private fun fetchWorkItems(timerange: TimeRange, progress: Progress): List<YouTrackWorkItem> {
@@ -113,7 +159,8 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         private fun i18n(key: String, vararg params: Any) = I18N.get(key, *params)
 
         private const val MAX_WORKITEMS_PER_BATCH = 400
+        private const val USER_FIELDS = "id,login,fullName,email"
         private const val ISSUE_FIELDS = "idReadable,resolved,project(shortName,name),summary,customFields(name,localizedName,aliases,value(name))"
-        private const val WORKITEM_FIELDS = "author(login,fullName,email),creator(login,fullName,email),type(name),text,duration(minutes,presentation),date,issue($ISSUE_FIELDS)"
+        private const val WORKITEM_FIELDS = "author($USER_FIELDS),creator($USER_FIELDS),type(name),text,duration(minutes,presentation),date,issue($ISSUE_FIELDS)"
     }
 }

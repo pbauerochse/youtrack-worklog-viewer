@@ -5,9 +5,12 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectionSettings
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.IssueDetailsResponse
+import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackAddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackIssue
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackWorklogItem
 import de.pbauerochse.worklogviewer.connector.v2018.url.UrlBuilder
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.http.HttpParams
 import de.pbauerochse.worklogviewer.i18n.I18n
@@ -15,11 +18,15 @@ import de.pbauerochse.worklogviewer.isSameDayOrAfter
 import de.pbauerochse.worklogviewer.isSameDayOrBefore
 import de.pbauerochse.worklogviewer.report.*
 import de.pbauerochse.worklogviewer.tasks.Progress
+import org.apache.http.HttpHeaders
+import org.apache.http.entity.StringEntity
+import org.apache.http.message.BasicHeader
 import org.slf4j.LoggerFactory
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.CountDownLatch
 import java.util.stream.Collectors
 
-class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
+class Connector(private val settings: YouTrackConnectionSettings) : YouTrackConnector {
 
     private val urlBuilder = UrlBuilder(settings.baseUrl!!)
     private val http = Http(HttpParams(10, settings.baseUrl!!, settings.permanentToken!!))
@@ -48,6 +55,35 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
 
         progress.setProgress(i18n("done"), 100)
         return TimeReport(parameters, issues)
+    }
+
+    override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
+        val url = urlBuilder.getAddWorkItemUrl(request.issueId)
+        val youtrackRequest = YouTrackAddWorkItemRequest(
+            request.date,
+            request.durationInMinutes,
+            request.description
+        )
+        val serialized = MAPPER.writeValueAsString(youtrackRequest)
+
+        val payload = StringEntity(serialized, StandardCharsets.UTF_8)
+        payload.contentType = BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+        payload.contentEncoding = BasicHeader(HttpHeaders.CONTENT_ENCODING, StandardCharsets.UTF_8.name())
+
+        val response = http.post(url, payload)
+        if (response.isError) {
+            LOGGER.error("Got Error Response Message from YouTrack while pushing WorkItem $serialized to URL $url: ${response.statusLine.statusCode} ${response.error}")
+            throw IllegalStateException(i18n("addworkitem.post.error", response.error))
+        }
+
+        return AddWorkItemResult(
+            request.issueId,
+            User(settings.username!!, settings.username!!),
+            request.date,
+            request.durationInMinutes,
+            request.description,
+            null
+        )
     }
 
     private fun fetchYouTrackIssues(parameters: TimeReportParameters): List<YouTrackIssue> {
@@ -85,11 +121,12 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         val issue = Issue(
             youtrackIssue.id,
             youtrackIssue.description,
-            youtrackIssue.resolutionDate,
             youtrackIssue.fields.map {
                 val value = it.textValue?.let { textValue -> listOf(textValue) } ?: emptyList()
                 Field(it.name, value)
-            })
+            },
+            youtrackIssue.resolutionDate
+        )
 
         val worklogItems: List<YouTrackWorklogItem> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorklogItem>>() {})
         worklogItems

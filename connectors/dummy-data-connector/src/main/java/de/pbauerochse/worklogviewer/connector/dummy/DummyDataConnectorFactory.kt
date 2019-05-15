@@ -10,8 +10,8 @@ import de.pbauerochse.worklogviewer.version.Version
  * Connector factory that provides dummy data for testing
  */
 class DummyDataConnectorFactory : YouTrackConnectorFactory {
-    override fun createServiceInstance(settings: YouTrackConnectionSettings): YouTrackConnector = DummyDataConnector()
+    override fun createServiceInstance(settings: YouTrackConnectionSettings): YouTrackConnector = DummyDataConnector(settings.username ?: "You")
     override val supportedVersions: List<YouTrackVersion> = listOf(
-        YouTrackVersion("v2019.x_DUMMY", "2019.x (dummy data)", Version.fromVersionString("2019.1.0"))
+        YouTrackVersion("DUMMY", "Generated Example Data", Version.fromVersionString("0.0.0"))
     )
 }

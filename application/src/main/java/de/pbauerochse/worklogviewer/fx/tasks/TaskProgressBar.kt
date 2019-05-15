@@ -22,7 +22,7 @@ import javafx.util.Duration
  * a label for the Task to be completed, and a
  * progress message label
  */
-class TaskProgressBar(private val task: WorklogViewerTask<*>) : StackPane(), ChangeListener<Worker.State> {
+class TaskProgressBar(private val task: WorklogViewerTask<*>, private val showTaskName : Boolean) : StackPane(), ChangeListener<Worker.State> {
 
     @FXML
     lateinit var progressBar: ProgressBar
@@ -44,7 +44,7 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>) : StackPane(), Cha
     }
 
     override fun changed(observable: ObservableValue<out Worker.State>?, oldValue: Worker.State?, newValue: Worker.State?) {
-        taskName.text = getTaskNameLabel(newValue)
+        taskName.text = if (showTaskName) getTaskNameLabel(newValue) else ""
 
         if (isCompletedState(newValue)) {
             triggerFadeOut()

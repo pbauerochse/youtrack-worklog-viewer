@@ -16,8 +16,9 @@ class UrlBuilder(private val baseUrl: URL) {
         return generateUrl("/rest/issue?filter=$query&max=500&after=$numberOfIssuesToSkip")
     }
 
-    fun getWorkItemsUrl(issue: YouTrackIssue): URL =
-        generateUrl("/rest/issue/${issue.id}/timetracking/workitem")
+    fun getWorkItemsUrl(issue: YouTrackIssue): URL = getAddWorkItemUrl(issue.id)
+    fun getAddWorkItemUrl(issueId: String): URL =
+        generateUrl("/rest/issue/$issueId/timetracking/workitem")
 
     private fun generateUrl(path: String): URL {
         val baseUrlAsString = baseUrl.toExternalForm().trimEnd('/')

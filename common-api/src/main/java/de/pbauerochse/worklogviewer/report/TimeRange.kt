@@ -1,5 +1,7 @@
 package de.pbauerochse.worklogviewer.report
 
+import de.pbauerochse.worklogviewer.isSameDayOrAfter
+import de.pbauerochse.worklogviewer.isSameDayOrBefore
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -17,6 +19,8 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
     override fun toString(): String {
         return "${start.format(ISO_DATE_FORMATTER)} - ${end.format(ISO_DATE_FORMATTER)}"
     }
+
+    fun includes(date: LocalDate): Boolean = date.isSameDayOrAfter(start) && date.isSameDayOrBefore(end)
 
     companion object {
 

@@ -32,9 +32,6 @@
         </VBox>
     </top>
 
-    <bottom>
-        <VBox fx:id="taskProgressContainer" BorderPane.alignment="CENTER"/>
-    </bottom>
     <center>
         <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="TOP_LEFT">
             <children>
@@ -69,4 +66,7 @@
         </StackPane>
     </center>
 
+    <bottom>
+        <VBox fx:id="taskProgressContainer" BorderPane.alignment="CENTER"/>
+    </bottom>
 </BorderPane>

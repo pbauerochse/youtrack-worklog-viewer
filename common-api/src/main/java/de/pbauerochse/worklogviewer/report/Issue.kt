@@ -8,10 +8,10 @@ import java.time.LocalDateTime
  * having WorklogEntries
  */
 data class Issue(
-        val id: String,
-        val description: String,
-        var resolutionDate: LocalDateTime? = null,
-        val fields: List<Field>
+    val id: String,
+    val description: String,
+    val fields: List<Field>,
+    var resolutionDate: LocalDateTime? = null
 ) : Comparable<Issue> {
 
     /**
@@ -19,7 +19,7 @@ data class Issue(
      * the worklog items, from the other Issue are
      * applied to the new instance
      */
-    constructor(issue: Issue, fields: List<Field>, worklogItems: List<WorklogItem>) : this(issue.id, issue.description, issue.resolutionDate, fields) {
+    constructor(issue: Issue, fields: List<Field>, worklogItems: List<WorklogItem>) : this(issue.id, issue.description, fields, issue.resolutionDate) {
         this.worklogItems.addAll(worklogItems)
     }
 

@@ -17,13 +17,12 @@ import java.net.URL
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class YouTrackConnectionSettingsImpl(
+    override var baseUrl: URL? = null,
+    override var username: String? = null,
+
     @JsonSerialize(using = YouTrackVersionSerializer::class)
     @JsonDeserialize(using = YouTrackVersionDeserializer::class)
     override var version: YouTrackVersion? = null,
-
-    override var baseUrl: URL? = null,
-
-    var username: String? = null,
 
     @JsonSerialize(using = EncryptingSerializer::class)
     @JsonDeserialize(using = EncryptingDeserializer::class)

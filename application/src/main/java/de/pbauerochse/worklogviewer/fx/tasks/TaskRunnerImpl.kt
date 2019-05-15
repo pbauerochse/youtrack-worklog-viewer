@@ -19,7 +19,8 @@ import java.util.concurrent.Future
  */
 class TaskRunnerImpl(
     private val parent: Pane,
-    private val waitScreenOverlay: StackPane
+    private val waitScreenOverlay: StackPane,
+    private val showTaskNameLabel : Boolean = true
 ) : TaskRunner {
 
     @Suppress("UNCHECKED_CAST")
@@ -43,7 +44,7 @@ class TaskRunnerImpl(
     @Suppress("UNCHECKED_CAST")
     fun <T> startTask(task: WorklogViewerTask<T>): Future<T> {
         LOGGER.info("Starting task ${task.label}")
-        val progressBar = TaskProgressBar(task)
+        val progressBar = TaskProgressBar(task, showTaskNameLabel)
         task.stateProperty().addListener(progressBar)
 
         bindOnRunning(task, progressBar)

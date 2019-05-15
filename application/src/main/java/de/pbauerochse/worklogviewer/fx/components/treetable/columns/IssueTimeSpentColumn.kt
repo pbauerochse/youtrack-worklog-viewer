@@ -6,6 +6,7 @@ import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.HIGHLIGH
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TIMESPENT_CELL
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TODAY_HIGHLIGHT_CELL
+import de.pbauerochse.worklogviewer.fx.components.treetable.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.report.view.ReportRow
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatDate
@@ -15,9 +16,12 @@ import de.pbauerochse.worklogviewer.view.IssueReportRow
 import de.pbauerochse.worklogviewer.view.SummaryReportRow
 import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.event.EventHandler
 import javafx.scene.control.Tooltip
 import javafx.scene.control.TreeTableCell
 import javafx.scene.control.TreeTableColumn
+import javafx.scene.input.MouseButton
+import javafx.scene.input.MouseEvent
 import javafx.util.Callback
 import java.time.LocalDate
 
@@ -64,6 +68,14 @@ data class TimeSpentColumnData(
 
 private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData>() {
 
+    init {
+        onMouseClicked = EventHandler<MouseEvent> {
+            when {
+                it.button == MouseButton.PRIMARY && it.clickCount == 2 -> showAddWorkItemDialog()
+            }
+        }
+    }
+
     override fun updateItem(item: TimeSpentColumnData?, empty: Boolean) {
         super.updateItem(item, empty)
 
@@ -88,6 +100,7 @@ private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData
     }
 
     private fun handleGroupBy(date: LocalDate, row: GroupReportRow) {
+        contextMenu = null
         val totalTimeSpentInMinutes = row.getDurationInMinutes(date)
         if (totalTimeSpentInMinutes > 0) {
             text = formatMinutes(totalTimeSpentInMinutes)
@@ -96,6 +109,7 @@ private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData
     }
 
     private fun handleIssue(date: LocalDate, row: IssueReportRow) {
+        contextMenu = IssueCellContextMenu(row.issue, date)
         val timeSpentInMinutes = row.issue.getTimeInMinutesSpentOn(date)
         if (timeSpentInMinutes > 0) {
             text = formatMinutes(timeSpentInMinutes)
@@ -105,6 +119,7 @@ private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData
     }
 
     private fun handleSummary(date: LocalDate, row: SummaryReportRow) {
+        contextMenu = null
         val totalTimeSpentInMinutes = row.getDurationInMinutes(date)
         if (totalTimeSpentInMinutes > 0) {
             text = formatMinutes(totalTimeSpentInMinutes)
@@ -112,7 +127,13 @@ private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData
         }
     }
 
-    private fun isToday(date: LocalDate): Boolean = date.isEqual(LocalDate.now())
+    private fun showAddWorkItemDialog() {
+        val issueContextMenu = contextMenu as IssueCellContextMenu?
+        issueContextMenu?.showAddWorkItemToIssueDialog()
+    }
 
-    private fun isHighlighted(date: LocalDate): Boolean = SettingsUtil.settings.highlightState.isSet(date.dayOfWeek)
+    companion object {
+        private fun isToday(date: LocalDate): Boolean = date.isEqual(LocalDate.now())
+        private fun isHighlighted(date: LocalDate): Boolean = SettingsUtil.settings.highlightState.isSet(date.dayOfWeek)
+    }
 }
