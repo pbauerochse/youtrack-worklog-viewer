@@ -32,37 +32,39 @@ class Dialog(private val scene: Scene) : WorklogViewerDialog {
     }
 
     fun openDialog(content: Parent, specs: DialogSpecification) {
-        val settingsViewModel = SettingsUtil.settingsViewModel
+        Platform.runLater {
+            val settingsViewModel = SettingsUtil.settingsViewModel
 
-        val scene = Scene(content).apply {
-            stylesheets.add("/fx/css/base-styling.css")
-            stylesheets.add(settingsViewModel.themeProperty.get().stylesheet)
-        }
-
-        val themeChangeListener = ThemeChangeListener(scene)
-        settingsViewModel.themeProperty.addListener(themeChangeListener)
-
-        val stage = Stage().apply {
-            this.initOwner(scene.window)
-            this.title = specs.title
-            this.scene = scene
-        }
-
-        if (specs.modal) {
-            stage.initStyle(StageStyle.UTILITY)
-            stage.initModality(Modality.APPLICATION_MODAL)
-            stage.isResizable = false
-        }
-
-        specs.onClose?.let { onCloseCallback ->
-            stage.setOnCloseRequest {
-                settingsViewModel.themeProperty.removeListener(themeChangeListener)
-                onCloseCallback.invoke()
+            val scene = Scene(content).apply {
+                stylesheets.add("/fx/css/base-styling.css")
+                stylesheets.add(settingsViewModel.themeProperty.get().stylesheet)
             }
-        }
 
-        stage.onShown = EventHandler { centerDialog(it.source as Stage) }
-        stage.showAndWait()
+            val themeChangeListener = ThemeChangeListener(scene)
+            settingsViewModel.themeProperty.addListener(themeChangeListener)
+
+            val stage = Stage().apply {
+                this.initOwner(scene.window)
+                this.title = specs.title
+                this.scene = scene
+            }
+
+            if (specs.modal) {
+                stage.initStyle(StageStyle.UTILITY)
+                stage.initModality(Modality.APPLICATION_MODAL)
+                stage.isResizable = false
+            }
+
+            specs.onClose?.let { onCloseCallback ->
+                stage.setOnCloseRequest {
+                    settingsViewModel.themeProperty.removeListener(themeChangeListener)
+                    onCloseCallback.invoke()
+                }
+            }
+
+            stage.onShown = EventHandler { centerDialog(it.source as Stage) }
+            stage.showAndWait()
+        }
     }
 
     private fun centerDialog(newStage: Stage) {

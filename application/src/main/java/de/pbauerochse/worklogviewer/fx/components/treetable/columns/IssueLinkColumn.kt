@@ -85,7 +85,6 @@ private class IssueLinkCell : TreeTableCell<ReportRow, ReportRow>() {
         styleClass.add(SUMMARY_CELL)
     }
 
-
     private fun openIssueLinkInBrowser() {
         issueItem?.issue?.openInBrowser()
     }

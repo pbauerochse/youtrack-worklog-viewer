@@ -40,10 +40,10 @@ class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate
         val loader = FXMLLoader(IssueCellContextMenu::class.java.getResource("/fx/views/add-workitem.fxml"), RESOURCE_BUNDLE)
         val root = loader.load<Parent>()
         val controller = loader.getController<AddWorkItemController>()
-        controller.issueProperty.set(issue)
+        controller.issueProperty.set(issue?.id)
         controller.dateProperty.set(date)
 
-        Dialog(scene).openDialog(root, DialogSpecification(getFormatted("dialog.addworkitem.title")))
+        Dialog(scene).openDialog(root, DialogSpecification(getFormatted("dialog.addworkitem.title"), true))
     }
 
 }
