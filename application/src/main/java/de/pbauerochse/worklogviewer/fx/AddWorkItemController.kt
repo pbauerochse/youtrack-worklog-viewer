@@ -2,11 +2,13 @@ package de.pbauerochse.worklogviewer.fx
 
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder
 import de.pbauerochse.worklogviewer.fx.tasks.AddWorkItemTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
+import de.pbauerochse.worklogviewer.withAddedWorkItem
 import javafx.beans.property.*
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
@@ -39,7 +41,7 @@ class AddWorkItemController : Initializable {
     private lateinit var saveButton: Button
 
     @FXML
-    private lateinit var cancelButton : Button
+    private lateinit var cancelButton: Button
 
     @FXML
     private lateinit var issueTextField: TextField
@@ -51,15 +53,15 @@ class AddWorkItemController : Initializable {
     private lateinit var workDurationTextField: TextField
 
     @FXML
-    private lateinit var workDescriptionTextField : TextField
+    private lateinit var workDescriptionTextField: TextField
 
     @FXML
-    private lateinit var progressIndicator : StackPane
+    private lateinit var progressIndicator: StackPane
 
     @FXML
-    private lateinit var progressBarContainer : VBox
+    private lateinit var progressBarContainer: VBox
 
-    private lateinit var taskRunner : TaskRunnerImpl
+    private lateinit var taskRunner: TaskRunnerImpl
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         taskRunner = TaskRunnerImpl(progressBarContainer, progressIndicator, false)
@@ -68,10 +70,10 @@ class AddWorkItemController : Initializable {
         workDurationTextField.textProperty().bindBidirectional(durationProperty)
         workDurationTextField.textProperty().addListener { _, _, newDuration -> updateIsValidDurationProperty(newDuration) }
 
+        cancelButton.disableProperty().bind(progressIndicator.visibleProperty())
         saveButton.disableProperty().bind(
             progressIndicator.visibleProperty().or(durationProperty.isEmpty.or(isValidWorkTimeProperty.not()).or(issueProperty.isEmpty).or(dateProperty.isNull))
         )
-        cancelButton.disableProperty().bind(progressIndicator.visibleProperty())
     }
 
     fun closeDialog(actionEvent: ActionEvent) {
@@ -107,7 +109,10 @@ class AddWorkItemController : Initializable {
 
     private fun handleAddWorkItemResponse(addWorkItemResult: AddWorkItemResult) {
         LOGGER.debug("Adding Work Item was successfull = ${addWorkItemResult.success}")
-        // TODO handle update
+        val newWorkitem = addWorkItemResult.worklogItem!!
+        val currentTimeReport = ReportDataHolder.currentTimeReportProperty.value!!
+        val modifiedTimeReport = currentTimeReport.withAddedWorkItem(newWorkitem)
+        ReportDataHolder.currentTimeReportProperty.value = modifiedTimeReport
     }
 
     companion object {

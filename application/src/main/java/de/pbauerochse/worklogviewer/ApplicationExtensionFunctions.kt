@@ -1,11 +1,10 @@
 package de.pbauerochse.worklogviewer
 
-import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.connector.workitem.MinimalWorklogItem
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
-import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.scene.control.Hyperlink
@@ -60,36 +59,10 @@ fun WorklogItem.isOwn(): Boolean {
 fun String.toURL(): URL = URL(this)
 
 /**
- * adds the given [AddWorkItemResult] into this [TimeReport]
- * by creating a copy with the [AddWorkItemResult] applied
+ * adds the given [MinimalWorklogItem] into this [TimeReport]
+ * by creating a copy with the [MinimalWorklogItem] applied
  * to the clone
  */
-fun TimeReport.addWorkItem(newWorkitem: AddWorkItemResult): TimeReport {
-    return if (reportParameters.timerange.includes(newWorkitem.date)) {
-        // only update if the newly created item is for the current timerange
-        var issue = issues.find { it.id == newWorkitem.issueId }
-        val issueList = issues.toMutableList()
-
-        if (issue == null) {
-            // issue to added work item was not
-            // present when initial report was fetched
-            // add "mock" item
-            issue = Issue(newWorkitem.issueId, getFormatted("task.addworkitem.missingissuedescription"), emptyList())
-            issueList.add(issue)
-        }
-
-        issue.let {
-            val newWorkItem = WorklogItem(
-                issue = it,
-                date = newWorkitem.date,
-                description = newWorkitem.description,
-                durationInMinutes = newWorkitem.durationInMinutes,
-                user = newWorkitem.user,
-                workType = newWorkitem.workType
-            )
-            it.worklogItems.add(newWorkItem)
-        }
-
-        return TimeReport(reportParameters, issueList)
-    } else this
+fun TimeReport.withAddedWorkItem(newWorkitem: MinimalWorklogItem) : TimeReport {
+    TODO("Not implemented yet")
 }
