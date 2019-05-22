@@ -1,20 +1,19 @@
 package de.pbauerochse.worklogviewer.fx
 
+import de.pbauerochse.worklogviewer.addWorkItem
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.connector.workitem.MinimalWorklogItem
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder
 import de.pbauerochse.worklogviewer.fx.tasks.AddWorkItemTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
-import de.pbauerochse.worklogviewer.withAddedWorkItem
 import javafx.beans.property.*
-import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.DatePicker
 import javafx.scene.control.TextField
@@ -76,9 +75,9 @@ class AddWorkItemController : Initializable {
         )
     }
 
-    fun closeDialog(actionEvent: ActionEvent) {
+    fun closeDialog() {
         LOGGER.debug("Closing AddWorkItem dialogue")
-        val window = (actionEvent.source as Node).scene.window
+        val window = progressBarContainer.scene.window
         window.fireEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST))
     }
 
@@ -108,11 +107,24 @@ class AddWorkItemController : Initializable {
     private fun parseWorkTimeFromField(newDuration: String) = WorklogTimeFormatter(SettingsUtil.settingsViewModel.workhoursProperty.value).parseDurationInMinutes(newDuration)
 
     private fun handleAddWorkItemResponse(addWorkItemResult: AddWorkItemResult) {
-        LOGGER.debug("Adding Work Item was successfull = ${addWorkItemResult.success}")
-        val newWorkitem = addWorkItemResult.worklogItem!!
+        if (addWorkItemResult.success) {
+            updateCurrentTimeReport(addWorkItemResult.worklogItem!!)
+        } else {
+            showError(addWorkItemResult.errorMessage!!)
+        }
+    }
+
+    private fun showError(errorMessage: String) {
+        TODO("Not implemented yet")
+    }
+
+    private fun updateCurrentTimeReport(newWorkitem: MinimalWorklogItem) {
+        LOGGER.debug("Adding Work Item was successful. Adding $newWorkitem to current rpeort")
         val currentTimeReport = ReportDataHolder.currentTimeReportProperty.value!!
-        val modifiedTimeReport = currentTimeReport.withAddedWorkItem(newWorkitem)
-        ReportDataHolder.currentTimeReportProperty.value = modifiedTimeReport
+        val newTimeReport = currentTimeReport.addWorkItem(newWorkitem)
+
+        ReportDataHolder.currentTimeReportProperty.value = newTimeReport
+        closeDialog()
     }
 
     companion object {

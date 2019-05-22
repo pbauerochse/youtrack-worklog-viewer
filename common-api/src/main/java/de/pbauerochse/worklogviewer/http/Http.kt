@@ -57,22 +57,12 @@ class Http(private val params: HttpParams) {
     }
 
     private fun execute(request: HttpUriRequest): HttpResponse {
-        return execute(request) { response ->
-            val mappedHeaders = mutableMapOf<String, String>()
-            response.allHeaders.map { mappedHeaders[it.name] = it.value }
-
-            if (response.statusLine.isValid().not()) {
-                EntityUtils.consumeQuietly(response.entity)
-                HttpResponse(
-                    statusLine = response.statusLine,
-                    headers = mappedHeaders
-                )
+        return execute(request) {
+            if (it.statusLine.isValid().not()) {
+                EntityUtils.consumeQuietly(it.entity)
+                HttpResponse(it.statusLine)
             } else {
-                HttpResponse(
-                    statusLine = response.statusLine,
-                    content = EntityUtils.toString(response.entity),
-                    headers = mappedHeaders
-                )
+                HttpResponse(it.statusLine, EntityUtils.toString(it.entity))
             }
         }
     }
@@ -86,6 +76,7 @@ class Http(private val params: HttpParams) {
             }
         }
     }
+
 
 
 }

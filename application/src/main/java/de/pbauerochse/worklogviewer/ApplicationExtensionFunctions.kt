@@ -63,6 +63,23 @@ fun String.toURL(): URL = URL(this)
  * by creating a copy with the [MinimalWorklogItem] applied
  * to the clone
  */
-fun TimeReport.withAddedWorkItem(newWorkitem: MinimalWorklogItem) : TimeReport {
-    TODO("Not implemented yet")
+fun TimeReport.addWorkItem(newWorkitem: MinimalWorklogItem) : TimeReport {
+    return if (reportParameters.timerange.includes(newWorkitem.date)) {
+        // only update if the newly created item is for the current timerange
+        issues
+                .find { it.id == newWorkitem.issueId }
+                ?.let {
+                    val newWorkItem = WorklogItem(
+                            issue = it,
+                            date = newWorkitem.date,
+                            description = newWorkitem.description,
+                            durationInMinutes = newWorkitem.durationInMinutes,
+                            user = newWorkitem.user,
+                            workType = newWorkitem.workType
+                    )
+                    it.worklogItems.add(newWorkItem)
+                }
+
+        return TimeReport(reportParameters, issues)
+    } else this
 }
