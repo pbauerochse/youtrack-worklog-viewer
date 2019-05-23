@@ -14,9 +14,7 @@ import javafx.beans.property.*
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.control.Button
-import javafx.scene.control.DatePicker
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.WindowEvent
@@ -60,6 +58,9 @@ class AddWorkItemController : Initializable {
     @FXML
     private lateinit var progressBarContainer: VBox
 
+    @FXML
+    private lateinit var errorLabel : Label
+
     private lateinit var taskRunner: TaskRunnerImpl
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
@@ -68,6 +69,7 @@ class AddWorkItemController : Initializable {
         workDateDatePicker.valueProperty().bindBidirectional(dateProperty)
         workDurationTextField.textProperty().bindBidirectional(durationProperty)
         workDurationTextField.textProperty().addListener { _, _, newDuration -> updateIsValidDurationProperty(newDuration) }
+        errorLabel.visibleProperty().bind(errorLabel.textProperty().isNotEmpty)
 
         cancelButton.disableProperty().bind(progressIndicator.visibleProperty())
         saveButton.disableProperty().bind(
@@ -115,7 +117,9 @@ class AddWorkItemController : Initializable {
     }
 
     private fun showError(errorMessage: String) {
-        TODO("Not implemented yet")
+        LOGGER.warn("Error while adding new worklog item")
+        errorLabel.text = errorMessage
+        errorLabel.tooltip = Tooltip(errorMessage)
     }
 
     private fun updateCurrentTimeReport(newWorkitem: MinimalWorklogItem) {

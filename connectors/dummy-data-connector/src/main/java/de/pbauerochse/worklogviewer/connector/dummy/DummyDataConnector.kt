@@ -18,7 +18,7 @@ class DummyDataConnector : YouTrackConnector {
     }
 
     override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
-        return AddWorkItemResult.error("Not implemented")
+        return AddWorkItemResult.error("Adding Work Items not supported in Dummy Data connector")
     }
 
     private fun generateRandomIssues(parameters: TimeReportParameters): List<Issue> {
