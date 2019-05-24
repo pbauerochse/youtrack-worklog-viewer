@@ -121,11 +121,12 @@ class Connector(private val settings: YouTrackConnectionSettings) : YouTrackConn
         val issue = Issue(
             youtrackIssue.id,
             youtrackIssue.description,
-            youtrackIssue.resolutionDate,
             youtrackIssue.fields.map {
                 val value = it.textValue?.let { textValue -> listOf(textValue) } ?: emptyList()
                 Field(it.name, value)
-            })
+            },
+            youtrackIssue.resolutionDate
+        )
 
         val worklogItems: List<YouTrackWorklogItem> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorklogItem>>() {})
         worklogItems

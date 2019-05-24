@@ -75,7 +75,7 @@ class DummyDataConnector(username: String) : YouTrackConnector {
             val resolved = Random.nextBoolean()
             val resolveDate = if (resolved) LocalDateTime.now() else null
             val issueFields = fieldsWithValues(project.possibleFields)
-            Issue(issueId, issueDescription, resolveDate, issueFields)
+            Issue(issueId, issueDescription, issueFields, resolveDate)
         }
     }
 
