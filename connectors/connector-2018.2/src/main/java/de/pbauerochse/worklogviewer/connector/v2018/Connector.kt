@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectionSettings
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.IssueDetailsResponse
+import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackAddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackIssue
 import de.pbauerochse.worklogviewer.connector.v2018.domain.issue.YouTrackWorklogItem
 import de.pbauerochse.worklogviewer.connector.v2018.url.UrlBuilder
@@ -17,11 +18,15 @@ import de.pbauerochse.worklogviewer.isSameDayOrAfter
 import de.pbauerochse.worklogviewer.isSameDayOrBefore
 import de.pbauerochse.worklogviewer.report.*
 import de.pbauerochse.worklogviewer.tasks.Progress
+import org.apache.http.HttpHeaders
+import org.apache.http.entity.StringEntity
+import org.apache.http.message.BasicHeader
 import org.slf4j.LoggerFactory
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.CountDownLatch
 import java.util.stream.Collectors
 
-class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
+class Connector(private val settings: YouTrackConnectionSettings) : YouTrackConnector {
 
     private val urlBuilder = UrlBuilder(settings.baseUrl!!)
     private val http = Http(HttpParams(10, settings.baseUrl!!, settings.permanentToken!!))
@@ -53,7 +58,32 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
     }
 
     override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
-        TODO("Not implemented yet")
+        val url = urlBuilder.getAddWorkItemUrl(request.issueId)
+        val youtrackRequest = YouTrackAddWorkItemRequest(
+            request.date,
+            request.durationInMinutes,
+            request.description
+        )
+        val serialized = MAPPER.writeValueAsString(youtrackRequest)
+
+        val payload = StringEntity(serialized, StandardCharsets.UTF_8)
+        payload.contentType = BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+        payload.contentEncoding = BasicHeader(HttpHeaders.CONTENT_ENCODING, StandardCharsets.UTF_8.name())
+
+        val response = http.post(url, payload)
+        if (response.isError) {
+            LOGGER.error("Got Error Response Message from YouTrack while pushing WorkItem $serialized to URL $url: ${response.statusLine.statusCode} ${response.error}")
+            throw IllegalStateException(i18n("addworkitem.post.error", response.error))
+        }
+
+        return AddWorkItemResult(
+            request.issueId,
+            User(settings.username!!, settings.username!!),
+            request.date,
+            request.durationInMinutes,
+            request.description,
+            null
+        )
     }
 
     private fun fetchYouTrackIssues(parameters: TimeReportParameters): List<YouTrackIssue> {

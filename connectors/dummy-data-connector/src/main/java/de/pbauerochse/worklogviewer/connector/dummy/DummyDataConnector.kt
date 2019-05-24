@@ -10,7 +10,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.random.Random
 
-class DummyDataConnector(private val username: String?) : YouTrackConnector {
+class DummyDataConnector(username: String) : YouTrackConnector {
+
+    private val ownUser = User(username, "Yourself ($username)")
 
     override fun getTimeReport(parameters: TimeReportParameters, progress: Progress): TimeReport {
         val issues = generateRandomIssues(parameters)
@@ -18,7 +20,14 @@ class DummyDataConnector(private val username: String?) : YouTrackConnector {
     }
 
     override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
-        throw UnsupportedOperationException("DummyDataConnector does not support adding Work Items")
+        return AddWorkItemResult(
+            request.issueId,
+            ownUser,
+            request.date,
+            request.durationInMinutes,
+            request.description,
+            null
+        )
     }
 
     private fun generateRandomIssues(parameters: TimeReportParameters): List<Issue> {
@@ -51,12 +60,9 @@ class DummyDataConnector(private val username: String?) : YouTrackConnector {
             val lastName = DummyNames.lastNames.random()
 
             User("User_$it", "$firstName $lastName")
-        }.toMutableList()
+        }
 
-        // add own user
-        username?.let { User(it, "Yourself ($it)") }?.let { genereatedUsers.add(it) }
-
-        return genereatedUsers
+        return genereatedUsers + ownUser
     }
 
     private fun generateRandomIssues(): List<Issue> {
