@@ -1,21 +1,13 @@
 package de.pbauerochse.worklogviewer.connector.workitem
 
-class AddWorkItemResult private constructor(
-    val success: Boolean,
-    val errorMessage: String? = null,
-    val worklogItem: MinimalWorklogItem? = null
-) {
+import de.pbauerochse.worklogviewer.report.User
+import java.time.LocalDate
 
-    companion object {
-        @JvmStatic
-        fun error(message: String): AddWorkItemResult {
-            return AddWorkItemResult(success = false, errorMessage = message)
-        }
-
-        @JvmStatic
-        fun success(worklogItem: MinimalWorklogItem): AddWorkItemResult {
-            return AddWorkItemResult(success = true, worklogItem = worklogItem)
-        }
-    }
-
-}
+data class AddWorkItemResult(
+    val issueId: String,
+    val user: User,
+    val date: LocalDate,
+    val durationInMinutes: Long,
+    val description: String?,
+    val workType: String?
+)

@@ -10,7 +10,6 @@ import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackUser
 import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackWorkItem
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
-import de.pbauerochse.worklogviewer.connector.workitem.MinimalWorklogItem
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.http.HttpParams
 import de.pbauerochse.worklogviewer.i18n.I18n
@@ -49,20 +48,18 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         val response = http.post(url, payload)
         if (response.isError) {
             LOGGER.error("Got Error Response Message from YouTrack while pushing WorkItem $serialized to URL $url: ${response.statusLine.statusCode} ${response.error}")
-            return AddWorkItemResult.error(i18n("addworkitem.post.error", response.error))
+            throw IllegalStateException(i18n("addworkitem.post.error", response.error))
         }
 
         val newYouTrackWorkItem = MAPPER.readValue(response.content!!, YouTrackWorkItem::class.java)
-        val minimalWorklogItem = MinimalWorklogItem(
-                newYouTrackWorkItem.issue.id,
-                getUser(newYouTrackWorkItem.author),
-                newYouTrackWorkItem.date!!.toLocalDate(),
-                newYouTrackWorkItem.duration.minutes,
-                newYouTrackWorkItem.text,
-                newYouTrackWorkItem.type?.name
+        return AddWorkItemResult(
+            newYouTrackWorkItem.issue.id,
+            getUser(newYouTrackWorkItem.author),
+            newYouTrackWorkItem.date!!.toLocalDate(),
+            newYouTrackWorkItem.duration.minutes,
+            newYouTrackWorkItem.text,
+            newYouTrackWorkItem.type?.name
         )
-
-        return AddWorkItemResult.success(minimalWorklogItem)
     }
 
     private fun getMe(): YouTrackUser {

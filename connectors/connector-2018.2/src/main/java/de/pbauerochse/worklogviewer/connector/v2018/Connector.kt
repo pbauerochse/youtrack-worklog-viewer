@@ -53,8 +53,7 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
     }
 
     override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
-        // TODO
-        return AddWorkItemResult.error("Not implemented yet")
+        TODO("Not implemented yet")
     }
 
     private fun fetchYouTrackIssues(parameters: TimeReportParameters): List<YouTrackIssue> {

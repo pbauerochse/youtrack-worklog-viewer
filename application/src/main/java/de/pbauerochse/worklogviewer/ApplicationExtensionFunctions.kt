@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer
 
-import de.pbauerochse.worklogviewer.connector.workitem.MinimalWorklogItem
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.WorklogItem
@@ -59,26 +59,26 @@ fun WorklogItem.isOwn(): Boolean {
 fun String.toURL(): URL = URL(this)
 
 /**
- * adds the given [MinimalWorklogItem] into this [TimeReport]
- * by creating a copy with the [MinimalWorklogItem] applied
+ * adds the given [AddWorkItemResult] into this [TimeReport]
+ * by creating a copy with the [AddWorkItemResult] applied
  * to the clone
  */
-fun TimeReport.addWorkItem(newWorkitem: MinimalWorklogItem) : TimeReport {
+fun TimeReport.addWorkItem(newWorkitem: AddWorkItemResult): TimeReport {
     return if (reportParameters.timerange.includes(newWorkitem.date)) {
         // only update if the newly created item is for the current timerange
         issues
-                .find { it.id == newWorkitem.issueId }
-                ?.let {
-                    val newWorkItem = WorklogItem(
-                            issue = it,
-                            date = newWorkitem.date,
-                            description = newWorkitem.description,
-                            durationInMinutes = newWorkitem.durationInMinutes,
-                            user = newWorkitem.user,
-                            workType = newWorkitem.workType
-                    )
-                    it.worklogItems.add(newWorkItem)
-                }
+            .find { it.id == newWorkitem.issueId }
+            ?.let {
+                val newWorkItem = WorklogItem(
+                    issue = it,
+                    date = newWorkitem.date,
+                    description = newWorkitem.description,
+                    durationInMinutes = newWorkitem.durationInMinutes,
+                    user = newWorkitem.user,
+                    workType = newWorkitem.workType
+                )
+                it.worklogItems.add(newWorkItem)
+            }
 
         return TimeReport(reportParameters, issues)
     } else this

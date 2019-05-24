@@ -9,48 +9,49 @@
         <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="TOP_LEFT">
             <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                 <center>
-                    <GridPane hgap="5.0" vgap="2.0" BorderPane.alignment="TOP_LEFT">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                        </columnConstraints>
-                        <rowConstraints>
-                            <RowConstraints prefHeight="20.0" vgrow="NEVER" />
-                            <RowConstraints prefHeight="30.0" vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints prefHeight="20.0" vgrow="NEVER" />
-                            <RowConstraints prefHeight="30.0" vgrow="NEVER" />
-                            <RowConstraints prefHeight="20.0" vgrow="NEVER" />
-                            <RowConstraints minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER" />
-                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                        </rowConstraints>
-                        <padding>
-                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                        </padding>
+                    <VBox>
+                        <GridPane hgap="5.0" vgap="2.0" BorderPane.alignment="TOP_LEFT" VBox.vgrow="NEVER">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints prefHeight="20.0" vgrow="NEVER" />
+                                <RowConstraints prefHeight="30.0" vgrow="NEVER" />
+                                <RowConstraints vgrow="NEVER" />
+                                <RowConstraints prefHeight="20.0" vgrow="NEVER" />
+                                <RowConstraints prefHeight="30.0" vgrow="NEVER" />
+                                <RowConstraints prefHeight="20.0" vgrow="NEVER" />
+                                <RowConstraints minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER" />
+                            </rowConstraints>
 
-                        <Label text="%dialog.addworkitem.issue" GridPane.columnSpan="2147483647" />
-                        <TextField fx:id="issueTextField" GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
-                            <GridPane.margin>
-                                <Insets bottom="2.0" top="2.0" />
-                            </GridPane.margin>
-                        </TextField>
+                            <Label text="%dialog.addworkitem.issue" GridPane.columnSpan="2147483647" />
+                            <TextField fx:id="issueTextField" GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="2.0" top="2.0" />
+                                </GridPane.margin>
+                            </TextField>
 
-                        <Label text="%dialog.addworkitem.date" GridPane.rowIndex="3" />
-                        <Label text="%dialog.addworkitem.time" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                            <Label text="%dialog.addworkitem.date" GridPane.rowIndex="3" />
+                            <Label text="%dialog.addworkitem.time" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                        <DatePicker fx:id="workDateDatePicker" GridPane.hgrow="NEVER" GridPane.rowIndex="4" />
-                        <TextField fx:id="workDurationTextField" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4">
-                            <GridPane.margin>
-                                <Insets bottom="2.0" top="2.0" />
-                            </GridPane.margin>
-                        </TextField>
+                            <DatePicker fx:id="workDateDatePicker" GridPane.hgrow="NEVER" GridPane.rowIndex="4" />
+                            <TextField fx:id="workDurationTextField" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4">
+                                <GridPane.margin>
+                                    <Insets bottom="2.0" top="2.0" />
+                                </GridPane.margin>
+                            </TextField>
 
-                        <Label text="%dialog.addworkitem.description" GridPane.columnSpan="2147483647" GridPane.rowIndex="5" />
-                        <TextField fx:id="workDescriptionTextField" GridPane.columnSpan="2147483647" GridPane.rowIndex="6" />
+                            <Label text="%dialog.addworkitem.description" GridPane.columnSpan="2147483647" GridPane.rowIndex="5" />
+                            <TextField fx:id="workDescriptionTextField" GridPane.columnSpan="2147483647" GridPane.rowIndex="6" />
 
-                        <Label fx:id="errorLabel" styleClass="error-label" GridPane.columnSpan="2147483647" GridPane.rowIndex="7" wrapText="true" />
+                        </GridPane>
 
-                    </GridPane>
+                        <Label fx:id="errorLabel" alignment="TOP_LEFT" styleClass="error-label" wrapText="true" GridPane.columnSpan="2147483647" GridPane.rowIndex="7" VBox.vgrow="SOMETIMES" />
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+                    </VBox>
                 </center>
 
                 <bottom>
