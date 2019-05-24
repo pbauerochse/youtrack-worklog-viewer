@@ -13,7 +13,6 @@ import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder.currentTimeReportP
 import de.pbauerochse.worklogviewer.fx.tasks.CheckForUpdateTask
 import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
-import de.pbauerochse.worklogviewer.logging.ProcessPendingLogsService
 import de.pbauerochse.worklogviewer.plugins.PluginLoader
 import de.pbauerochse.worklogviewer.plugins.actions.PluginActionContext
 import de.pbauerochse.worklogviewer.plugins.dialog.DialogSpecification
@@ -32,6 +31,7 @@ import de.pbauerochse.worklogviewer.version.Version
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import de.pbauerochse.worklogviewer.view.grouping.GroupingFactory
 import de.pbauerochse.worklogviewer.view.grouping.NoopGrouping
+import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
 import javafx.concurrent.WorkerStateEvent
@@ -45,7 +45,6 @@ import javafx.scene.input.KeyCombination
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
-import javafx.util.Duration
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.time.LocalDate
@@ -70,9 +69,6 @@ class MainViewController : Initializable {
 
     @FXML
     private lateinit var settingsMenuItem: MenuItem
-
-    @FXML
-    private lateinit var logMessagesMenuItem: MenuItem
 
     @FXML
     private lateinit var aboutMenuItem: MenuItem
@@ -116,7 +112,6 @@ class MainViewController : Initializable {
         this.settingsModel = SettingsUtil.settingsViewModel
         this.taskRunner = TaskRunnerImpl(taskProgressContainer, waitScreenOverlay)
 
-        startLogViewUpdaterTask()
         checkForUpdate()
         autoLoadLastUsedReport()
 
@@ -133,14 +128,6 @@ class MainViewController : Initializable {
                 onFormShown()
             }
         }
-    }
-
-    private fun startLogViewUpdaterTask() {
-        val service = ProcessPendingLogsService()
-        service.delay = Duration.millis(1.0)
-        service.period = Duration.seconds(1.0)
-        service.restartOnFailure = true
-        taskRunner.startService(service)
     }
 
     private fun checkForUpdate() {
@@ -220,7 +207,6 @@ class MainViewController : Initializable {
         exportToExcelMenuItem.setOnAction { startExportToExcelTask() }
         settingsMenuItem.setOnAction { showSettingsDialogue() }
         exitMenuItem.setOnAction { exitWorklogViewer() }
-        logMessagesMenuItem.setOnAction { showLogMessagesDialogue() }
         aboutMenuItem.setOnAction { showAboutDialogue() }
     }
 
@@ -247,11 +233,6 @@ class MainViewController : Initializable {
         )
     }
 
-    private fun showLogMessagesDialogue() {
-        LOGGER.debug("Showing log messages dialogue")
-        dialog.openDialog("/fx/views/logMessagesView.fxml", DialogSpecification(getFormatted("view.menu.help.logs")))
-    }
-
     private fun showAboutDialogue() {
         LOGGER.debug("Showing log messages dialogue")
         dialog.openDialog("/fx/views/about.fxml", DialogSpecification(getFormatted("view.menu.help.about")))
@@ -260,39 +241,40 @@ class MainViewController : Initializable {
     private fun initializePluginsMenu() {
         pluginsMenu.visibleProperty().bind(settingsModel.enablePluginsProperty)
         pluginsToolbarButtons.visibleProperty().bind(settingsModel.enablePluginsProperty)
-
         settingsModel.enablePluginsProperty.addListener { _, _, _ -> refreshPlugins() }
         refreshPlugins()
     }
 
     private fun refreshPlugins() {
-        PluginLoader.setScanForPlugins(settingsModel.enablePluginsProperty.get())
+        Platform.runLater {
+            PluginLoader.setScanForPlugins(settingsModel.enablePluginsProperty.get())
 
-        LOGGER.debug("Removing all Plugin Actions from Menu and Toolbar")
-        pluginsToolbarButtons.children.clear()
-        pluginsMenu.items.clear()
+            LOGGER.debug("Removing all Plugin Actions from Menu and Toolbar")
+            pluginsToolbarButtons.children.clear()
+            pluginsMenu.items.clear()
 
-        val plugins = PluginLoader.getPlugins()
-        LOGGER.info("Found ${plugins.size} active Plugins")
+            val plugins = PluginLoader.getPlugins()
+            LOGGER.info("Found ${plugins.size} active Plugins")
 
-        if (plugins.isEmpty()) {
-            val noActivePluginsMenuItem = MenuItem(getFormatted("plugins.nonefound")).apply { isDisable = true }
-            pluginsMenu.items.add(noActivePluginsMenuItem)
-        }
-
-        plugins
-            .groupBy { it.author }
-            .forEach { (author, authorPlugins) ->
-                val parent = when (authorPlugins.size) {
-                    1 -> pluginsMenu
-                    else -> Menu(author.name).apply { pluginsMenu.items.add(this) }
-                }
-
-                authorPlugins.forEach {
-                    parent.items.add(PluginMenu(it) { createPluginContext() })
-                    pluginsToolbarButtons.children.add(PluginToolbarActionGroup(it) { createPluginContext() })
-                }
+            if (plugins.isEmpty()) {
+                val noActivePluginsMenuItem = MenuItem(getFormatted("plugins.nonefound")).apply { isDisable = true }
+                pluginsMenu.items.add(noActivePluginsMenuItem)
             }
+
+            plugins
+                .groupBy { it.author }
+                .forEach { (author, authorPlugins) ->
+                    val parent = when (authorPlugins.size) {
+                        1 -> pluginsMenu
+                        else -> Menu(author.name).apply { pluginsMenu.items.add(this) }
+                    }
+
+                    authorPlugins.forEach {
+                        parent.items.add(PluginMenu(it) { createPluginContext() })
+                        pluginsToolbarButtons.children.add(PluginToolbarActionGroup(it) { createPluginContext() })
+                    }
+                }
+        }
     }
 
     private fun createPluginContext(): PluginActionContext {

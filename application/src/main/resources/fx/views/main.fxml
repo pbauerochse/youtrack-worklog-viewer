@@ -20,11 +20,7 @@
                         </Menu>
                         <Menu fx:id="pluginsMenu" mnemonicParsing="false" text="%view.menu.plugins" />
                         <Menu mnemonicParsing="false" text="%view.menu.help">
-                            <items>
-                                <MenuItem fx:id="logMessagesMenuItem" mnemonicParsing="false" text="%view.menu.help.logs" />
-                                <SeparatorMenuItem mnemonicParsing="false" />
-                                <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="%view.menu.help.about" />
-                            </items>
+                            <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="%view.menu.help.about" />
                         </Menu>
                     </menus>
                 </MenuBar>

@@ -21,15 +21,6 @@
         </encoder>
     </appender>
 
-    <appender name="logWindowAppender" class="de.pbauerochse.worklogviewer.logging.WorklogViewerAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
-
-        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        <maxLogLines>2500</maxLogLines>
-    </appender>
-
     <logger name="org.apache.http" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
