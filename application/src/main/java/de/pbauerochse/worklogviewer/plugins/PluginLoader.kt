@@ -31,15 +31,21 @@ object PluginLoader {
         } ?: emptyList()
     }
 
-    private fun createClassloader(): ClassLoader {
+    private fun createClassloader(): ClassLoader? {
         val potentialPluginJars = pluginJars()
-        LOGGER.info("Found ${potentialPluginJars.size} potential Plugins in ${PLUGIN_DIRECTORY.absolutePath}")
-        return URLClassLoader(potentialPluginJars, WorklogViewer::class.java.classLoader)
+        return if (potentialPluginJars.isNotEmpty()) {
+            LOGGER.info("Found ${potentialPluginJars.size} potential Plugins in ${PLUGIN_DIRECTORY.absolutePath}")
+            URLClassLoader(potentialPluginJars, WorklogViewer::class.java.classLoader)
+        } else null
     }
 
-    private fun pluginJars(): Array<URL> = PLUGIN_DIRECTORY
-        .listFiles { _, name -> name.toLowerCase().endsWith(".jar") }
-        .map { it.toURI().toURL() }
-        .toTypedArray()
+    private fun pluginJars(): Array<URL> {
+        return if (PLUGIN_DIRECTORY.exists() && PLUGIN_DIRECTORY.isDirectory) {
+            PLUGIN_DIRECTORY
+                .listFiles { _, name -> name.toLowerCase().endsWith(".jar") }
+                .map { it.toURI().toURL() }
+                .toTypedArray()
+        } else emptyArray()
+    }
 
 }
