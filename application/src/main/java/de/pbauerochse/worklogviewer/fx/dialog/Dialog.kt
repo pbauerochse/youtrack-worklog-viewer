@@ -9,6 +9,7 @@ import de.pbauerochse.worklogviewer.plugins.dialog.WorklogViewerDialog
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import javafx.application.Platform
+import javafx.beans.value.ChangeListener
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -62,7 +63,18 @@ class Dialog(private val scene: Scene) : WorklogViewerDialog {
                 }
             }
 
-            stage.onShown = EventHandler { centerDialog(it.source as Stage) }
+            // workaround to stop flickering when positioning stage on parent stage
+            // see https://stackoverflow.com/a/44165221/5883577
+            val widthListener = ChangeListener<Number> { _, _, _ -> centerDialog(stage) }
+            val heightListener = ChangeListener<Number> { _, _, _ -> centerDialog(stage) }
+            stage.widthProperty().addListener(widthListener)
+            stage.heightProperty().addListener(heightListener)
+            stage.onShown = EventHandler {
+                val theStage = it.source as Stage
+                theStage.widthProperty().removeListener(widthListener)
+                theStage.heightProperty().removeListener(heightListener)
+            }
+
             stage.showAndWait()
         }
     }
