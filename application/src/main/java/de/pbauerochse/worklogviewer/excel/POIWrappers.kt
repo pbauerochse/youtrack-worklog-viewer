@@ -162,7 +162,7 @@ class POIRow(private val row: Row, val sheet: POISheet) {
         return row.cellIterator().asSequence()
             .map { it.cellStyle }
             .filter { it != null }
-            .map { it.fontIndex }
+            .map { it.fontIndexAsInt }
             .map { row.sheet.workbook.getFontAt(it).fontHeightInPoints }
             .max()
     }
