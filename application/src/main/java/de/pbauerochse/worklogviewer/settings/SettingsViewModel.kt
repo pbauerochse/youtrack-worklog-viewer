@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleFloatProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ChangeListener
+import javafx.scene.input.KeyCombination
 import java.time.DayOfWeek.*
 import java.time.LocalDate
 
@@ -35,6 +36,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val endDateProperty = SimpleObjectProperty<LocalDate>()
     val lastUsedGroupByCategoryIdProperty = SimpleStringProperty()
     val lastUsedFilePath = SimpleStringProperty()
+    val fetchWorklogsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
 
     val collapseStateMondayProperty = SimpleBooleanProperty()
     val collapseStateTuesdayProperty = SimpleBooleanProperty()
@@ -76,6 +78,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         settings.startDate = startDateProperty.get()
         settings.endDate = endDateProperty.get()
         settings.lastUsedGroupByCategoryId = lastUsedGroupByCategoryIdProperty.get()
+        settings.fetchWorklogsKeyboardCombination = fetchWorklogsKeyboardCombination.get()?.name
 
         settings.collapseState.set(MONDAY, collapseStateMondayProperty.get())
         settings.collapseState.set(TUESDAY, collapseStateTuesdayProperty.get())
@@ -118,6 +121,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         startDateProperty.set(settings.startDate)
         endDateProperty.set(settings.endDate)
         lastUsedGroupByCategoryIdProperty.set(settings.lastUsedGroupByCategoryId)
+        settings.fetchWorklogsKeyboardCombination?.let { fetchWorklogsKeyboardCombination.set(KeyCombination.valueOf(it)) }
 
         collapseStateMondayProperty.set(settings.collapseState.isSet(MONDAY))
         collapseStateTuesdayProperty.set(settings.collapseState.isSet(TUESDAY))

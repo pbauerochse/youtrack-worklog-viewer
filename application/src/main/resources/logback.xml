@@ -21,15 +21,18 @@
         </encoder>
     </appender>
 
+    <logger name="javafx" level="warn" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
     <logger name="org.apache.http" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
-        <appender-ref ref="logWindowAppender"/>
     </logger>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
-        <appender-ref ref="logWindowAppender"/>
     </root>
 </configuration>

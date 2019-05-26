@@ -39,9 +39,7 @@ import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
-import javafx.scene.input.KeyCode
-import javafx.scene.input.KeyCodeCombination
-import javafx.scene.input.KeyCombination
+import javafx.scene.input.KeyEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
@@ -344,10 +342,14 @@ class MainViewController : Initializable {
     }
 
     private fun setupKeyboardShortcuts() {
-        mainToolbar.scene.accelerators[KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN)] = Runnable { fetchWorklogs() }
-        mainToolbar.scene.accelerators[KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN)] = Runnable { fetchWorklogs() }
-        mainToolbar.scene.accelerators[KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN)] = Runnable { showSettingsDialogue() }
-        mainToolbar.scene.accelerators[KeyCodeCombination(KeyCode.Q, KeyCombination.SHORTCUT_DOWN)] = Runnable { exitWorklogViewer() }
+        mainToolbar.scene.addEventHandler(KeyEvent.KEY_PRESSED) { event ->
+            val configuredFetchWorklogsShortcut = settingsModel.fetchWorklogsKeyboardCombination.value
+            val isFetchWorklogsShortcut = configuredFetchWorklogsShortcut != null && configuredFetchWorklogsShortcut.match(event)
+            if (isFetchWorklogsShortcut) {
+                LOGGER.debug("Keyboard shortcut for fetching worklogs triggered")
+                fetchWorklogs()
+            }
+        }
     }
 
     /**

@@ -74,4 +74,6 @@ class Settings {
     @JsonDeserialize(using = WeekdaySettingsDeserializer::class)
     var highlightState = WeekdaySettings(SATURDAY, SUNDAY)
 
+    var fetchWorklogsKeyboardCombination : String? = null
+
 }

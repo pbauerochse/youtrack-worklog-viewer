@@ -95,3 +95,7 @@
     -fx-font-size: 11;
     -fx-font-family: "DejaVu Sans Mono", monospace;
 }
+
+.hint-label {
+     -fx-text-fill: derive(-fx-light-text-color, -40%);
+}
