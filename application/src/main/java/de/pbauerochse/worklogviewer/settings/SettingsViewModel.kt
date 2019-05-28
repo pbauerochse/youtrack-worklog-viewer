@@ -36,7 +36,6 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val endDateProperty = SimpleObjectProperty<LocalDate>()
     val lastUsedGroupByCategoryIdProperty = SimpleStringProperty()
     val lastUsedFilePath = SimpleStringProperty()
-    val fetchWorklogsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
 
     val collapseStateMondayProperty = SimpleBooleanProperty()
     val collapseStateTuesdayProperty = SimpleBooleanProperty()
@@ -55,6 +54,12 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val highlightStateSundayProperty = SimpleBooleanProperty()
 
     val hasMissingConnectionSettings = hasMissingConnectionSettingsBinding
+
+    // shortcuts
+    val fetchWorklogsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
+    val toggleStatisticsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
+    val showSettingsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
+    val exitWorklogViewerKeyboardCombination = SimpleObjectProperty<KeyCombination>()
 
     init {
         applyPropertiesFromSettings()
@@ -78,7 +83,6 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         settings.startDate = startDateProperty.get()
         settings.endDate = endDateProperty.get()
         settings.lastUsedGroupByCategoryId = lastUsedGroupByCategoryIdProperty.get()
-        settings.fetchWorklogsKeyboardCombination = fetchWorklogsKeyboardCombination.get()?.name
 
         settings.collapseState.set(MONDAY, collapseStateMondayProperty.get())
         settings.collapseState.set(TUESDAY, collapseStateTuesdayProperty.get())
@@ -95,6 +99,11 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         settings.highlightState.set(FRIDAY, highlightStateFridayProperty.get())
         settings.highlightState.set(SATURDAY, highlightStateSaturdayProperty.get())
         settings.highlightState.set(SUNDAY, highlightStateSundayProperty.get())
+
+        settings.shortcuts.fetchWorklogs = fetchWorklogsKeyboardCombination.get()?.name
+        settings.shortcuts.toggleStatistics = toggleStatisticsKeyboardCombination.get()?.name
+        settings.shortcuts.showSettings = showSettingsKeyboardCombination.get()?.name
+        settings.shortcuts.exitWorklogViewer = exitWorklogViewerKeyboardCombination.get()?.name
 
         SettingsUtil.saveSettings()
     }
@@ -121,7 +130,6 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         startDateProperty.set(settings.startDate)
         endDateProperty.set(settings.endDate)
         lastUsedGroupByCategoryIdProperty.set(settings.lastUsedGroupByCategoryId)
-        settings.fetchWorklogsKeyboardCombination?.let { fetchWorklogsKeyboardCombination.set(KeyCombination.valueOf(it)) }
 
         collapseStateMondayProperty.set(settings.collapseState.isSet(MONDAY))
         collapseStateTuesdayProperty.set(settings.collapseState.isSet(TUESDAY))
@@ -138,6 +146,11 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         highlightStateFridayProperty.set(settings.highlightState.isSet(FRIDAY))
         highlightStateSaturdayProperty.set(settings.highlightState.isSet(SATURDAY))
         highlightStateSundayProperty.set(settings.highlightState.isSet(SUNDAY))
+
+        settings.shortcuts.fetchWorklogs?.let { fetchWorklogsKeyboardCombination.set(KeyCombination.valueOf(it)) }
+        settings.shortcuts.toggleStatistics?.let { toggleStatisticsKeyboardCombination.set(KeyCombination.valueOf(it)) }
+        settings.shortcuts.showSettings?.let { showSettingsKeyboardCombination.set(KeyCombination.valueOf(it)) }
+        settings.shortcuts.exitWorklogViewer?.let { exitWorklogViewerKeyboardCombination.set(KeyCombination.valueOf(it)) }
     }
 
     private val hasMissingConnectionSettingsBinding: BooleanBinding

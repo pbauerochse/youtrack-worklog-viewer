@@ -5,17 +5,24 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion
 import de.pbauerochse.worklogviewer.fx.converter.WorkhoursStringConverter
 import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter
+import de.pbauerochse.worklogviewer.fx.shortcutkeys.KeyCombinationAsStringBinding
+import de.pbauerochse.worklogviewer.fx.shortcutkeys.KeyboardShortcutDefinition
 import de.pbauerochse.worklogviewer.fx.shortcutkeys.RecordKeyboardShortcutListener
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.application.Platform
-import javafx.beans.binding.StringBinding
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
+import javafx.geometry.Insets
+import javafx.geometry.VPos
+import javafx.scene.Scene
 import javafx.scene.control.*
+import javafx.scene.layout.AnchorPane
+import javafx.scene.layout.GridPane
+import javafx.scene.layout.RowConstraints
 import javafx.stage.WindowEvent
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -83,25 +90,29 @@ class SettingsViewController : Initializable {
     @FXML
     private lateinit var sundayHighlightCheckbox: CheckBox
     @FXML
-    private lateinit var assignKeyboardShortcutButton: Button
-    @FXML
-    private lateinit var currentKeyboardShortcutTextField: Label
-    @FXML
-    private lateinit var cancelHintLabel : Label
-
-    private lateinit var resourceBundle: ResourceBundle
-
-    private lateinit var recordKeyboardShortcutListener : RecordKeyboardShortcutListener
+    private lateinit var keyboardShortcutGridPane: GridPane
 
     override fun initialize(location: URL, resources: ResourceBundle) {
         LOGGER.debug("Initializing")
-        this.resourceBundle = resources
-
         val viewModel = SettingsUtil.settingsViewModel
 
         attachListeners(viewModel)
         initializeDefaultValues()
         bindInputElements(viewModel)
+
+        themeComboBox.sceneProperty().addListener { _, _, scene ->
+            if (scene != null) {
+                initializeKeyboardShortcutPanel(
+                    scene,
+                    listOf(
+                        KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.fetchworklogs"), viewModel.fetchWorklogsKeyboardCombination),
+                        KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.showsettings"), viewModel.showSettingsKeyboardCombination),
+                        KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.togglestatistics"), viewModel.toggleStatisticsKeyboardCombination),
+                        KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.exit"), viewModel.exitWorklogViewerKeyboardCombination)
+                    )
+                )
+            }
+        }
     }
 
     private fun initializeDefaultValues() {
@@ -146,29 +157,41 @@ class SettingsViewController : Initializable {
         fridayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateFridayProperty)
         saturdayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateSaturdayProperty)
         sundayHighlightCheckbox.selectedProperty().bindBidirectional(viewModel.highlightStateSundayProperty)
+    }
 
-        // keyboard shortcut mode
-        currentKeyboardShortcutTextField.sceneProperty().addListener { _, _, scene -> scene?.let {
-            recordKeyboardShortcutListener = RecordKeyboardShortcutListener(scene) { viewModel.fetchWorklogsKeyboardCombination.set(it) }
-            assignKeyboardShortcutButton.onAction = EventHandler<ActionEvent> { recordKeyboardShortcutListener.enabledProperty.set(true) }
-            assignKeyboardShortcutButton.disableProperty().bind(recordKeyboardShortcutListener.enabledProperty)
-            cancelHintLabel.visibleProperty().bind(recordKeyboardShortcutListener.enabledProperty)
+    private fun initializeKeyboardShortcutPanel(scene: Scene, shortcutDefinitions: List<KeyboardShortcutDefinition>) {
+        val recordKeyboardShortcutListener = RecordKeyboardShortcutListener(scene)
 
-            val keycombinationBinding : StringBinding = object : StringBinding() {
-                init {
-                    bind(viewModel.fetchWorklogsKeyboardCombination)
-                }
+        val cancelHintLabel = Label(getFormatted("view.settings.shortkey.cancelhint"))
+        cancelHintLabel.styleClass.add("hint-label")
+        cancelHintLabel.visibleProperty().bind(recordKeyboardShortcutListener.enabledProperty)
 
-                override fun dispose() {
-                    unbind(viewModel.fetchWorklogsKeyboardCombination)
-                }
+        shortcutDefinitions.forEachIndexed { index, definition ->
+            val descriptionLabel = Label(definition.label)
+            val anchorPane = AnchorPane()
+            keyboardShortcutGridPane.addRow(index, descriptionLabel, anchorPane)
 
-                override fun computeValue(): String? {
-                    return viewModel.fetchWorklogsKeyboardCombination.value?.displayText
-                }
-            }
-            currentKeyboardShortcutTextField.textProperty().bind(keycombinationBinding)
-        }}
+            GridPane.setColumnIndex(descriptionLabel, 0)
+            GridPane.setColumnIndex(anchorPane, 1)
+            GridPane.setValignment(anchorPane, VPos.CENTER)
+            GridPane.setMargin(anchorPane, Insets(2.0, 0.0, 0.0, 0.0))
+
+            val assignedShortcutLabel = Label()
+            assignedShortcutLabel.textProperty().bind(KeyCombinationAsStringBinding(definition.property))
+
+            val assignShortcutButton = Button(getFormatted("view.settings.shortkey.define"))
+            assignShortcutButton.disableProperty().bind(recordKeyboardShortcutListener.enabledProperty)
+            assignShortcutButton.onAction = EventHandler { recordKeyboardShortcutListener.listen(definition.property) }
+
+            anchorPane.children.addAll(assignedShortcutLabel, assignShortcutButton)
+            AnchorPane.setRightAnchor(assignShortcutButton, 0.0)
+
+            keyboardShortcutGridPane.rowConstraints.add(RowConstraints(10.0, 30.0, 30.0))
+        }
+
+        keyboardShortcutGridPane.addRow(keyboardShortcutGridPane.rowCount, cancelHintLabel)
+        GridPane.setColumnIndex(cancelHintLabel, 1)
+        GridPane.setMargin(cancelHintLabel, Insets(4.0, 0.0, 0.0, 0.0))
     }
 
     private fun attachListeners(viewModel: SettingsViewModel) {
@@ -194,7 +217,7 @@ class SettingsViewController : Initializable {
 
     @FXML
     fun showSettingsHelp() {
-        val helpUrl = resourceBundle.getString("view.settings.authentication.help_url")
+        val helpUrl = getFormatted("view.settings.authentication.help_url")
         LOGGER.debug("Opening page {} in browser", helpUrl)
         Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(helpUrl) }
     }

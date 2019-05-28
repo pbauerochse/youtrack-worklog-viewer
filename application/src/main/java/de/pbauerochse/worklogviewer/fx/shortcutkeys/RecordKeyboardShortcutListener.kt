@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.shortcutkeys
 
 import javafx.beans.property.BooleanProperty
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.event.EventHandler
 import javafx.scene.Scene
@@ -16,25 +17,38 @@ import java.util.*
  * keystrokes can be cancelled by hitting the
  * Escape button
  */
-class RecordKeyboardShortcutListener(scene: Scene, private val changeListener : (combination : KeyCombination) -> Unit) : EventHandler<KeyEvent> {
+class RecordKeyboardShortcutListener(scene: Scene) : EventHandler<KeyEvent> {
 
-    var enabledProperty: BooleanProperty = SimpleBooleanProperty(false)
+    val enabledProperty: BooleanProperty = SimpleBooleanProperty(false)
+
+    private var currentProperty : ObjectProperty<KeyCombination>? = null
 
     init {
         scene.addEventHandler(KeyEvent.KEY_PRESSED, this)
     }
 
+    fun listen(property : ObjectProperty<KeyCombination>) {
+        enabledProperty.set(true)
+        currentProperty = property
+    }
+
+
     override fun handle(event: KeyEvent) {
         if (enabledProperty.get() && !event.code.isModifierKey) {
             event.consume()
             if (event.code == KeyCode.ESCAPE) {
-                enabledProperty.set(false)
+                stopListening()
             } else {
                 val keyCombination = createCombo(event)
-                changeListener.invoke(keyCombination)
-                enabledProperty.set(false)
+                currentProperty!!.set(keyCombination)
+                stopListening()
             }
         }
+    }
+
+    private fun stopListening() {
+        enabledProperty.set(false)
+        currentProperty = null
     }
 
     private fun createCombo(event: KeyEvent): KeyCombination {

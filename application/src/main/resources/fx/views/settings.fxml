@@ -70,6 +70,8 @@
 
                     </GridPane>
                 </TitledPane>
+
+
                 <TitledPane expanded="false" text="%view.settings.general">
                     <GridPane hgap="5.0" BorderPane.alignment="TOP_LEFT">
                         <columnConstraints>
@@ -79,8 +81,6 @@
                         <rowConstraints>
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
-                            <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="NEVER" />
-                     <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="NEVER" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
@@ -98,37 +98,37 @@
                         <Label text="%view.settings.workhours" GridPane.rowIndex="1" />
                         <ComboBox fx:id="workhoursComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                        <Label text="%view.settings.showall" GridPane.rowIndex="4" />
-                        <CheckBox fx:id="showAllWorklogsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label text="%view.settings.showall" GridPane.rowIndex="2" />
+                        <CheckBox fx:id="showAllWorklogsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                        <Label text="%view.settings.showStatistics" GridPane.rowIndex="5" />
-                        <CheckBox fx:id="showStatisticsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <Label text="%view.settings.showStatistics" GridPane.rowIndex="3" />
+                        <CheckBox fx:id="showStatisticsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                        <Label text="%view.settings.autoload" GridPane.rowIndex="6" />
-                        <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <Label text="%view.settings.autoload" GridPane.rowIndex="4" />
+                        <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                        <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="7" />
-                        <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="5" />
+                        <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-                        <Label text="%view.settings.enablePlugins" GridPane.rowIndex="8" />
-                        <CheckBox fx:id="enablePlugins" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <Label text="%view.settings.enablePlugins" GridPane.rowIndex="6" />
+                        <CheckBox fx:id="enablePlugins" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
-                        <Label text="%view.settings.shortkey" GridPane.rowIndex="2" />
-                        <AnchorPane GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="CENTER">
-                            <Label fx:id="currentKeyboardShortcutTextField" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" HBox.hgrow="ALWAYS" />
-                            <Button fx:id="assignKeyboardShortcutButton" text="%view.settings.shortkey.define" AnchorPane.rightAnchor="0.0" />
-                     <GridPane.margin>
-                        <Insets top="2.0" />
-                     </GridPane.margin>
-                        </AnchorPane>
-                        
-                        <Label fx:id="cancelHintLabel" styleClass="hint-label" text="%view.settings.shortkey.cancelhint" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                             <GridPane.margin>
-                                <Insets top="4.0" />
-                             </GridPane.margin>
-                        </Label>
                     </GridPane>
                 </TitledPane>
+
+                <TitledPane expanded="false" text="%view.settings.shortkey">
+                    <GridPane fx:id="keyboardShortcutGridPane" hgap="5.0" BorderPane.alignment="TOP_LEFT">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                        </columnConstraints>
+
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </GridPane>
+                </TitledPane>
+
                 <TitledPane expanded="false" text="%view.settings.workdays">
                     <GridPane>
                         <columnConstraints>

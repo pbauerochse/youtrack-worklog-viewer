@@ -39,6 +39,7 @@ import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
+import javafx.scene.input.KeyCombination
 import javafx.scene.input.KeyEvent
 import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
@@ -343,13 +344,17 @@ class MainViewController : Initializable {
 
     private fun setupKeyboardShortcuts() {
         mainToolbar.scene.addEventHandler(KeyEvent.KEY_PRESSED) { event ->
-            val configuredFetchWorklogsShortcut = settingsModel.fetchWorklogsKeyboardCombination.value
-            val isFetchWorklogsShortcut = configuredFetchWorklogsShortcut != null && configuredFetchWorklogsShortcut.match(event)
-            if (isFetchWorklogsShortcut) {
-                LOGGER.debug("Keyboard shortcut for fetching worklogs triggered")
-                fetchWorklogs()
+            when {
+                matches(settingsModel.fetchWorklogsKeyboardCombination, event) -> fetchWorklogs()
+                matches(settingsModel.showSettingsKeyboardCombination, event) -> showSettingsDialogue()
+                matches(settingsModel.toggleStatisticsKeyboardCombination, event) -> settingsModel.showStatisticsProperty.set(!settingsModel.showStatisticsProperty.get())
+                matches(settingsModel.exitWorklogViewerKeyboardCombination, event) -> exitWorklogViewer()
             }
         }
+    }
+
+    private fun matches(keyCombinationProperty: SimpleObjectProperty<KeyCombination>, event: KeyEvent): Boolean {
+        return keyCombinationProperty.value?.match(event) ?: false
     }
 
     /**
