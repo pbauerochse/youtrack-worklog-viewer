@@ -20,6 +20,7 @@ class DummyDataConnector(username: String) : YouTrackConnector {
     }
 
     override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
+        LOGGER.info("Adding Workitem $request")
         return AddWorkItemResult(
             request.issueId,
             ownUser,

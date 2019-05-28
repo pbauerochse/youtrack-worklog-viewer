@@ -7,6 +7,7 @@ import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPan
 import de.pbauerochse.worklogviewer.fx.converter.GroupingComboBoxConverter
 import de.pbauerochse.worklogviewer.fx.converter.TimerangeProviderStringConverter
 import de.pbauerochse.worklogviewer.fx.dialog.Dialog
+import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogViewerStateAdapter
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder.currentTimeReportProperty
@@ -114,8 +115,8 @@ class MainViewController : Initializable {
         checkForUpdate()
         autoLoadLastUsedReport()
 
-        initializeTimerangeComboBox()
         initializeDatePickers()
+        initializeTimerangeComboBox()
         initializeFetchWorklogsButton()
         initializeMenuItems()
         initializePluginsMenu()
@@ -166,7 +167,7 @@ class MainViewController : Initializable {
     private fun initializeDatePickers() {
         // start and end datepicker are only editable if report timerange is CUSTOM
         val dateChangeListener = ChangeListener<LocalDate> { observable, _, newDate ->
-            LOGGER.info("Setting date on $observable to $newDate")
+            LOGGER.debug("Setting date on $observable to $newDate")
             val datePicker = (observable as SimpleObjectProperty<*>).bean as DatePicker
             if (newDate == null) {
                 datePicker.styleClass.add(REQUIRED_FIELD_CLASS)
@@ -180,6 +181,9 @@ class MainViewController : Initializable {
 
         endDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isNotEqualTo(CustomTimerangeProvider))
         endDatePicker.valueProperty().addListener(dateChangeListener)
+
+        DatePickerManualEditListener.applyTo(startDatePicker)
+        DatePickerManualEditListener.applyTo(endDatePicker)
 
         // value listener
         startDatePicker.valueProperty().addListener { _, _, newValue -> settingsModel.startDateProperty.set(newValue) }
