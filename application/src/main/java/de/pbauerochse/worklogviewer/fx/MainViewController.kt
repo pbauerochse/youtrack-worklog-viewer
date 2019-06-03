@@ -131,9 +131,11 @@ class MainViewController : Initializable {
     }
 
     private fun checkForUpdate() {
-        val versionCheckTask = CheckForUpdateTask()
-        versionCheckTask.onSucceeded = EventHandler { this.addDownloadLinkToToolbarIfNeverVersionPresent(it) }
-        taskRunner.startTask(versionCheckTask)
+        Platform.runLater {
+            val versionCheckTask = CheckForUpdateTask()
+            versionCheckTask.onSucceeded = EventHandler { this.addDownloadLinkToToolbarIfNeverVersionPresent(it) }
+            taskRunner.startTask(versionCheckTask)
+        }
     }
 
     private fun autoLoadLastUsedReport() {
