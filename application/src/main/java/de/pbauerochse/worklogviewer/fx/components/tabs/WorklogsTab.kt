@@ -2,13 +2,17 @@ package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
 import de.pbauerochse.worklogviewer.fx.components.treetable.TimeReportTreeTableView
+import de.pbauerochse.worklogviewer.fx.dialog.Dialog
 import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask
+import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
+import de.pbauerochse.worklogviewer.plugins.dialog.FileChooserSpecification
+import de.pbauerochse.worklogviewer.plugins.dialog.FileType
 import de.pbauerochse.worklogviewer.plugins.state.TabContext
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.report.view.ReportView
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
-import de.pbauerochse.worklogviewer.util.FormattingUtil
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.view.ReportViewFactory
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import javafx.geometry.Insets
@@ -17,9 +21,7 @@ import javafx.scene.Node
 import javafx.scene.control.SplitPane
 import javafx.scene.control.Tab
 import javafx.scene.layout.AnchorPane
-import javafx.stage.FileChooser
 import org.slf4j.LoggerFactory
-import java.io.File
 
 /**
  * Abstract class to display parts of the result
@@ -32,8 +34,8 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
     private val splitPane = SplitPane(getWorklogsTableView()).apply { orientation = Orientation.HORIZONTAL }
     private val settingsModel = SettingsUtil.settingsViewModel
 
-    var currentData : ReportView? = null
-    private var nextData : ReportView? = null
+    var currentData: ReportView? = null
+    private var nextData: ReportView? = null
 
     init {
         content = splitPane
@@ -42,7 +44,7 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
         showStatisticsView(settingsModel.showStatisticsProperty.get())
     }
 
-    fun update(label: String, filteredIssues : List<Issue>, reportParameters: TimeReportParameters, grouping: Grouping) {
+    fun update(label: String, filteredIssues: List<Issue>, reportParameters: TimeReportParameters, grouping: Grouping) {
         text = label
         nextData = ReportViewFactory.convert(filteredIssues, reportParameters, grouping)
 
@@ -92,22 +94,15 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
         return anchorPane
     }
 
-    fun getDownloadAsExcelTask(): ExportToExcelTask? {
+    fun startDownloadAsExcel(taskRunner: TaskRunnerImpl) {
         // ask the user where to save the target file
         val timerange = currentData!!.reportParameters.timerange
 
-        val fileChooser = FileChooser()
-        fileChooser.title = FormattingUtil.getFormatted("view.menu.file.exportexcel")
-        fileChooser.initialFileName = "${text}_$timerange.xls"
-        fileChooser.selectedExtensionFilter = FileChooser.ExtensionFilter("Microsoft Excel", "*.xls")
-        fileChooser.initialDirectory = settingsModel.lastUsedFilePath.get()?.let { File(it) } ?: File(System.getProperty("user.home"))
-
-        val targetFile = fileChooser.showSaveDialog(content.scene.window)
-        return targetFile?.let {
-            LOGGER.debug("Exporting tab {} to excel {}", text, it.absoluteFile)
-            settingsModel.lastUsedFilePath.set(targetFile.parentFile.absolutePath)
-            return ExportToExcelTask(text, currentData!!, it)
-        }
+        Dialog(content.scene)
+            .showSaveFileDialog(FileChooserSpecification(getFormatted("view.menu.file.exportexcel"), "${text}_$timerange.xls", FileType("Microsoft Excel", "*.xls"))) {
+                LOGGER.debug("Exporting tab {} to excel {}", text, it.absoluteFile)
+                taskRunner.startTask(ExportToExcelTask(text, currentData!!, it))
+            }
     }
 
     override val view: ReportView

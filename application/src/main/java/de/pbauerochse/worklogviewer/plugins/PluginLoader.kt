@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.plugins
 
 import de.pbauerochse.worklogviewer.WorklogViewer
+import de.pbauerochse.worklogviewer.settings.WorklogViewerFiles
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL
@@ -10,7 +11,7 @@ import java.util.*
 object PluginLoader {
 
     private val LOGGER = LoggerFactory.getLogger(PluginLoader::class.java)
-    private val PLUGIN_DIRECTORY = File(System.getProperty("user.home"), ".youtrack-worklog-viewer/plugins")
+    private val PLUGIN_DIRECTORY = File(WorklogViewerFiles.WORKLOG_VIEWER_HOME, "plugins")
 
     private var pluginClassloader: ClassLoader? = null
 

@@ -218,9 +218,7 @@ class MainViewController : Initializable {
      */
     private fun startExportToExcelTask() {
         val tab = resultTabPane.currentlyVisibleTab
-        tab.getDownloadAsExcelTask()?.let {
-            taskRunner.startTask(it)
-        }
+        tab.startDownloadAsExcel(taskRunner)
     }
 
     private fun showSettingsDialogue() {

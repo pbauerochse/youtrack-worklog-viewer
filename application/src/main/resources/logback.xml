@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
 
+    <property name="WLV_HOME" value="${worklogviewer.home:-${user.home}/.youtrack-worklog-viewer}" />
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
@@ -14,7 +16,7 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${user.home}/.youtrack-worklog-viewer/logs/worklog-viewer.log</file>
+        <file>${WLV_HOME}/logs/worklog-viewer.log</file>
         <append>false</append>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
