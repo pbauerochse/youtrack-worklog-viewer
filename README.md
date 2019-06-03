@@ -24,7 +24,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 * **v3.0.0**
   * Grouping criterias are now applied on-the-fly, without having to reload the report
   * Add work items directly from the application using the new context menu
-  * You may now define a keyboard shortcut for downloading the current time report
+  * You may now define various keyboard shortcuts (e.g. for downloading the current time report) in the settings menu
   * Finer control of the work hours per day (quarter hour intervals)
   * Optional [Installer](TODO) to help you start the application
   * Added a basic plugin mechanism, that allows you to extend the Worklog Viewer with own functionality (beta)
