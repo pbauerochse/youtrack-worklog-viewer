@@ -17,7 +17,6 @@ import javafx.scene.Scene
 import javafx.stage.FileChooser
 import javafx.stage.Modality
 import javafx.stage.Stage
-import javafx.stage.StageStyle
 import java.io.File
 import java.net.URL
 
@@ -51,7 +50,6 @@ class Dialog(private val scene: Scene) : WorklogViewerDialog {
             }
 
             if (specs.modal) {
-                stage.initStyle(StageStyle.UTILITY)
                 stage.initModality(Modality.APPLICATION_MODAL)
                 stage.isResizable = false
             }

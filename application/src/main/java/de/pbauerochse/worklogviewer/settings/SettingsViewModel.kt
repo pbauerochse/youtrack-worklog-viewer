@@ -57,6 +57,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
 
     // shortcuts
     val fetchWorklogsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
+    val addWorkitemKeyboardCombination = SimpleObjectProperty<KeyCombination>()
     val toggleStatisticsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
     val showSettingsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
     val exitWorklogViewerKeyboardCombination = SimpleObjectProperty<KeyCombination>()
@@ -101,6 +102,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         settings.highlightState.set(SUNDAY, highlightStateSundayProperty.get())
 
         settings.shortcuts.fetchWorklogs = fetchWorklogsKeyboardCombination.get()?.name
+        settings.shortcuts.addWorkitem = addWorkitemKeyboardCombination.get()?.name
         settings.shortcuts.toggleStatistics = toggleStatisticsKeyboardCombination.get()?.name
         settings.shortcuts.showSettings = showSettingsKeyboardCombination.get()?.name
         settings.shortcuts.exitWorklogViewer = exitWorklogViewerKeyboardCombination.get()?.name
@@ -148,6 +150,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         highlightStateSundayProperty.set(settings.highlightState.isSet(SUNDAY))
 
         settings.shortcuts.fetchWorklogs?.let { fetchWorklogsKeyboardCombination.set(KeyCombination.valueOf(it)) }
+        settings.shortcuts.addWorkitem?.let { addWorkitemKeyboardCombination.set(KeyCombination.valueOf(it)) }
         settings.shortcuts.toggleStatistics?.let { toggleStatisticsKeyboardCombination.set(KeyCombination.valueOf(it)) }
         settings.shortcuts.showSettings?.let { showSettingsKeyboardCombination.set(KeyCombination.valueOf(it)) }
         settings.shortcuts.exitWorklogViewer?.let { exitWorklogViewerKeyboardCombination.set(KeyCombination.valueOf(it)) }

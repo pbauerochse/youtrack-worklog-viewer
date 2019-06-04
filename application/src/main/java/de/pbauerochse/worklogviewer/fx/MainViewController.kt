@@ -7,6 +7,7 @@ import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPan
 import de.pbauerochse.worklogviewer.fx.converter.GroupingComboBoxConverter
 import de.pbauerochse.worklogviewer.fx.converter.TimerangeProviderStringConverter
 import de.pbauerochse.worklogviewer.fx.dialog.Dialog
+import de.pbauerochse.worklogviewer.fx.dialog.workitem.AddWorkitemDialog
 import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogViewerStateAdapter
@@ -350,6 +351,7 @@ class MainViewController : Initializable {
         mainToolbar.scene.addEventHandler(KeyEvent.KEY_PRESSED) { event ->
             when {
                 matches(settingsModel.fetchWorklogsKeyboardCombination, event) -> fetchWorklogs()
+                matches(settingsModel.addWorkitemKeyboardCombination, event) -> showAddWorkitemDialog()
                 matches(settingsModel.showSettingsKeyboardCombination, event) -> showSettingsDialogue()
                 matches(settingsModel.toggleStatisticsKeyboardCombination, event) -> settingsModel.showStatisticsProperty.set(!settingsModel.showStatisticsProperty.get())
                 matches(settingsModel.exitWorklogViewerKeyboardCombination, event) -> exitWorklogViewer()
@@ -377,6 +379,11 @@ class MainViewController : Initializable {
         val task = FetchTimereportTask(parameters)
         task.setOnSucceeded { event -> currentTimeReportProperty.value = event.source.value as TimeReport }
         taskRunner.startTask(task)
+    }
+
+    private fun showAddWorkitemDialog() {
+        LOGGER.debug("Showing AddWorkitem Dialog")
+        AddWorkitemDialog.show(dialog)
     }
 
     private fun displayWorklogResult() {

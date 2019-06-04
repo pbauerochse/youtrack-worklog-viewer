@@ -106,6 +106,7 @@ class SettingsViewController : Initializable {
                     scene,
                     listOf(
                         KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.fetchworklogs"), viewModel.fetchWorklogsKeyboardCombination),
+                        KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.addworkitem"), viewModel.addWorkitemKeyboardCombination),
                         KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.showsettings"), viewModel.showSettingsKeyboardCombination),
                         KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.togglestatistics"), viewModel.toggleStatisticsKeyboardCombination),
                         KeyboardShortcutDefinition(getFormatted("view.settings.shortkey.exit"), viewModel.exitWorklogViewerKeyboardCombination)

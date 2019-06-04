@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 @JsonIgnoreProperties(ignoreUnknown = true)
 class KeyboardShotcuts {
     var fetchWorklogs: String? = null
+    var addWorkitem: String? = null
     var toggleStatistics: String? = null
     var showSettings: String? = null
     var exitWorklogViewer: String? = null

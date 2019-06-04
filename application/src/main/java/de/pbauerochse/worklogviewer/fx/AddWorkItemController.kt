@@ -3,7 +3,6 @@ package de.pbauerochse.worklogviewer.fx
 import de.pbauerochse.worklogviewer.addWorkItem
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
-import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder
 import de.pbauerochse.worklogviewer.fx.tasks.AddWorkItemTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
@@ -70,7 +69,7 @@ class AddWorkItemController : Initializable {
         taskRunner = TaskRunnerImpl(progressBarContainer, progressIndicator, false)
         issueTextField.textProperty().bindBidirectional(issueProperty)
         workDateDatePicker.valueProperty().bindBidirectional(dateProperty)
-        DatePickerManualEditListener.applyTo(workDateDatePicker)
+//        DatePickerManualEditListener.applyTo(workDateDatePicker)
 
         workDurationTextField.textProperty().bindBidirectional(durationProperty)
         workDurationTextField.textProperty().addListener { _, _, newDuration -> updateIsValidDurationProperty(newDuration) }
@@ -80,6 +79,10 @@ class AddWorkItemController : Initializable {
         saveButton.disableProperty().bind(
             progressIndicator.visibleProperty().or(durationProperty.isEmpty.or(isValidWorkTimeProperty.not()).or(issueProperty.isEmpty).or(dateProperty.isNull))
         )
+
+        // workaround to detect whether the whole form has been rendered to screen yet
+        val focusedElement = if (issueProperty.isEmpty.value) issueTextField else workDurationTextField
+        focusedElement.requestFocus()
     }
 
     fun closeDialog() {
@@ -118,10 +121,12 @@ class AddWorkItemController : Initializable {
 
     private fun handleAddWorkItemResponse(newWorkitem: AddWorkItemResult) {
         LOGGER.debug("Adding Work Item was successful. Adding $newWorkitem to current rpeort")
-        val currentTimeReport = ReportDataHolder.currentTimeReportProperty.value!!
-        val newTimeReport = currentTimeReport.addWorkItem(newWorkitem)
+        val currentTimeReport = ReportDataHolder.currentTimeReportProperty.value
+        currentTimeReport?.let {
+            val newTimeReport = it.addWorkItem(newWorkitem)
+            ReportDataHolder.currentTimeReportProperty.value = newTimeReport
+        }
 
-        ReportDataHolder.currentTimeReportProperty.value = newTimeReport
         closeDialog()
     }
 
