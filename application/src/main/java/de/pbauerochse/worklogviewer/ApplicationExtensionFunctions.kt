@@ -74,7 +74,7 @@ fun TimeReport.addWorkItem(newWorkitem: AddWorkItemResult): TimeReport {
             // issue to added work item was not
             // present when initial report was fetched
             // add "mock" item
-            issue = Issue(newWorkitem.issueId, getFormatted("task.addworkitem.missingissuedescription"), emptyList())
+            issue = Issue(newWorkitem.issueId, getFormatted("task.addworkitem.missingissuedescription"), "", emptyList())
             issueList.add(issue)
         }
 
@@ -92,4 +92,10 @@ fun TimeReport.addWorkItem(newWorkitem: AddWorkItemResult): TimeReport {
 
         return TimeReport(reportParameters, issueList)
     } else this
+}
+
+fun <T> MutableCollection<T>.addIfMissing(item : T) {
+    if (!contains(item)) {
+        this.add(item)
+    }
 }

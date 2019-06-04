@@ -31,6 +31,10 @@ class DummyDataConnector(username: String) : YouTrackConnector {
         )
     }
 
+    override fun searchIssues(query: String, offset: Int, progress: Progress): List<Issue> {
+        TODO("not implemented")
+    }
+
     private fun generateRandomIssues(parameters: TimeReportParameters): List<Issue> {
         LOGGER.info("Generating Random Issues for ${parameters.timerange}")
         val users = generateRandomUsers()
@@ -76,7 +80,7 @@ class DummyDataConnector(username: String) : YouTrackConnector {
             val resolved = Random.nextBoolean()
             val resolveDate = if (resolved) LocalDateTime.now() else null
             val issueFields = fieldsWithValues(project.possibleFields)
-            Issue(issueId, issueDescription, issueFields, resolveDate)
+            Issue(issueId, issueDescription, issueDescription, issueFields, resolveDate)
         }
     }
 

@@ -17,9 +17,9 @@ import java.util.concurrent.Future
  * according to the Task state
  */
 class TaskRunnerImpl(
-    private val parent: Pane,
-    private val waitScreenOverlay: StackPane,
-    private val showTaskNameLabel : Boolean = true
+        private val progressbarContainer: Pane,
+        private val waitScreenOverlay: StackPane,
+        private val showTaskNameLabel: Boolean = true
 ) : TaskRunner {
 
     private val runningTasks : MutableList<WorklogViewerTask<*>> = mutableListOf()
@@ -49,7 +49,7 @@ class TaskRunnerImpl(
 
         task.stateProperty().addListener { _, oldValue, newValue -> LOGGER.debug("Task ${task.label} changed from $oldValue to $newValue") }
 
-        parent.children.add(progressBar)
+        progressbarContainer.children.add(progressBar)
         return EXECUTOR.submit(task) as Future<T>
     }
 

@@ -8,7 +8,7 @@ import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPan
 import de.pbauerochse.worklogviewer.fx.converter.GroupingComboBoxConverter
 import de.pbauerochse.worklogviewer.fx.converter.TimerangeProviderStringConverter
 import de.pbauerochse.worklogviewer.fx.dialog.Dialog
-import de.pbauerochse.worklogviewer.fx.dialog.workitem.AddWorkitemDialog
+import de.pbauerochse.worklogviewer.fx.dialog.workitem.WorkitemDialogs
 import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogViewerStateAdapter
@@ -384,7 +384,7 @@ class MainViewController : Initializable {
 
     private fun showAddWorkitemDialog() {
         LOGGER.debug("Showing AddWorkitem Dialog")
-        AddWorkitemDialog.show(dialog)
+        WorkitemDialogs.showFull(dialog)
     }
 
     private fun displayWorklogResult() {

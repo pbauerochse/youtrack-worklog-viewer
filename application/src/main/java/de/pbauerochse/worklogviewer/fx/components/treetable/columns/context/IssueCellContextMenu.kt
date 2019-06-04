@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable.columns.context
 
-import de.pbauerochse.worklogviewer.fx.dialog.workitem.AddWorkitemDialog
+import de.pbauerochse.worklogviewer.fx.dialog.workitem.WorkitemDialogs
 import de.pbauerochse.worklogviewer.openInBrowser
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
@@ -28,7 +28,7 @@ class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate
         items.add(addWorkItemToAnyIssueMenu)
     }
 
-    fun showAddWorkItemToIssueDialog() = AddWorkitemDialog.show(scene, date, issue)
-    private fun showAddWorkItemToAnyIssueDialog() = AddWorkitemDialog.show(scene, date)
+    fun showAddWorkItemToIssueDialog() = WorkitemDialogs.show(scene, date, issue)
+    private fun showAddWorkItemToAnyIssueDialog() = WorkitemDialogs.show(scene, date)
 
 }

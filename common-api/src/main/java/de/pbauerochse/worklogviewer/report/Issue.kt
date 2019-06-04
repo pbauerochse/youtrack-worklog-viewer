@@ -9,6 +9,7 @@ import java.time.LocalDateTime
  */
 data class Issue(
     val id: String,
+    val summary : String,
     val description: String,
     val fields: List<Field>,
     var resolutionDate: LocalDateTime? = null
@@ -19,7 +20,7 @@ data class Issue(
      * the worklog items, from the other Issue are
      * applied to the new instance
      */
-    constructor(issue: Issue, fields: List<Field>, worklogItems: List<WorklogItem>) : this(issue.id, issue.description, fields, issue.resolutionDate) {
+    constructor(issue: Issue, fields: List<Field>, worklogItems: List<WorklogItem>) : this(issue.id, issue.summary, issue.description, fields, issue.resolutionDate) {
         this.worklogItems.addAll(worklogItems)
     }
 
@@ -34,7 +35,7 @@ data class Issue(
     }
 
     val fullTitle: String by lazy {
-        "$id - $description"
+        "$id - $summary"
     }
 
     /**

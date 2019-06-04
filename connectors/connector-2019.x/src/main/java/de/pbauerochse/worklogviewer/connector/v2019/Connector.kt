@@ -19,7 +19,9 @@ import org.apache.http.HttpHeaders
 import org.apache.http.entity.StringEntity
 import org.apache.http.message.BasicHeader
 import org.slf4j.LoggerFactory
+import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
@@ -60,6 +62,66 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
             newYouTrackWorkItem.text,
             newYouTrackWorkItem.type?.name
         )
+    }
+
+    override fun searchIssues(query: String, offset: Int, progress: Progress): List<Issue> {
+        LOGGER.info("Searching Issues with query='$query' and offset=$offset")
+        progress.setProgress(i18n("searching.issues", query), 1)
+
+        val queryParam = URLEncoder.encode(query, StandardCharsets.UTF_8)
+        val url = "/api/issues?fields=$ISSUE_FIELDS&\$top=$MAX_RESULTS_SEARCH_ISSUES&\$skip=$offset&query=$queryParam"
+
+        val response = http.get(url)
+        if (response.isError) {
+            LOGGER.error("Got Error Response Message from YouTrack while fetching with URL $url: ${response.statusLine.statusCode} ${response.error}")
+            throw IllegalStateException(i18n("fetching.workitems.error", response.error))
+        }
+
+        val issues: List<YouTrackIssue> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackIssue>>() {})
+        LOGGER.debug("Got ${issues.size} Issues for query '$query'")
+        progress.setProgress(i18n("searching.workitems", issues.size), 50)
+
+        val withWorkitems = loadWorkitems(issues, progress.subProgress(50))
+        progress.setProgress(i18n("done"), 100)
+
+        return withWorkitems
+    }
+
+    private fun loadWorkitems(issues: List<YouTrackIssue>, progress: Progress) : List<Issue> {
+        if (issues.isEmpty()) {
+            return emptyList()
+        }
+
+        var keepOnFetching = true
+        val workItems = mutableListOf<YouTrackWorkItem>()
+
+        val issueIds = issues.joinToString(",") { it.id }
+        val query = URLEncoder.encode("issue ID: $issueIds", StandardCharsets.UTF_8)
+
+        val startDate = LocalDate.now().minusDays(30).format(DATE_FORMATTER)
+
+        while (keepOnFetching) {
+            val url = "/api/workItems?\$top=$MAX_WORKITEMS_PER_BATCH&\$skip=${workItems.size}&fields=$WORKITEM_FIELDS&startDate=$startDate&query=$query"
+
+            val response = http.get(url)
+            if (response.isError) {
+                LOGGER.error("Got Error Response Message from YouTrack while fetching with URL $url: ${response.statusLine.statusCode} ${response.error}")
+                throw IllegalStateException(i18n("fetching.workitems.error", response.error))
+            }
+
+            val currentWorkItemsBatch: List<YouTrackWorkItem> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorkItem>>() {})
+            LOGGER.debug("Got ${currentWorkItemsBatch.size} WorkItems")
+
+            workItems.addAll(currentWorkItemsBatch)
+            keepOnFetching = currentWorkItemsBatch.size == MAX_WORKITEMS_PER_BATCH
+
+            progress.incrementProgress(1)
+        }
+
+        return issues.map { issue ->
+            val workitemsForIssue = workItems.filter { workItem -> workItem.issue.id == issue.id }
+            createIssue(issue, workitemsForIssue)
+        }
     }
 
     private fun getMe(): YouTrackUser {
@@ -129,7 +191,8 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
 
         val issue = Issue(
             id = youtrackIssue.id,
-            description = youtrackIssue.summary ?: i18n("issue.nosummary"),
+            summary = youtrackIssue.summary ?: i18n("issue.nosummary"),
+            description = youtrackIssue.description ?: i18n("issue.nosummary"),
             resolutionDate = youtrackIssue.resolveDate?.toLocalDateTime(),
             fields = fields
         )
@@ -159,8 +222,9 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         private fun i18n(key: String, vararg params: Any) = I18N.get(key, *params)
 
         private const val MAX_WORKITEMS_PER_BATCH = 400
+        private const val MAX_RESULTS_SEARCH_ISSUES = 30
         private const val USER_FIELDS = "id,login,fullName,email"
-        private const val ISSUE_FIELDS = "idReadable,resolved,project(shortName,name),summary,customFields(name,localizedName,aliases,value(name))"
+        private const val ISSUE_FIELDS = "idReadable,resolved,project(shortName,name),summary,wikifiedDescription,customFields(name,localizedName,aliases,value(name))"
         private const val WORKITEM_FIELDS = "author($USER_FIELDS),creator($USER_FIELDS),type(name),text,duration(minutes,presentation),date,issue($ISSUE_FIELDS)"
     }
 }

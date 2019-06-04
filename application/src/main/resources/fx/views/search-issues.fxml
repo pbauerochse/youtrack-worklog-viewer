@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--<?import de.pbauerochse.worklogviewer.fx.components.listview.ScrollSpyListView?>-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="de.pbauerochse.worklogviewer.fx.issuesearch.SearchIssuesController">
+    <center>
+        <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="TOP_LEFT">
+            <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                <top>
+                    <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" BorderPane.alignment="CENTER_LEFT">
+                        <Label maxHeight="1.7976931348623157E308" text="Abfrage" HBox.hgrow="NEVER"/>
+                        <TextField fx:id="queryTextField" maxHeight="1.7976931348623157E308" HBox.hgrow="ALWAYS"/>
+                        <Button maxHeight="1.7976931348623157E308" mnemonicParsing="false" fx:id="triggerSearchButton" text="Suchen" HBox.hgrow="NEVER"/>
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        </padding>
+                    </HBox>
+                </top>
+                <center>
+                    <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
+                        <TreeTableView fx:id="issuesView" />
+                        <BorderPane fx:id="issueDetailPanelContainer" />
+                    </SplitPane>
+                </center>
+                <bottom>
+                    <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER" fx:id="actionsToolbar"/>
+                </bottom>
+            </BorderPane>
+
+            <!-- Loading overlay -->
+            <StackPane fx:id="progressIndicator" style="-fx-background-color: rgba(0, 0, 0, 0.5);" visible="false">
+                <ProgressIndicator maxHeight="60.0" maxWidth="60.0" StackPane.alignment="CENTER"/>
+            </StackPane>
+        </StackPane>
+    </center>
+
+    <bottom>
+        <VBox fx:id="progressBarContainer" BorderPane.alignment="CENTER"/>
+    </bottom>
+</BorderPane>

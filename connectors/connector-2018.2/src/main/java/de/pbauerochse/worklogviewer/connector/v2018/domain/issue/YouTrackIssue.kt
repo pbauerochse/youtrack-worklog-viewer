@@ -12,7 +12,8 @@ data class YouTrackIssue @JsonCreator constructor(
     @JsonProperty("field") val fields: List<IssueField>
 ) {
 
-    val description = fields.find { it.name == "summary" }?.textValue ?: ""
+    val summary = fields.find { it.name == "summary" }?.textValue ?: ""
+    val description = fields.find { it.name == "description" }?.textValue ?: "" // TODO verify field name
     val resolutionDate: LocalDateTime? = fields.find { it.name == "resolved" }?.textValue?.toLong()?.toLocalDateTimeUsingUserTimeZone()
 
 }

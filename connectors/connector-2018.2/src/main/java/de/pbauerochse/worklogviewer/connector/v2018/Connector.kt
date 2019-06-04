@@ -86,6 +86,10 @@ class Connector(private val settings: YouTrackConnectionSettings) : YouTrackConn
         )
     }
 
+    override fun searchIssues(query: String, offset: Int, progress: Progress): List<Issue> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private fun fetchYouTrackIssues(parameters: TimeReportParameters): List<YouTrackIssue> {
         val issues = mutableListOf<YouTrackIssue>()
 
@@ -120,6 +124,7 @@ class Connector(private val settings: YouTrackConnectionSettings) : YouTrackConn
 
         val issue = Issue(
             youtrackIssue.id,
+            youtrackIssue.summary,
             youtrackIssue.description,
             youtrackIssue.fields.map {
                 val value = it.textValue?.let { textValue -> listOf(textValue) } ?: emptyList()
