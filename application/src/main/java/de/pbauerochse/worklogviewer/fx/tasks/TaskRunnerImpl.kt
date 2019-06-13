@@ -5,7 +5,6 @@ import de.pbauerochse.worklogviewer.plugins.tasks.TaskCallback
 import de.pbauerochse.worklogviewer.plugins.tasks.TaskRunner
 import de.pbauerochse.worklogviewer.tasks.Progress
 import de.pbauerochse.worklogviewer.util.FormattingUtil
-import javafx.concurrent.Service
 import javafx.css.Styleable
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
@@ -30,11 +29,6 @@ class TaskRunnerImpl(
         }
         pluginTask.setOnSucceeded { callback?.invoke(it.source.value as T?) }
         startTask(pluginTask)
-    }
-
-    fun <T> startService(service : Service<T>) {
-        service.executor = EXECUTOR
-        service.start()
     }
 
     /**
