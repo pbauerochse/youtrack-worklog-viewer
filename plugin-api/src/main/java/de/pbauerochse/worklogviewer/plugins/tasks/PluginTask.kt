@@ -14,6 +14,13 @@ interface PluginTask<T> {
     val label : String
 
     /**
+     * Determines whether the main application window
+     * should block user input while this task is running
+     * e.g. show the loading spinner
+     */
+    val isBlockingUi : Boolean
+
+    /**
      * The actual work that will be performed
      * must be implemented in here
      */

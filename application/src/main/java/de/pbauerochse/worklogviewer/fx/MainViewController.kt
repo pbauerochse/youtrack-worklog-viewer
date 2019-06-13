@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.fx
 
 import de.pbauerochse.worklogviewer.WorklogViewer
+import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
 import de.pbauerochse.worklogviewer.fx.components.plugins.PluginMenu
 import de.pbauerochse.worklogviewer.fx.components.plugins.PluginToolbarActionGroup
 import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPane
@@ -376,7 +377,7 @@ class MainViewController : Initializable {
         val timeRange = TimeRange(selectedStartDate, selectedEndDate)
         val parameters = TimeReportParameters(timeRange)
 
-        val task = FetchTimereportTask(parameters)
+        val task = FetchTimereportTask(YouTrackConnectorLocator.getActiveConnector()!!, parameters)
         task.setOnSucceeded { event -> currentTimeReportProperty.value = event.source.value as TimeReport }
         taskRunner.startTask(task)
     }

@@ -29,7 +29,7 @@ public class ExportToExcelTask extends WorklogViewerTask<File> {
     private final File targetFile;
 
     public ExportToExcelTask(String text, ReportView data, File targetFile) {
-        super(getFormatted("task.excelexport", text));
+        super(getFormatted("task.excelexport", text), false);
         this.text = text;
         this.data = data;
         this.targetFile = targetFile;

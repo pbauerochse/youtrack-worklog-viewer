@@ -25,7 +25,7 @@ class TaskRunnerImpl(
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> start(task: PluginTask<T>, callback: TaskCallback<T>?) {
-        val pluginTask = object : WorklogViewerTask<T?>(task.label) {
+        val pluginTask = object : WorklogViewerTask<T?>(task.label, task.isBlockingUi) {
             override fun start(progress: Progress): T? = task.run(progress)
         }
         pluginTask.setOnSucceeded { callback?.invoke(it.source.value as T?) }
@@ -65,7 +65,7 @@ class TaskRunnerImpl(
     private fun bindOnRunning(task: WorklogViewerTask<*>, progressBar: TaskProgressBar) {
         val initialOnRunningHandler = task.onRunning
         task.setOnRunning { event ->
-            waitScreenOverlay.isVisible = true
+            waitScreenOverlay.isVisible = task.isUiBlocking
             progressBar.progressText.textProperty().bind(task.messageProperty())
             progressBar.progressBar.progressProperty().bind(task.progressProperty())
 

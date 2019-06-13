@@ -4,7 +4,7 @@ import de.pbauerochse.worklogviewer.tasks.Progress
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.concurrent.Task
 
-abstract class WorklogViewerTask<T>(val label: String) : Task<T>() {
+abstract class WorklogViewerTask<T>(val label: String, val isUiBlocking : Boolean = true) : Task<T>() {
 
     init {
         this.updateTitle(label)
