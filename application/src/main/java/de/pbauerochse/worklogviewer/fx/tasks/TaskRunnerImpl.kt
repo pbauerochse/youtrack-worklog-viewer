@@ -22,6 +22,8 @@ class TaskRunnerImpl(
     private val showTaskNameLabel : Boolean = true
 ) : TaskRunner {
 
+    private val runningTasks : MutableList<WorklogViewerTask<*>> = mutableListOf()
+
     @Suppress("UNCHECKED_CAST")
     override fun <T> start(task: PluginTask<T>, callback: TaskCallback<T>?) {
         val pluginTask = object : WorklogViewerTask<T?>(task.label, task.isBlockingUi) {
@@ -59,7 +61,9 @@ class TaskRunnerImpl(
     private fun bindOnRunning(task: WorklogViewerTask<*>, progressBar: TaskProgressBar) {
         val initialOnRunningHandler = task.onRunning
         task.setOnRunning { event ->
-            waitScreenOverlay.isVisible = task.isUiBlocking
+            LOGGER.info("onRunning: ${task.label}")
+            runningTasks.add(task)
+            waitScreenOverlay.isVisible = waitScreenOverlay.isVisible || task.isUiBlocking
             progressBar.progressText.textProperty().bind(task.messageProperty())
             progressBar.progressBar.progressProperty().bind(task.progressProperty())
 
@@ -74,6 +78,7 @@ class TaskRunnerImpl(
         val initialOnSucceededHandler = task.onSucceeded
         task.setOnSucceeded { event ->
             LOGGER.info("Task {} succeeded", task.title)
+            runningTasks.remove(task)
 
             // unbind progress indicators
             progressBar.progressText.textProperty().unbind()
@@ -87,7 +92,7 @@ class TaskRunnerImpl(
                 initialOnSucceededHandler.handle(event)
             }
 
-            waitScreenOverlay.isVisible = false
+            waitScreenOverlay.isVisible = stillHasRunningUiBlockingTasks()
         }
     }
 
@@ -95,6 +100,7 @@ class TaskRunnerImpl(
         val initialOnFailedHandler = task.onFailed
         task.setOnFailed { event ->
             LOGGER.warn("Task {} failed", task.title)
+            runningTasks.remove(task)
 
             // unbind progress indicators
             progressBar.progressText.textProperty().unbind()
@@ -121,13 +127,17 @@ class TaskRunnerImpl(
             }
 
             progressBar.progressBar.progress = 1.0
-            waitScreenOverlay.isVisible = false
+            waitScreenOverlay.isVisible = stillHasRunningUiBlockingTasks()
         }
     }
 
     private fun setStyle(style: String, stylable: Styleable) {
         stylable.styleClass.removeAll(ERROR_CLASS, RUNNING_CLASS, SUCCESSFUL_CLASS)
         stylable.styleClass.add(style)
+    }
+
+    private fun stillHasRunningUiBlockingTasks() : Boolean {
+        return runningTasks.any { it.isUiBlocking }
     }
 
     companion object {
