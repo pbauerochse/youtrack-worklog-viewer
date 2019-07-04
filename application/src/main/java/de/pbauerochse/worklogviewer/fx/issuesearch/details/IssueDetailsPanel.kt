@@ -1,7 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.details
 
+import de.pbauerochse.worklogviewer.fx.Theme
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.WorklogItem
+import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
@@ -10,11 +12,10 @@ import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
-import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.layout.BorderPane
+import javafx.scene.web.WebView
 import org.slf4j.LoggerFactory
 import java.net.URL
-import java.time.LocalDate
 import java.util.*
 
 class IssueDetailsPanel : BorderPane(), Initializable {
@@ -23,7 +24,7 @@ class IssueDetailsPanel : BorderPane(), Initializable {
     private lateinit var issueSummaryLabel: Label
 
     @FXML
-    private lateinit var issueDescriptionLabel: Label
+    private lateinit var issueDescriptionWebView: WebView
 
     @FXML
     private lateinit var addWorklogButton: Button
@@ -42,24 +43,35 @@ class IssueDetailsPanel : BorderPane(), Initializable {
     }
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        val dateCell = TableColumn<WorklogItem, LocalDate?>("DATUM").apply { cellFactory = WorklogDateCell.CELL_FACTORY }
-        val descriptionCell = TableColumn<WorklogItem, String?>("DESCRIPTION").apply { cellValueFactory = PropertyValueFactory<WorklogItem, String?>("description") }
-//        val durationCell = TableColumn<WorklogItem, String?>("DURATION").apply { cellFactory = PropertyValueFactory<WorklogItem, String?>("description") }
+        val themeProperty = SettingsUtil.settingsViewModel.themeProperty
+        themeProperty.addListener { _, _, newValue -> updateTheme(newValue) }
+        updateTheme(themeProperty.value)
 
         issueWorklogsTableView.columns.addAll(
-            dateCell,
-            // type
-            descriptionCell
-            // duration
-            // action buttons
+            WorklogDateColumn(),
+            WorklogTypeColumn(),
+            WorklogDescriptionColumn(),
+            WorklogDurationColumn(),
+            WorklogActionsColumn()
         )
     }
 
     fun update(issue: Issue) {
-        LOGGER.info("Loading IssueDetails $issue")
+        LOGGER.info("Showing Issue Details for $issue")
         issueSummaryLabel.text = issue.fullTitle
-        issueDescriptionLabel.text = issue.description
+        issueDescriptionWebView.engine.loadContent(issue.description)
+
+        LOGGER.debug(issue.description)
+
         issueWorklogsTableView.items.setAll(issue.worklogItems)
+
+        val dateColumn = issueWorklogsTableView.columns.find { it is WorklogDateColumn }!!
+        dateColumn.sortType = TableColumn.SortType.DESCENDING
+        issueWorklogsTableView.sortOrder.add(dateColumn)
+    }
+
+    private fun updateTheme(theme: Theme) {
+        issueDescriptionWebView.engine.userStyleSheetLocation = IssueDetailsPanel::class.java.getResource(theme.webviewStylesheet).toExternalForm()
     }
 
     companion object {

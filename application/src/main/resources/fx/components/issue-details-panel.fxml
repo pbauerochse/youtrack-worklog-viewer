@@ -4,24 +4,25 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
 <fx:root maxWidth="Infinity" prefHeight="600.0" prefWidth="800.0" type="javafx.scene.layout.BorderPane" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
-        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
+        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" />
     </padding>
 
     <top>
         <Label fx:id="issueSummaryLabel" wrapText="true">
             <font>
-                <Font name="System Bold" size="16.0"/>
+                <Font name="System Bold" size="16.0" />
             </font>
         </Label>
     </top>
 
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
-            <Label fx:id="issueDescriptionLabel" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" wrapText="true" HBox.hgrow="ALWAYS"/>
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+            <WebView fx:id="issueDescriptionWebView" />
             <BorderPane.margin>
-                <Insets top="20.0"/>
+                <Insets top="20.0" />
             </BorderPane.margin>
         </ScrollPane>
     </center>
@@ -32,20 +33,23 @@
                 <center>
                     <Label text="Zeitbuchungen" BorderPane.alignment="CENTER_LEFT">
                         <font>
-                            <Font name="System Bold" size="13.0"/>
+                            <Font name="System Bold" size="13.0" />
                         </font>
                     </Label>
                 </center>
                 <right>
                     <HBox BorderPane.alignment="CENTER">
-                        <Button fx:id="addWorklogButton" mnemonicParsing="false" text="+"/>
-                        <Button fx:id="editWorklogButton" mnemonicParsing="false" text="ED"/>
+                        <Button fx:id="addWorklogButton" mnemonicParsing="false" text="+" />
+                        <Button fx:id="editWorklogButton" mnemonicParsing="false" text="ED" />
                     </HBox>
                 </right>
             </BorderPane>
-            <TableView fx:id="issueWorklogsTableView" prefHeight="200.0"/>
+            <TableView fx:id="issueWorklogsTableView" prefHeight="200.0">
+            <columnResizePolicy>
+               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy></TableView>
             <BorderPane.margin>
-                <Insets top="20.0"/>
+                <Insets top="20.0" />
             </BorderPane.margin>
         </VBox>
     </bottom>

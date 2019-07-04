@@ -245,3 +245,9 @@
     -fx-text-fill: #d2394d;
     -fx-font-weight: bold;
 }
+
+.split-pane {
+    -fx-background-color: -ytwlv-dark-background-color, -ytwlv-dark-background-color;
+    /*-fx-background-insets: 0, 1;*/
+    /*-fx-padding: 1;*/
+}

@@ -50,7 +50,9 @@ class SearchIssuesController : Initializable {
     private lateinit var progressBarContainer: VBox
 
     private lateinit var taskRunner: TaskRunnerImpl
-    private lateinit var favoritesTreeItem: TreeItem<IssueSearchTreeItem>
+
+    private lateinit var favouriteSearchesTreeItem: TreeItem<IssueSearchTreeItem>
+    private lateinit var favouriteIssuesTreeItem: TreeItem<IssueSearchTreeItem>
     private lateinit var searchResultsTreeItem: TreeItem<IssueSearchTreeItem>
 
     private val lastSearchQueryProperty = SimpleStringProperty()
@@ -84,8 +86,12 @@ class SearchIssuesController : Initializable {
     }
 
     private fun initializeIssueTreeTableView() {
-        favoritesTreeItem = TreeItem(NamedIssueList(getFormatted("dialog.issuesearch.groups.favourites")))
-        favoritesTreeItem.isExpanded = true
+        favouriteSearchesTreeItem = TreeItem(NamedIssueList(getFormatted("dialog.issuesearch.groups.favourites.searches")))
+        favouriteSearchesTreeItem.isExpanded = true
+
+        favouriteIssuesTreeItem = TreeItem(NamedIssueList(getFormatted("dialog.issuesearch.groups.favourites.issues")))
+        favouriteIssuesTreeItem.isExpanded = true
+
         searchResultsTreeItem = TreeItem(NamedIssueList(getFormatted("dialog.issuesearch.groups.searchresult")))
         searchResultsTreeItem.isExpanded = true
 
@@ -93,24 +99,24 @@ class SearchIssuesController : Initializable {
         issuesView.columns.add(IssueSearchTreeColumn())
         issuesView.selectionModel.selectedItemProperty().addListener { _, _, selectedItem -> selectIssue(selectedItem.value) }
         issuesView.root = TreeItem<IssueSearchTreeItem>().apply {
-            children.addAll(favoritesTreeItem, searchResultsTreeItem)
+            children.addAll(favouriteSearchesTreeItem, favouriteIssuesTreeItem, searchResultsTreeItem)
         }
     }
 
     private fun updateIssuesView(issues: List<Issue>) {
         searchResultsTreeItem.children.clear()
-        searchResultsTreeItem.children.addAll(issues.sorted().map { TreeItem(IssueTreeItem(it) as IssueSearchTreeItem) }.toList())
+        searchResultsTreeItem.children.addAll(issues.map { TreeItem(IssueTreeItem(it) as IssueSearchTreeItem) }.toList())
     }
 
     private fun startNewSearch() {
         if (queryTextField.text.isNullOrBlank().not()) {
             lastSearchQueryProperty.value = queryTextField.text
-            performSearch(queryTextField.text, 0)
+            performSearch(queryTextField.text)
         }
     }
 
-    private fun performSearch(query: String, offset: Int) {
-        val task = SearchIssuesTask(query, offset, YouTrackConnectorLocator.getActiveConnector()!!)
+    private fun performSearch(query: String) {
+        val task = SearchIssuesTask(query, 0, YouTrackConnectorLocator.getActiveConnector()!!)
         task.onSucceeded = EventHandler { updateIssueList(it) }
         lastSearchQueryProperty.value = query
         taskRunner.startTask(task)
