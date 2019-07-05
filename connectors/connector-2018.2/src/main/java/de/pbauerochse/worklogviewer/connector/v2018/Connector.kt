@@ -86,8 +86,12 @@ class Connector(private val settings: YouTrackConnectionSettings) : YouTrackConn
         )
     }
 
+    override fun loadIssue(id: String, progress: Progress): Issue {
+        TODO("not implemented")
+    }
+
     override fun searchIssues(query: String, offset: Int, progress: Progress): List<Issue> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     private fun fetchYouTrackIssues(parameters: TimeReportParameters): List<YouTrackIssue> {

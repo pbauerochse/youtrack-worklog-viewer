@@ -8,12 +8,12 @@ import java.time.LocalDateTime
  * having WorklogEntries
  */
 data class Issue(
-    val id: String,
-    val summary : String,
+    override val id: String,
+    override val summary : String,
     val description: String,
     val fields: List<Field>,
     var resolutionDate: LocalDateTime? = null
-) : Comparable<Issue> {
+) : Comparable<Issue>, MinimalIssue {
 
     /**
      * Allows "cloning" an Issue. The values, except

@@ -2,6 +2,7 @@ package de.pbauerochse.worklogviewer
 
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
 import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.report.MinimalIssue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
@@ -28,7 +29,7 @@ fun Hyperlink.setHref(url: String) {
 /**
  * Opens the issue in the browser
  */
-fun Issue.openInBrowser() {
+fun MinimalIssue.openInBrowser() {
     Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(this.getYouTrackLink().toExternalForm()) }
 }
 
@@ -37,7 +38,7 @@ fun Issue.openInBrowser() {
  * by taking the base URL from the Settings
  * and adding the issue path
  */
-fun Issue.getYouTrackLink(): URL {
+fun MinimalIssue.getYouTrackLink(): URL {
     return URL(SettingsUtil.settings.youTrackConnectionSettings.baseUrl, "/issue/$id#tab=Time%20Tracking")
 }
 

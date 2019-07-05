@@ -2,6 +2,7 @@ package de.pbauerochse.worklogviewer.settings
 
 import de.pbauerochse.worklogviewer.connector.YouTrackVersion
 import de.pbauerochse.worklogviewer.fx.Theme
+import de.pbauerochse.worklogviewer.settings.favourites.FavouritesModel
 import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import de.pbauerochse.worklogviewer.toURL
 import javafx.beans.binding.BooleanBinding
@@ -61,6 +62,8 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val toggleStatisticsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
     val showSettingsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
     val exitWorklogViewerKeyboardCombination = SimpleObjectProperty<KeyCombination>()
+
+    val favourites : FavouritesModel = FavouritesModel(settings.favourites)
 
     init {
         applyPropertiesFromSettings()

@@ -64,6 +64,21 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         )
     }
 
+    override fun loadIssue(id: String, progress: Progress): Issue {
+        val url = "/api/issues/$id?fields=$ISSUE_FIELDS"
+
+        val response = http.get(url)
+        if (response.isError) {
+            LOGGER.error("Got Error Response Message from YouTrack while loading single Issue $id from URL $url: ${response.statusLine.statusCode} ${response.error}")
+            throw IllegalStateException(i18n("loadissue.error", id, response.error))
+        }
+
+        val youtrackIssue = MAPPER.readValue(response.content!!, YouTrackIssue::class.java)
+        val withWorkitems = loadWorkitems(listOf(youtrackIssue), progress)
+
+        return withWorkitems.first()
+    }
+
     override fun searchIssues(query: String, offset: Int, progress: Progress): List<Issue> {
         LOGGER.info("Searching Issues with query='$query' and offset=$offset")
         progress.setProgress(i18n("searching.issues", query), 1)
@@ -74,7 +89,7 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         val response = http.get(url)
         if (response.isError) {
             LOGGER.error("Got Error Response Message from YouTrack while fetching with URL $url: ${response.statusLine.statusCode} ${response.error}")
-            throw IllegalStateException(i18n("fetching.workitems.error", response.error))
+            throw IllegalStateException(i18n("searching.issues.error", query, response.error))
         }
 
         val issues: List<YouTrackIssue> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackIssue>>() {})

@@ -35,6 +35,10 @@ class DummyDataConnector(username: String) : YouTrackConnector {
         TODO("not implemented")
     }
 
+    override fun loadIssue(id: String, progress: Progress): Issue {
+        TODO("not implemented")
+    }
+
     private fun generateRandomIssues(parameters: TimeReportParameters): List<Issue> {
         LOGGER.info("Generating Random Issues for ${parameters.timerange}")
         val users = generateRandomUsers()

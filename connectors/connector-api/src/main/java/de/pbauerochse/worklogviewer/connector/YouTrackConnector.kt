@@ -23,6 +23,10 @@ interface YouTrackConnector {
      */
     fun addWorkItem(request : AddWorkItemRequest) : AddWorkItemResult
 
+    // TODO document
     fun searchIssues(query : String, offset : Int, progress: Progress) : List<Issue>
+
+    // TODO document
+    fun loadIssue(id: String, progress: Progress): Issue
 
 }

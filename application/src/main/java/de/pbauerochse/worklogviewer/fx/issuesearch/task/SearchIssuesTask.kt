@@ -4,13 +4,17 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnector
 import de.pbauerochse.worklogviewer.fx.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import org.slf4j.LoggerFactory
 
+/**
+ * Task that searches a List of Issues by a given query
+ */
 class SearchIssuesTask(
         private val query: String,
         private val offset : Int,
         private val connector : YouTrackConnector
-) : WorklogViewerTask<List<Issue>>("TODO Issue Search") {
+) : WorklogViewerTask<List<Issue>>(getFormatted("dialog.issuesearch.task.title")) {
 
     val isNewSearch = offset == 0
 

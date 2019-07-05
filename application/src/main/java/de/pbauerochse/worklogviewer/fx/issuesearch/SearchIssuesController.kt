@@ -1,11 +1,17 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch
 
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
+import de.pbauerochse.worklogviewer.fx.components.treetable.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.fx.issuesearch.details.IssueDetailsPanel
+import de.pbauerochse.worklogviewer.fx.issuesearch.task.LoadSingleIssueTask
 import de.pbauerochse.worklogviewer.fx.issuesearch.task.SearchIssuesTask
 import de.pbauerochse.worklogviewer.fx.issuesearch.treeview.IssueSearchTreeColumn
 import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
 import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.settings.favourites.FavouriteIssue
+import de.pbauerochse.worklogviewer.settings.favourites.FavouriteSearch
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
@@ -64,10 +70,9 @@ class SearchIssuesController : Initializable {
         issueDetailPanelContainer.center = issueDetailsPanel
         issueDetailPanelContainer.center = BorderPane().apply { center = Label(getFormatted("dialog.issuesearch.noselection")).apply { isWrapText = true } }
 
-        lastSearchResultProperty.addListener(ListChangeListener { updateIssuesView(it.list) })
-
         initializeSearchElements()
         initializeIssueTreeTableView()
+        initializeFavourites()
 
         actionsToolbar.items.addAll(
             Button("<"),
@@ -76,23 +81,25 @@ class SearchIssuesController : Initializable {
     }
 
     private fun initializeSearchElements() {
-        triggerSearchButton.onAction = EventHandler { startNewSearch() }
+        triggerSearchButton.onAction = EventHandler { startNewSearch(queryTextField.text) }
         triggerSearchButton.disableProperty().bind(queryTextField.textProperty().isEmpty)
         queryTextField.onKeyPressed = EventHandler {
             if (it.code == KeyCode.ENTER) {
-                startNewSearch()
+                startNewSearch(queryTextField.text)
             }
         }
     }
 
     private fun initializeIssueTreeTableView() {
-        favouriteSearchesTreeItem = TreeItem(NamedIssueList(getFormatted("dialog.issuesearch.groups.favourites.searches")))
+        lastSearchResultProperty.addListener(ListChangeListener { updateSearchResultsTreeItem(it.list) })
+
+        favouriteSearchesTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(getFormatted("dialog.issuesearch.groups.favourites.searches")))
         favouriteSearchesTreeItem.isExpanded = true
 
-        favouriteIssuesTreeItem = TreeItem(NamedIssueList(getFormatted("dialog.issuesearch.groups.favourites.issues")))
+        favouriteIssuesTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(getFormatted("dialog.issuesearch.groups.favourites.issues")))
         favouriteIssuesTreeItem.isExpanded = true
 
-        searchResultsTreeItem = TreeItem(NamedIssueList(getFormatted("dialog.issuesearch.groups.searchresult")))
+        searchResultsTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(getFormatted("dialog.issuesearch.groups.searchresult")))
         searchResultsTreeItem.isExpanded = true
 
         issuesView.isShowRoot = false
@@ -103,26 +110,58 @@ class SearchIssuesController : Initializable {
         }
     }
 
-    private fun updateIssuesView(issues: List<Issue>) {
-        searchResultsTreeItem.children.clear()
-        searchResultsTreeItem.children.addAll(issues.map { TreeItem(IssueTreeItem(it) as IssueSearchTreeItem) }.toList())
+    private fun initializeFavourites() {
+        val favouritesModel = SettingsUtil.settingsViewModel.favourites
+        favouritesModel.issues.addListener(ListChangeListener { updateFavouritesTreeItem(it.list) })
+        favouritesModel.searches.addListener(ListChangeListener { updateSavedSearches(it.list) })
+
+        updateFavouritesTreeItem(favouritesModel.issues)
+        updateSavedSearches(favouritesModel.searches)
     }
 
-    private fun startNewSearch() {
-        if (queryTextField.text.isNullOrBlank().not()) {
-            lastSearchQueryProperty.value = queryTextField.text
-            performSearch(queryTextField.text)
+    private fun updateSearchResultsTreeItem(issues: List<Issue>) {
+        val treeItems = issues.map {
+            val styleClasses = mutableSetOf(ComponentStyleClasses.ISSUE_LINK_CELL)
+            if (it.resolutionDate != null) {
+                styleClasses.add(ComponentStyleClasses.RESOLVED_ISSUE_CELL)
+            }
+
+            TreeItem(IssueSearchTreeItem(it.fullTitle, { showIssueDetails(it) }, IssueCellContextMenu(it), styleClasses))
+        }
+        searchResultsTreeItem.children.setAll(treeItems)
+    }
+
+    private fun updateFavouritesTreeItem(favourites: List<FavouriteIssue>) {
+        val treeItems = favourites.map {
+            val data = IssueSearchTreeItem(it.fullTitle, { loadIssue(it) }, IssueCellContextMenu(it))
+            TreeItem(data)
+        }
+        favouriteIssuesTreeItem.children.setAll(treeItems)
+    }
+
+    private fun updateSavedSearches(searches: List<FavouriteSearch>) {
+        val treeItems = searches.map {
+            val data = IssueSearchTreeItem(it.title, { startNewSearch(it.query) })
+            TreeItem(data)
+        }
+        favouriteSearchesTreeItem.children.setAll(treeItems)
+    }
+
+    private fun startNewSearch(query : String?) {
+        if (query.isNullOrBlank().not()) {
+            lastSearchQueryProperty.value = query
+            performSearch(query!!)
         }
     }
 
     private fun performSearch(query: String) {
         val task = SearchIssuesTask(query, 0, YouTrackConnectorLocator.getActiveConnector()!!)
-        task.onSucceeded = EventHandler { updateIssueList(it) }
+        task.onSucceeded = EventHandler { showSearchResults(it) }
         lastSearchQueryProperty.value = query
         taskRunner.startTask(task)
     }
 
-    private fun updateIssueList(event: WorkerStateEvent) {
+    private fun showSearchResults(event: WorkerStateEvent) {
         val task = event.source as SearchIssuesTask
         LOGGER.info("Found ${task.value.size} Issues")
         if (task.isNewSearch) {
@@ -132,12 +171,24 @@ class SearchIssuesController : Initializable {
         }
     }
 
-    private fun selectIssue(item: IssueSearchTreeItem) {
-        item.issue?.let {
-            LOGGER.info("Selected issue ${it.fullTitle}")
-            issueDetailsPanel.update(it)
-            issueDetailPanelContainer.center = issueDetailsPanel
+    private fun loadIssue(favouriteIssue: FavouriteIssue) {
+        val task = LoadSingleIssueTask(favouriteIssue.id, YouTrackConnectorLocator.getActiveConnector()!!)
+        task.onSucceeded = EventHandler { event ->
+            val finishedTask = event.source as LoadSingleIssueTask
+            finishedTask.value?.let { showIssueDetails(it) }
         }
+        taskRunner.startTask(task)
+    }
+
+    private fun selectIssue(item: IssueSearchTreeItem) {
+        LOGGER.debug("Selected TreeItem $item")
+        item.onSelect.invoke()
+    }
+
+    private fun showIssueDetails(issue: Issue) {
+        LOGGER.info("Selected issue ${issue.fullTitle}")
+        issueDetailsPanel.update(issue)
+        issueDetailPanelContainer.center = issueDetailsPanel
     }
 
     companion object {

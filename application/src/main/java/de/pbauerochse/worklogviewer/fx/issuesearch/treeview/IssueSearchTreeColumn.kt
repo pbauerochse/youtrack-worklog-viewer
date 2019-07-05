@@ -1,9 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.treeview
 
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
-import de.pbauerochse.worklogviewer.fx.components.treetable.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.fx.issuesearch.IssueSearchTreeItem
-import de.pbauerochse.worklogviewer.report.Issue
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.Tooltip
 import javafx.scene.control.TreeTableCell
@@ -32,23 +30,8 @@ private class IssueSearchResultCell : TreeTableCell<IssueSearchTreeItem, IssueSe
         item?.let {
             text = it.label
             tooltip = Tooltip(it.label)
-
-            when (it.issue) {
-                null -> handleGrouping()
-                else -> handleIssue(it.issue!!)
-            }
-        }
-    }
-
-    private fun handleGrouping() {
-        contextMenu = null
-    }
-
-    private fun handleIssue(issue: Issue) {
-        contextMenu = IssueCellContextMenu(issue)
-        styleClass.add(ComponentStyleClasses.ISSUE_LINK_CELL)
-        issue.resolutionDate?.let {
-            styleClass.add(ComponentStyleClasses.RESOLVED_ISSUE_CELL)
+            contextMenu = it.contextMenu
+            styleClass.addAll(it.styleClasses)
         }
     }
 

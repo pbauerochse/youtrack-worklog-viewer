@@ -1,16 +1,16 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch
 
-import de.pbauerochse.worklogviewer.report.Issue
+import javafx.scene.control.ContextMenu
 
-interface IssueSearchTreeItem {
-    val label: String
-    val issue: Issue?
-}
-
-data class NamedIssueList(override val label: String) : IssueSearchTreeItem {
-    override val issue: Issue? = null
-}
-
-data class IssueTreeItem(override val issue: Issue) : IssueSearchTreeItem {
-    override val label: String = issue.fullTitle
+data class IssueSearchTreeItem(
+    val label: String,
+    val onSelect: () -> Unit,
+    val contextMenu : ContextMenu? = null,
+    val styleClasses : Collection<String> = emptySet()
+) {
+    companion object {
+        fun labelledNoopItem(label: String): IssueSearchTreeItem {
+            return IssueSearchTreeItem(label, {})
+        }
+    }
 }

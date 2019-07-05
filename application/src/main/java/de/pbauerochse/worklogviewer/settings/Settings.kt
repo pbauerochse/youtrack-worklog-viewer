@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import de.pbauerochse.worklogviewer.fx.Theme
+import de.pbauerochse.worklogviewer.settings.favourites.Favourites
 import de.pbauerochse.worklogviewer.settings.jackson.*
 import de.pbauerochse.worklogviewer.timerange.CurrentWeekTimerangeProvider
 import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
@@ -76,5 +77,8 @@ class Settings {
 
     @JsonProperty("shortcuts")
     var shortcuts : KeyboardShotcuts = KeyboardShotcuts()
+
+    @JsonProperty("favourites")
+    var favourites : Favourites = Favourites()
 
 }
