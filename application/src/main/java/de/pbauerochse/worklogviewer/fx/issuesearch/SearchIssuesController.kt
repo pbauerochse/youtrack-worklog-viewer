@@ -4,10 +4,10 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import de.pbauerochse.worklogviewer.fx.components.treetable.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.fx.issuesearch.details.IssueDetailsPanel
+import de.pbauerochse.worklogviewer.fx.issuesearch.listview.IssueSearchResultCell
 import de.pbauerochse.worklogviewer.fx.issuesearch.task.LoadSingleIssueTask
 import de.pbauerochse.worklogviewer.fx.issuesearch.task.SearchIssuesTask
-import de.pbauerochse.worklogviewer.fx.issuesearch.treeview.IssueSearchTreeColumn
-import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
+import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.favourites.FavouriteIssue
@@ -23,8 +23,6 @@ import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.StackPane
-import javafx.scene.layout.VBox
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.util.*
@@ -41,21 +39,15 @@ class SearchIssuesController : Initializable {
     private lateinit var triggerSearchButton: Button
 
     @FXML
-    private lateinit var issuesView: TreeTableView<IssueSearchTreeItem>
+    private lateinit var saveSearchButton: Button
+
+    @FXML
+    private lateinit var issuesView: TreeView<IssueSearchTreeItem>
 
     @FXML
     private lateinit var issueDetailPanelContainer: BorderPane
 
-    @FXML
-    private lateinit var actionsToolbar: ToolBar
-
-    @FXML
-    private lateinit var progressIndicator: StackPane
-
-    @FXML
-    private lateinit var progressBarContainer: VBox
-
-    private lateinit var taskRunner: TaskRunnerImpl
+    lateinit var taskExecutor: TaskExecutor
 
     private lateinit var favouriteSearchesTreeItem: TreeItem<IssueSearchTreeItem>
     private lateinit var favouriteIssuesTreeItem: TreeItem<IssueSearchTreeItem>
@@ -66,23 +58,17 @@ class SearchIssuesController : Initializable {
     private val issueDetailsPanel: IssueDetailsPanel = IssueDetailsPanel()
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        taskRunner = TaskRunnerImpl(progressBarContainer, progressIndicator)
         issueDetailPanelContainer.center = issueDetailsPanel
         issueDetailPanelContainer.center = BorderPane().apply { center = Label(getFormatted("dialog.issuesearch.noselection")).apply { isWrapText = true } }
 
         initializeSearchElements()
-        initializeIssueTreeTableView()
+        initializeTreeView()
         initializeFavourites()
-
-        actionsToolbar.items.addAll(
-            Button("<"),
-            Button(">")
-        )
     }
 
     private fun initializeSearchElements() {
-        triggerSearchButton.onAction = EventHandler { startNewSearch(queryTextField.text) }
         triggerSearchButton.disableProperty().bind(queryTextField.textProperty().isEmpty)
+        triggerSearchButton.onAction = EventHandler { startNewSearch(queryTextField.text) }
         queryTextField.onKeyPressed = EventHandler {
             if (it.code == KeyCode.ENTER) {
                 startNewSearch(queryTextField.text)
@@ -90,7 +76,7 @@ class SearchIssuesController : Initializable {
         }
     }
 
-    private fun initializeIssueTreeTableView() {
+    private fun initializeTreeView() {
         lastSearchResultProperty.addListener(ListChangeListener { updateSearchResultsTreeItem(it.list) })
 
         favouriteSearchesTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(getFormatted("dialog.issuesearch.groups.favourites.searches")))
@@ -102,8 +88,8 @@ class SearchIssuesController : Initializable {
         searchResultsTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(getFormatted("dialog.issuesearch.groups.searchresult")))
         searchResultsTreeItem.isExpanded = true
 
+        issuesView.cellFactory = IssueSearchResultCell.cellFactory()
         issuesView.isShowRoot = false
-        issuesView.columns.add(IssueSearchTreeColumn())
         issuesView.selectionModel.selectedItemProperty().addListener { _, _, selectedItem -> selectIssue(selectedItem.value) }
         issuesView.root = TreeItem<IssueSearchTreeItem>().apply {
             children.addAll(favouriteSearchesTreeItem, favouriteIssuesTreeItem, searchResultsTreeItem)
@@ -147,7 +133,7 @@ class SearchIssuesController : Initializable {
         favouriteSearchesTreeItem.children.setAll(treeItems)
     }
 
-    private fun startNewSearch(query : String?) {
+    private fun startNewSearch(query: String?) {
         if (query.isNullOrBlank().not()) {
             lastSearchQueryProperty.value = query
             performSearch(query!!)
@@ -158,7 +144,7 @@ class SearchIssuesController : Initializable {
         val task = SearchIssuesTask(query, 0, YouTrackConnectorLocator.getActiveConnector()!!)
         task.onSucceeded = EventHandler { showSearchResults(it) }
         lastSearchQueryProperty.value = query
-        taskRunner.startTask(task)
+        taskExecutor.startTask(task)
     }
 
     private fun showSearchResults(event: WorkerStateEvent) {
@@ -177,7 +163,7 @@ class SearchIssuesController : Initializable {
             val finishedTask = event.source as LoadSingleIssueTask
             finishedTask.value?.let { showIssueDetails(it) }
         }
-        taskRunner.startTask(task)
+        taskExecutor.startTask(task)
     }
 
     private fun selectIssue(item: IssueSearchTreeItem) {

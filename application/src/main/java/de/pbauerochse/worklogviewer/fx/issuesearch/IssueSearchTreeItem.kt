@@ -8,6 +8,9 @@ data class IssueSearchTreeItem(
     val contextMenu : ContextMenu? = null,
     val styleClasses : Collection<String> = emptySet()
 ) {
+
+    override fun toString(): String = label
+
     companion object {
         fun labelledNoopItem(label: String): IssueSearchTreeItem {
             return IssueSearchTreeItem(label, {})

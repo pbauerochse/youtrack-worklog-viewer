@@ -18,7 +18,7 @@ public class FetchTimereportTask extends WorklogViewerTask<TimeReport> {
     private final TimeReportParameters parameters;
 
     public FetchTimereportTask(@NotNull YouTrackConnector connector, @NotNull TimeReportParameters parameters) {
-        super(getFormatted("task.fetchworklogs"), true);
+        super(getFormatted("task.fetchworklogs"));
         this.connector = connector;
         this.parameters = parameters;
     }

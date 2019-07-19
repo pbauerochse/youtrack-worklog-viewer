@@ -4,7 +4,7 @@ import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
 import de.pbauerochse.worklogviewer.fx.components.treetable.TimeReportTreeTableView
 import de.pbauerochse.worklogviewer.fx.dialog.Dialog
 import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask
-import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
+import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor
 import de.pbauerochse.worklogviewer.plugins.dialog.FileChooserSpecification
 import de.pbauerochse.worklogviewer.plugins.dialog.FileType
 import de.pbauerochse.worklogviewer.plugins.state.TabContext
@@ -94,14 +94,14 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
         return anchorPane
     }
 
-    fun startDownloadAsExcel(taskRunner: TaskRunnerImpl) {
+    fun startDownloadAsExcel(executor: TaskExecutor) {
         // ask the user where to save the target file
         val timerange = currentData!!.reportParameters.timerange
 
         Dialog(content.scene)
             .showSaveFileDialog(FileChooserSpecification(getFormatted("view.menu.file.exportexcel"), "${text}_$timerange.xls", FileType("Microsoft Excel", "*.xls"))) {
                 LOGGER.debug("Exporting tab {} to excel {}", text, it.absoluteFile)
-                taskRunner.startTask(ExportToExcelTask(text, currentData!!, it))
+                executor.startTask(ExportToExcelTask(text, currentData!!, it))
             }
     }
 

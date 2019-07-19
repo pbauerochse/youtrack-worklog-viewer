@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs;
 
+import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor;
 import de.pbauerochse.worklogviewer.report.Issue;
 import de.pbauerochse.worklogviewer.report.TimeReport;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
@@ -8,6 +9,7 @@ import de.pbauerochse.worklogviewer.view.grouping.Grouping;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,15 @@ public class TimeReportResultTabbedPane extends TabPane {
         updateOwnWorklogs(timeReport, grouping);
         updateAllWorklogs(timeReport, grouping);
         updateProjectTabs(timeReport, grouping);
+
+        updateActiveTab();
+    }
+
+    private void updateActiveTab() {
+        // switch from search tab to "own worklogs" tab if new data was loaded
+        if (getSelectionModel().getSelectedItem() instanceof IssueSearchTab && getTabs().size() > 1) {
+            getSelectionModel().select(1);
+        }
     }
 
     private void updateOwnWorklogs(@NotNull TimeReport timeReport, @NotNull Grouping grouping) {
@@ -43,11 +54,11 @@ public class TimeReportResultTabbedPane extends TabPane {
     }
 
     private OwnWorklogsTab getOwnWorklogsTab() {
-        if (getTabs().isEmpty()) {
+        if (getTabs().size() == 1) {
             LOGGER.debug("Adding OwnWorklogsTab");
-            getTabs().add(0, new OwnWorklogsTab());
+            getTabs().add(1, new OwnWorklogsTab());
         }
-        return (OwnWorklogsTab) getTabs().get(0);
+        return (OwnWorklogsTab) getTabs().get(1);
     }
 
     private void updateAllWorklogs(TimeReport timeReport, @NotNull Grouping grouping) {
@@ -59,18 +70,18 @@ public class TimeReportResultTabbedPane extends TabPane {
     }
 
     private AllWorklogsTab getAllWorklogsTab() {
-        if (getTabs().size() < 2 || !(getTabs().get(1) instanceof AllWorklogsTab)) {
+        if (getTabs().size() < 3 || !(getTabs().get(2) instanceof AllWorklogsTab)) {
             LOGGER.debug("Adding AllWorklogsTab");
-            getTabs().add(1, new AllWorklogsTab());
+            getTabs().add(2, new AllWorklogsTab());
         }
 
-        return (AllWorklogsTab) getTabs().get(1);
+        return (AllWorklogsTab) getTabs().get(2);
     }
 
     private void removeAllWorklogsTab() {
-        if (getTabs().get(1) instanceof AllWorklogsTab) {
+        if (getTabs().get(2) instanceof AllWorklogsTab) {
             LOGGER.debug("Removing AllWorklogsTab");
-            getTabs().remove(1);
+            getTabs().remove(2);
         }
     }
 
@@ -80,7 +91,7 @@ public class TimeReportResultTabbedPane extends TabPane {
 
         List<String> projectNamesSorted = projectToIssues.keySet().stream().sorted().collect(Collectors.toList());
 
-        int firstProjectTabIndex = settingsViewModel.getShowAllWorklogsProperty().get() ? 2 : 1;
+        int firstProjectTabIndex = settingsViewModel.getShowAllWorklogsProperty().get() ? 3 : 2;
         for (int i = 0; i < projectNamesSorted.size(); i++) {
             String project = projectNamesSorted.get(i);
             List<Issue> sortedIssues = projectToIssues.get(project).stream().sorted().collect(Collectors.toList());
@@ -104,7 +115,17 @@ public class TimeReportResultTabbedPane extends TabPane {
         return (WorklogsTab) getTabs().get(tabIndex);
     }
 
+    @Nullable
     public WorklogsTab getCurrentlyVisibleTab() {
-        return (WorklogsTab) getSelectionModel().getSelectedItem();
+        Tab selectedTab = getSelectionModel().getSelectedItem();
+        if (selectedTab instanceof WorklogsTab) {
+            return (WorklogsTab) selectedTab;
+        }
+        return null;
     }
+
+    public void setTaskExecutor(TaskExecutor taskExecutor) {
+        getTabs().add(new IssueSearchTab(taskExecutor));
+    }
+
 }

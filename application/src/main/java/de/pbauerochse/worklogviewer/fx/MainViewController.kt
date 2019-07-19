@@ -13,22 +13,25 @@ import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogViewerStateAdapter
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder.currentTimeReportProperty
-import de.pbauerochse.worklogviewer.fx.tasks.CheckForUpdateTask
-import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
-import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
+import de.pbauerochse.worklogviewer.fx.tasks.*
 import de.pbauerochse.worklogviewer.plugins.PluginLoader
 import de.pbauerochse.worklogviewer.plugins.actions.PluginActionContext
 import de.pbauerochse.worklogviewer.plugins.dialog.DialogSpecification
 import de.pbauerochse.worklogviewer.plugins.state.WorklogViewerState
+import de.pbauerochse.worklogviewer.plugins.tasks.PluginTask
+import de.pbauerochse.worklogviewer.plugins.tasks.TaskCallback
+import de.pbauerochse.worklogviewer.plugins.tasks.TaskRunner
 import de.pbauerochse.worklogviewer.report.TimeRange
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.setHref
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
+import de.pbauerochse.worklogviewer.tasks.Progress
 import de.pbauerochse.worklogviewer.timerange.CustomTimerangeProvider
 import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import de.pbauerochse.worklogviewer.timerange.TimerangeProviders
+import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.version.Version
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
@@ -37,6 +40,7 @@ import de.pbauerochse.worklogviewer.view.grouping.NoopGrouping
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
+import javafx.concurrent.Worker
 import javafx.concurrent.WorkerStateEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -45,17 +49,19 @@ import javafx.scene.control.*
 import javafx.scene.input.KeyCombination
 import javafx.scene.input.KeyEvent
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
+import java.util.concurrent.Future
 
 /**
  * Java FX Controller for the main window
  */
-class MainViewController : Initializable {
+class MainViewController : Initializable, TaskRunner, TaskExecutor {
 
     @FXML
     private lateinit var timerangeComboBox: ComboBox<TimerangeProvider>
@@ -102,8 +108,6 @@ class MainViewController : Initializable {
     @FXML
     private lateinit var mainToolbar: ToolBar
 
-    private lateinit var taskRunner: TaskRunnerImpl
-
     private lateinit var resources: ResourceBundle
     private lateinit var settingsModel: SettingsViewModel
     private lateinit var dialog: Dialog
@@ -112,8 +116,8 @@ class MainViewController : Initializable {
         LOGGER.debug("Initializing main view")
         this.resources = resources
         this.settingsModel = SettingsUtil.settingsViewModel
-        this.taskRunner = TaskRunnerImpl(taskProgressContainer, waitScreenOverlay)
 
+        initializeTaskRunner()
         checkForUpdate()
         autoLoadLastUsedReport()
 
@@ -132,11 +136,16 @@ class MainViewController : Initializable {
         }
     }
 
+    private fun initializeTaskRunner() {
+        waitScreenOverlay.visibleProperty().bind(MainTaskRunner.runningTasksProperty.emptyProperty().not())
+        resultTabPane.setTaskExecutor(this)
+    }
+
     private fun checkForUpdate() {
         Platform.runLater {
             val versionCheckTask = CheckForUpdateTask()
             versionCheckTask.onSucceeded = EventHandler { this.addDownloadLinkToToolbarIfNeverVersionPresent(it) }
-            taskRunner.startTask(versionCheckTask)
+            startTask(versionCheckTask)
         }
     }
 
@@ -221,8 +230,7 @@ class MainViewController : Initializable {
      * Exports the currently visible data to an excel spreadsheet
      */
     private fun startExportToExcelTask() {
-        val tab = resultTabPane.currentlyVisibleTab
-        tab.startDownloadAsExcel(taskRunner)
+        resultTabPane.currentlyVisibleTab?.startDownloadAsExcel(this)
     }
 
     private fun showSettingsDialogue() {
@@ -283,7 +291,7 @@ class MainViewController : Initializable {
     }
 
     private fun createPluginContext(): PluginActionContext {
-        return PluginActionContextAdapter(taskRunner, dialog, getPluginState())
+        return PluginActionContextAdapter(this, dialog, getPluginState())
     }
 
     private fun getPluginState(): WorklogViewerState {
@@ -379,7 +387,7 @@ class MainViewController : Initializable {
 
         val task = FetchTimereportTask(YouTrackConnectorLocator.getActiveConnector()!!, parameters)
         task.setOnSucceeded { event -> currentTimeReportProperty.value = event.source.value as TimeReport }
-        taskRunner.startTask(task)
+        startTask(task)
     }
 
     private fun showAddWorkitemDialog() {
@@ -398,8 +406,77 @@ class MainViewController : Initializable {
         WorklogViewer.getInstance().requestShutdown()
     }
 
+    override fun <T> start(task: PluginTask<T>, callback: TaskCallback<T>?) {
+        val wrapper = object : WorklogViewerTask<T?>(task.label) {
+            override fun start(progress: Progress): T? = task.run(progress)
+        }
+        wrapper.setOnSucceeded { callback?.invoke(it.source.value as T?) }
+        startTask(wrapper)
+    }
+
+    override fun <T> startTask(task: WorklogViewerTask<T>): Future<T> {
+        val wrappedTask = TaskInitializer.initialize(taskProgressContainer, task)
+        return MainTaskRunner.startTask(wrappedTask)
+    }
+
     companion object {
         private val LOGGER = LoggerFactory.getLogger(MainViewController::class.java)
         private const val REQUIRED_FIELD_CLASS = "required"
+    }
+
+    /**
+     * Wrapper for a WorklogViewerTasks that handles
+     * the ui blocking and displays a progress bar
+     * for the task on the main application window
+     */
+    internal object TaskInitializer {
+
+        internal fun <T> initialize(taskProgressContainer: Pane, task: WorklogViewerTask<T>) : WorklogViewerTask<T> {
+            val progressbar = TaskProgressBar(task, true)
+            bindOnRunning(task, progressbar, taskProgressContainer)
+            bindOnSucceeded(task, progressbar)
+            bindOnFailed(task, progressbar)
+            return task
+        }
+
+        private fun bindOnRunning(task : WorklogViewerTask<*>, progressbar: TaskProgressBar, progressbarContainer : Pane) {
+            val initialHandler = task.onRunning
+            task.setOnRunning {
+                progressbarContainer.children.add(progressbar)
+                progressbar.progressText.textProperty().bind(task.messageProperty())
+                progressbar.progressBar.progressProperty().bind(task.progressProperty())
+                progressbar.updateStatus(Worker.State.RUNNING)
+
+                initialHandler?.handle(it)
+            }
+        }
+
+        private fun bindOnSucceeded(task: WorklogViewerTask<*>, progressbar: TaskProgressBar) {
+            val initialHandler = task.onSucceeded
+            task.setOnSucceeded {
+                progressbar.progressText.textProperty().unbind()
+                progressbar.progressBar.progressProperty().unbind()
+                progressbar.updateStatus(Worker.State.SUCCEEDED)
+                initialHandler?.handle(it)
+            }
+        }
+
+        private fun bindOnFailed(task: WorklogViewerTask<*>, progressbar: TaskProgressBar) {
+            val initialHandler = task.onFailed
+            task.setOnFailed {
+                progressbar.progressText.textProperty().unbind()
+                progressbar.progressBar.progressProperty().unbind()
+                progressbar.updateStatus(Worker.State.FAILED)
+
+                progressbar.progressText.text = getErrorMessage(it)
+                progressbar.progressBar.progress = 1.0
+
+                initialHandler?.handle(it)
+            }
+        }
+
+        private fun getErrorMessage(event: WorkerStateEvent): String {
+            return event.source.exception?.message?.trimToNull() ?: getFormatted("exceptions.main.worker.unknown")
+        }
     }
 }

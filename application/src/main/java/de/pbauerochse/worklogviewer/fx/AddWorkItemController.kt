@@ -5,7 +5,7 @@ import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder
 import de.pbauerochse.worklogviewer.fx.tasks.AddWorkItemTask
-import de.pbauerochse.worklogviewer.fx.tasks.TaskRunnerImpl
+import de.pbauerochse.worklogviewer.fx.tasks.MainTaskRunner
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
@@ -63,10 +63,8 @@ class AddWorkItemController : Initializable {
     @FXML
     private lateinit var errorLabel: Label
 
-    private lateinit var taskRunner: TaskRunnerImpl
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        taskRunner = TaskRunnerImpl(progressBarContainer, progressIndicator, false)
         issueTextField.textProperty().bindBidirectional(issueProperty)
         workDateDatePicker.valueProperty().bindBidirectional(dateProperty)
 //        DatePickerManualEditListener.applyTo(workDateDatePicker)
@@ -105,7 +103,7 @@ class AddWorkItemController : Initializable {
             onFailed = EventHandler { handleError(it.source.exception) }
         }
 
-        taskRunner.startTask(task)
+        MainTaskRunner.startTask(task)
     }
 
     private fun updateIsValidDurationProperty(newDuration: String?) {

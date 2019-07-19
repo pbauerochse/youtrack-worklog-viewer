@@ -71,6 +71,7 @@
     -fx-background-color: -ytwlv-dark-background-color;
 }
 
+.issue-search,
 .tab-pane > .tab-content-area .split-pane {
     -fx-background-color: derive(-fx-base, 10%);
 }

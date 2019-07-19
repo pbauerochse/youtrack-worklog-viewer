@@ -26,7 +26,7 @@ import java.util.Comparator.comparing
  * Fetches the most recent version of the
  * Worklog Viewer from Github
  */
-class CheckForUpdateTask : WorklogViewerTask<GitHubVersion?>(getFormatted("task.updatecheck"), false) {
+class CheckForUpdateTask : WorklogViewerTask<GitHubVersion?>(getFormatted("task.updatecheck")) {
 
     override fun start(progress: Progress): GitHubVersion? {
         progress.setProgress(getFormatted("worker.updatecheck.checking"), 0.1)

@@ -45,8 +45,17 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>, private val showTa
 
     override fun changed(observable: ObservableValue<out Worker.State>?, oldValue: Worker.State?, newValue: Worker.State?) {
         taskName.text = if (showTaskName) getTaskNameLabel(newValue) else ""
+    }
 
-        if (isCompletedState(newValue)) {
+    @Suppress("NON_EXHAUSTIVE_WHEN")
+    fun updateStatus(status : Worker.State) {
+        when (status) {
+            Worker.State.RUNNING -> updateStyles(RUNNING_CLASS)
+            Worker.State.SUCCEEDED -> updateStyles(SUCCESSFUL_CLASS)
+            Worker.State.FAILED -> updateStyles(ERROR_CLASS)
+        }
+
+        if (isCompletedState(status)) {
             triggerFadeOut()
         }
     }
@@ -83,8 +92,20 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>, private val showTa
         parent.children.remove(this)
     }
 
+    private fun updateStyles(style: String) {
+        progressBar.styleClass.removeAll(ERROR_CLASS, RUNNING_CLASS, SUCCESSFUL_CLASS)
+        progressBar.styleClass.add(style)
+
+        progressText.styleClass.removeAll(ERROR_CLASS, RUNNING_CLASS, SUCCESSFUL_CLASS)
+        progressText.styleClass.add(style)
+    }
+
     companion object {
         private val FADE_OUT_DELAY = Duration.seconds(5.0)
         private val FADE_OUT_DURATION = Duration.millis(700.0)
+
+        private const val ERROR_CLASS = "error"
+        private const val RUNNING_CLASS = "running"
+        private const val SUCCESSFUL_CLASS = "success"
     }
 }
