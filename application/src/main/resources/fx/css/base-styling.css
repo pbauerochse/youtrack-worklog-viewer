@@ -99,3 +99,9 @@
 .hint-label {
      -fx-text-fill: derive(-fx-light-text-color, -40%);
 }
+
+.tree-parent {
+    -fx-font-weight: bold;
+    -fx-padding: 7 0 7 0;
+    -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
+}

@@ -1,13 +1,12 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.listview
 
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
-import de.pbauerochse.worklogviewer.fx.issuesearch.IssueSearchTreeItem
 import javafx.scene.control.Tooltip
 import javafx.scene.control.TreeCell
 import javafx.scene.control.TreeView
 import javafx.util.Callback
 
-class IssueSearchResultCell : TreeCell<IssueSearchTreeItem>() {
+class IssueSearchTreeItemCell : TreeCell<IssueSearchTreeItem>() {
 
     override fun updateItem(item: IssueSearchTreeItem?, empty: Boolean) {
         super.updateItem(item, empty)
@@ -25,7 +24,7 @@ class IssueSearchResultCell : TreeCell<IssueSearchTreeItem>() {
     }
 
     companion object {
-        fun cellFactory() : Callback<TreeView<IssueSearchTreeItem>, TreeCell<IssueSearchTreeItem>> = Callback { IssueSearchResultCell() }
+        fun cellFactory() : Callback<TreeView<IssueSearchTreeItem>, TreeCell<IssueSearchTreeItem>> = Callback { IssueSearchTreeItemCell() }
     }
 
 }

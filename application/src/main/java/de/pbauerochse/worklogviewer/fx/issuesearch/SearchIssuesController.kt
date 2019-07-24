@@ -4,7 +4,9 @@ import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import de.pbauerochse.worklogviewer.fx.components.treetable.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.fx.issuesearch.details.IssueDetailsPanel
-import de.pbauerochse.worklogviewer.fx.issuesearch.listview.IssueSearchResultCell
+import de.pbauerochse.worklogviewer.fx.issuesearch.listview.IssueSearchTreeItem
+import de.pbauerochse.worklogviewer.fx.issuesearch.listview.IssueSearchTreeItemCell
+import de.pbauerochse.worklogviewer.fx.issuesearch.savedsearch.EditSavedSearchDialog
 import de.pbauerochse.worklogviewer.fx.issuesearch.task.LoadSingleIssueTask
 import de.pbauerochse.worklogviewer.fx.issuesearch.task.SearchIssuesTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor
@@ -64,6 +66,10 @@ class SearchIssuesController : Initializable {
         initializeSearchElements()
         initializeTreeView()
         initializeFavourites()
+
+        saveSearchButton.onAction = EventHandler {
+            EditSavedSearchDialog().showAndWait()
+        }
     }
 
     private fun initializeSearchElements() {
@@ -88,8 +94,9 @@ class SearchIssuesController : Initializable {
         searchResultsTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(getFormatted("dialog.issuesearch.groups.searchresult")))
         searchResultsTreeItem.isExpanded = true
 
-        issuesView.cellFactory = IssueSearchResultCell.cellFactory()
+        issuesView.cellFactory = IssueSearchTreeItemCell.cellFactory()
         issuesView.isShowRoot = false
+        issuesView.isEditable = false
         issuesView.selectionModel.selectedItemProperty().addListener { _, _, selectedItem -> selectIssue(selectedItem.value) }
         issuesView.root = TreeItem<IssueSearchTreeItem>().apply {
             children.addAll(favouriteSearchesTreeItem, favouriteIssuesTreeItem, searchResultsTreeItem)

@@ -1,5 +1,6 @@
-package de.pbauerochse.worklogviewer.fx.issuesearch
+package de.pbauerochse.worklogviewer.fx.issuesearch.listview
 
+import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import javafx.scene.control.ContextMenu
 
 data class IssueSearchTreeItem(
@@ -13,7 +14,7 @@ data class IssueSearchTreeItem(
 
     companion object {
         fun labelledNoopItem(label: String): IssueSearchTreeItem {
-            return IssueSearchTreeItem(label, {})
+            return IssueSearchTreeItem(label, {}, null, listOf(ComponentStyleClasses.TREE_GROUP_PARENT))
         }
     }
 }

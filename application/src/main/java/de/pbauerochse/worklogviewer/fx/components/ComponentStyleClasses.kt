@@ -15,6 +15,7 @@ object ComponentStyleClasses {
     const val ISSUE_LINK_CELL = "issue-cell"
     const val RESOLVED_ISSUE_CELL = "resolved-issue-cell"
     const val STATISTICS_PANEL = "statistics"
+    const val TREE_GROUP_PARENT = "tree-parent"
 
     val ALL_WORKLOGVIEWER_CLASSES: Set<String> = setOf(
         SUMMARY_CELL,
@@ -25,7 +26,8 @@ object ComponentStyleClasses {
         TODAY_HIGHLIGHT_CELL,
         ISSUE_LINK_CELL,
         RESOLVED_ISSUE_CELL,
-        STATISTICS_PANEL
+        STATISTICS_PANEL,
+        TREE_GROUP_PARENT
     )
 
 }
