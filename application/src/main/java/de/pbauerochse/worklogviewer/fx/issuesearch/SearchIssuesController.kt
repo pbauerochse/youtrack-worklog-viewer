@@ -1,12 +1,13 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch
 
+import de.pbauerochse.worklogviewer.addIfMissing
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import de.pbauerochse.worklogviewer.fx.components.treetable.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.fx.issuesearch.details.IssueDetailsPanel
 import de.pbauerochse.worklogviewer.fx.issuesearch.listview.IssueSearchTreeItem
 import de.pbauerochse.worklogviewer.fx.issuesearch.listview.IssueSearchTreeItemCell
-import de.pbauerochse.worklogviewer.fx.issuesearch.savedsearch.EditSavedSearchDialog
+import de.pbauerochse.worklogviewer.fx.issuesearch.savedsearch.EditFavouriteSearchDialog
 import de.pbauerochse.worklogviewer.fx.issuesearch.task.LoadSingleIssueTask
 import de.pbauerochse.worklogviewer.fx.issuesearch.task.SearchIssuesTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor
@@ -68,7 +69,8 @@ class SearchIssuesController : Initializable {
         initializeFavourites()
 
         saveSearchButton.onAction = EventHandler {
-            EditSavedSearchDialog().showAndWait()
+            val result = EditFavouriteSearchDialog(FavouriteSearch("", queryTextField.text), queryTextField.scene?.window).showAndWait()
+            result.ifPresent { SettingsUtil.settingsViewModel.favourites.searches.addIfMissing(it) }
         }
     }
 
@@ -134,7 +136,7 @@ class SearchIssuesController : Initializable {
 
     private fun updateSavedSearches(searches: List<FavouriteSearch>) {
         val treeItems = searches.map {
-            val data = IssueSearchTreeItem(it.title, { startNewSearch(it.query) })
+            val data = IssueSearchTreeItem(it.name, { startNewSearch(it.query) })
             TreeItem(data)
         }
         favouriteSearchesTreeItem.children.setAll(treeItems)
