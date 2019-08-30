@@ -11,6 +11,7 @@ import javafx.event.EventHandler
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.SeparatorMenuItem
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.util.concurrent.Callable
 
@@ -47,7 +48,7 @@ class IssueCellContextMenu(private val issue: MinimalIssue, private val date: Lo
 
         val markAsFavourite = MenuItem(getFormatted("contextmenu.issue.addfavourite", issue.id))
         markAsFavourite.onAction = EventHandler {
-            println("Marking ${issue.id} as Favourite")
+            LOGGER.info("Marking ${issue.id} as Favourite")
             favouritesModel.issues.add(itemAsFavourite)
         }
         markAsFavourite.visibleProperty().bind(issueAlreadyMarkedAsFavourite.not())
@@ -55,7 +56,7 @@ class IssueCellContextMenu(private val issue: MinimalIssue, private val date: Lo
 
         val removeFromFavourites = MenuItem(getFormatted("contextmenu.issue.removefavourite", issue.id))
         removeFromFavourites.onAction = EventHandler {
-            println("Removing ${issue.id} from Favourites")
+            LOGGER.info("Removing ${issue.id} from Favourites")
             favouritesModel.issues.remove(itemAsFavourite)
         }
         removeFromFavourites.visibleProperty().bind(issueAlreadyMarkedAsFavourite)
@@ -65,4 +66,7 @@ class IssueCellContextMenu(private val issue: MinimalIssue, private val date: Lo
     fun showAddWorkItemToIssueDialog() = WorkitemDialogs.show(scene, date, issue)
     private fun showAddWorkItemToAnyIssueDialog() = WorkitemDialogs.show(scene, date)
 
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(IssueCellContextMenu::class.java)
+    }
 }

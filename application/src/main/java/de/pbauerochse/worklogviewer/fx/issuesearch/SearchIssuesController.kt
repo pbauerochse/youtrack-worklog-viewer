@@ -77,11 +77,6 @@ class SearchIssuesController : Initializable {
     private fun initializeSearchElements() {
         triggerSearchButton.disableProperty().bind(queryTextField.textProperty().isEmpty)
         triggerSearchButton.onAction = EventHandler { startNewSearch(queryTextField.text) }
-        queryTextField.onKeyPressed = EventHandler {
-            if (it.code == KeyCode.ENTER) {
-                startNewSearch(queryTextField.text)
-            }
-        }
     }
 
     private fun initializeTreeView() {
@@ -99,7 +94,7 @@ class SearchIssuesController : Initializable {
         issuesView.cellFactory = IssueSearchTreeItemCell.cellFactory()
         issuesView.isShowRoot = false
         issuesView.isEditable = false
-        issuesView.selectionModel.selectedItemProperty().addListener { _, _, selectedItem -> selectIssue(selectedItem.value) }
+        issuesView.selectionModel.selectedItemProperty().addListener { _, _, selectedItem -> selectedItem?.let { selectIssue(it.value) } }
         issuesView.root = TreeItem<IssueSearchTreeItem>().apply {
             children.addAll(favouriteSearchesTreeItem, favouriteIssuesTreeItem, searchResultsTreeItem)
         }
@@ -136,7 +131,7 @@ class SearchIssuesController : Initializable {
 
     private fun updateSavedSearches(searches: List<FavouriteSearch>) {
         val treeItems = searches.map {
-            val data = IssueSearchTreeItem(it.name, { startNewSearch(it.query) })
+            val data = IssueSearchTreeItem(it.name, { startNewSearch(it.query) }, SavedSearchContextMenu(it))
             TreeItem(data)
         }
         favouriteSearchesTreeItem.children.setAll(treeItems)

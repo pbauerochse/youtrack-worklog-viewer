@@ -8,7 +8,6 @@ import de.pbauerochse.worklogviewer.fx.components.tabs.TimeReportResultTabbedPan
 import de.pbauerochse.worklogviewer.fx.converter.GroupingComboBoxConverter
 import de.pbauerochse.worklogviewer.fx.converter.TimerangeProviderStringConverter
 import de.pbauerochse.worklogviewer.fx.dialog.Dialog
-import de.pbauerochse.worklogviewer.fx.dialog.workitem.WorkitemDialogs
 import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogViewerStateAdapter
@@ -360,7 +359,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
         mainToolbar.scene.addEventHandler(KeyEvent.KEY_PRESSED) { event ->
             when {
                 matches(settingsModel.fetchWorklogsKeyboardCombination, event) -> fetchWorklogs()
-                matches(settingsModel.addWorkitemKeyboardCombination, event) -> showAddWorkitemDialog()
+                matches(settingsModel.showIssueSearchKeyboardCombination, event) -> showAddWorkitemDialog()
                 matches(settingsModel.showSettingsKeyboardCombination, event) -> showSettingsDialogue()
                 matches(settingsModel.toggleStatisticsKeyboardCombination, event) -> settingsModel.showStatisticsProperty.set(!settingsModel.showStatisticsProperty.get())
                 matches(settingsModel.exitWorklogViewerKeyboardCombination, event) -> exitWorklogViewer()
@@ -392,7 +391,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
 
     private fun showAddWorkitemDialog() {
         LOGGER.debug("Showing AddWorkitem Dialog")
-        WorkitemDialogs.showFull(dialog)
+        resultTabPane.showSearchTab()
     }
 
     private fun displayWorklogResult() {

@@ -37,12 +37,12 @@
                         </font>
                     </Label>
                 </center>
-                <right>
-                    <HBox BorderPane.alignment="CENTER">
-                        <Button fx:id="addWorklogButton" mnemonicParsing="false" text="+" />
-                        <Button fx:id="editWorklogButton" mnemonicParsing="false" text="ED" />
-                    </HBox>
-                </right>
+<!--                <right>-->
+<!--                    <HBox BorderPane.alignment="CENTER">-->
+<!--                        <Button fx:id="addWorklogButton" mnemonicParsing="false" text="+" />-->
+<!--                        <Button fx:id="editWorklogButton" mnemonicParsing="false" text="ED" />-->
+<!--                    </HBox>-->
+<!--                </right>-->
             </BorderPane>
             <TableView fx:id="issueWorklogsTableView" prefHeight="200.0">
             <columnResizePolicy>

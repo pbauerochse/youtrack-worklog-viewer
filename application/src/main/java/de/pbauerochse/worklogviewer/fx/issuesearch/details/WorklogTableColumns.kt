@@ -1,9 +1,14 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.details
 
+import de.pbauerochse.worklogviewer.report.User
 import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
+import javafx.beans.value.ObservableValue
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.cell.PropertyValueFactory
@@ -13,7 +18,7 @@ import java.time.LocalDate
 /**
  * Displays the formatted date of a WorklogItem
  */
-class WorklogDateColumn : TableColumn<WorklogItem, LocalDate>("DATUM") {
+class WorklogDateColumn : TableColumn<WorklogItem, LocalDate>(getFormatted("dialog.issuesearch.workitems.columns.date")) {
     init {
         cellValueFactory = PropertyValueFactory<WorklogItem, LocalDate>("date")
         cellFactory = WorklogDateCell.CELL_FACTORY
@@ -23,7 +28,7 @@ class WorklogDateColumn : TableColumn<WorklogItem, LocalDate>("DATUM") {
 private class WorklogDateCell : TableCell<WorklogItem, LocalDate>() {
     override fun updateItem(item: LocalDate?, empty: Boolean) {
         super.updateItem(item, empty)
-        text = item?.let { FormattingUtil.formatDate(it) }
+        text = item?.let { FormattingUtil.formatLongDate(it) }
     }
 
     companion object {
@@ -34,7 +39,7 @@ private class WorklogDateCell : TableCell<WorklogItem, LocalDate>() {
 /**
  * Displays the type of the worklog item
  */
-class WorklogTypeColumn : TableColumn<WorklogItem, String?>("TYPE") {
+class WorklogTypeColumn : TableColumn<WorklogItem, String?>(getFormatted("dialog.issuesearch.workitems.columns.type")) {
     init {
         cellValueFactory = PropertyValueFactory<WorklogItem, String?>("workType")
         isSortable = true
@@ -42,9 +47,19 @@ class WorklogTypeColumn : TableColumn<WorklogItem, String?>("TYPE") {
 }
 
 /**
+ * Displays the author of the WorklogItem
+ */
+class WorklogAuthorColumn : TableColumn<WorklogItem, String?>(getFormatted("dialog.issuesearch.workitems.columns.author")) {
+    init {
+        cellValueFactory = Callback<CellDataFeatures<WorklogItem, String?>?, ObservableValue<String?>?> { SimpleStringProperty(it?.value?.user?.displayName) }
+        isSortable = true
+    }
+}
+
+/**
  * Displays the description of the WorklogItem
  */
-class WorklogDescriptionColumn : TableColumn<WorklogItem, String?>("DESCRIPTION") {
+class WorklogDescriptionColumn : TableColumn<WorklogItem, String?>(getFormatted("dialog.issuesearch.workitems.columns.description")) {
     init {
         cellValueFactory = PropertyValueFactory<WorklogItem, String?>("description")
         isSortable = true
@@ -54,7 +69,7 @@ class WorklogDescriptionColumn : TableColumn<WorklogItem, String?>("DESCRIPTION"
 /**
  * Displays the formatted duration of the WorklogItem
  */
-class WorklogDurationColumn : TableColumn<WorklogItem, Long>("DURATION") {
+class WorklogDurationColumn : TableColumn<WorklogItem, Long>(getFormatted("dialog.issuesearch.workitems.columns.duration")) {
     init {
         cellValueFactory = PropertyValueFactory<WorklogItem, Long>("durationInMinutes")
         cellFactory = WorklogDurationCell.CELL_FACTORY

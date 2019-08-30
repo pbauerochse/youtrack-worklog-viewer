@@ -49,6 +49,12 @@ public class TimeReportResultTabbedPane extends TabPane {
         }
     }
 
+    public void showSearchTab() {
+        if (!(getSelectionModel().getSelectedItem() instanceof IssueSearchTab)) {
+            getSelectionModel().select(0);
+        }
+    }
+
     private void updateOwnWorklogs(@NotNull TimeReport timeReport, @NotNull Grouping grouping) {
         getOwnWorklogsTab().update(timeReport, grouping);
     }
@@ -127,5 +133,4 @@ public class TimeReportResultTabbedPane extends TabPane {
     public void setTaskExecutor(TaskExecutor taskExecutor) {
         getTabs().add(new IssueSearchTab(taskExecutor));
     }
-
 }

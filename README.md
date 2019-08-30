@@ -7,10 +7,12 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Latest Version
 
-[Download v3.0.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/3.0.0)
+[Download v2.6.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.6.0)
 
 # Features
 
+* search for issues and save them as favourite for quick access
+* save search queries as favourites for quick access
 * display your own spent time within the defined timespan in a table
 * display all other time spent for each project in a seperate tab
 * statistical charts on the current time report (can be turned off in the settings)
@@ -21,18 +23,30 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Important changes
 
-* **v3.0.0**
+* **v2.6.0**
   * Grouping criterias are now applied on-the-fly, without having to reload the report
-  * Add work items directly from the application using the new context menu
+  * Marking issues and frequently used search queries as favorites
+  * Adding a view to search for issues and access your favourites
+  * Added context menus in the issue view allowing you to
+       * Open the selected issue in the browser
+       * Add a new work item to the issue
+       * Add a new work item to any other issue
+       * Add the issue to your saved favourites
   * You may now define various keyboard shortcuts (e.g. for downloading the current time report) in the settings menu
-  * Finer control of the work hours per day (quarter hour intervals)
-  * Optional [Installer](TODO) to help you start the application
-  * Added a basic plugin mechanism, that allows you to extend the Worklog Viewer with own functionality (beta)
+  * Finer control of the work hours per day (quarter hour intervals)  
+  * Added a basic plugin mechanism, that allows you to extend the Worklog Viewer with own functionality (beta, no documentation yet)
 * **v2.5.0**
   * Switching to Java 11 as minimum required Java version. If you need to stick to Java < 11 please use the [v2.4.3 release](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.4.3) 
 * **v2.4.0**
   * Dropping support for YouTrack versions < 2018.1
   * Dropping OAuth2 and password authentication in favor of new token based authentication
+  
+### Roadmap
+  * Optional application installer
+  * Further usability improvements (keyboard navigation)
+  * High contrast theme for the visually impaired
+  * Allowing to group by multiple criteria
+  * Suggestions very welcome!
 
 # Minimum requirements
 

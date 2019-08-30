@@ -3,7 +3,9 @@ package de.pbauerochse.worklogviewer.fx.components.statistics.panels
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.ProjectSummary
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.UserStatistic
-import de.pbauerochse.worklogviewer.util.FormattingUtil.*
+import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
+import de.pbauerochse.worklogviewer.util.FormattingUtil.formatPercentage
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.geometry.HPos
 import javafx.scene.control.Label
 import javafx.scene.layout.GridPane

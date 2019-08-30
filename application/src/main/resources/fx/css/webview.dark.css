@@ -27,13 +27,13 @@ body {
     padding-left: 0;
 }
 
-a {
+span.link {
     color: #87afc7;
     text-decoration: none;
     cursor: pointer;
 }
 
-a.issue-resolved {
+span.link.issue-resolved {
     color: #828282;
     text-decoration: line-through;
 }

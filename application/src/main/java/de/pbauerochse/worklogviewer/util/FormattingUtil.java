@@ -10,15 +10,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
-/**
- * @author Patrick Bauerochse
- * @since 14.04.15
- */
 public class FormattingUtil {
 
     public static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("i18n/ytwv");
 
     private static DateTimeFormatter dateFormatter;
+    private static DateTimeFormatter longDateFormatter;
     private static DateTimeFormatter dateTimeFormatter;
     private static NumberFormat percentageFormatter;
 
@@ -53,6 +50,15 @@ public class FormattingUtil {
             dateFormatter = DateTimeFormatter.ofPattern(getFormatted("date.column.format"));
         }
         return dateFormatter.format(date);
+    }
+
+    public static String formatLongDate(LocalDate date) {
+        if (date == null) return "";
+
+        if (longDateFormatter == null) {
+            longDateFormatter = DateTimeFormatter.ofPattern(getFormatted("date.column.format.long"));
+        }
+        return longDateFormatter.format(date);
     }
 
     public static String formatDateTime(LocalDateTime date) {

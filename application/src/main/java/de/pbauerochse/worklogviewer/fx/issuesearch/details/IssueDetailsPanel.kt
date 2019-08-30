@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.details
 
 import de.pbauerochse.worklogviewer.fx.Theme
+import de.pbauerochse.worklogviewer.fx.issuesearch.WebViewSanitizer
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
@@ -26,11 +27,11 @@ class IssueDetailsPanel : BorderPane(), Initializable {
     @FXML
     private lateinit var issueDescriptionWebView: WebView
 
-    @FXML
-    private lateinit var addWorklogButton: Button
-
-    @FXML
-    private lateinit var editWorklogButton: Button
+//    @FXML
+//    private lateinit var addWorklogButton: Button
+//
+//    @FXML
+//    private lateinit var editWorklogButton: Button
 
     @FXML
     private lateinit var issueWorklogsTableView: TableView<WorklogItem>
@@ -49,6 +50,7 @@ class IssueDetailsPanel : BorderPane(), Initializable {
 
         issueWorklogsTableView.columns.addAll(
             WorklogDateColumn(),
+            WorklogAuthorColumn(),
             WorklogTypeColumn(),
             WorklogDescriptionColumn(),
             WorklogDurationColumn(),
@@ -59,7 +61,8 @@ class IssueDetailsPanel : BorderPane(), Initializable {
     fun update(issue: Issue) {
         LOGGER.info("Showing Issue Details for $issue")
         issueSummaryLabel.text = issue.fullTitle
-        issueDescriptionWebView.engine.loadContent(issue.description)
+        val sanitizedDescription = WebViewSanitizer.sanitize(issue.description)
+        issueDescriptionWebView.engine.loadContent(sanitizedDescription)
 
         LOGGER.debug(issue.description)
 
