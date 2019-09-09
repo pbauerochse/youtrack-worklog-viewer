@@ -265,6 +265,21 @@
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-web</artifactId>
+                <classifier>win</classifier>
+                <version>${openjfx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-web</artifactId>
+                <classifier>linux</classifier>
+                <version>${openjfx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-web</artifactId>
+                <classifier>mac</classifier>
                 <version>${openjfx.version}</version>
             </dependency>
 
