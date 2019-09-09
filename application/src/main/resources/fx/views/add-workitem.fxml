@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="260.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.fx.AddWorkItemController">
+<BorderPane prefHeight="260.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.fx.AddWorkItemController">
 
     <center>
         <StackPane alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="TOP_LEFT">
