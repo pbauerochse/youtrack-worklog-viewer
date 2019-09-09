@@ -22,6 +22,29 @@
         <module>connectors/connector-2019.x</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>linux</id>
+            <properties>
+                <javafx-binary-variant>linux</javafx-binary-variant>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>windows</id>
+            <properties>
+                <javafx-binary-variant>win</javafx-binary-variant>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>mac</id>
+            <properties>
+                <javafx-binary-variant>mac</javafx-binary-variant>
+            </properties>
+        </profile>
+    </profiles>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
@@ -264,49 +287,21 @@
 
             <dependency>
                 <groupId>org.openjfx</groupId>
-                <artifactId>javafx-web</artifactId>
-                <classifier>win</classifier>
-                <version>${openjfx.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-web</artifactId>
-                <classifier>linux</classifier>
-                <version>${openjfx.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-web</artifactId>
-                <classifier>mac</classifier>
-                <version>${openjfx.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.openjfx</groupId>
                 <artifactId>javafx-fxml</artifactId>
                 <version>${openjfx.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.openjfx</groupId>
-                <artifactId>javafx-graphics</artifactId>
-                <classifier>win</classifier>
+                <artifactId>javafx-web</artifactId>
+                <classifier>${javafx-binary-variant}</classifier>
                 <version>${openjfx.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>
-                <classifier>linux</classifier>
-                <version>${openjfx.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-graphics</artifactId>
-                <classifier>mac</classifier>
+                <classifier>${javafx-binary-variant}</classifier>
                 <version>${openjfx.version}</version>
             </dependency>
 

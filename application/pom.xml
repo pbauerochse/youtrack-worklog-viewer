@@ -14,7 +14,7 @@
     <description>The base JavaFX application of the Youtrack Worklog Viewer</description>
 
     <build>
-        <finalName>youtrack-worklog-viewer-${project.version}-slim</finalName>
+        <finalName>youtrack-worklog-viewer-${javafx-binary-variant}-${project.version}-slim</finalName>
 
         <plugins>
 
@@ -35,7 +35,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>project-classifier</shadedClassifierName>
-                            <outputFile>${project.build.directory}/${project.parent.artifactId}-${project.version}.jar</outputFile>
+                            <outputFile>${project.build.directory}/${project.parent.artifactId}-${javafx-binary-variant}-${project.version}.jar</outputFile>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -118,24 +118,6 @@
 
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <classifier>win</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <classifier>linux</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <classifier>mac</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
         </dependency>
 
@@ -146,20 +128,14 @@
 
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <classifier>win</classifier>
+            <artifactId>javafx-web</artifactId>
+            <classifier>${javafx-binary-variant}</classifier>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <classifier>linux</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <classifier>mac</classifier>
+            <classifier>${javafx-binary-variant}</classifier>
         </dependency>
 
     </dependencies>
