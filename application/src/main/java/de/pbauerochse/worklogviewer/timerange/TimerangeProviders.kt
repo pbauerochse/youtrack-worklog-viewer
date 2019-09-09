@@ -11,7 +11,9 @@ object TimerangeProviders {
     @JvmStatic
     val allTimerangeProviders
         get() = listOf(
+            LastTwoWeeksTimerangeProvider,
             LastWeekTimerangeProvider,
+            CurrentAndLastWeekTimerangeProvider,
             CurrentWeekTimerangeProvider,
             CurrentMonthTimerangeProvider,
             LastMonthTimerangeProvider,

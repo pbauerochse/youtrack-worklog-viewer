@@ -76,5 +76,20 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
             return TimeRange(startDate, endDate)
         }
 
+        @JvmStatic
+        fun lastTwoWeeks(): TimeRange {
+            val lastWeek = lastWeek()
+            val start = lastWeek.start.minusWeeks(1)
+            val end = lastWeek.end
+            return TimeRange(start, end)
+        }
+
+        @JvmStatic
+        fun currentAndLastWeek(): TimeRange {
+            val start = lastWeek().start
+            val end = currentWeek().end
+            return TimeRange(start, end)
+        }
+
     }
 }
