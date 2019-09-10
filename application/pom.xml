@@ -14,7 +14,7 @@
     <description>The base JavaFX application of the Youtrack Worklog Viewer</description>
 
     <build>
-        <finalName>youtrack-worklog-viewer-${javafx-binary-variant}-${project.version}-slim</finalName>
+        <finalName>slim-youtrack-worklog-viewer-${javafx-binary-variant}-${project.version}</finalName>
 
         <plugins>
 
