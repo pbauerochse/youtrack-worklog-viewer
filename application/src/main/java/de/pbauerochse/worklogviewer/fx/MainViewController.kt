@@ -118,7 +118,6 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
 
         initializeTaskRunner()
         checkForUpdate()
-        autoLoadLastUsedReport()
 
         initializeDatePickers()
         initializeTimerangeComboBox()
@@ -153,7 +152,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
         // and the user chose to load data at startup
         if (settingsModel.loadDataAtStartupProperty.get()) {
             LOGGER.debug("Fetching last used TimeReport upon startup")
-            fetchWorklogButton.fire()
+            fetchWorklogs()
         }
     }
 
@@ -352,6 +351,8 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
         if (settingsModel.hasMissingConnectionSettings.get()) {
             LOGGER.info("No YouTrack connection settings defined yet. Opening settings dialogue")
             showSettingsDialogue()
+        } else {
+            autoLoadLastUsedReport()
         }
     }
 
