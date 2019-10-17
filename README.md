@@ -50,7 +50,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Minimum requirements
 
-* Java 11 Runtime (if you are having trouble running the application use the [installer](TODO))
+* Java 11 Runtime
 * Access to a YouTrack instance >= 2018.x
  
 # Screenshots
@@ -76,8 +76,6 @@ If you find this tool useful and would like to show me your appreciation [buy me
 **How do I start the application?**
 
 *Simply open up your terminal/console and start the application with `[/path/to/java-11/bin/]java -jar youtrack-worklog-viewer-[version].jar` or right click the file and select `Open with...` and then select the path to your java executable*
-
-*Alternatively you may use the [Installer](TODO)*
 
 **How do I setup the authentication in YouTrack?**
 
