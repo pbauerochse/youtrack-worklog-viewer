@@ -61,7 +61,7 @@
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 
         <httpclient.version>4.5.8</httpclient.version>
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.9.10</jackson.version>
         <poi.version>4.1.0</poi.version>
         <jetbrains-annotations.version>17.0.0</jetbrains-annotations.version>
 
