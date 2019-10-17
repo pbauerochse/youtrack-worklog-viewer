@@ -1,10 +1,12 @@
 package de.pbauerochse.worklogviewer
 
-import de.pbauerochse.worklogviewer.connector.GroupByParameter
-import de.pbauerochse.worklogviewer.fx.components.NoSelectionGroupByParameter
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
 import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.report.MinimalIssue
+import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.scene.control.Hyperlink
@@ -16,11 +18,19 @@ import java.time.format.DateTimeFormatter
  * Kotlin convenience extension functions
  */
 
-fun String.toLocalDate() : LocalDate? = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
-fun LocalDate.toFormattedString() : String = format(DateTimeFormatter.ISO_DATE)
+fun String.toLocalDate(): LocalDate? = LocalDate.parse(this, DateTimeFormatter.ISO_DATE)
+
+fun LocalDate.toFormattedString(): String = format(DateTimeFormatter.ISO_DATE)
 
 fun Hyperlink.setHref(url: String) {
-    onAction = EventHandler { _ -> Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(url) } }
+    onAction = EventHandler { Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(url) } }
+}
+
+/**
+ * Opens the issue in the browser
+ */
+fun MinimalIssue.openInBrowser() {
+    Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(this.getYouTrackLink().toExternalForm()) }
 }
 
 /**
@@ -28,9 +38,8 @@ fun Hyperlink.setHref(url: String) {
  * by taking the base URL from the Settings
  * and adding the issue path
  */
-fun Issue.getYouTrackLink() : URL {
-    val baseUrl = SettingsUtil.settings.youTrackConnectionSettings.url.removeSuffix("/")
-    return URL("$baseUrl/issue/$id#tab=Time%20Tracking")
+fun MinimalIssue.getYouTrackLink(): URL {
+    return URL(SettingsUtil.settings.youTrackConnectionSettings.baseUrl, "/issue/$id#tab=Time%20Tracking")
 }
 
 /**
@@ -49,9 +58,45 @@ fun WorklogItem.isOwn(): Boolean {
     return user.username == ownUsername
 }
 
-/**
- * Returns true if this is the special "NoSelectionGroupByParameter" and
- * therefore should not be passed as grouping criteria to YouTrack
- */
-fun GroupByParameter.isNoSelection(): Boolean = this is NoSelectionGroupByParameter
+fun String.toURL(): URL = URL(this)
 
+/**
+ * adds the given [AddWorkItemResult] into this [TimeReport]
+ * by creating a copy with the [AddWorkItemResult] applied
+ * to the clone
+ */
+fun TimeReport.addWorkItem(newWorkitem: AddWorkItemResult): TimeReport {
+    return if (reportParameters.timerange.includes(newWorkitem.date)) {
+        // only update if the newly created item is for the current timerange
+        var issue = issues.find { it.id == newWorkitem.issueId }
+        val issueList = issues.toMutableList()
+
+        if (issue == null) {
+            // issue to added work item was not
+            // present when initial report was fetched
+            // add "mock" item
+            issue = Issue(newWorkitem.issueId, getFormatted("task.addworkitem.missingissuedescription"), "", emptyList())
+            issueList.add(issue)
+        }
+
+        issue.let {
+            val newWorkItem = WorklogItem(
+                issue = it,
+                date = newWorkitem.date,
+                description = newWorkitem.description,
+                durationInMinutes = newWorkitem.durationInMinutes,
+                user = newWorkitem.user,
+                workType = newWorkitem.workType
+            )
+            it.worklogItems.add(newWorkItem)
+        }
+
+        return TimeReport(reportParameters, issueList)
+    } else this
+}
+
+fun <T> MutableCollection<T>.addIfMissing(item : T) {
+    if (!contains(item)) {
+        this.add(item)
+    }
+}

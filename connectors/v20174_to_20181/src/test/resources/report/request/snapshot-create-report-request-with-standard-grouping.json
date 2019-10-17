@@ -1,1 +1,0 @@
-{"$type":"jetbrains.charisma.smartui.report.time.TimeReport","type":"time","own":true,"range":{"$type":"jetbrains.charisma.smartui.report.common.timeRange.FixedTimeRange","from":1514764800000,"to":1515369600000},"grouping":{"id":"WORK_TYPE","presentation":"Typ der Zeitbuchung","label":"Typ der Zeitbuchung"},"name":"YTWLV: 2018-01-01_2018-01-07"}

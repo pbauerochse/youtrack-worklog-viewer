@@ -4,10 +4,7 @@ import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer
 import de.pbauerochse.worklogviewer.excel.POIRow
 import de.pbauerochse.worklogviewer.excel.POIWorkbook
 import de.pbauerochse.worklogviewer.excel.setTimeSpent
-import de.pbauerochse.worklogviewer.fx.components.treetable.GroupedIssuesTreeTableRow
-import de.pbauerochse.worklogviewer.fx.components.treetable.IssueTreeTableRow
-import de.pbauerochse.worklogviewer.fx.components.treetable.SummaryTreeTableRow
-import de.pbauerochse.worklogviewer.fx.components.treetable.TreeTableRowModel
+import de.pbauerochse.worklogviewer.report.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatDate
 import org.apache.poi.ss.usermodel.Cell
 import java.time.LocalDate
@@ -22,35 +19,35 @@ class IssueTimeSpentExcelColumn(private val date: LocalDate) : ExcelColumnRender
 
     override val headline: String = formatDate(date)
 
-    override fun write(row: POIRow, columnIndex: Int, value: TreeTableRowModel) {
-        val cell = row.createCell(columnIndex)
-        val workbook = row.sheet.workbook
+    override fun write(excelRow: POIRow, columnIndex: Int, reportRow: ReportRow) {
+        val cell = excelRow.createCell(columnIndex)
+        val workbook = excelRow.sheet.workbook
 
         when {
-            value.isGroupByRow -> renderGroupBySummary(workbook, cell, value as GroupedIssuesTreeTableRow)
-            value.isIssueRow -> renderIssueSummary(workbook, cell, value as IssueTreeTableRow)
-            value.isSummaryRow -> renderSummary(workbook, cell, value as SummaryTreeTableRow)
+            reportRow.isGrouping -> renderGroupBySummary(workbook, cell, reportRow)
+            reportRow.isIssue -> renderIssueSummary(workbook, cell, reportRow)
+            reportRow.isSummary -> renderSummary(workbook, cell, reportRow)
         }
     }
 
-    private fun renderGroupBySummary(workbook: POIWorkbook, cell: Cell, value: GroupedIssuesTreeTableRow) {
-        val totalTimeSpentInMinutes = value.totalTimeSpentOn(date)
+    private fun renderGroupBySummary(workbook: POIWorkbook, cell: Cell, value: ReportRow) {
+        val totalTimeSpentInMinutes = value.getDurationInMinutes(date)
         if (totalTimeSpentInMinutes > 0) {
             cell.setTimeSpent(totalTimeSpentInMinutes)
             cell.cellStyle = workbook.groupByTimeSpentStyle
         }
     }
 
-    private fun renderIssueSummary(workbook: POIWorkbook, cell: Cell, value: IssueTreeTableRow) {
-        val timeSpentInMinutes = value.issue.getTimeSpentOn(date)
+    private fun renderIssueSummary(workbook: POIWorkbook, cell: Cell, value: ReportRow) {
+        val timeSpentInMinutes = value.getDurationInMinutes(date)
         if (timeSpentInMinutes > 0) {
             cell.setTimeSpent(timeSpentInMinutes)
             cell.cellStyle = workbook.issueTimeSpentStyle
         }
     }
 
-    private fun renderSummary(workbook: POIWorkbook, cell: Cell, value: SummaryTreeTableRow) {
-        val totalTimeSpentInMinutes = value.getTotalTimeSpentOn(date)
+    private fun renderSummary(workbook: POIWorkbook, cell: Cell, value: ReportRow) {
+        val totalTimeSpentInMinutes = value.getDurationInMinutes(date)
         if (totalTimeSpentInMinutes > 0) {
             cell.setTimeSpent(totalTimeSpentInMinutes)
             cell.cellStyle = workbook.issueSummaryStyle

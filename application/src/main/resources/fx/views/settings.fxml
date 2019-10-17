@@ -4,12 +4,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="530.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.pbauerochse.worklogviewer.fx.SettingsViewController">
+<BorderPane prefHeight="530.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.999-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.fx.SettingsViewController">
 
     <center>
         <Accordion maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-            <expandedPane>
+            <panes>
                 <TitledPane fx:id="authenticationPane" text="%view.settings.authentication">
                     <GridPane hgap="5.0" BorderPane.alignment="TOP_LEFT">
                         <columnConstraints>
@@ -23,189 +22,197 @@
                             <RowConstraints vgrow="NEVER" />
                             <RowConstraints vgrow="NEVER" />
                             <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
-                            <RowConstraints vgrow="NEVER" />
                         </rowConstraints>
-                        <padding><Insets bottom="10.0" left="10.0" right="10.0" top="10.0" /></padding>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
 
-                        <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"
-                              GridPane.rowIndex="0">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0">
                             <Label text="%view.settings.allfields">
                                 <font>
-                                    <Font name="System Bold" size="13.0"/>
+                                    <Font name="System Bold" size="13.0" />
                                 </font>
                             </Label>
-                            <Hyperlink onAction="#showSettingsHelp" text="%view.settings.authentication.help"/>
+                            <Hyperlink onAction="#showSettingsHelp" text="%view.settings.authentication.help" />
 
                             <GridPane.margin>
-                                <Insets bottom="10"/>
+                                <Insets bottom="10" />
                             </GridPane.margin>
                         </HBox>
 
                         <Label text="%view.settings.youtrackurl" GridPane.rowIndex="1" />
                         <TextField fx:id="youtrackUrlField" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
+                            <GridPane.margin>
+                                <Insets bottom="2.0" top="2.0" />
+                            </GridPane.margin>
                         </TextField>
 
                         <Label text="%view.settings.youtrackversion" GridPane.rowIndex="2" />
                         <ComboBox fx:id="youtrackVersionField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
+                            <GridPane.margin>
+                                <Insets bottom="2.0" top="2.0" />
+                            </GridPane.margin>
                         </ComboBox>
 
                         <Label text="%view.settings.youtrackuser" GridPane.rowIndex="4" />
                         <TextField fx:id="youtrackUsernameField" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
+                            <GridPane.margin>
+                                <Insets bottom="2.0" top="2.0" />
+                            </GridPane.margin>
                         </TextField>
 
-                        <Label text="%view.settings.youtrackpermanenttoken" GridPane.rowIndex="5"/>
+                        <Label text="%view.settings.youtrackpermanenttoken" GridPane.rowIndex="5" />
                         <PasswordField fx:id="youtrackPermanentTokenField" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                            <GridPane.margin><Insets bottom="2.0" top="2.0" /></GridPane.margin>
+                            <GridPane.margin>
+                                <Insets bottom="2.0" top="2.0" />
+                            </GridPane.margin>
                         </PasswordField>
-
-                        <Label fx:id="youtrackWorklogFielNameLabel" text="%connector.v20182.worklogfield.label" GridPane.rowIndex="6"/>
-                        <TextField fx:id="youtrackWorklogFielNameField" GridPane.columnIndex="1" GridPane.rowIndex="6">
-                            <GridPane.margin>
-                                <Insets bottom="2.0" top="2.0"/>
-                            </GridPane.margin>
-                        </TextField>
-
-                        <Label fx:id="youtrackWorklogFielNameHint" GridPane.columnIndex="1" GridPane.rowIndex="7" text="%connector.v20182.worklogfield.hint" wrapText="true">
-                            <GridPane.margin>
-                                <Insets bottom="2.0" top="2.0"/>
-                            </GridPane.margin>
-                        </Label>
-
-                        <Hyperlink fx:id="youtrackWorklogFielNameHelpLink" text="%connector.v20182.worklogfield.help" GridPane.columnIndex="1" GridPane.rowIndex="8">
-                            <GridPane.margin>
-                                <Insets bottom="2.0" top="2.0"/>
-                            </GridPane.margin>
-                        </Hyperlink>
 
                     </GridPane>
                 </TitledPane>
-            </expandedPane>
-            <panes>
-                <fx:reference source="authenticationPane" />
+
+
                 <TitledPane expanded="false" text="%view.settings.general">
                     <GridPane hgap="5.0" BorderPane.alignment="TOP_LEFT">
                         <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0"/>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
                         </columnConstraints>
                         <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                         </rowConstraints>
 
                         <padding>
-                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </padding>
-                        <Label text="%view.settings.theme" GridPane.rowIndex="0"/>
-                        <ComboBox fx:id="themeComboBox" maxWidth="1.7976931348623157E308" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-                        <Label text="%view.settings.workhours" GridPane.rowIndex="1"/>
-                        <ComboBox fx:id="workhoursComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label text="%view.settings.theme" GridPane.rowIndex="0" />
+                        <ComboBox fx:id="themeComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                        <Label text="%view.settings.showall" GridPane.rowIndex="2"/>
-                        <CheckBox fx:id="showAllWorklogsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <Label text="%view.settings.workhours" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="workhoursComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                        <Label text="%view.settings.showStatistics" GridPane.rowIndex="3"/>
-                        <CheckBox fx:id="showStatisticsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                        <Label text="%view.settings.showall" GridPane.rowIndex="2" />
+                        <CheckBox fx:id="showAllWorklogsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                        <Label text="%view.settings.autoload" GridPane.rowIndex="4"/>
-                        <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                        <Label text="%view.settings.showStatistics" GridPane.rowIndex="3" />
+                        <CheckBox fx:id="showStatisticsCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                        <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="5"/>
-                        <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                        <Label text="%view.settings.autoload" GridPane.rowIndex="4" />
+                        <CheckBox fx:id="loadDataAtStartupCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                        <Label text="%view.settings.showDecimalsInExcel" GridPane.rowIndex="5" />
+                        <CheckBox fx:id="showDecimalsInExcel" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                        <Label text="%view.settings.enablePlugins" GridPane.rowIndex="6" />
+                        <CheckBox fx:id="enablePlugins" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
 
                     </GridPane>
                 </TitledPane>
+
+                <TitledPane expanded="false" text="%view.settings.shortkey">
+                    <GridPane fx:id="keyboardShortcutGridPane" hgap="5.0" BorderPane.alignment="TOP_LEFT">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                        </columnConstraints>
+
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </GridPane>
+                </TitledPane>
+
                 <TitledPane expanded="false" text="%view.settings.workdays">
                     <GridPane>
                         <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0"/>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0"/>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0"/>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0"/>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0"/>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0"/>
-                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0"/>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0" />
+                            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="40.0" />
                         </columnConstraints>
                         <rowConstraints>
-                            <RowConstraints vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                            <RowConstraints vgrow="NEVER" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
                         </rowConstraints>
                         <padding>
-                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                         </padding>
-                        <Label text="%view.settings.workdays.collapse" GridPane.rowIndex="1"/>
-                        <Label text="%view.settings.workdays.highlight" GridPane.rowIndex="2"/>
+                        <Label text="%view.settings.workdays.collapse" GridPane.rowIndex="1" />
+                        <Label text="%view.settings.workdays.highlight" GridPane.rowIndex="2" />
 
                         <Label text="%view.settings.workdays.monday" GridPane.columnIndex="1">
                             <font>
-                                <Font name="System Bold" size="13.0"/>
+                                <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <CheckBox fx:id="mondayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        <CheckBox fx:id="mondayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        <CheckBox fx:id="mondayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="mondayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                         <Label text="%view.settings.workdays.tuesday" GridPane.columnIndex="2">
                             <font>
-                                <Font name="System Bold" size="13.0"/>
+                                <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <CheckBox fx:id="tuesdayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-                        <CheckBox fx:id="tuesdayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                        <CheckBox fx:id="tuesdayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="tuesdayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
 
                         <Label text="%view.settings.workdays.wednesday" GridPane.columnIndex="3">
                             <font>
-                                <Font name="System Bold" size="13.0"/>
+                                <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <CheckBox fx:id="wednesdayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-                        <CheckBox fx:id="wednesdayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="3" GridPane.rowIndex="2"/>
+                        <CheckBox fx:id="wednesdayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="wednesdayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="3" GridPane.rowIndex="2" />
 
                         <Label text="%view.settings.workdays.thursday" GridPane.columnIndex="4">
                             <font>
-                                <Font name="System Bold" size="13.0"/>
+                                <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <CheckBox fx:id="thursdayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="1"/>
-                        <CheckBox fx:id="thursdayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="2"/>
+                        <CheckBox fx:id="thursdayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="thursdayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="2" />
 
                         <Label text="%view.settings.workdays.friday" GridPane.columnIndex="5">
                             <font>
-                                <Font name="System Bold" size="13.0"/>
+                                <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <CheckBox fx:id="fridayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="5" GridPane.rowIndex="1"/>
-                        <CheckBox fx:id="fridayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="5" GridPane.rowIndex="2"/>
+                        <CheckBox fx:id="fridayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="fridayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="5" GridPane.rowIndex="2" />
 
                         <Label text="%view.settings.workdays.saturday" GridPane.columnIndex="6">
                             <font>
-                                <Font name="System Bold" size="13.0"/>
+                                <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <CheckBox fx:id="saturdayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="1"/>
-                        <CheckBox fx:id="saturdayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="2"/>
+                        <CheckBox fx:id="saturdayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="saturdayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="2" />
 
                         <Label text="%view.settings.workdays.sunday" GridPane.columnIndex="7">
                             <font>
-                                <Font name="System Bold" size="13.0"/>
+                                <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <CheckBox fx:id="sundayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="7" GridPane.rowIndex="1"/>
-                        <CheckBox fx:id="sundayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="7" GridPane.rowIndex="2"/>
+                        <CheckBox fx:id="sundayCollapseCheckbox" mnemonicParsing="false" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="sundayHighlightCheckbox" mnemonicParsing="false" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                     </GridPane>
                 </TitledPane>
             </panes>
+            <expandedPane>
+                <fx:reference source="authenticationPane" />
+            </expandedPane>
         </Accordion>
 
     </center>
@@ -213,10 +220,10 @@
     <bottom>
         <HBox alignment="CENTER_RIGHT" spacing="5.0" styleClass="tool-bar" BorderPane.alignment="CENTER_RIGHT">
             <padding>
-                <Insets bottom="7.0" left="10.0" right="10.0" top="7.0"/>
+                <Insets bottom="7.0" left="10.0" right="10.0" top="7.0" />
             </padding>
-            <Button fx:id="cancelSettingsButton" cancelButton="true" mnemonicParsing="false" text="%view.settings.cancel"/>
-            <Button fx:id="saveSettingsButton" defaultButton="true" mnemonicParsing="false" text="%view.settings.save"/>
+            <Button fx:id="cancelSettingsButton" cancelButton="true" mnemonicParsing="false" text="%view.settings.cancel" />
+            <Button fx:id="saveSettingsButton" defaultButton="true" mnemonicParsing="false" text="%view.settings.save" />
         </HBox>
     </bottom>
 </BorderPane>

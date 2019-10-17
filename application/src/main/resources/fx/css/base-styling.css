@@ -90,3 +90,18 @@
     -fx-padding: 0.6em;
     -fx-background-color: derive(-fx-accent, 5%);
 }
+
+#logMessagesComponent {
+    -fx-font-size: 11;
+    -fx-font-family: "DejaVu Sans Mono", monospace;
+}
+
+.hint-label {
+     -fx-text-fill: derive(-fx-light-text-color, -40%);
+}
+
+.tree-parent {
+    -fx-font-weight: bold;
+    -fx-padding: 7 0 7 0;
+    -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
+}

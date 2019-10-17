@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<fx:root type="VBox" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="BASELINE_LEFT" spacing="5.0">
+
+        <Label fx:id="pluginNameLabel" text="The Plugin Name">
+            <font>
+                <Font name="System Bold" size="20.0" />
+            </font>
+        </Label>
+
+        <Label fx:id="pluginVersionLabel" text="2.0.0">
+            <font>
+                <Font name="System" size="12.0" />
+            </font>
+        </Label>
+      <padding>
+         <Insets left="3.0" />
+      </padding>
+    </HBox>
+
+    <Hyperlink fx:id="pluginVendorLink" text="The Plugin Factory Inc." />
+
+    <Label fx:id="pluginDescriptionLabel" alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" text="Some really long description" textAlignment="JUSTIFY" wrapText="true" VBox.vgrow="ALWAYS">
+      <padding>
+         <Insets left="5.0" top="10.0" />
+      </padding>
+    </Label>
+
+
+</fx:root>

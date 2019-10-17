@@ -3,8 +3,9 @@ package de.pbauerochse.worklogviewer.fx.components.statistics.panels
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.ProjectSummary
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.UserStatistic
-import de.pbauerochse.worklogviewer.util.FormattingUtil
-import de.pbauerochse.worklogviewer.util.FormattingUtil.*
+import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
+import de.pbauerochse.worklogviewer.util.FormattingUtil.formatPercentage
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.geometry.HPos
 import javafx.scene.control.Label
 import javafx.scene.layout.GridPane
@@ -66,8 +67,8 @@ class TaskCountByUserAndProjectStatistics(private val data: TaskCountByUserAndPr
         val label = Label(getFormatted("view.statistics.somethingtoamountoftickets", userStatistic.userDisplayLabel, totalNumberOfTickets))
         label.styleClass.add("task-by-user-statistics-username")
 //        label.padding = Insets(20.0, 0.0, 0.0, 0.0)
-        GridPane.setConstraints(label, 0, index)
-        GridPane.setColumnSpan(label, 3)
+        setConstraints(label, 0, index)
+        setColumnSpan(label, 3)
         return label
     }
 
@@ -75,24 +76,24 @@ class TaskCountByUserAndProjectStatistics(private val data: TaskCountByUserAndPr
         val percentageFormatted = formatPercentage(projectSummary.percentage)
         val percentageLabel = Label(percentageFormatted)
         percentageLabel.styleClass.add("task-by-user-statistics-percentage")
-        GridPane.setHalignment(percentageLabel, HPos.RIGHT)
-        GridPane.setConstraints(percentageLabel, 1, currentRow)
+        setHalignment(percentageLabel, HPos.RIGHT)
+        setConstraints(percentageLabel, 1, currentRow)
         return percentageLabel
     }
 
     private fun getProjectLabel(currentRow: Int, it: ProjectSummary): Label {
         val projectLabel = Label(getFormatted("view.statistics.somethingtoamountoftickets", it.projectId, it.numberOfIssues))
         projectLabel.styleClass.add("task-by-user-statistics-project")
-        GridPane.setConstraints(projectLabel, 2, currentRow)
+        setConstraints(projectLabel, 2, currentRow)
         return projectLabel
     }
 
     private fun getProjectSpentTimeLabel(currentRow: Int, it: ProjectSummary): Label {
         val timespentLabel = Label(formatMinutes(it.timeSpentInMinutes, true))
         timespentLabel.styleClass.add("task-by-user-statistics-project-spent-time")
-        GridPane.setConstraints(timespentLabel, 3, currentRow)
-        GridPane.setHalignment(timespentLabel, HPos.RIGHT)
-        GridPane.setHgrow(timespentLabel, Priority.ALWAYS)
+        setConstraints(timespentLabel, 3, currentRow)
+        setHalignment(timespentLabel, HPos.RIGHT)
+        setHgrow(timespentLabel, Priority.ALWAYS)
         timespentLabel.applyCss()
         return timespentLabel
     }
@@ -100,18 +101,18 @@ class TaskCountByUserAndProjectStatistics(private val data: TaskCountByUserAndPr
     private fun getTotalSpentTimeLabel(currentRow: Int): Label {
         val label = Label(getFormatted("view.statistics.totaltimespent"))
         label.styleClass.add("task-by-user-statistics-total-spent-time-label")
-        GridPane.setConstraints(label, 0, currentRow)
-        GridPane.setColumnSpan(label, 2)
-        GridPane.setHalignment(label, HPos.RIGHT)
+        setConstraints(label, 0, currentRow)
+        setColumnSpan(label, 2)
+        setHalignment(label, HPos.RIGHT)
         return label
     }
 
     private fun getTotalSpentTime(currentRow: Int, data: UserStatistic): Label {
-        val label = Label(FormattingUtil.formatMinutes(data.totalTimeSpent, true))
+        val label = Label(formatMinutes(data.totalTimeSpent, true))
         label.styleClass.add("task-by-user-statistics-total-spent-time")
-        GridPane.setConstraints(label, 3, currentRow)
-        GridPane.setHalignment(label, HPos.RIGHT)
-        GridPane.setHgrow(label, Priority.ALWAYS)
+        setConstraints(label, 3, currentRow)
+        setHalignment(label, HPos.RIGHT)
+        setHgrow(label, Priority.ALWAYS)
         return label
     }
 

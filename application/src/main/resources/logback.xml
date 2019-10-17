@@ -1,26 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
 
+    <property name="WLV_HOME" value="${worklogviewer.home:-${user.home}/.youtrack-worklog-viewer}" />
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
     </appender>
-    
-    <appender name="logWindowAppender" class="de.pbauerochse.worklogviewer.logging.ListenableLimitedLogMessagesAppender">
-        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        <maxLogLines>2500</maxLogLines>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${WLV_HOME}/logs/worklog-viewer.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
     </appender>
+
+    <logger name="javafx" level="warn" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </logger>
 
     <logger name="org.apache.http" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="logWindowAppender"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
     <root level="debug">
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="logWindowAppender"/>
+        <appender-ref ref="FILE"/>
     </root>
 </configuration>

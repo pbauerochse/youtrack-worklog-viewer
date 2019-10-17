@@ -52,6 +52,12 @@
     -fx-border-insets: 1 0 0 0;
 }
 
+.tool-bar .separator:vertical .line {
+    -fx-border-color: transparent transparent transparent -fx-shadow-highlight-color;
+    -fx-border-width: 1;
+    -fx-border-insets: 5 0 5 0;
+}
+
 .progress-bar.error > .bar {
     -fx-background-color: #8f2b3c;
 }
@@ -65,6 +71,7 @@
     -fx-background-color: -ytwlv-dark-background-color;
 }
 
+.issue-search,
 .tab-pane > .tab-content-area .split-pane {
     -fx-background-color: derive(-fx-base, 10%);
 }
@@ -233,4 +240,15 @@
 .tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
     -fx-background: -ytwlv-hightlight-cell-color;
     -fx-table-cell-border-color: transparent;
+}
+
+.error-label {
+    -fx-text-fill: #d2394d;
+    -fx-font-weight: bold;
+}
+
+.split-pane {
+    -fx-background-color: -ytwlv-dark-background-color, -ytwlv-dark-background-color;
+    /*-fx-background-insets: 0, 1;*/
+    /*-fx-padding: 1;*/
 }

@@ -162,7 +162,7 @@ class POIRow(private val row: Row, val sheet: POISheet) {
         return row.cellIterator().asSequence()
             .map { it.cellStyle }
             .filter { it != null }
-            .map { it.fontIndex }
+            .map { it.fontIndexAsInt }
             .map { row.sheet.workbook.getFontAt(it).fontHeightInPoints }
             .max()
     }
@@ -174,7 +174,7 @@ class POIRow(private val row: Row, val sheet: POISheet) {
 }
 
 fun Cell.setTimeSpent(timeSpentInMinutes: Long) {
-    if (SettingsUtil.settingsViewModel.isShowDecimalsInExcel) {
+    if (SettingsUtil.settingsViewModel.showDecimalsInExcelProperty.get()) {
         setCellValue(timeSpentInMinutes.toDouble() / 60.0)
     } else {
         setCellValue(FormattingUtil.formatMinutes(timeSpentInMinutes))

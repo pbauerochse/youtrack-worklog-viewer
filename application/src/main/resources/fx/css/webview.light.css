@@ -1,0 +1,59 @@
+* {
+    font-family: sans-serif;
+    font-size: 12pt;
+    color: #333333;
+}
+
+.prewrapped {
+    white-space: pre-wrap;
+}
+
+.text {
+    line-height: 17pt;
+}
+
+.text ul {
+    padding-left: 2em;
+    margin-left: 25pt;
+    list-style: disc outside;
+}
+
+.text ul.wiki-list0 {
+    list-style-type: disc;
+    padding-left: 0;
+}
+
+span.link {
+    color: #3b6aed;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+span.link.issue-resolved {
+    color: #828282;
+    text-decoration: line-through;
+}
+
+table {
+    display: table;
+    width: auto !important;
+    table-layout: auto !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    border: 1px solid #4c4c4c;
+    margin-left: 1px;
+    margin-top: 1px;
+}
+
+th {
+    padding: 6px;
+    font-weight: bold;
+    color: #333333;
+    border: 1px solid #737373;
+    background-color: #a4a4a4;
+}
+
+td {
+    padding: 4px 6px;
+    border: 1px solid #737373;
+}

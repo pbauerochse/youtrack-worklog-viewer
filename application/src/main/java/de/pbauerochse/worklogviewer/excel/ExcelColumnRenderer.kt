@@ -1,11 +1,10 @@
 package de.pbauerochse.worklogviewer.excel
 
-import de.pbauerochse.worklogviewer.fx.components.treetable.TreeTableRowModel
+import de.pbauerochse.worklogviewer.report.view.ReportRow
 
 internal interface ExcelColumnRenderer {
 
     val headline: String
-
-    fun write(row: POIRow, columnIndex: Int, value: TreeTableRowModel)
+    fun write(excelRow: POIRow, columnIndex: Int, reportRow: ReportRow)
 
 }

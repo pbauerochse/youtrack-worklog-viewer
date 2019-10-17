@@ -5,29 +5,22 @@
     <parent>
         <artifactId>youtrack-worklog-viewer</artifactId>
         <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-        <version>2.5.0</version>
+        <version>2.6.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>application</artifactId>
+    <name>YouTrack Worklog Viewer - Main Application (JavaFX)</name>
     <description>The base JavaFX application of the Youtrack Worklog Viewer</description>
 
     <build>
-        <finalName>youtrack-worklog-viewer-${project.version}-slim</finalName>
+        <finalName>slim-youtrack-worklog-viewer-${javafx-binary-variant}-${project.version}</finalName>
 
         <plugins>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>de.pbauerochse.worklogviewer.WorklogViewerLauncher</mainClass>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -42,11 +35,15 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>project-classifier</shadedClassifierName>
-                            <outputFile>${project.build.directory}/${project.parent.artifactId}-${project.version}.jar</outputFile>
+                            <outputFile>${project.build.directory}/${project.parent.artifactId}-${javafx-binary-variant}-${project.version}.jar</outputFile>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>de.pbauerochse.worklogviewer.WorklogViewerLauncher</mainClass>
+                                    <manifestEntries>
+                                        <X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
+                                        <X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+                                    </manifestEntries>
                                 </transformer>
                             </transformers>
                         </configuration>
@@ -61,17 +58,27 @@
     <dependencies>
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>api</artifactId>
+            <artifactId>common-api</artifactId>
         </dependency>
 
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>connector-v20174_to_20181</artifactId>
+            <artifactId>connector-api</artifactId>
         </dependency>
 
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>connector-v20182</artifactId>
+            <artifactId>plugin-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+            <artifactId>dummy-data-connector</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
+            <artifactId>connector-2019.x</artifactId>
         </dependency>
 
         <dependency>
@@ -80,13 +87,13 @@
         </dependency>
 
         <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
         </dependency>
 
         <dependency>
@@ -116,20 +123,14 @@
 
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <classifier>win</classifier>
+            <artifactId>javafx-web</artifactId>
+            <classifier>${javafx-binary-variant}</classifier>
         </dependency>
 
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <classifier>linux</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <classifier>mac</classifier>
+            <classifier>${javafx-binary-variant}</classifier>
         </dependency>
 
     </dependencies>

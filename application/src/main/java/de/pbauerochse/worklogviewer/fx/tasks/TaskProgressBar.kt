@@ -22,7 +22,7 @@ import javafx.util.Duration
  * a label for the Task to be completed, and a
  * progress message label
  */
-class TaskProgressBar(private val task: WorklogViewerTask<*>) : StackPane(), ChangeListener<Worker.State> {
+class TaskProgressBar(private val task: WorklogViewerTask<*>, private val showTaskName : Boolean) : StackPane(), ChangeListener<Worker.State> {
 
     @FXML
     lateinit var progressBar: ProgressBar
@@ -44,9 +44,18 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>) : StackPane(), Cha
     }
 
     override fun changed(observable: ObservableValue<out Worker.State>?, oldValue: Worker.State?, newValue: Worker.State?) {
-        taskName.text = getTaskNameLabel(newValue)
+        taskName.text = if (showTaskName) getTaskNameLabel(newValue) else ""
+    }
 
-        if (isCompletedState(newValue)) {
+    @Suppress("NON_EXHAUSTIVE_WHEN")
+    fun updateStatus(status : Worker.State) {
+        when (status) {
+            Worker.State.RUNNING -> updateStyles(RUNNING_CLASS)
+            Worker.State.SUCCEEDED -> updateStyles(SUCCESSFUL_CLASS)
+            Worker.State.FAILED -> updateStyles(ERROR_CLASS)
+        }
+
+        if (isCompletedState(status)) {
             triggerFadeOut()
         }
     }
@@ -73,7 +82,7 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>) : StackPane(), Cha
                 toValue = 0.0
             }
         )
-        transition.onFinished = EventHandler { _ -> removeFromParent() }
+        transition.onFinished = EventHandler { removeFromParent() }
 
         transition.play()
     }
@@ -83,8 +92,20 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>) : StackPane(), Cha
         parent.children.remove(this)
     }
 
+    private fun updateStyles(style: String) {
+        progressBar.styleClass.removeAll(ERROR_CLASS, RUNNING_CLASS, SUCCESSFUL_CLASS)
+        progressBar.styleClass.add(style)
+
+        progressText.styleClass.removeAll(ERROR_CLASS, RUNNING_CLASS, SUCCESSFUL_CLASS)
+        progressText.styleClass.add(style)
+    }
+
     companion object {
         private val FADE_OUT_DELAY = Duration.seconds(5.0)
         private val FADE_OUT_DURATION = Duration.millis(700.0)
+
+        private const val ERROR_CLASS = "error"
+        private const val RUNNING_CLASS = "running"
+        private const val SUCCESSFUL_CLASS = "success"
     }
 }
