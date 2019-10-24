@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.report
 import de.pbauerochse.worklogviewer.isSameDayOrAfter
 import de.pbauerochse.worklogviewer.isSameDayOrBefore
 import java.time.LocalDate
+import java.time.Period
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -11,7 +12,7 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.WeekFields
 import java.util.*
 
-data class TimeRange(val start: LocalDate, val end: LocalDate) {
+data class TimeRange(val start: LocalDate, val end: LocalDate) : Iterable<LocalDate> {
 
     val reportName: String = "${start.format(ISO_DATE_FORMATTER)}_${end.format(ISO_DATE_FORMATTER)}"
     val formattedForLocale: String = "${start.format(LOCALIZED_FORMATTER)} - ${end.format(LOCALIZED_FORMATTER)}"
@@ -21,6 +22,37 @@ data class TimeRange(val start: LocalDate, val end: LocalDate) {
     }
 
     fun includes(date: LocalDate): Boolean = date.isSameDayOrAfter(start) && date.isSameDayOrBefore(end)
+
+    /**
+     * Returns the total number of days for this timerange.
+     * Start and End are both counted as full days (inclusive)
+     */
+    val totalNumberOfDays : Int
+        get() = Period.between(start, end.plusDays(1)).days
+
+    /**
+     * Iterates over all days covered by this timerange
+     */
+    override fun iterator(): Iterator<LocalDate> {
+        return TimeRangeIterator(start, end)
+    }
+
+    private class TimeRangeIterator(start : LocalDate, private val end : LocalDate) : Iterator<LocalDate> {
+
+        private var nextValue : LocalDate?
+
+        init {
+            require(start.isSameDayOrBefore(end)) { "End must not be before Start" }
+            nextValue = start
+        }
+
+        override fun hasNext(): Boolean = nextValue != null
+        override fun next(): LocalDate {
+            val currentValue = nextValue!!
+            nextValue = currentValue.plusDays(1).takeIf { it.isSameDayOrBefore(end) }
+            return currentValue
+        }
+    }
 
     companion object {
 

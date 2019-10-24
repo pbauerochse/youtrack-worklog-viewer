@@ -34,7 +34,7 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
     private val splitPane = SplitPane(getWorklogsTableView()).apply { orientation = Orientation.HORIZONTAL }
     private val settingsModel = SettingsUtil.settingsViewModel
 
-    var currentData: ReportView? = null
+    private var currentData: ReportView? = null
     private var nextData: ReportView? = null
 
     init {
@@ -57,12 +57,12 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
      * Returns a list of component nodes, that are
      * supposed to be shown in the statistics panel
      */
-    internal abstract fun getStatistics(issues: List<Issue>): List<Node>
+    internal abstract fun getStatistics(reportView: ReportView): List<Node>
 
     private fun showStatisticsView(showStatistics: Boolean) {
         if (showStatistics && !splitPane.items.contains(statisticsPane)) {
             splitPane.items.add(statisticsPane)
-            splitPane.setDividerPosition(0, 0.8)
+            splitPane.setDividerPosition(0, 0.78)
         } else if (!showStatistics && splitPane.items.contains(statisticsPane)) {
             splitPane.items.remove(statisticsPane)
         }
@@ -76,7 +76,7 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
 
             worklogsTableView.update(currentData!!)
 
-            val statistics = getStatistics(currentData!!.issues)
+            val statistics = getStatistics(currentData!!)
             statisticsPane.replaceAll(statistics)
         }
     }

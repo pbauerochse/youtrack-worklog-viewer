@@ -5,7 +5,7 @@ import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUse
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TaskCountByUserAndProjectStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserAndProjectGraphStatistics
-import de.pbauerochse.worklogviewer.report.Issue
+import de.pbauerochse.worklogviewer.report.view.ReportView
 import javafx.scene.Node
 
 /**
@@ -14,9 +14,9 @@ import javafx.scene.Node
  */
 internal class ProjectWorklogTab : WorklogsTab("") {
 
-    override fun getStatistics(issues: List<Issue>): List<Node> {
-        val dataByUser = TaskCountByUserAndProjectStatisticData(issues)
-        val dataByProject = TaskCountByProjectAndUserStatisticData(issues)
+    override fun getStatistics(reportView: ReportView): List<Node> {
+        val dataByUser = TaskCountByUserAndProjectStatisticData(reportView.issues)
+        val dataByProject = TaskCountByProjectAndUserStatisticData(reportView.issues)
         return arrayListOf(
             TaskCountByUserAndProjectStatistics(dataByUser),
             TimePerProjectAndUserGraphStatistics(dataByUser),

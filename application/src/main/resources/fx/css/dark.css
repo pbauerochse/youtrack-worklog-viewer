@@ -247,8 +247,14 @@
     -fx-font-weight: bold;
 }
 
+.negative {
+    -fx-text-fill: #d2394d;
+}
+
+.positive {
+    -fx-text-fill: #4a8b4c;
+}
+
 .split-pane {
     -fx-background-color: -ytwlv-dark-background-color, -ytwlv-dark-background-color;
-    /*-fx-background-insets: 0, 1;*/
-    /*-fx-padding: 1;*/
 }

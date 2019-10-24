@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<fx:root type="javafx.scene.layout.GridPane"
+         xmlns="http://javafx.com/javafx"
+         xmlns:fx="http://javafx.com/fxml/1"
+         hgap="5" vgap="5">
+
+    <GridPane.margin>
+        <Insets top="5" bottom="5" />
+    </GridPane.margin>
+
+    <columnConstraints>
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0"/>
+        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="200.0" halignment="RIGHT"/>
+    </columnConstraints>
+
+    <rowConstraints>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+        <RowConstraints vgrow="NEVER"/>
+    </rowConstraints>
+
+    <Label text="%statistics.overtime.title" styleClass="chart-title" GridPane.columnIndex="0" GridPane.rowIndex="0"
+           GridPane.columnSpan="2" GridPane.hgrow="ALWAYS" maxWidth="Infinity"/>
+
+    <Label text="%statistics.overtime.totaldays" styleClass="statistics-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+    <Label GridPane.columnIndex="1" GridPane.rowIndex="1" fx:id="totalDays"/>
+
+    <Label text="%statistics.overtime.dayswithworkentries" styleClass="statistics-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+    <Label GridPane.columnIndex="1" GridPane.rowIndex="2" fx:id="totalDaysWithTimeEntries"/>
+
+    <Label text="%statistics.overtime.dayswithoutworkentries" styleClass="statistics-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+    <Label GridPane.columnIndex="1" GridPane.rowIndex="3" fx:id="totalDaysWithoutTimeEntries"/>
+
+    <Label text="%statistics.overtime.daysunderfullfilled" styleClass="statistics-label" GridPane.columnIndex="0" GridPane.rowIndex="4">
+        <GridPane.margin>
+            <Insets top="10" />
+        </GridPane.margin>
+    </Label>
+    <Label GridPane.columnIndex="1" GridPane.rowIndex="4" fx:id="totalDaysWithIncompleteTimeEntries"/>
+
+    <Label text="%statistics.overtime.daysfullfilled" styleClass="statistics-label" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+    <Label GridPane.columnIndex="1" GridPane.rowIndex="5" fx:id="totalDaysWithOverfilledTimeEntries"/>
+
+    <Label text="%statistics.overtime.expectedbookedtime" styleClass="statistics-label" GridPane.columnIndex="0" GridPane.rowIndex="6">
+        <GridPane.margin>
+            <Insets top="10" />
+        </GridPane.margin>
+    </Label>
+    <Label GridPane.columnIndex="1" GridPane.rowIndex="6" fx:id="expectedTotalBookedTime"/>
+
+    <Label text="%statistics.overtime.actualbookedtime" styleClass="statistics-label" GridPane.columnIndex="0" GridPane.rowIndex="7"/>
+    <Label GridPane.columnIndex="1" GridPane.rowIndex="7" fx:id="totalBookedTime"/>
+
+    <Label text="%statistics.overtime.difference" styleClass="statistics-label" GridPane.columnIndex="0" GridPane.rowIndex="8"/>
+    <Label styleClass="statistics-label" GridPane.columnIndex="1" GridPane.rowIndex="8" fx:id="diffBookedTime"/>
+
+    <CheckBox GridPane.columnIndex="0" GridPane.rowIndex="9" GridPane.columnSpan="2"
+              fx:id="ignoreWeekends" text="%statistics.overtime.ignore.weekends" selected="true">
+        <GridPane.margin>
+            <Insets top="10" />
+        </GridPane.margin>
+    </CheckBox>
+
+    <CheckBox GridPane.columnIndex="0" GridPane.rowIndex="10" GridPane.columnSpan="2"
+              fx:id="ignoreDaysWithoutWorklogItems" text="%statistics.overtime.ignore.withoutbookedtime" />
+
+    <CheckBox GridPane.columnIndex="0" GridPane.rowIndex="11" GridPane.columnSpan="2"
+              fx:id="ignoreToday" text="%statistics.overtime.ignore.today" />
+
+</fx:root>

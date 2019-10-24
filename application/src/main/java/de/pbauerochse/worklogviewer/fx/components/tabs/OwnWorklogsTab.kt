@@ -2,6 +2,7 @@ package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByProjectAndUserStatisticData
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
+import de.pbauerochse.worklogviewer.fx.components.statistics.panels.OvertimeStatisticsPane
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TaskCountByUserAndProjectStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserAndProjectGraphStatistics
@@ -9,6 +10,7 @@ import de.pbauerochse.worklogviewer.hasOwnWorklogs
 import de.pbauerochse.worklogviewer.isOwn
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.TimeReport
+import de.pbauerochse.worklogviewer.report.view.ReportView
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import javafx.scene.Node
@@ -25,11 +27,12 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
         update(LABEL, extractOwnWorklogs(report), report.reportParameters, grouping)
     }
 
-    override fun getStatistics(issues: List<Issue>): List<Node> {
-        val dataByUser = TaskCountByUserAndProjectStatisticData(issues)
-        val dataByProject = TaskCountByProjectAndUserStatisticData(issues)
+    override fun getStatistics(reportView: ReportView): List<Node> {
+        val dataByUser = TaskCountByUserAndProjectStatisticData(reportView.issues)
+        val dataByProject = TaskCountByProjectAndUserStatisticData(reportView.issues)
         return arrayListOf(
             TaskCountByUserAndProjectStatistics(dataByUser),
+            OvertimeStatisticsPane(reportView),
             TimePerProjectAndUserGraphStatistics(dataByUser),
             TimePerUserAndProjectGraphStatistics(dataByProject)
         )

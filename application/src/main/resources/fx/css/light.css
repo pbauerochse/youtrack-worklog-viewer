@@ -175,3 +175,12 @@
     -fx-text-fill: #dd3e3b;
     -fx-font-weight: bold;
 }
+
+.negative {
+    -fx-text-fill: #dd3e3b;
+}
+
+.positive {
+    -fx-text-fill: #4ba101;
+}
+

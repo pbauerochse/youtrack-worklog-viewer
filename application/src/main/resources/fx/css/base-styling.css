@@ -105,3 +105,13 @@
     -fx-padding: 7 0 7 0;
     -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
 }
+
+.chart-title {
+    -fx-text-alignment: CENTER;
+    -fx-alignment: CENTER;
+    -fx-font-weight: bold;
+}
+
+.statistics-label {
+    -fx-font-weight: bold;
+}
