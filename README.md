@@ -25,6 +25,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 * **v2.6.0**
   * Grouping criterias are now applied on-the-fly, without having to reload the report
+  * Two new report time ranges: "last two weeks" and "this and last week"
   * Marking issues and frequently used search queries as favorites
   * Adding a view to search for issues and access your favourites
   * Added context menus in the issue view allowing you to
