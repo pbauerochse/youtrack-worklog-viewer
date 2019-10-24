@@ -7,7 +7,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Latest Version
 
-[Download v2.6.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.6.0)
+[Download v2.6.1](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.6.1)
 
 # Features
 
