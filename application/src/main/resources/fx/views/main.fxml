@@ -36,7 +36,7 @@
                         <ToolBar maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" fx:id="mainToolbar">
                             <items>
                                 <Label text="%view.main.timerange" />
-                                <ComboBox fx:id="timerangeComboBox" prefWidth="150.0" />
+                                <ComboBox fx:id="timerangeComboBox" prefWidth="220.0" />
                                 <DatePicker fx:id="startDatePicker" prefWidth="120.0" promptText="%view.main.startdate.prompt" />
                                 <DatePicker fx:id="endDatePicker" prefWidth="120.0" promptText="%view.main.enddate.prompt" />
                                 <Button fx:id="fetchWorklogButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0">
