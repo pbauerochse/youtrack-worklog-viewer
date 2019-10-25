@@ -4,6 +4,7 @@ import de.pbauerochse.worklogviewer.isSameDayOrBefore
 import de.pbauerochse.worklogviewer.report.TimeRange
 import de.pbauerochse.worklogviewer.report.view.ReportView
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.settings.SettingsViewModel
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
 import javafx.fxml.FXMLLoader
@@ -42,17 +43,20 @@ class OvertimeStatisticsPane(private val reportView: ReportView) : GridPane() {
         loader.setController(this)
         loader.load<Parent>()
 
-        ignoreWeekends.selectedProperty().addListener { _, _, _ -> updateData() }
-        ignoreDaysWithoutWorklogItems.selectedProperty().addListener { _, _, _ -> updateData() }
-        ignoreToday.selectedProperty().addListener { _, _, _ -> updateData() }
+        val settingsViewModel = SettingsUtil.settingsViewModel
 
-        updateData()
+        ignoreWeekends.selectedProperty().bindBidirectional(settingsViewModel.overtimeStatisticsIgnoreWeekendsProperty)
+        ignoreWeekends.selectedProperty().addListener { _, _, _ -> updateData(settingsViewModel) }
+        ignoreDaysWithoutWorklogItems.selectedProperty().bindBidirectional(settingsViewModel.overtimeStatisticsIgnoreWithoutTimeEntriesProperty)
+        ignoreDaysWithoutWorklogItems.selectedProperty().addListener { _, _, _ -> updateData(settingsViewModel) }
+        ignoreToday.selectedProperty().bindBidirectional(settingsViewModel.overtimeStatisticsIgnoreTodayProperty)
+        ignoreToday.selectedProperty().addListener { _, _, _ -> updateData(settingsViewModel) }
+
+        updateData(settingsViewModel)
     }
 
-    private fun updateData() {
-        val settings = SettingsUtil.settings
-        val expectedWorkMinutesPerDay = settings.workHoursADay.times(60).toLong()
-
+    private fun updateData(settingsViewModel: SettingsViewModel) {
+        val expectedWorkMinutesPerDay = settingsViewModel.workhoursProperty.value.times(60).toLong()
         val timerangeOfPastDaysOnly = getTimerangeWithoutUpcomingDays(reportView)
 
         val relevantDaysInTimeRange = timerangeOfPastDaysOnly.toMutableList()
@@ -83,7 +87,7 @@ class OvertimeStatisticsPane(private val reportView: ReportView) : GridPane() {
         }.toString()
 
         val totalBookedTimeInMinutes = relevantDaysInTimeRange.flatMap { date -> reportView.issues.map { it.getTimeInMinutesSpentOn(date) } }.sum()
-        val expectedTotalBookedTimeInMinutes = relevantDaysInTimeRange.size.times(settings.workHoursADay).times(60).toLong()
+        val expectedTotalBookedTimeInMinutes = relevantDaysInTimeRange.size.times(settingsViewModel.workhoursProperty.value).times(60).toLong()
 
         totalBookedTime.text = formatMinutes(totalBookedTimeInMinutes)
         expectedTotalBookedTime.text = formatMinutes(expectedTotalBookedTimeInMinutes)

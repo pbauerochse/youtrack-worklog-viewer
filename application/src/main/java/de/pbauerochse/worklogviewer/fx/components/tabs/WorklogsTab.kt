@@ -63,6 +63,7 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
         if (showStatistics && !splitPane.items.contains(statisticsPane)) {
             splitPane.items.add(statisticsPane)
             splitPane.setDividerPosition(0, 0.78)
+            splitPane.dividers[0].positionProperty().bindBidirectional(settingsModel.statisticsPaneDividerPosition)
         } else if (!showStatistics && splitPane.items.contains(statisticsPane)) {
             splitPane.items.remove(statisticsPane)
         }

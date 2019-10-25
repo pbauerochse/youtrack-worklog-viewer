@@ -67,6 +67,11 @@ class Settings {
     var isShowDecimalHourTimesInExcelReport = false
     var isEnablePlugins = false
 
+    var statisticsPaneDividerPosition = 0.78
+    var isOvertimeStatisticsIgnoreWeekends = true
+    var isOvertimeStatisticsIgnoreWithoutTimeEntries = false
+    var isOvertimeStatisticsIgnoreToday = false
+
     @JsonSerialize(using = WeekdaySettingsSerializer::class)
     @JsonDeserialize(using = WeekdaySettingsDeserializer::class)
     var collapseState = WeekdaySettings(SATURDAY, SUNDAY)

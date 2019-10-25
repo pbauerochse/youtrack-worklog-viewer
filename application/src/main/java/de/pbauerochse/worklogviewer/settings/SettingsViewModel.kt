@@ -6,10 +6,7 @@ import de.pbauerochse.worklogviewer.settings.favourites.FavouritesModel
 import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import de.pbauerochse.worklogviewer.toURL
 import javafx.beans.binding.BooleanBinding
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleFloatProperty
-import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.*
 import javafx.beans.value.ChangeListener
 import javafx.scene.input.KeyCombination
 import java.time.DayOfWeek.*
@@ -29,6 +26,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val workhoursProperty = SimpleFloatProperty()
     val showAllWorklogsProperty = SimpleBooleanProperty()
     val showStatisticsProperty = SimpleBooleanProperty()
+    val statisticsPaneDividerPosition = SimpleDoubleProperty()
     val loadDataAtStartupProperty = SimpleBooleanProperty()
     val showDecimalsInExcelProperty = SimpleBooleanProperty()
     val enablePluginsProperty = SimpleBooleanProperty()
@@ -62,6 +60,11 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val toggleStatisticsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
     val showSettingsKeyboardCombination = SimpleObjectProperty<KeyCombination>()
     val exitWorklogViewerKeyboardCombination = SimpleObjectProperty<KeyCombination>()
+
+    // overtime statistics
+    var overtimeStatisticsIgnoreWeekendsProperty = SimpleBooleanProperty()
+    var overtimeStatisticsIgnoreWithoutTimeEntriesProperty = SimpleBooleanProperty()
+    var overtimeStatisticsIgnoreTodayProperty = SimpleBooleanProperty()
 
     val favourites : FavouritesModel = FavouritesModel(settings.favourites)
 
@@ -157,6 +160,12 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         settings.shortcuts.toggleStatistics?.let { toggleStatisticsKeyboardCombination.set(KeyCombination.valueOf(it)) }
         settings.shortcuts.showSettings?.let { showSettingsKeyboardCombination.set(KeyCombination.valueOf(it)) }
         settings.shortcuts.exitWorklogViewer?.let { exitWorklogViewerKeyboardCombination.set(KeyCombination.valueOf(it)) }
+
+        overtimeStatisticsIgnoreWeekendsProperty.set(settings.isOvertimeStatisticsIgnoreWeekends)
+        overtimeStatisticsIgnoreWithoutTimeEntriesProperty.set(settings.isOvertimeStatisticsIgnoreWithoutTimeEntries)
+        overtimeStatisticsIgnoreTodayProperty.set(settings.isOvertimeStatisticsIgnoreToday)
+
+        statisticsPaneDividerPosition.set(settings.statisticsPaneDividerPosition)
     }
 
     private val hasMissingConnectionSettingsBinding: BooleanBinding
@@ -177,6 +186,12 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         startDateProperty.addListener(invokeSetter { settings.startDate = it })
         endDateProperty.addListener(invokeSetter { settings.endDate = it })
         lastUsedFilePath.addListener(invokeSetter { settings.lastUsedFilePath = it })
+
+        overtimeStatisticsIgnoreWeekendsProperty.addListener(invokeSetter { settings.isOvertimeStatisticsIgnoreWeekends = it })
+        overtimeStatisticsIgnoreWithoutTimeEntriesProperty.addListener(invokeSetter { settings.isOvertimeStatisticsIgnoreWithoutTimeEntries = it })
+        overtimeStatisticsIgnoreTodayProperty.addListener(invokeSetter { settings.isOvertimeStatisticsIgnoreToday = it })
+
+        statisticsPaneDividerPosition.addListener(invokeSetter { settings.statisticsPaneDividerPosition = it.toDouble() })
     }
 
     private fun <T> invokeSetter(block: (t : T) -> Unit): ChangeListener<T> {
