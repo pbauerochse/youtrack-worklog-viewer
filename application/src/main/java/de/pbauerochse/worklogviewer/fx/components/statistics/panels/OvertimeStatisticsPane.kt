@@ -95,9 +95,19 @@ class OvertimeStatisticsPane(private val reportView: ReportView) : GridPane() {
 
         val diff = totalBookedTimeInMinutes - expectedTotalBookedTimeInMinutes
         val isFilledOrOvertime = diff >= 0
-        val sign = if (isFilledOrOvertime) '+' else '-'
+
+        val sign = when {
+            diff > 0 -> "+"
+            diff < 0 -> "-"
+            else -> "+/-"
+        }
+        val formattedValue = when {
+            diff == 0L -> "0"
+            else -> formatMinutes(diff.absoluteValue)
+        }
+
         diffBookedTime.apply {
-            text = "$sign ${formatMinutes(diff.absoluteValue)}"
+            text = "$sign $formattedValue"
             styleClass.removeAll(UNDERTIME_CLASS, OVERTIME_CLASS)
             styleClass.add(if (isFilledOrOvertime) OVERTIME_CLASS else UNDERTIME_CLASS)
         }
