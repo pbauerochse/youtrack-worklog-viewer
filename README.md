@@ -23,7 +23,9 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Important changes
 * **v2.6.1**
-  * Booked time overview in the statistcs pane on the "own worklogs" tab
+  * Booked time overview in the statistics pane on the "own worklogs" tab
+  * Saving window divider position in the settings
+  * Fixed [#39 - Error parsing custom field value](https://github.com/pbauerochse/youtrack-worklog-viewer/issues/39)
 
 * **v2.6.0**
   * Grouping criterias are now applied on-the-fly, without having to reload the report
