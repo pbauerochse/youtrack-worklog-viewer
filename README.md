@@ -22,6 +22,9 @@ If you find this tool useful and would like to show me your appreciation [buy me
 * two color schemes: light and dark
 
 # Important changes
+* **v2.6.2**
+  * Minor changes to the plugin API
+
 * **v2.6.1**
   * Booked time overview in the statistics pane on the "own worklogs" tab
   * Saving window divider position in the settings
