@@ -11,9 +11,9 @@ interface WorklogViewerState {
     val currentTimeReport: TimeReport?
 
     /**
-     * The data context of the currently visible tab / project
-     * in the main application window
+     * Provides access the state the worklog
+     * viewer user interface is currently in
      */
-    val currentlyVisibleTab: TabContext?
+    val ui: UIState
 
 }
