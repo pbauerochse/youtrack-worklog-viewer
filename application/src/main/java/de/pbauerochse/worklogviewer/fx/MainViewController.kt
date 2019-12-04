@@ -11,6 +11,7 @@ import de.pbauerochse.worklogviewer.fx.dialog.Dialog
 import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogViewerStateAdapter
+import de.pbauerochse.worklogviewer.fx.plugins.WorklogviewerUiState
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder.currentTimeReportProperty
 import de.pbauerochse.worklogviewer.fx.tasks.*
 import de.pbauerochse.worklogviewer.plugins.PluginLoader
@@ -295,7 +296,11 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
     private fun getPluginState(): WorklogViewerState {
         return WorklogViewerStateAdapter(
             currentTimeReportProperty.get(),
-            resultTabPane.currentlyVisibleTab
+            WorklogviewerUiState(
+                currentlyVisibleTab = resultTabPane.currentlyVisibleTab,
+                currentStartValue = startDatePicker.value,
+                currentEndValue = endDatePicker.value
+            )
         )
     }
 
