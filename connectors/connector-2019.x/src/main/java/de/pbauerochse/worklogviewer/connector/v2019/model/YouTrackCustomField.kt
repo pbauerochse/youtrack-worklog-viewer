@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.slf4j.LoggerFactory
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class YouTrackCustomField @JsonCreator constructor(
@@ -19,7 +20,12 @@ data class YouTrackCustomField @JsonCreator constructor(
             return when {
                 jsonNode.isArray -> readValues(jsonNode as ArrayNode)
                 jsonNode.isNull -> emptyList()
-                else -> listOf(readNodeValue(jsonNode))
+                jsonNode.isObject -> listOf(readNodeValue(jsonNode))
+                jsonNode.isNumber || jsonNode.isTextual || jsonNode.isBoolean -> listOf(YouTrackCustomFieldValue(jsonNode.textValue()))
+                else -> {
+                    LOGGER.warn("Unhandled YouTrackCustomField Value: ${jsonNode.nodeType}: $jsonNode. Defaulting to emptyList")
+                    emptyList()
+                }
             }
         } ?: emptyList()
 
@@ -30,5 +36,9 @@ data class YouTrackCustomField @JsonCreator constructor(
     private fun readNodeValue(node: JsonNode): YouTrackCustomFieldValue {
         val stringValue: String? = node.toString()
         return jacksonObjectMapper().readValue(stringValue, YouTrackCustomFieldValue::class.java)
+    }
+
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(YouTrackCustomField::class.java)
     }
 }
