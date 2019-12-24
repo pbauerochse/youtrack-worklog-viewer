@@ -12,7 +12,6 @@ import java.net.URL
  */
 class POIWorkbook(internal val workbook: Workbook) {
 
-
     fun createSheet(text: String): POISheet = POISheet(workbook.createSheet(text), this)
 
     val headlineStyle: CellStyle by lazy {
