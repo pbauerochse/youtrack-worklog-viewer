@@ -298,8 +298,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
             currentTimeReportProperty.get(),
             WorklogviewerUiState(
                 currentlyVisibleTab = resultTabPane.currentlyVisibleTab,
-                currentStartValue = startDatePicker.value,
-                currentEndValue = endDatePicker.value
+                timeRange = TimeRange(startDatePicker.value, endDatePicker.value)
             )
         )
     }
@@ -381,9 +380,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
      * Fetches the worklogs for the currently defined settings from YouTrack
      */
     private fun fetchWorklogs() {
-        val timerange = timerangeComboBox.selectionModel.selectedItem
-        LOGGER.debug("Fetch worklogs clicked for timerange {}", timerange.toString())
-
+        LOGGER.debug("Fetch worklogs clicked for timerange ${timerangeComboBox.selectionModel.selectedItem}")
         val selectedStartDate = startDatePicker.value
         val selectedEndDate = endDatePicker.value
 
