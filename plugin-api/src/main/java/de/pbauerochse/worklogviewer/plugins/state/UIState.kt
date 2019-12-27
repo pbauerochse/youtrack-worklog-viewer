@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.plugins.state
 
-import java.time.LocalDate
+import de.pbauerochse.worklogviewer.report.TimeRange
 
 /**
  * Contains state of the youtrack worklog viewer ui
@@ -14,13 +14,8 @@ interface UIState {
     val currentlyVisibleTab: TabContext?
 
     /**
-     * The value currently selected in the start date picker
+     * The currently selected TimeRange in the UI date pickers.
      */
-    val currentStartValue: LocalDate?
-
-    /**
-     * The value currently selected in the end date picker
-     */
-    val currentEndValue: LocalDate?
+    val timeRange: TimeRange
 
 }
