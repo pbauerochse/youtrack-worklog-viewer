@@ -1,5 +1,7 @@
 package de.pbauerochse.worklogviewer;
 
+import javafx.application.Application;
+
 /**
  * Main class must not extend Application due to
  * openjfx module restrictions in a fat jar.
@@ -9,7 +11,7 @@ package de.pbauerochse.worklogviewer;
 public class WorklogViewerLauncher {
 
     public static void main(String[] args) {
-        WorklogViewer.main(args);
+        Application.launch(WorklogViewer.class, args);
     }
 
 }

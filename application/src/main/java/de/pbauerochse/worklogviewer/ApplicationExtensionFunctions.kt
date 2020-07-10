@@ -23,14 +23,14 @@ fun String.toLocalDate(): LocalDate? = LocalDate.parse(this, DateTimeFormatter.I
 fun LocalDate.toFormattedString(): String = format(DateTimeFormatter.ISO_DATE)
 
 fun Hyperlink.setHref(url: String) {
-    onAction = EventHandler { Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(url) } }
+    onAction = EventHandler { Platform.runLater { WorklogViewer.instance.hostServices.showDocument(url) } }
 }
 
 /**
  * Opens the issue in the browser
  */
 fun MinimalIssue.openInBrowser() {
-    Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(this.getYouTrackLink().toExternalForm()) }
+    Platform.runLater { WorklogViewer.instance.hostServices.showDocument(this.getYouTrackLink().toExternalForm()) }
 }
 
 /**

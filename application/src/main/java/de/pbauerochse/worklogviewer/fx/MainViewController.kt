@@ -405,7 +405,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
     }
 
     private fun exitWorklogViewer() {
-        WorklogViewer.getInstance().requestShutdown()
+        WorklogViewer.instance.requestShutdown()
     }
 
     override fun <T> start(task: PluginTask<T>, callback: TaskCallback<T>?) {
