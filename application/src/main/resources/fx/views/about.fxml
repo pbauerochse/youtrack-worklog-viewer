@@ -2,34 +2,44 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.121"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="de.pbauerochse.worklogviewer.fx.AboutController"
-            styleClass="about-dialog">
+<AnchorPane maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="400.0" styleClass="about-dialog" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.fx.AboutController">
    <padding>
-       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
+
+    <HBox alignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
+        <ImageView preserveRatio="true">
+            <Image url="@/fx/img/logo.png" />
+        </ImageView>
+    </HBox>
+
     <Label alignment="CENTER" contentDisplay="CENTER" layoutX="228.0" layoutY="165.0" text="YouTrack Worklog Viewer" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <font>
-            <Font name="System Bold" size="20.0"/>
+            <Font name="System Bold" size="20.0" />
         </font>
     </Label>
-    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="238.0" layoutY="175.0" text="%release.version" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+
+    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="238.0" layoutY="175.0" text="%release.version" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
         <font>
-            <Font name="System Bold" size="12.0"/>
+            <Font name="System Bold" size="12.0" />
         </font>
     </Label>
-    <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
+
+
+
+    <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="160.0">
         <Label text="%release.description" textAlignment="JUSTIFY" wrapText="true" VBox.vgrow="ALWAYS">
             <VBox.margin>
-                <Insets bottom="20.0"/>
+                <Insets bottom="20.0" />
             </VBox.margin>
         </Label>
-        <Hyperlink fx:id="youtrackLink" text="YouTrack by JetBrains"/>
-        <Hyperlink fx:id="worklogViewerLink" text="YouTrack Worklog Viewer @github.com"/>
-        <Hyperlink fx:id="licenseLink" text="%release.license"/>
-        <Hyperlink fx:id="iconsLink" layoutX="10.0" layoutY="94.0" text="%release.icons"/>
+        <Hyperlink fx:id="youtrackLink" text="YouTrack by JetBrains" />
+        <Hyperlink fx:id="worklogViewerLink" text="YouTrack Worklog Viewer @github.com" />
+        <Hyperlink fx:id="licenseLink" text="%release.license" />
+        <Hyperlink fx:id="iconsLink" layoutX="10.0" layoutY="94.0" text="%release.icons" />
     </VBox>
 </AnchorPane>

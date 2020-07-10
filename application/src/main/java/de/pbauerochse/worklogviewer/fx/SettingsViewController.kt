@@ -220,7 +220,7 @@ class SettingsViewController : Initializable {
     fun showSettingsHelp() {
         val helpUrl = getFormatted("view.settings.authentication.help_url")
         LOGGER.debug("Opening page {} in browser", helpUrl)
-        Platform.runLater { WorklogViewer.getInstance().hostServices.showDocument(helpUrl) }
+        Platform.runLater { WorklogViewer.instance.hostServices.showDocument(helpUrl) }
     }
 
     private fun closeSettingsDialogue() {
