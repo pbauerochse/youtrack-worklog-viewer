@@ -19,6 +19,9 @@ class AboutController : Initializable {
     private lateinit var worklogViewerLink: Hyperlink
 
     @FXML
+    private lateinit var logoByPatrickMarx: Hyperlink
+
+    @FXML
     private lateinit var licenseLink: Hyperlink
 
     @FXML
@@ -27,6 +30,7 @@ class AboutController : Initializable {
     override fun initialize(location: URL, resources: ResourceBundle) {
         youtrackLink.setHref("https://www.jetbrains.com/youtrack/")
         worklogViewerLink.setHref("https://github.com/pbauerochse/youtrack-worklog-viewer")
+        logoByPatrickMarx.setHref("https://twitter.com/ptrckmrx")
         licenseLink.setHref("https://github.com/pbauerochse/youtrack-worklog-viewer/blob/master/LICENSE.txt")
         iconsLink.setHref("http://www.famfamfam.com/lab/icons/silk/")
     }
