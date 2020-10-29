@@ -51,7 +51,7 @@ object MainTaskRunner : TaskExecutor {
     private fun <T> bindOnFailed(task: WorklogViewerTask<T>) {
         val initialHandler = task.onFailed
         task.setOnFailed {
-            LOGGER.debug("${task.label} failed")
+            LOGGER.warn("${task.label} failed", it.source.exception)
             runningTasksList.remove(task)
             initialHandler?.handle(it)
         }
