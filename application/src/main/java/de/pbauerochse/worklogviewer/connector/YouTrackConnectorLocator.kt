@@ -2,7 +2,6 @@ package de.pbauerochse.worklogviewer.connector
 
 import de.pbauerochse.worklogviewer.WorklogViewer
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
-import org.jetbrains.annotations.Nullable
 import java.util.*
 
 /**
@@ -27,7 +26,7 @@ object YouTrackConnectorLocator {
             .sorted()
     }
 
-    private fun getConnectorFactoryForVersion(version: @Nullable YouTrackVersion?): YouTrackConnectorFactory? {
+    private fun getConnectorFactoryForVersion(version: YouTrackVersion?): YouTrackConnectorFactory? {
         if (version == null) {
             return null
         }
