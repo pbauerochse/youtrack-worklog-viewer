@@ -5,6 +5,7 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil
 import org.apache.poi.common.usermodel.HyperlinkType
 import org.apache.poi.ss.usermodel.*
 import java.net.URL
+import kotlin.math.max
 
 /**
  * Provides helper utilities for
@@ -20,8 +21,8 @@ class POIWorkbook(internal val workbook: Workbook) {
                 bold = true
                 fontHeightInPoints = 14
             })
-            setAlignment(HorizontalAlignment.CENTER)
-            setVerticalAlignment(VerticalAlignment.BOTTOM)
+            alignment = HorizontalAlignment.CENTER
+            verticalAlignment = VerticalAlignment.BOTTOM
         }
     }
 
@@ -31,8 +32,8 @@ class POIWorkbook(internal val workbook: Workbook) {
                 bold = true
                 fontHeightInPoints = 12
             })
-            setAlignment(HorizontalAlignment.LEFT)
-            setVerticalAlignment(VerticalAlignment.BOTTOM)
+            alignment = HorizontalAlignment.LEFT
+            verticalAlignment = VerticalAlignment.BOTTOM
         }
     }
 
@@ -42,8 +43,8 @@ class POIWorkbook(internal val workbook: Workbook) {
                 bold = true
                 fontHeightInPoints = 12
             })
-            setAlignment(HorizontalAlignment.RIGHT)
-            setVerticalAlignment(VerticalAlignment.BOTTOM)
+            alignment = HorizontalAlignment.RIGHT
+            verticalAlignment = VerticalAlignment.BOTTOM
         }
     }
 
@@ -54,8 +55,8 @@ class POIWorkbook(internal val workbook: Workbook) {
                 strikeout = true
                 color = IndexedColors.LIGHT_BLUE.getIndex()
             })
-            setAlignment(HorizontalAlignment.LEFT)
-            setVerticalAlignment(VerticalAlignment.CENTER)
+            alignment = HorizontalAlignment.LEFT
+            verticalAlignment = VerticalAlignment.CENTER
             fillForegroundColor = IndexedColors.LIGHT_BLUE.getIndex()
         }
     }
@@ -66,8 +67,8 @@ class POIWorkbook(internal val workbook: Workbook) {
                 fontHeightInPoints = 10
                 color = IndexedColors.BLUE.getIndex()
             })
-            setAlignment(HorizontalAlignment.LEFT)
-            setVerticalAlignment(VerticalAlignment.CENTER)
+            alignment = HorizontalAlignment.LEFT
+            verticalAlignment = VerticalAlignment.CENTER
             fillForegroundColor = IndexedColors.BLUE.getIndex()
         }
     }
@@ -78,8 +79,8 @@ class POIWorkbook(internal val workbook: Workbook) {
                 fontHeightInPoints = 10
                 bold = true
             })
-            setAlignment(HorizontalAlignment.RIGHT)
-            setVerticalAlignment(VerticalAlignment.CENTER)
+            alignment = HorizontalAlignment.RIGHT
+            verticalAlignment = VerticalAlignment.CENTER
         }
     }
 
@@ -88,8 +89,8 @@ class POIWorkbook(internal val workbook: Workbook) {
             setFont(workbook.createFont().apply {
                 fontHeightInPoints = 10
             })
-            setAlignment(HorizontalAlignment.RIGHT)
-            setVerticalAlignment(VerticalAlignment.CENTER)
+            alignment = HorizontalAlignment.RIGHT
+            verticalAlignment = VerticalAlignment.CENTER
         }
     }
 
@@ -120,7 +121,7 @@ class POISheet(private val sheet: Sheet, val workbook: POIWorkbook) {
      * returned by #createNextRow is desired
      */
     fun addSpacing(numRows: Int) {
-        nextRowIncrement = Math.max(1, Math.max(numRows + 1, nextRowIncrement))
+        nextRowIncrement = max(1, max(numRows + 1, nextRowIncrement))
     }
 
     fun autoSizeColumns() {
@@ -130,7 +131,7 @@ class POISheet(private val sheet: Sheet, val workbook: POIWorkbook) {
     }
 
     internal fun createdCellAt(num: Int) {
-        maxCellIndex = Math.max(0, Math.max(num, maxCellIndex))
+        maxCellIndex = max(0, max(num, maxCellIndex))
     }
 
     fun writeHeadlines(headlines: List<String>) {
@@ -154,7 +155,7 @@ class POIRow(private val row: Row, val sheet: POISheet) {
 
     fun adjustHeight() {
         val maxFontHeight = getMaxFontHeightInPointsInRow() ?: 10
-        row.heightInPoints = Math.max(maxFontHeight + ADDITIONAL_ROW_HEIGHT, row.heightInPoints)
+        row.heightInPoints = max(maxFontHeight + ADDITIONAL_ROW_HEIGHT, row.heightInPoints)
     }
 
     private fun getMaxFontHeightInPointsInRow(): Short? {
@@ -163,7 +164,7 @@ class POIRow(private val row: Row, val sheet: POISheet) {
             .filter { it != null }
             .map { it.fontIndexAsInt }
             .map { row.sheet.workbook.getFontAt(it).fontHeightInPoints }
-            .max()
+            .maxOrNull()
     }
 
     companion object {
