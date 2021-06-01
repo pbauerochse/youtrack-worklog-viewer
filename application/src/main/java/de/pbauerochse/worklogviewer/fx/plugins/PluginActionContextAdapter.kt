@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.plugins
 
-import de.pbauerochse.worklogviewer.connector.YouTrackConnector
-import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
+import de.pbauerochse.worklogviewer.datasource.DataSources
+import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource
 import de.pbauerochse.worklogviewer.plugins.actions.PluginActionContext
 import de.pbauerochse.worklogviewer.plugins.dialog.WorklogViewerDialog
 import de.pbauerochse.worklogviewer.plugins.formatter.YouTrackWorktimeFormatter
@@ -17,8 +17,8 @@ class PluginActionContextAdapter(
     override val state: WorklogViewerState
 ) : PluginActionContext {
 
-    override val connector: YouTrackConnector
-        get() = YouTrackConnectorLocator.getActiveConnector() ?: throw ExceptionUtil.getIllegalStateException("exceptions.notsetyet", YouTrackConnector::class.java.simpleName)
+    override val connector: TimeTrackingDataSource
+        get() = DataSources.activeDataSource ?: throw ExceptionUtil.getIllegalStateException("exceptions.notsetyet", TimeTrackingDataSource::class.java.simpleName)
 
     override val timesFormatter: YouTrackWorktimeFormatter
         get() = WorklogTimeFormatter(SettingsUtil.settingsViewModel.workhoursProperty.value)

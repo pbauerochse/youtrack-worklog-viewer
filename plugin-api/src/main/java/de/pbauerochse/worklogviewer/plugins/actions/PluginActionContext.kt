@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.plugins.actions
 
-import de.pbauerochse.worklogviewer.connector.YouTrackConnector
+import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource
 import de.pbauerochse.worklogviewer.plugins.dialog.WorklogViewerDialog
 import de.pbauerochse.worklogviewer.plugins.formatter.YouTrackWorktimeFormatter
 import de.pbauerochse.worklogviewer.plugins.state.WorklogViewerState
@@ -18,7 +18,7 @@ interface PluginActionContext {
      * configured YouTrack API. The http connector already
      * contains the login data of the user. Use responsibly!
      */
-    val connector: YouTrackConnector
+    val connector: TimeTrackingDataSource
 
     /**
      * a time formatter to convert durations in minutes to the default

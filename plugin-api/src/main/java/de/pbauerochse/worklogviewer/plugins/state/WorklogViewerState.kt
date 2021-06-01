@@ -6,7 +6,7 @@ interface WorklogViewerState {
 
     /**
      * the raw TimeReport as it was provided by the
-     * [de.pbauerochse.worklogviewer.connector.YouTrackConnector]
+     * [de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource]
      */
     val currentTimeReport: TimeReport?
 

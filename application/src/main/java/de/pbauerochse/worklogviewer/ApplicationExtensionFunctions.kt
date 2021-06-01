@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer
 
-import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.report.MinimalIssue
 import de.pbauerochse.worklogviewer.report.TimeReport

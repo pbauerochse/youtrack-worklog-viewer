@@ -17,9 +17,9 @@ data class Version(
     }
 
     override fun compareTo(other: Version): Int {
-        val majorComparison = Integer.compare(major, other.major)
-        val minorComparison = Integer.compare(minor, other.minor)
-        val releaseComparison = Integer.compare(release, other.release)
+        val majorComparison = major.compareTo(other.major)
+        val minorComparison = minor.compareTo(other.minor)
+        val releaseComparison = release.compareTo(other.release)
 
         return when (majorComparison) {
             0 -> if (minorComparison == 0) releaseComparison else minorComparison

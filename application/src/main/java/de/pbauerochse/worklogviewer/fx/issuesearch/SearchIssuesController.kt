@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch
 
 import de.pbauerochse.worklogviewer.addIfMissing
-import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
+import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import de.pbauerochse.worklogviewer.fx.components.treetable.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.fx.issuesearch.details.IssueDetailsPanel
@@ -24,7 +24,6 @@ import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
-import javafx.scene.input.KeyCode
 import javafx.scene.layout.BorderPane
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -145,7 +144,7 @@ class SearchIssuesController : Initializable {
     }
 
     private fun performSearch(query: String) {
-        val task = SearchIssuesTask(query, 0, YouTrackConnectorLocator.getActiveConnector()!!)
+        val task = SearchIssuesTask(query, 0, DataSources.activeDataSource!!)
         task.onSucceeded = EventHandler { showSearchResults(it) }
         lastSearchQueryProperty.value = query
         taskExecutor.startTask(task)
@@ -162,7 +161,7 @@ class SearchIssuesController : Initializable {
     }
 
     private fun loadIssue(favouriteIssue: FavouriteIssue) {
-        val task = LoadSingleIssueTask(favouriteIssue.id, YouTrackConnectorLocator.getActiveConnector()!!)
+        val task = LoadSingleIssueTask(favouriteIssue.id, DataSources.activeDataSource!!)
         task.onSucceeded = EventHandler { event ->
             val finishedTask = event.source as LoadSingleIssueTask
             finishedTask.value?.let { showIssueDetails(it) }

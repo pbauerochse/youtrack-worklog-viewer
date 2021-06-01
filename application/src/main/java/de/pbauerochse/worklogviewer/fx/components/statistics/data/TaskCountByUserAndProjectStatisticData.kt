@@ -38,20 +38,20 @@ class TaskCountByUserAndProjectStatisticData(issues : List<Issue>) {
 
     private fun getProjectStatistics(worklogsForUser: List<WorklogItem>): List<ProjectSummary> {
         val distinctProjects = worklogsForUser
-            .map { it.issue.project.name ?: "---" }
+            .map { it.issue.project.shortName ?: "---" }
             .distinct()
             .sorted()
 
-        val totalTimeSpentInTimerange = worklogsForUser.map { it.durationInMinutes }.sum()
+        val totalTimeSpentInTimerange = worklogsForUser.sumOf { it.durationInMinutes }
 
-        val worklogsByProject = worklogsForUser.groupBy { it.issue.project.name ?: "---" }
+        val worklogsByProject = worklogsForUser.groupBy { it.issue.project.shortName ?: "---" }
         val issuesByProject = worklogsForUser
             .map { it.issue }
             .distinct()
-            .groupBy { it.project.name ?: "---" }
+            .groupBy { it.project.shortName ?: "---" }
 
         return distinctProjects.map {
-            val totalTimeSpentInMinutesOnThisProject = worklogsByProject[it]!!.map { it.durationInMinutes }.sum()
+            val totalTimeSpentInMinutesOnThisProject = worklogsByProject[it]!!.sumOf { worklogItem -> worklogItem.durationInMinutes }
             val numberOfWorkedIssuesInThisProject = issuesByProject[it]!!.count()
             val percentOfTimeSpentOnThisProject = totalTimeSpentInMinutesOnThisProject.toDouble() / totalTimeSpentInTimerange.toDouble()
             ProjectSummary(it, percentOfTimeSpentOnThisProject, numberOfWorkedIssuesInThisProject, totalTimeSpentInMinutesOnThisProject)

@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.workitem.add
 
-import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
-import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
-import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.datasource.AddWorkItemRequest
+import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
+import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.fx.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.tasks.Progress
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
@@ -11,7 +11,7 @@ class AddWorkItemTask(private val request: AddWorkItemRequest) : WorklogViewerTa
 
     override fun start(progress: Progress): AddWorkItemResult {
         progress.setProgress(getFormatted("task.addworkitem.creating"), 0.1)
-        val service = YouTrackConnectorLocator.getActiveConnector()!!
+        val service = DataSources.activeDataSource!!
         val response = service.addWorkItem(request, progress)
         progress.setProgress(getFormatted("task.addworkitem.done"), 100)
         return response
