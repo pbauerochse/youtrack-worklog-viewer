@@ -24,7 +24,7 @@ class TaskCountByProjectAndUserStatisticData(issues : List<Issue>) {
     private fun extractProjectStatistics(issues: List<Issue>): List<ProjectStatistic> {
         val worklogsGroupedByProject = issues
             .flatMap { it.worklogItems }
-            .groupBy { it.issue.project }
+            .groupBy { it.issue.project.name ?: "---" }
             .toSortedMap()
 
         return worklogsGroupedByProject.map {

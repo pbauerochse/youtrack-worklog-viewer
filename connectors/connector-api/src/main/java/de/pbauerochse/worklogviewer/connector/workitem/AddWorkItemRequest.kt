@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.connector.workitem
 
+import de.pbauerochse.worklogviewer.report.WorkItemType
 import java.time.LocalDate
 
 /**
@@ -10,5 +11,6 @@ data class AddWorkItemRequest(
     val issueId : String,
     val date: LocalDate,
     val durationInMinutes : Long,
+    val workItemType: WorkItemType?,
     val description : String? = null
 )

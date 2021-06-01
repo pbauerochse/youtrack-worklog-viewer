@@ -6,7 +6,6 @@ import de.pbauerochse.worklogviewer.report.MinimalIssue
 import de.pbauerochse.worklogviewer.report.TimeReport
 import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
-import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.scene.control.Hyperlink
@@ -68,31 +67,36 @@ fun String.toURL(): URL = URL(this)
 fun TimeReport.addWorkItem(newWorkitem: AddWorkItemResult): TimeReport {
     return if (reportParameters.timerange.includes(newWorkitem.date)) {
         // only update if the newly created item is for the current timerange
-        var issue = issues.find { it.id == newWorkitem.issueId }
         val issueList = issues.toMutableList()
-
-        if (issue == null) {
+        val issue = issues.find { it.id == newWorkitem.issue.id } ?: createDetachedIssue(newWorkitem).apply {
             // issue to added work item was not
             // present when initial report was fetched
             // add "mock" item
-            issue = Issue(newWorkitem.issueId, getFormatted("task.addworkitem.missingissuedescription"), "", emptyList())
-            issueList.add(issue)
+            issueList.add(this)
         }
 
-        issue.let {
-            val newWorkItem = WorklogItem(
-                issue = it,
-                date = newWorkitem.date,
-                description = newWorkitem.description,
-                durationInMinutes = newWorkitem.durationInMinutes,
-                user = newWorkitem.user,
-                workType = newWorkitem.workType
-            )
-            it.worklogItems.add(newWorkItem)
-        }
+        val newWorkItem = WorklogItem(
+            issue = issue,
+            date = newWorkitem.date,
+            description = newWorkitem.text,
+            durationInMinutes = newWorkitem.durationInMinutes,
+            user = newWorkitem.user,
+            workType = newWorkitem.workType
+        )
+        issue.worklogItems.add(newWorkItem)
 
         return TimeReport(reportParameters, issueList)
     } else this
+}
+
+private fun createDetachedIssue(newWorkitem: AddWorkItemResult): Issue {
+    return Issue(
+        newWorkitem.issue.id,
+        newWorkitem.issue.summary ?: "",
+        newWorkitem.issue.project!!,
+        newWorkitem.issue.description ?: "",
+        emptyList()
+    )
 }
 
 fun <T> MutableCollection<T>.addIfMissing(item : T) {

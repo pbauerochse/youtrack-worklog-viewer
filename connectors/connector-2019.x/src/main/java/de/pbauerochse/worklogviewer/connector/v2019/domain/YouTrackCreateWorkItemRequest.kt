@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.connector.v2019.model
+package de.pbauerochse.worklogviewer.connector.v2019.domain
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -10,7 +10,8 @@ class YouTrackCreateWorkItemRequest(
     workDate: LocalDate,
     durationInMinutes: Long,
     @JsonProperty("author") val author: YouTrackUser,
-    @JsonProperty("text") val text: String?
+    @JsonProperty("text") val text: String?,
+    @JsonProperty("type") val type: YouTrackWorkItemType?
 ) {
 
     @JsonProperty("date")
@@ -20,5 +21,5 @@ class YouTrackCreateWorkItemRequest(
         .toEpochMilli()
 
     @JsonProperty("duration")
-    val duration: YouTrackWorkItemDuration = YouTrackWorkItemDuration(durationInMinutes)
+    val duration: YouTrackWorkItemDuration = YouTrackWorkItemDuration(durationInMinutes, "${durationInMinutes}m")
 }
