@@ -47,8 +47,8 @@
                             </GridPane.margin>
                         </TextField>
 
-                        <Label text="%view.settings.youtrackversion" GridPane.rowIndex="2" />
-                        <ComboBox fx:id="youtrackVersionField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label text="%view.settings.youtrack.connector" GridPane.rowIndex="2" />
+                        <ComboBox fx:id="youtrackConnectorField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2">
                             <GridPane.margin>
                                 <Insets bottom="2.0" top="2.0" />
                             </GridPane.margin>

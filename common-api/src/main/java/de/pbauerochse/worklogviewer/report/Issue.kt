@@ -59,8 +59,8 @@ data class Issue(
     }
 
     override fun compareTo(other: Issue): Int {
-        val byProject = if (project.name != null && other.project.name != null) {
-            project.name.compareTo(other.project.name)
+        val byProject = if (project.shortName != null && other.project.shortName != null) {
+            project.shortName.compareTo(other.project.shortName)
         } else 0
 
         return when (byProject) {

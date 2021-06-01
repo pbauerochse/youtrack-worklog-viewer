@@ -15,7 +15,7 @@ internal object ProjectGrouping : Grouping {
 
     override fun rows(issues: List<Issue>): List<ReportRow> {
         return issues
-            .groupBy { it.project.name ?: "---" }
+            .groupBy { it.project.shortName ?: "---" }
             .map { createGroup(it.key, it.value) }
     }
 

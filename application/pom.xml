@@ -63,22 +63,7 @@
 
         <dependency>
             <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>connector-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
             <artifactId>plugin-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>dummy-data-connector</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-            <artifactId>connector-2019.x</artifactId>
         </dependency>
 
         <dependency>

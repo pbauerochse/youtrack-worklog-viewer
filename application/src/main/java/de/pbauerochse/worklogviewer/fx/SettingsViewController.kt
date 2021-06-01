@@ -1,10 +1,8 @@
 package de.pbauerochse.worklogviewer.fx
 
 import de.pbauerochse.worklogviewer.WorklogViewer
-import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
-import de.pbauerochse.worklogviewer.connector.YouTrackVersion
+import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.fx.converter.WorkhoursStringConverter
-import de.pbauerochse.worklogviewer.fx.converter.YouTrackVersionStringConverter
 import de.pbauerochse.worklogviewer.fx.shortcutkeys.KeyCombinationAsStringBinding
 import de.pbauerochse.worklogviewer.fx.shortcutkeys.KeyboardShortcutDefinition
 import de.pbauerochse.worklogviewer.fx.shortcutkeys.RecordKeyboardShortcutListener
@@ -24,6 +22,7 @@ import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.RowConstraints
 import javafx.stage.WindowEvent
+import javafx.util.StringConverter
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.util.*
@@ -37,7 +36,7 @@ class SettingsViewController : Initializable {
     @FXML
     private lateinit var youtrackUrlField: TextField
     @FXML
-    private lateinit var youtrackVersionField: ComboBox<YouTrackVersion>
+    private lateinit var youtrackConnectorField: ComboBox<ConnectorDescriptor>
     @FXML
     private lateinit var youtrackUsernameField: TextField
     @FXML
@@ -122,8 +121,11 @@ class SettingsViewController : Initializable {
         workhoursComboBox.converter = WorkhoursStringConverter
 
         // Version Combobox Values
-        youtrackVersionField.items.addAll(YouTrackConnectorLocator.getSupportedVersions())
-        youtrackVersionField.converter = YouTrackVersionStringConverter
+        youtrackConnectorField.items.addAll(DataSources.dataSourceFactories.map { ConnectorDescriptor(it.id, it.name) })
+        youtrackConnectorField.converter = object : StringConverter<ConnectorDescriptor?>() {
+            override fun toString(descriptor: ConnectorDescriptor?): String? = descriptor?.name
+            override fun fromString(string: String?): ConnectorDescriptor? = string?.let { youtrackConnectorField.items.find { descriptor -> descriptor.name == it } }
+        }
 
         // Theme Combobox
         themeComboBox.items.addAll(*Theme.values())
@@ -131,7 +133,7 @@ class SettingsViewController : Initializable {
 
     private fun bindInputElements(viewModel: SettingsViewModel) {
         youtrackUrlField.textProperty().bindBidirectional(viewModel.youTrackUrlProperty)
-        youtrackVersionField.valueProperty().bindBidirectional(viewModel.youTrackVersionProperty)
+        youtrackConnectorField.valueProperty().bindBidirectional(viewModel.youTrackConnectorProperty)
         youtrackUsernameField.textProperty().bindBidirectional(viewModel.youTrackUsernameProperty)
         youtrackPermanentTokenField.textProperty().bindBidirectional(viewModel.youTrackPermanentTokenProperty)
 

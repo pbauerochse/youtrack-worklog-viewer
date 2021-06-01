@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.workitem.add
 
 import de.pbauerochse.worklogviewer.addWorkItem
-import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
-import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.datasource.AddWorkItemRequest
+import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
 import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder
 import de.pbauerochse.worklogviewer.fx.tasks.MainTaskRunner

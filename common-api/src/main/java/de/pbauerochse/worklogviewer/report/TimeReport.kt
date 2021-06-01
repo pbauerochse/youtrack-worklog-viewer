@@ -5,6 +5,7 @@ package de.pbauerochse.worklogviewer.report
  * into the domain model of the Worklog Viewer
  */
 class TimeReport(
+
     /**
      * The parameters this report
      * was created with
@@ -16,4 +17,5 @@ class TimeReport(
      * as retrieved from YouTrack
      */
     val issues : List<Issue>
+
 )

@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.settings
 
-import de.pbauerochse.worklogviewer.connector.YouTrackVersion
+import de.pbauerochse.worklogviewer.datasource.DataSources
+import de.pbauerochse.worklogviewer.fx.ConnectorDescriptor
 import de.pbauerochse.worklogviewer.fx.Theme
 import de.pbauerochse.worklogviewer.settings.favourites.FavouritesModel
 import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
@@ -18,7 +19,7 @@ import java.time.LocalDate
 class SettingsViewModel internal constructor(val settings: Settings) {
 
     val youTrackUrlProperty = SimpleStringProperty()
-    val youTrackVersionProperty = SimpleObjectProperty<YouTrackVersion>()
+    val youTrackConnectorProperty = SimpleObjectProperty<ConnectorDescriptor>()
     val youTrackUsernameProperty = SimpleStringProperty()
     val youTrackPermanentTokenProperty = SimpleStringProperty()
 
@@ -75,7 +76,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
 
     fun saveChanges() {
         settings.youTrackConnectionSettings.baseUrl = youTrackUrlProperty.get().toURL()
-        settings.youTrackConnectionSettings.version = youTrackVersionProperty.get()
+        settings.youTrackConnectionSettings.selectedConnectorId = youTrackConnectorProperty.get().id
         settings.youTrackConnectionSettings.username = youTrackUsernameProperty.get()
         settings.youTrackConnectionSettings.permanentToken = youTrackPermanentTokenProperty.get()
 
@@ -122,7 +123,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
 
     private fun applyPropertiesFromSettings() {
         youTrackUrlProperty.set(settings.youTrackConnectionSettings.baseUrl?.toExternalForm())
-        youTrackVersionProperty.set(settings.youTrackConnectionSettings.version)
+        youTrackConnectorProperty.set(DataSources.dataSourceFactories.find { it.id == settings.youTrackConnectionSettings.selectedConnectorId }?.let { ConnectorDescriptor(it.id, it.name) })
         youTrackUsernameProperty.set(settings.youTrackConnectionSettings.username)
         youTrackPermanentTokenProperty.set(settings.youTrackConnectionSettings.permanentToken)
 
@@ -170,7 +171,7 @@ class SettingsViewModel internal constructor(val settings: Settings) {
 
     private val hasMissingConnectionSettingsBinding: BooleanBinding
         get() = youTrackUrlProperty.isEmpty
-            .or(youTrackVersionProperty.isNull)
+            .or(youTrackConnectorProperty.isNull)
             .or(youTrackUsernameProperty.isEmpty)
             .or(youTrackPermanentTokenProperty.isEmpty)
 

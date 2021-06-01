@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.task
 
-import de.pbauerochse.worklogviewer.connector.YouTrackConnector
+import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource
 import de.pbauerochse.worklogviewer.fx.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.report.Issue
 import de.pbauerochse.worklogviewer.tasks.Progress
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory
 class SearchIssuesTask(
         private val query: String,
         private val offset : Int,
-        private val connector : YouTrackConnector
+        private val connector : TimeTrackingDataSource
 ) : WorklogViewerTask<List<Issue>>(getFormatted("dialog.issuesearch.task.title")) {
 
     val isNewSearch = offset == 0

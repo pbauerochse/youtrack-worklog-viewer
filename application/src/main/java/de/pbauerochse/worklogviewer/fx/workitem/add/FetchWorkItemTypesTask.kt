@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.workitem.add
 
-import de.pbauerochse.worklogviewer.connector.YouTrackConnectorLocator
+import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.fx.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.report.WorkItemType
 import de.pbauerochse.worklogviewer.tasks.Progress
@@ -13,7 +13,7 @@ class FetchWorkItemTypesTask(private val projectId: String) : WorklogViewerTask<
 
     override fun start(progress: Progress): List<WorkItemType> {
         progress.setProgress(FormattingUtil.getFormatted("task.addworkitem.task.workitems.loading"), 0.1)
-        val service = YouTrackConnectorLocator.getActiveConnector()!!
+        val service = DataSources.activeDataSource!!
         val response = service.getWorkItemTypes(projectId, progress)
         progress.setProgress(FormattingUtil.getFormatted("task.addworkitem.task.workitems.done"), 100)
         return response

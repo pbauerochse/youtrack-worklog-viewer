@@ -15,10 +15,6 @@
         <module>common-api</module>
         <module>plugin-api</module>
         <module>application</module>
-
-        <module>connectors/connector-api</module>
-        <module>connectors/dummy-data-connector</module>
-        <module>connectors/connector-2019.x</module>
     </modules>
 
     <profiles>
@@ -208,25 +204,7 @@
 
             <dependency>
                 <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-                <artifactId>connector-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
                 <artifactId>plugin-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-                <artifactId>dummy-data-connector</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-                <artifactId>connector-2019.x</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

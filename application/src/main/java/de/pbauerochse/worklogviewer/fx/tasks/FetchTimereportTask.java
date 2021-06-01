@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
-import de.pbauerochse.worklogviewer.connector.YouTrackConnector;
+import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource;
 import de.pbauerochse.worklogviewer.report.TimeReport;
 import de.pbauerochse.worklogviewer.report.TimeReportParameters;
 import de.pbauerochse.worklogviewer.tasks.Progress;
@@ -14,10 +14,10 @@ import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
  */
 public class FetchTimereportTask extends WorklogViewerTask<TimeReport> {
 
-    private final YouTrackConnector connector;
+    private final TimeTrackingDataSource connector;
     private final TimeReportParameters parameters;
 
-    public FetchTimereportTask(@NotNull YouTrackConnector connector, @NotNull TimeReportParameters parameters) {
+    public FetchTimereportTask(@NotNull TimeTrackingDataSource connector, @NotNull TimeReportParameters parameters) {
         super(getFormatted("task.fetchworklogs"));
         this.connector = connector;
         this.parameters = parameters;
