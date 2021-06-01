@@ -1,25 +1,25 @@
-package de.pbauerochse.worklogviewer.fx
+package de.pbauerochse.worklogviewer.fx.workitem.add
 
 import de.pbauerochse.worklogviewer.addWorkItem
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder
-import de.pbauerochse.worklogviewer.fx.tasks.AddWorkItemTask
 import de.pbauerochse.worklogviewer.fx.tasks.MainTaskRunner
+import de.pbauerochse.worklogviewer.report.MinimalIssue
+import de.pbauerochse.worklogviewer.report.WorkItemType
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
+import javafx.beans.binding.Bindings
 import javafx.beans.property.*
 import javafx.event.EventHandler
-import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.control.Button
-import javafx.scene.control.DatePicker
-import javafx.scene.control.Label
-import javafx.scene.control.TextField
+import javafx.scene.control.*
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.stage.WindowEvent
+import javafx.util.StringConverter
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.time.LocalDate
@@ -31,43 +31,28 @@ import java.util.*
  */
 class AddWorkItemController : Initializable {
 
-    val issueProperty: StringProperty = SimpleStringProperty()
-    val dateProperty: ObjectProperty<LocalDate?> = SimpleObjectProperty()
+    private val issueIdProperty: StringProperty = SimpleStringProperty()
+    private val projectIdProperty: StringProperty = SimpleStringProperty()
+    private val dateProperty: ObjectProperty<LocalDate?> = SimpleObjectProperty()
     private val durationProperty: StringProperty = SimpleStringProperty()
     private val isValidWorkTimeProperty: BooleanProperty = SimpleBooleanProperty()
 
-    @FXML
-    private lateinit var saveButton: Button
+    lateinit var saveButton: Button
+    lateinit var cancelButton: Button
+    lateinit var issueTextField: TextField
+    lateinit var workDateDatePicker: DatePicker
+    lateinit var workDurationTextField: TextField
+    lateinit var workDescriptionTextField: TextField
+    lateinit var progressIndicator: StackPane
+    lateinit var progressBarContainer: VBox
+    lateinit var errorLabel: Label
 
-    @FXML
-    private lateinit var cancelButton: Button
-
-    @FXML
-    private lateinit var issueTextField: TextField
-
-    @FXML
-    private lateinit var workDateDatePicker: DatePicker
-
-    @FXML
-    private lateinit var workDurationTextField: TextField
-
-    @FXML
-    private lateinit var workDescriptionTextField: TextField
-
-    @FXML
-    private lateinit var progressIndicator: StackPane
-
-    @FXML
-    private lateinit var progressBarContainer: VBox
-
-    @FXML
-    private lateinit var errorLabel: Label
-
+    lateinit var workTypeComboBox: ComboBox<WorkItemType>
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        issueTextField.textProperty().bindBidirectional(issueProperty)
+        issueTextField.textProperty().bindBidirectional(issueIdProperty)
         workDateDatePicker.valueProperty().bindBidirectional(dateProperty)
-//        DatePickerManualEditListener.applyTo(workDateDatePicker)
+        DatePickerManualEditListener.applyTo(workDateDatePicker)
 
         workDurationTextField.textProperty().bindBidirectional(durationProperty)
         workDurationTextField.textProperty().addListener { _, _, newDuration -> updateIsValidDurationProperty(newDuration) }
@@ -75,12 +60,24 @@ class AddWorkItemController : Initializable {
 
         cancelButton.disableProperty().bind(progressIndicator.visibleProperty())
         saveButton.disableProperty().bind(
-            progressIndicator.visibleProperty().or(durationProperty.isEmpty.or(isValidWorkTimeProperty.not()).or(issueProperty.isEmpty).or(dateProperty.isNull))
+            progressIndicator.visibleProperty().or(durationProperty.isEmpty.or(isValidWorkTimeProperty.not()).or(issueIdProperty.isEmpty).or(dateProperty.isNull))
         )
 
+        workTypeComboBox.apply {
+            disableProperty().bind(Bindings.isEmpty(workTypeComboBox.items))
+            converter = object : StringConverter<WorkItemType>() {
+                override fun toString(type: WorkItemType?): String? = type?.name ?: type?.id
+                override fun fromString(name: String?): WorkItemType? = name?.let { workTypeComboBox.items.find { item -> item.name == it }!! }
+            }
+        }
+
+
         // workaround to detect whether the whole form has been rendered to screen yet
-        val focusedElement = if (issueProperty.isEmpty.value) issueTextField else workDurationTextField
-        focusedElement.requestFocus()
+        saveButton.sceneProperty().addListener { _, oldValue, newValue ->
+            if (oldValue == null && newValue != null) {
+                onFormShown()
+            }
+        }
     }
 
     fun closeDialog() {
@@ -92,9 +89,10 @@ class AddWorkItemController : Initializable {
     fun createNewWorkItem() {
         LOGGER.info("Trying to save new WorkItem")
         val request = AddWorkItemRequest(
-            issueId = issueProperty.value,
+            issueId = issueIdProperty.value,
             date = dateProperty.value!!,
             durationInMinutes = parseWorkTimeFromField(workDurationTextField.text)!!,
+            workItemType = workTypeComboBox.value,
             description = workDescriptionTextField.text.trimToNull()
         )
 
@@ -104,6 +102,11 @@ class AddWorkItemController : Initializable {
         }
 
         MainTaskRunner.startTask(task)
+    }
+
+    private fun onFormShown() {
+        focusBestInputElement()
+        loadValidWorkTypes()
     }
 
     private fun updateIsValidDurationProperty(newDuration: String?) {
@@ -131,6 +134,34 @@ class AddWorkItemController : Initializable {
     private fun handleError(throwable: Throwable) {
         LOGGER.warn("Error while adding new worklog item", throwable)
         errorLabel.text = throwable.localizedMessage
+    }
+
+    private fun focusBestInputElement() {
+        val focusedElement = if (issueIdProperty.isEmpty.value) issueTextField else workDurationTextField
+        focusedElement.requestFocus()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun loadValidWorkTypes() {
+        projectIdProperty.value?.let { projectId ->
+            val task = FetchWorkItemTypesTask(projectId).apply {
+                onSucceeded = EventHandler { handleWorkItemTypes(it.source.value as List<WorkItemType>) }
+                onFailed = EventHandler { handleError(it.source.exception) }
+            }
+
+            MainTaskRunner.startTask(task)
+        }
+    }
+
+    private fun handleWorkItemTypes(workitemTypes: List<WorkItemType>) {
+        LOGGER.debug("Got ${workitemTypes.size} WorkItem types: $workitemTypes")
+        workTypeComboBox.items.setAll(workitemTypes)
+    }
+
+    fun forIssueAtDate(issue: MinimalIssue?, date: LocalDate?) {
+        issueIdProperty.set(issue?.id)
+        projectIdProperty.set(issue?.projectId)
+        dateProperty.set(date)
     }
 
     companion object {

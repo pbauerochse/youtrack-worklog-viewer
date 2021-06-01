@@ -93,7 +93,7 @@ public class TimeReportResultTabbedPane extends TabPane {
 
     private void updateProjectTabs(@NotNull TimeReport timeReport, @NotNull Grouping grouping) {
         Map<String, List<Issue>> projectToIssues = timeReport.getIssues().stream()
-                .collect(groupingBy(Issue::getProject));
+                .collect(groupingBy(it -> it.getProject().getName()));
 
         List<String> projectNamesSorted = projectToIssues.keySet().stream().sorted().collect(Collectors.toList());
 

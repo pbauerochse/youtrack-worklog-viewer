@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.connector.v2019.model
+package de.pbauerochse.worklogviewer.connector.v2019.domain
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -9,9 +9,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
 
+/**
+ * https://www.jetbrains.com/help/youtrack/devportal/api-entity-CustomField.html
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class YouTrackCustomField @JsonCreator constructor(
     @JsonProperty("name") val name: String?,
+    @JsonProperty("localizedName") val localizedName: String?,
     @JsonProperty("value") val rawValue: JsonNode?
 ) {
 

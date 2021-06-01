@@ -10,6 +10,7 @@ import java.time.LocalDateTime
 data class Issue(
     override val id: String,
     override val summary : String,
+    val project: Project,
     val description: String,
     val fields: List<Field>,
     var resolutionDate: LocalDateTime? = null
@@ -20,7 +21,7 @@ data class Issue(
      * the worklog items, from the other Issue are
      * applied to the new instance
      */
-    constructor(issue: Issue, fields: List<Field>, worklogItems: List<WorklogItem>) : this(issue.id, issue.summary, issue.description, fields, issue.resolutionDate) {
+    constructor(issue: Issue, fields: List<Field>, worklogItems: List<WorklogItem>) : this(issue.id, issue.summary, issue.project, issue.description, fields, issue.resolutionDate) {
         this.worklogItems.addAll(worklogItems)
     }
 
@@ -29,10 +30,6 @@ data class Issue(
     // and will then be contained in hashCode, equals and toString
     // which leads to an infinite loop
     val worklogItems: MutableList<WorklogItem> = mutableListOf()
-
-    val project: String by lazy {
-        PROJECT_ID_REGEX.matchEntire(id)!!.groupValues[1]
-    }
 
     val fullTitle: String by lazy {
         "$id - $summary"
@@ -44,8 +41,7 @@ data class Issue(
      */
     fun getTimeInMinutesSpentOn(date: LocalDate) = worklogItems
         .filter { it.date == date }
-        .map { it.durationInMinutes }
-        .sum()
+        .sumOf { it.durationInMinutes }
 
     /**
      * Returns the total time in minutes that
@@ -53,21 +49,23 @@ data class Issue(
      * defined time period
      */
     fun getTotalTimeInMinutes(): Long = worklogItems
-        .map { it.durationInMinutes }
-        .sum()
+        .sumOf { it.durationInMinutes }
+
+    override val projectId: String
+        get() = project.id
 
     private val issueNumber: Long by lazy {
-        PROJECT_ID_REGEX.matchEntire(id)!!.groupValues[2].toLong()
+        id.substringAfterLast('-').toLong()
     }
 
     override fun compareTo(other: Issue): Int {
-        return when (val byProject = project.compareTo(other.project)) {
+        val byProject = if (project.name != null && other.project.name != null) {
+            project.name.compareTo(other.project.name)
+        } else 0
+
+        return when (byProject) {
             0 -> issueNumber.compareTo(other.issueNumber)
             else -> byProject
         }
-    }
-
-    companion object {
-        private val PROJECT_ID_REGEX = Regex("^(.+)-(\\d+)$")
     }
 }

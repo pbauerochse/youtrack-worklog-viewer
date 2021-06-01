@@ -6,5 +6,6 @@ package de.pbauerochse.worklogviewer.report
  */
 interface MinimalIssue {
     val id: String
+    val projectId: String
     val summary: String
 }

@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.connector.dummy
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResultIssue
 import de.pbauerochse.worklogviewer.report.*
 import de.pbauerochse.worklogviewer.tasks.Progress
 import org.slf4j.LoggerFactory
@@ -19,24 +20,39 @@ class DummyDataConnector(username: String) : YouTrackConnector {
         return TimeReport(parameters, issues)
     }
 
-    override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
+    override fun addWorkItem(request: AddWorkItemRequest, progress: Progress): AddWorkItemResult {
         LOGGER.info("Adding Workitem $request")
+        val resultIssue = AddWorkItemResultIssue(
+            id = request.issueId,
+            project = generateRandomProjects().first().let { Project(it.id, it.name, it.name) },
+            summary = null,
+            description = null
+        )
+
         return AddWorkItemResult(
-            request.issueId,
-            ownUser,
-            request.date,
-            request.durationInMinutes,
-            request.description,
-            null
+            issue = resultIssue,
+            user = ownUser,
+            date = request.date,
+            durationInMinutes = request.durationInMinutes,
+            text = request.description,
+            workType = request.workItemType?.name
         )
     }
 
     override fun searchIssues(query: String, offset: Int, progress: Progress): List<Issue> {
-        TODO("not implemented")
+        return generateRandomIssues().take(30)
     }
 
     override fun loadIssue(id: String, progress: Progress): Issue {
-        TODO("not implemented")
+        return generateRandomIssues().first()
+    }
+
+    override fun getWorkItemTypes(projectId: String, progress: Progress): List<WorkItemType> {
+        return listOf(
+            WorkItemType("ID1", "Development"),
+            WorkItemType("ID2", "Project management"),
+            WorkItemType("ID3", "Documentation")
+        )
     }
 
     private fun generateRandomIssues(parameters: TimeReportParameters): List<Issue> {
@@ -84,7 +100,7 @@ class DummyDataConnector(username: String) : YouTrackConnector {
             val resolved = Random.nextBoolean()
             val resolveDate = if (resolved) LocalDateTime.now() else null
             val issueFields = fieldsWithValues(project.possibleFields)
-            Issue(issueId, issueDescription, issueDescription, issueFields, resolveDate)
+            Issue(issueId, issueDescription, Project(project.id, project.name, project.name), issueDescription, issueFields, resolveDate)
         }
     }
 
@@ -127,11 +143,12 @@ class DummyDataConnector(username: String) : YouTrackConnector {
             val amountOfFieldValues = Random.nextInt(3, DummyNames.fields.size)
             LOGGER.info("Selecting $amountOfFieldValues Fields out of ${DummyNames.fields.size} for Project $it")
             val projectFields = (1..amountOfFieldValues).map { DummyNames.fields.random() }.distinct()
-            DummyProject(projectName, projectFields)
+            DummyProject("P$it", projectName, projectFields)
         }
     }
 
     internal data class DummyProject(
+        val id: String,
         val name: String,
         val possibleFields: List<DummyNames.ProjectField> = emptyList()
     ) {

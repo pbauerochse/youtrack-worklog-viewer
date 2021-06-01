@@ -14,8 +14,8 @@ internal object ProjectGrouping : Grouping {
     override val label: String = getFormatted("grouping.project")
 
     override fun rows(issues: List<Issue>): List<ReportRow> {
-        return issues.asSequence()
-            .groupBy { it.project }
+        return issues
+            .groupBy { it.project.name ?: "---" }
             .map { createGroup(it.key, it.value) }
     }
 

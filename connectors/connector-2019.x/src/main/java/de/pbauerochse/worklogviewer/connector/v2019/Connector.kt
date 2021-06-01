@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import de.pbauerochse.worklogviewer.connector.YouTrackConnectionSettings
 import de.pbauerochse.worklogviewer.connector.YouTrackConnector
-import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackCreateWorkItemRequest
-import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackIssue
-import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackUser
-import de.pbauerochse.worklogviewer.connector.v2019.model.YouTrackWorkItem
+import de.pbauerochse.worklogviewer.connector.v2019.domain.*
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResult
+import de.pbauerochse.worklogviewer.connector.workitem.AddWorkItemResultIssue
 import de.pbauerochse.worklogviewer.http.Http
 import de.pbauerochse.worklogviewer.http.HttpParams
 import de.pbauerochse.worklogviewer.i18n.I18n
@@ -24,9 +22,12 @@ import java.nio.charset.StandardCharsets
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * YouTrack connector that uses the REST API published in 2019
+ */
 class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
 
-    private val http = Http(HttpParams(10, settings.baseUrl!!, settings.permanentToken!!))
+    private val http = Http(HttpParams(60, settings.baseUrl!!, settings.permanentToken!!))
 
     override fun getTimeReport(parameters: TimeReportParameters, progress: Progress): TimeReport {
         LOGGER.info("Fetching TimeReport for ${parameters.timerange}")
@@ -37,11 +38,18 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         return TimeReport(parameters, issues)
     }
 
-    override fun addWorkItem(request: AddWorkItemRequest): AddWorkItemResult {
+    /**
+     * https://www.jetbrains.com/help/youtrack/devportal/resource-api-issues-issueID-timeTracking-workItems.html#create-IssueWorkItem-method
+     */
+    override fun addWorkItem(request: AddWorkItemRequest, progress: Progress): AddWorkItemResult {
         val url = "/api/issues/${request.issueId}/timeTracking/workItems?fields=$WORKITEM_FIELDS"
 
         val user = getMe()
-        val youtrackRequest = YouTrackCreateWorkItemRequest(request.date, request.durationInMinutes, user, request.description)
+        val workItemType = request.workItemType?.let { YouTrackWorkItemType(
+            id = it.id,
+            name = it.name
+        ) }
+        val youtrackRequest = YouTrackCreateWorkItemRequest(request.date, request.durationInMinutes, user, request.description, workItemType)
         val serialized = MAPPER.writeValueAsString(youtrackRequest)
 
         val payload = StringEntity(serialized, StandardCharsets.UTF_8)
@@ -53,14 +61,23 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
             throw IllegalStateException(i18n("addworkitem.post.error", response.error))
         }
 
-        val newYouTrackWorkItem = MAPPER.readValue(response.content!!, YouTrackWorkItem::class.java)
+        val newYouTrackWorkItem = MAPPER.readValue(response.content!!, YouTrackIssueWorkItem::class.java)
+        val issue = newYouTrackWorkItem.issue
+        val project = issue.project
+
+        val resultIssue = AddWorkItemResultIssue(
+            id = issue.idReadable,
+            project = project?.let { Project(it.id, it.name, it.shortName) },
+            summary = issue.summary,
+            description = issue.description
+        )
         return AddWorkItemResult(
-            newYouTrackWorkItem.issue.id,
-            getUser(newYouTrackWorkItem.author),
-            newYouTrackWorkItem.date!!.toLocalDate(),
-            newYouTrackWorkItem.duration.minutes,
-            newYouTrackWorkItem.text,
-            newYouTrackWorkItem.type?.name
+            issue = resultIssue,
+            user = getUser(newYouTrackWorkItem.author),
+            date = newYouTrackWorkItem.date.toLocalDate(),
+            durationInMinutes = newYouTrackWorkItem.duration.minutes,
+            text = newYouTrackWorkItem.text,
+            workType = newYouTrackWorkItem.type?.name
         )
     }
 
@@ -102,15 +119,33 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         return withWorkitems
     }
 
-    private fun loadWorkitems(issues: List<YouTrackIssue>, progress: Progress) : List<Issue> {
+    override fun getWorkItemTypes(projectId: String, progress: Progress): List<WorkItemType> {
+        LOGGER.info("Loading WorkItemTypes for project $projectId")
+        val url = "/api/admin/projects/$projectId/timeTrackingSettings/workItemTypes?fields=id,name"
+
+        val response = http.get(url)
+        if (response.isError) {
+            LOGGER.error("Got Error Response Message from YouTrack while fetching with URL $url: ${response.statusLine.statusCode} ${response.error}")
+            throw IllegalStateException(i18n("fetching.workitemtypes.error", response.error))
+        }
+
+        val workItemTypes: List<YouTrackWorkItemType> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorkItemType>>() {})
+        progress.setProgress(i18n("done"), 100)
+
+        return workItemTypes.map {
+            WorkItemType(it.id, it.name)
+        }
+    }
+
+    private fun loadWorkitems(issues: List<YouTrackIssue>, progress: Progress): List<Issue> {
         if (issues.isEmpty()) {
             return emptyList()
         }
 
         var keepOnFetching = true
-        val workItems = mutableListOf<YouTrackWorkItem>()
+        val workItems = mutableListOf<YouTrackIssueWorkItem>()
 
-        val issueIds = issues.joinToString(",") { it.id }
+        val issueIds = issues.joinToString(",") { it.idReadable }
         val query = URLEncoder.encode("issue ID: $issueIds", StandardCharsets.UTF_8)
 
         val startDate = LocalDate.now().minusDays(30).format(DATE_FORMATTER)
@@ -124,7 +159,7 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
                 throw IllegalStateException(i18n("fetching.workitems.error", response.error))
             }
 
-            val currentWorkItemsBatch: List<YouTrackWorkItem> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorkItem>>() {})
+            val currentWorkItemsBatch: List<YouTrackIssueWorkItem> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackIssueWorkItem>>() {})
             LOGGER.debug("Got ${currentWorkItemsBatch.size} WorkItems")
 
             workItems.addAll(currentWorkItemsBatch)
@@ -151,7 +186,7 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         return MAPPER.readValue(response.content!!, YouTrackUser::class.java)
     }
 
-    private fun fetchWorkItems(timerange: TimeRange, progress: Progress): List<YouTrackWorkItem> {
+    private fun fetchWorkItems(timerange: TimeRange, progress: Progress): List<YouTrackIssueWorkItem> {
         LOGGER.info("Fetching WorkItems for $timerange")
         progress.setProgress(i18n("fetching.workitems", timerange.formattedForLocale), 1)
 
@@ -159,7 +194,7 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         val endDateFormatted = timerange.end.format(DATE_FORMATTER)
 
         var keepOnFetching = true
-        val workItems = mutableListOf<YouTrackWorkItem>()
+        val workItems = mutableListOf<YouTrackIssueWorkItem>()
 
         while (keepOnFetching) {
             val url = "/api/workItems?\$top=$MAX_WORKITEMS_PER_BATCH&\$skip=${workItems.size}&fields=$WORKITEM_FIELDS&startDate=$startDateFormatted&endDate=$endDateFormatted"
@@ -170,7 +205,7 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
                 throw IllegalStateException(i18n("fetching.workitems.error", response.error))
             }
 
-            val currentWorkItemsBatch: List<YouTrackWorkItem> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorkItem>>() {})
+            val currentWorkItemsBatch: List<YouTrackIssueWorkItem> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackIssueWorkItem>>() {})
             LOGGER.debug("Got ${currentWorkItemsBatch.size} WorkItems")
 
             progress.setProgress(i18n("fetching.workitems", timerange.formattedForLocale), 10)
@@ -182,19 +217,19 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         return workItems
     }
 
-    private fun createIssues(workItems: List<YouTrackWorkItem>, progress: Progress): List<Issue> {
+    private fun createIssues(workItems: List<YouTrackIssueWorkItem>, progress: Progress): List<Issue> {
         val subprogress = progress.subProgress(workItems.size)
 
-        return workItems.asSequence()
-            .groupBy { it.issue.id }
+        return workItems
+            .groupBy { it.issue.idReadable }
             .map {
                 val youtrackIssue = it.value[0].issue
-                subprogress.incrementProgress(i18n("converting.issues", youtrackIssue.id), 1)
+                subprogress.incrementProgress(i18n("converting.issues", youtrackIssue.idReadable), 1)
                 createIssue(youtrackIssue, it.value)
             }
     }
 
-    private fun createIssue(youtrackIssue: YouTrackIssue, workItems: List<YouTrackWorkItem>): Issue {
+    private fun createIssue(youtrackIssue: YouTrackIssue, workItems: List<YouTrackIssueWorkItem>): Issue {
         val fields = youtrackIssue.customFields.map { customField ->
             val fieldValues = customField.values.asSequence()
                 .filter { it.value.isNullOrBlank().not() }
@@ -205,16 +240,17 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         }
 
         val issue = Issue(
-            id = youtrackIssue.id,
+            id = youtrackIssue.idReadable,
             summary = youtrackIssue.summary ?: i18n("issue.nosummary"),
-            description = youtrackIssue.description ?: i18n("issue.nosummary"),
+            project = Project(youtrackIssue.project!!.id, youtrackIssue.project.name, youtrackIssue.project.shortName),
+            description = youtrackIssue.description,
             resolutionDate = youtrackIssue.resolveDate?.toLocalDateTime(),
             fields = fields
         )
 
         val worklogItems = workItems.map {
             val user = getUser(it.author)
-            WorklogItem(issue, user, it.date!!.toLocalDate(), it.duration.minutes, it.text, it.type?.name)
+            WorklogItem(issue, user, it.date.toLocalDate(), it.duration.minutes, it.text, it.type?.name)
         }
 
         return issue.apply {
@@ -239,7 +275,7 @@ class Connector(settings: YouTrackConnectionSettings) : YouTrackConnector {
         private const val MAX_WORKITEMS_PER_BATCH = 400
         private const val MAX_RESULTS_SEARCH_ISSUES = 30
         private const val USER_FIELDS = "id,login,fullName,email"
-        private const val ISSUE_FIELDS = "idReadable,resolved,project(shortName,name),summary,wikifiedDescription,customFields(name,localizedName,aliases,value(name))"
-        private const val WORKITEM_FIELDS = "author($USER_FIELDS),creator($USER_FIELDS),type(name),text,duration(minutes,presentation),date,issue($ISSUE_FIELDS)"
+        private const val ISSUE_FIELDS = "id,idReadable,resolved,project(id,shortName,name),summary,wikifiedDescription,customFields(name,localizedName,value(name))"
+        private const val WORKITEM_FIELDS = "author($USER_FIELDS),creator($USER_FIELDS),type(id,name),text,duration(minutes,presentation),date,issue($ISSUE_FIELDS)"
     }
 }
