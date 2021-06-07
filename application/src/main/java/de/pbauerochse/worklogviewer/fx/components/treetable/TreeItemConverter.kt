@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.components.treetable
 
-import de.pbauerochse.worklogviewer.report.view.ReportRow
-import de.pbauerochse.worklogviewer.report.view.ReportView
+import de.pbauerochse.worklogviewer.timereport.view.ReportRow
+import de.pbauerochse.worklogviewer.timereport.view.ReportView
 import javafx.scene.control.TreeItem
 
 /**

@@ -1,14 +1,14 @@
 package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
-import de.pbauerochse.worklogviewer.report.User
-import de.pbauerochse.worklogviewer.report.WorklogItem
+import de.pbauerochse.worklogviewer.timereport.User
+import de.pbauerochse.worklogviewer.timereport.WorkItem
 
 internal data class UserSummary(
     val user : User,
-    val worklogs : List<WorklogItem>
+    val works : List<WorkItem>
 ) {
     val timeSpentInMinutes : Long by lazy {
-        worklogs
+        works
             .map { it.durationInMinutes }
             .sum()
     }

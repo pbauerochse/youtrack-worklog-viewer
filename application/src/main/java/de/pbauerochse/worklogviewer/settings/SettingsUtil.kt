@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.settings
 
+import de.pbauerochse.worklogviewer.events.EventBus
 import de.pbauerochse.worklogviewer.settings.WorklogViewerFiles.OLD_SETTINGS_JSON_FILE
 import de.pbauerochse.worklogviewer.settings.WorklogViewerFiles.OLD_SETTINGS_PROPERTIES_FILE
 import de.pbauerochse.worklogviewer.settings.WorklogViewerFiles.SETTINGS_JSON_FILE
@@ -15,6 +16,10 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil
  * of the Settings or SettingsViewModel instance
  */
 object SettingsUtil {
+
+    init {
+        EventBus.subscribe(SettingsFavouritesChangedListener)
+    }
 
     @JvmStatic
     val settings: Settings by lazy {

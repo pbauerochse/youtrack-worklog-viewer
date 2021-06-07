@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.plugins.state
 
-import de.pbauerochse.worklogviewer.report.TimeReport
+import de.pbauerochse.worklogviewer.timereport.TimeReport
 
 interface WorklogViewerState {
 

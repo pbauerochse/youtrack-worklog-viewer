@@ -1,7 +1,8 @@
 package de.pbauerochse.worklogviewer.view.grouping
 
-import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.view.ReportRow
+import de.pbauerochse.worklogviewer.timereport.Issue
+import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
+import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.view.GroupReportRow
 import de.pbauerochse.worklogviewer.view.IssueReportRow
@@ -14,8 +15,8 @@ internal class FieldBasedGrouping(private val field: String) : Grouping {
 
     override val id: String = "FIELDBASED_$field"
     override val label: String = field
-    override fun rows(issues: List<Issue>): List<ReportRow> = issues.asSequence()
-        .groupBy { getFieldValue(it) }
+    override fun rows(issues: List<IssueWithWorkItems>): List<ReportRow> = issues.asSequence()
+        .groupBy { getFieldValue(it.issue) }
         .map {
             val issueRows = it.value.asSequence()
                 .map { issue -> IssueReportRow(issue) }

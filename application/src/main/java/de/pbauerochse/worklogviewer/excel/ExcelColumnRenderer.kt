@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.excel
 
-import de.pbauerochse.worklogviewer.report.view.ReportRow
+import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 
 internal interface ExcelColumnRenderer {
 

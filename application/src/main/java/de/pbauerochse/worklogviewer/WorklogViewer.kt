@@ -1,10 +1,10 @@
 package de.pbauerochse.worklogviewer
 
-import de.pbauerochse.worklogviewer.fx.tasks.MainTaskRunner.shutdown
 import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
 import de.pbauerochse.worklogviewer.settings.SettingsUtil.saveSettings
 import de.pbauerochse.worklogviewer.settings.SettingsUtil.settings
 import de.pbauerochse.worklogviewer.settings.SettingsUtil.settingsViewModel
+import de.pbauerochse.worklogviewer.tasks.DefaultTaskExecutor.shutdown
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import javafx.application.Application
 import javafx.beans.value.ObservableValue

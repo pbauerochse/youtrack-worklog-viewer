@@ -3,8 +3,8 @@ package de.pbauerochse.worklogviewer.excel
 import de.pbauerochse.worklogviewer.excel.columns.IssueLinkExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.IssueTimeSpentExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.SummaryExcelColumn
-import de.pbauerochse.worklogviewer.report.TimeRange
-import de.pbauerochse.worklogviewer.report.view.ReportView
+import de.pbauerochse.worklogviewer.timereport.TimeRange
+import de.pbauerochse.worklogviewer.timereport.view.ReportView
 import org.apache.poi.hssf.usermodel.HSSFWorkbook
 import org.apache.poi.ss.usermodel.Workbook
 import org.slf4j.LoggerFactory

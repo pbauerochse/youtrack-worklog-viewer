@@ -5,10 +5,10 @@ import de.pbauerochse.worklogviewer.datasource.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
 import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder
-import de.pbauerochse.worklogviewer.fx.tasks.MainTaskRunner
-import de.pbauerochse.worklogviewer.report.MinimalIssue
-import de.pbauerochse.worklogviewer.report.WorkItemType
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.tasks.DefaultTaskExecutor
+import de.pbauerochse.worklogviewer.timereport.Issue
+import de.pbauerochse.worklogviewer.timereport.WorkItemType
 import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
 import javafx.beans.binding.Bindings
@@ -66,8 +66,8 @@ class AddWorkItemController : Initializable {
         workTypeComboBox.apply {
             disableProperty().bind(Bindings.isEmpty(workTypeComboBox.items))
             converter = object : StringConverter<WorkItemType>() {
-                override fun toString(type: WorkItemType?): String? = type?.name ?: type?.id
-                override fun fromString(name: String?): WorkItemType? = name?.let { workTypeComboBox.items.find { item -> item.name == it }!! }
+                override fun toString(type: WorkItemType?): String? = type?.label ?: type?.id
+                override fun fromString(name: String?): WorkItemType? = name?.let { workTypeComboBox.items.find { item -> item.label == it }!! }
             }
         }
 
@@ -101,7 +101,7 @@ class AddWorkItemController : Initializable {
             onFailed = EventHandler { handleError(it.source.exception) }
         }
 
-        MainTaskRunner.startTask(task)
+        DefaultTaskExecutor.startTask(task)
     }
 
     private fun onFormShown() {
@@ -149,7 +149,7 @@ class AddWorkItemController : Initializable {
                 onFailed = EventHandler { handleError(it.source.exception) }
             }
 
-            MainTaskRunner.startTask(task)
+            DefaultTaskExecutor.startTask(task)
         }
     }
 
@@ -158,9 +158,9 @@ class AddWorkItemController : Initializable {
         workTypeComboBox.items.setAll(workitemTypes)
     }
 
-    fun forIssueAtDate(issue: MinimalIssue?, date: LocalDate?) {
+    fun forIssueAtDate(issue: Issue?, date: LocalDate?) {
         issueIdProperty.set(issue?.id)
-        projectIdProperty.set(issue?.projectId)
+        projectIdProperty.set(issue?.project?.shortName)
         dateProperty.set(date)
     }
 

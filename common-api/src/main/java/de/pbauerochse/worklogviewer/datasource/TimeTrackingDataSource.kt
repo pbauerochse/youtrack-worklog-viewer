@@ -1,10 +1,7 @@
 package de.pbauerochse.worklogviewer.datasource
 
-import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.TimeReport
-import de.pbauerochse.worklogviewer.report.TimeReportParameters
-import de.pbauerochse.worklogviewer.report.WorkItemType
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.timereport.*
 
 /**
  * Connector for a YouTrack instance
@@ -25,17 +22,24 @@ interface TimeTrackingDataSource {
     /**
      * Searches for [Issue]s by a YT query.
      */
-    fun searchIssues(query: String, offset: Int, progress: Progress): List<Issue>
+    fun searchIssues(query: String, offset: Int, maxResults: Int, progress: Progress): List<Issue>
+
+    /**
+     * Returns the given [Issue] with all of its [WorkItem]s
+     */
+    fun loadWorkItems(issue: Issue, progress: Progress): IssueWithWorkItems
 
     /**
      * Loads the details for an [Issue] by id
      */
-    fun loadIssue(id: String, progress: Progress): Issue
+    fun loadIssue(id: String, progress: Progress): IssueWithWorkItems
 
     /**
      * returns the [WorkItemType]s currently valid for the
      * given project
      */
     fun getWorkItemTypes(projectId: String, progress: Progress): List<WorkItemType>
+
+    fun loadIssuesByIds(issueIds: List<String>, progress: Progress): List<Issue>
 
 }

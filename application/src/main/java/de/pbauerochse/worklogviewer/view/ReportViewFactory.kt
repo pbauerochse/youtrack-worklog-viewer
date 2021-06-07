@@ -1,16 +1,16 @@
 package de.pbauerochse.worklogviewer.view
 
-import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.TimeReportParameters
-import de.pbauerochse.worklogviewer.report.view.ReportRow
-import de.pbauerochse.worklogviewer.report.view.ReportView
+import de.pbauerochse.worklogviewer.timereport.Issue
+import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
+import de.pbauerochse.worklogviewer.timereport.TimeReportParameters
+import de.pbauerochse.worklogviewer.timereport.view.ReportRow
+import de.pbauerochse.worklogviewer.timereport.view.ReportView
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import de.pbauerochse.worklogviewer.view.grouping.Grouping.Companion.UNGROUPED
 import de.pbauerochse.worklogviewer.view.grouping.NoopGrouping
 import org.slf4j.LoggerFactory
 import java.text.Collator
 import java.util.*
-import kotlin.Comparator
 
 /**
  * Converts a list of [Issue]s to a [ReportView].
@@ -36,7 +36,7 @@ object ReportViewFactory {
         }
     }
 
-    fun convert(issues: List<Issue>, reportParameters: TimeReportParameters, grouping: Grouping = NoopGrouping): ReportView {
+    fun convert(issues: List<IssueWithWorkItems>, reportParameters: TimeReportParameters, grouping: Grouping = NoopGrouping): ReportView {
         LOGGER.debug("Converting ${issues.size} Issues for ${reportParameters.timerange} with grouping $grouping to ReportView")
         val groups = grouping.rows(issues).sortedWith(REPORT_ROW_COMPARATOR)
         val summaryReportRow = SummaryReportRow(issues)

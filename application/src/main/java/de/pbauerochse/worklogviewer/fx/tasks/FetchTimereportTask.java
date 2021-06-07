@@ -1,9 +1,9 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
 import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource;
-import de.pbauerochse.worklogviewer.report.TimeReport;
-import de.pbauerochse.worklogviewer.report.TimeReportParameters;
 import de.pbauerochse.worklogviewer.tasks.Progress;
+import de.pbauerochse.worklogviewer.timereport.TimeReport;
+import de.pbauerochse.worklogviewer.timereport.TimeReportParameters;
 import org.jetbrains.annotations.NotNull;
 
 import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;

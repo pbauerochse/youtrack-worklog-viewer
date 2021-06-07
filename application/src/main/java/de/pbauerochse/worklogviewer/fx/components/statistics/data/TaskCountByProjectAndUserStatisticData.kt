@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.components.statistics.data
 
-import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.WorklogItem
+import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
+import de.pbauerochse.worklogviewer.timereport.WorkItem
 
 
 /**
@@ -9,38 +9,32 @@ import de.pbauerochse.worklogviewer.report.WorklogItem
  * then by project and displays cumulative
  * data for each project
  */
-class TaskCountByProjectAndUserStatisticData(issues : List<Issue>) {
+class TaskCountByProjectAndUserStatisticData(issues : List<IssueWithWorkItems>) {
 
     internal val projectStatistic : List<ProjectStatistic> by lazy { extractProjectStatistics(issues) }
 
     internal val numberOfUsers : Int by lazy {
         projectStatistic
             .flatMap { it.userStatistics }
-            .map { it.user.displayName }
+            .map { it.user.label }
             .distinct()
             .count()
     }
 
-    private fun extractProjectStatistics(issues: List<Issue>): List<ProjectStatistic> {
-        val worklogsGroupedByProject = issues
-            .flatMap { it.worklogItems }
-            .groupBy { it.issue.project.name ?: "---" }
-            .toSortedMap()
-
-        return worklogsGroupedByProject.map {
-            val projectName = it.key
-            val worklogsForThisProject = it.value
-
-            val userStatistics = getUserSummaries(worklogsForThisProject)
-
-            ProjectStatistic(projectName, userStatistics)
-        }
+    private fun extractProjectStatistics(issues: List<IssueWithWorkItems>): List<ProjectStatistic> {
+        return issues
+            .groupBy { it.issue.project }
+            .map {
+                val userStatistics = getUserSummaries(it.value.flatMap { issue -> issue.workItems })
+                ProjectStatistic(it.key.shortName, userStatistics)
+            }
+            .sortedBy { it.projectName }
     }
 
-    private fun getUserSummaries(worklogsForProject: List<WorklogItem>): List<UserSummary> {
+    private fun getUserSummaries(worklogsForProject: List<WorkItem>): List<UserSummary> {
         return worklogsForProject
-            .groupBy { it.user }
+            .groupBy { it.owner }
             .map { UserSummary(it.key, it.value) }
-            .sortedBy { it.user.displayName }
+            .sortedBy { it.user.label }
     }
 }

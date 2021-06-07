@@ -4,7 +4,7 @@ import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer
 import de.pbauerochse.worklogviewer.excel.POIRow
 import de.pbauerochse.worklogviewer.excel.POIWorkbook
 import de.pbauerochse.worklogviewer.excel.setTimeSpent
-import de.pbauerochse.worklogviewer.report.view.ReportRow
+import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatDate
 import org.apache.poi.ss.usermodel.Cell
 import java.time.LocalDate

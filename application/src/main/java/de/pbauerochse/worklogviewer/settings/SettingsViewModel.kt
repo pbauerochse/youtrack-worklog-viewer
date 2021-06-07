@@ -3,7 +3,6 @@ package de.pbauerochse.worklogviewer.settings
 import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.fx.ConnectorDescriptor
 import de.pbauerochse.worklogviewer.fx.Theme
-import de.pbauerochse.worklogviewer.settings.favourites.FavouritesModel
 import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import de.pbauerochse.worklogviewer.toURL
 import javafx.beans.binding.BooleanBinding
@@ -66,8 +65,6 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     var overtimeStatisticsIgnoreWeekendsProperty = SimpleBooleanProperty()
     var overtimeStatisticsIgnoreWithoutTimeEntriesProperty = SimpleBooleanProperty()
     var overtimeStatisticsIgnoreTodayProperty = SimpleBooleanProperty()
-
-    val favourites : FavouritesModel = FavouritesModel(settings.favourites)
 
     init {
         applyPropertiesFromSettings()

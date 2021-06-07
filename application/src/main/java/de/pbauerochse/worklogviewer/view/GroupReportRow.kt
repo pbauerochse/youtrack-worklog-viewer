@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.view
 
-import de.pbauerochse.worklogviewer.report.view.ReportRow
+import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import java.time.LocalDate
 
 /**

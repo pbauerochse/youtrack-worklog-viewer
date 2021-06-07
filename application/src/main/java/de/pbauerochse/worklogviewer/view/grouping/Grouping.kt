@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.view.grouping
 
-import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.view.ReportRow
+import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
+import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 
 interface Grouping {
@@ -11,5 +11,5 @@ interface Grouping {
 
     val id : String
     val label : String
-    fun rows(issues: List<Issue>) : List<ReportRow>
+    fun rows(issues: List<IssueWithWorkItems>) : List<ReportRow>
 }
