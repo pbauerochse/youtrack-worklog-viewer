@@ -1,7 +1,7 @@
 package de.pbauerochse.worklogviewer.timerangeprovider
 
-import de.pbauerochse.worklogviewer.report.TimeRange
 import de.pbauerochse.worklogviewer.timerange.*
+import de.pbauerochse.worklogviewer.timereport.TimeRange
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

@@ -1,10 +1,10 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs;
 
 import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor;
-import de.pbauerochse.worklogviewer.report.Issue;
-import de.pbauerochse.worklogviewer.report.TimeReport;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
+import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems;
+import de.pbauerochse.worklogviewer.timereport.TimeReport;
 import de.pbauerochse.worklogviewer.view.grouping.Grouping;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -92,15 +92,15 @@ public class TimeReportResultTabbedPane extends TabPane {
     }
 
     private void updateProjectTabs(@NotNull TimeReport timeReport, @NotNull Grouping grouping) {
-        Map<String, List<Issue>> projectToIssues = timeReport.getIssues().stream()
-                .collect(groupingBy(it -> it.getProject().getShortName()));
+        Map<String, List<IssueWithWorkItems>> projectToIssues = timeReport.getIssues().stream()
+                .collect(groupingBy(it -> it.getIssue().getProject().getShortName()));
 
         List<String> projectNamesSorted = projectToIssues.keySet().stream().sorted().collect(Collectors.toList());
 
         int firstProjectTabIndex = settingsViewModel.getShowAllWorklogsProperty().get() ? 3 : 2;
         for (int i = 0; i < projectNamesSorted.size(); i++) {
             String project = projectNamesSorted.get(i);
-            List<Issue> sortedIssues = projectToIssues.get(project).stream().sorted().collect(Collectors.toList());
+            List<IssueWithWorkItems> sortedIssues = projectToIssues.get(project).stream().sorted().collect(Collectors.toList());
             WorklogsTab tab = getOrCreateProjectTabAtIndex(firstProjectTabIndex + i);
             tab.update(project, sortedIssues, timeReport.getReportParameters(), grouping);
         }

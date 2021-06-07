@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.plugins.state
 
-import de.pbauerochse.worklogviewer.report.view.ReportView
+import de.pbauerochse.worklogviewer.timereport.view.ReportView
 
 interface TabContext {
 

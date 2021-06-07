@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.timerange
 
-import de.pbauerochse.worklogviewer.report.TimeRange
+import de.pbauerochse.worklogviewer.timereport.TimeRange
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import java.time.LocalDate
 

@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.plugins.state
 
-import de.pbauerochse.worklogviewer.report.TimeRange
+import de.pbauerochse.worklogviewer.timereport.TimeRange
 
 /**
  * Contains state of the youtrack worklog viewer ui

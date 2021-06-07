@@ -1,17 +1,17 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
-import de.pbauerochse.worklogviewer.fx.components.treetable.TimeReportTreeTableView
 import de.pbauerochse.worklogviewer.fx.dialog.Dialog
 import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask
 import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor
 import de.pbauerochse.worklogviewer.plugins.dialog.FileChooserSpecification
 import de.pbauerochse.worklogviewer.plugins.dialog.FileType
 import de.pbauerochse.worklogviewer.plugins.state.TabContext
-import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.TimeReportParameters
-import de.pbauerochse.worklogviewer.report.view.ReportView
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
+import de.pbauerochse.worklogviewer.timereport.TimeReportParameters
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeTableView
+import de.pbauerochse.worklogviewer.timereport.view.ReportView
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.view.ReportViewFactory
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory
 
 /**
  * Abstract class to display parts of the result
- * of a [de.pbauerochse.worklogviewer.report.TimeReport]
+ * of a [de.pbauerochse.worklogviewer.timereport.TimeReport]
  */
 abstract class WorklogsTab(label: String) : Tab(label), TabContext {
 
@@ -44,7 +44,7 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
         showStatisticsView(settingsModel.showStatisticsProperty.get())
     }
 
-    fun update(label: String, filteredIssues: List<Issue>, reportParameters: TimeReportParameters, grouping: Grouping) {
+    fun update(label: String, filteredIssues: List<IssueWithWorkItems>, reportParameters: TimeReportParameters, grouping: Grouping) {
         text = label
         nextData = ReportViewFactory.convert(filteredIssues, reportParameters, grouping)
 

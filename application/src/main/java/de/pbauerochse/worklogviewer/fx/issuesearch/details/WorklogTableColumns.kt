@@ -1,57 +1,68 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.details
 
-import de.pbauerochse.worklogviewer.report.User
-import de.pbauerochse.worklogviewer.report.WorklogItem
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.timereport.WorkItem
+import de.pbauerochse.worklogviewer.timereport.WorkItemType
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import javafx.beans.value.ObservableValue
 import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.util.Callback
-import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 /**
  * Displays the formatted date of a WorklogItem
  */
-class WorklogDateColumn : TableColumn<WorklogItem, LocalDate>(getFormatted("dialog.issuesearch.workitems.columns.date")) {
+class WorklogDateColumn : TableColumn<WorkItem, ZonedDateTime>(getFormatted("dialog.issuesearch.workitems.columns.date")) {
     init {
-        cellValueFactory = PropertyValueFactory<WorklogItem, LocalDate>("date")
+        cellValueFactory = PropertyValueFactory("workDate")
         cellFactory = WorklogDateCell.CELL_FACTORY
         isSortable = true
     }
 }
-private class WorklogDateCell : TableCell<WorklogItem, LocalDate>() {
-    override fun updateItem(item: LocalDate?, empty: Boolean) {
+private class WorklogDateCell : TableCell<WorkItem, ZonedDateTime>() {
+    override fun updateItem(item: ZonedDateTime?, empty: Boolean) {
         super.updateItem(item, empty)
-        text = item?.let { FormattingUtil.formatLongDate(it) }
+        text = item?.let { FormattingUtil.formatLongDate(it.withZoneSameInstant(ZoneId.systemDefault()).toLocalDate()) }
     }
 
     companion object {
-        val CELL_FACTORY = Callback<TableColumn<WorklogItem, LocalDate>?, TableCell<WorklogItem, LocalDate>?> { WorklogDateCell() }
+        val CELL_FACTORY = Callback<TableColumn<WorkItem, ZonedDateTime>?, TableCell<WorkItem, ZonedDateTime>?> { WorklogDateCell() }
     }
 }
 
 /**
  * Displays the type of the worklog item
  */
-class WorklogTypeColumn : TableColumn<WorklogItem, String?>(getFormatted("dialog.issuesearch.workitems.columns.type")) {
+class WorklogTypeColumn : TableColumn<WorkItem, WorkItemType>(getFormatted("dialog.issuesearch.workitems.columns.type")) {
     init {
-        cellValueFactory = PropertyValueFactory<WorklogItem, String?>("workType")
+        cellValueFactory = PropertyValueFactory("workType")
+        cellFactory = WorklogTypeCell.CELL_FACTORY
         isSortable = true
+    }
+}
+private class WorklogTypeCell : TableCell<WorkItem, WorkItemType>() {
+    override fun updateItem(item: WorkItemType?, empty: Boolean) {
+        super.updateItem(item, empty)
+        text = item?.label
+    }
+
+    companion object {
+        val CELL_FACTORY = Callback<TableColumn<WorkItem, WorkItemType>?, TableCell<WorkItem, WorkItemType>?> { WorklogTypeCell() }
     }
 }
 
 /**
  * Displays the author of the WorklogItem
  */
-class WorklogAuthorColumn : TableColumn<WorklogItem, String?>(getFormatted("dialog.issuesearch.workitems.columns.author")) {
+class WorklogAuthorColumn : TableColumn<WorkItem, String?>(getFormatted("dialog.issuesearch.workitems.columns.author")) {
     init {
-        cellValueFactory = Callback<CellDataFeatures<WorklogItem, String?>?, ObservableValue<String?>?> { SimpleStringProperty(it?.value?.user?.displayName) }
+        cellValueFactory = Callback<CellDataFeatures<WorkItem, String?>?, ObservableValue<String?>?> { SimpleStringProperty(it?.value?.owner?.label) }
         isSortable = true
     }
 }
@@ -59,9 +70,9 @@ class WorklogAuthorColumn : TableColumn<WorklogItem, String?>(getFormatted("dial
 /**
  * Displays the description of the WorklogItem
  */
-class WorklogDescriptionColumn : TableColumn<WorklogItem, String?>(getFormatted("dialog.issuesearch.workitems.columns.description")) {
+class WorklogDescriptionColumn : TableColumn<WorkItem, String?>(getFormatted("dialog.issuesearch.workitems.columns.description")) {
     init {
-        cellValueFactory = PropertyValueFactory<WorklogItem, String?>("description")
+        cellValueFactory = PropertyValueFactory<WorkItem, String?>("description")
         isSortable = true
     }
 }
@@ -69,14 +80,14 @@ class WorklogDescriptionColumn : TableColumn<WorklogItem, String?>(getFormatted(
 /**
  * Displays the formatted duration of the WorklogItem
  */
-class WorklogDurationColumn : TableColumn<WorklogItem, Long>(getFormatted("dialog.issuesearch.workitems.columns.duration")) {
+class WorklogDurationColumn : TableColumn<WorkItem, Long>(getFormatted("dialog.issuesearch.workitems.columns.duration")) {
     init {
-        cellValueFactory = PropertyValueFactory<WorklogItem, Long>("durationInMinutes")
+        cellValueFactory = PropertyValueFactory("durationInMinutes")
         cellFactory = WorklogDurationCell.CELL_FACTORY
         isSortable = true
     }
 }
-private class WorklogDurationCell : TableCell<WorklogItem, Long>() {
+private class WorklogDurationCell : TableCell<WorkItem, Long>() {
     override fun updateItem(item: Long?, empty: Boolean) {
         super.updateItem(item, empty)
         text = item?.let {
@@ -85,23 +96,23 @@ private class WorklogDurationCell : TableCell<WorklogItem, Long>() {
     }
 
     companion object {
-        val CELL_FACTORY = Callback<TableColumn<WorklogItem, Long>?, TableCell<WorklogItem, Long>?> { WorklogDurationCell() }
+        val CELL_FACTORY = Callback<TableColumn<WorkItem, Long>?, TableCell<WorkItem, Long>?> { WorklogDurationCell() }
     }
 }
 
-class WorklogActionsColumn : TableColumn<WorklogItem, WorklogItem>() {
+class WorklogActionsColumn : TableColumn<WorkItem, WorkItem>() {
     init {
         cellFactory = WorklogActionsCell.CELL_FACTORY
         isSortable = false
     }
 }
-private class WorklogActionsCell : TableCell<WorklogItem, WorklogItem>() {
-    override fun updateItem(item: WorklogItem?, empty: Boolean) {
+private class WorklogActionsCell : TableCell<WorkItem, WorkItem>() {
+    override fun updateItem(item: WorkItem?, empty: Boolean) {
         super.updateItem(item, empty)
         text = item?.let { "TODO" }
     }
 
     companion object {
-        val CELL_FACTORY = Callback<TableColumn<WorklogItem, WorklogItem>?, TableCell<WorklogItem, WorklogItem>?> { WorklogActionsCell() }
+        val CELL_FACTORY = Callback<TableColumn<WorkItem, WorkItem>?, TableCell<WorkItem, WorkItem>?> { WorklogActionsCell() }
     }
 }

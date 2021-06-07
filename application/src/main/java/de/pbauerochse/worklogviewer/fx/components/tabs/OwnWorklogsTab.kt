@@ -6,11 +6,9 @@ import de.pbauerochse.worklogviewer.fx.components.statistics.panels.OvertimeStat
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TaskCountByUserAndProjectStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserAndProjectGraphStatistics
-import de.pbauerochse.worklogviewer.hasOwnWorklogs
-import de.pbauerochse.worklogviewer.isOwn
-import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.TimeReport
-import de.pbauerochse.worklogviewer.report.view.ReportView
+import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
+import de.pbauerochse.worklogviewer.timereport.TimeReport
+import de.pbauerochse.worklogviewer.timereport.view.ReportView
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import javafx.scene.Node
@@ -38,11 +36,14 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
         )
     }
 
-    private fun extractOwnWorklogs(report: TimeReport): List<Issue> {
+    private fun extractOwnWorklogs(report: TimeReport): List<IssueWithWorkItems> {
         return report.issues
-            .filter { it.hasOwnWorklogs() }
-            .map { Issue(it, it.fields, it.worklogItems.filter { it.isOwn() }) }
-            .sorted()
+            .filter { it.hasWorkItemsBelongingToCurrentUser }
+            .map {
+                val workItemsForUserOnly = it.workItems.filter { workItem -> workItem.belongsToCurrentUser }
+                IssueWithWorkItems(it.issue, workItemsForUserOnly)
+            }
+            .sortedBy { it.issue }
     }
 
     companion object {

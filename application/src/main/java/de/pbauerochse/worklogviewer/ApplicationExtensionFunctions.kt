@@ -1,11 +1,9 @@
 package de.pbauerochse.worklogviewer
 
 import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
-import de.pbauerochse.worklogviewer.report.Issue
-import de.pbauerochse.worklogviewer.report.MinimalIssue
-import de.pbauerochse.worklogviewer.report.TimeReport
-import de.pbauerochse.worklogviewer.report.WorklogItem
-import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.timereport.Issue
+import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
+import de.pbauerochse.worklogviewer.timereport.TimeReport
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.scene.control.Hyperlink
@@ -26,35 +24,14 @@ fun Hyperlink.setHref(url: String) {
 }
 
 /**
- * Opens the issue in the browser
+ * Opens the [Issue] in the browser
  */
-fun MinimalIssue.openInBrowser() {
-    Platform.runLater { WorklogViewer.instance.hostServices.showDocument(this.getYouTrackLink().toExternalForm()) }
+fun Issue.openInBrowser() {
+    externalUrl.openInBrowser()
 }
 
-/**
- * Constructs a link to the YouTrack Issue
- * by taking the base URL from the Settings
- * and adding the issue path
- */
-fun MinimalIssue.getYouTrackLink(): URL {
-    return URL(SettingsUtil.settings.youTrackConnectionSettings.baseUrl, "/issue/$id#tab=Time%20Tracking")
-}
-
-/**
- * Returns true if the username of any of the
- * WorklogItems in this Issue matches the
- * username defined in the Settings
- */
-fun Issue.hasOwnWorklogs(): Boolean = worklogItems.any { it.isOwn() }
-
-/**
- * Returns true when the username matches the username
- * defined in the Settings dialog
- */
-fun WorklogItem.isOwn(): Boolean {
-    val ownUsername = SettingsUtil.settings.youTrackConnectionSettings.username
-    return user.username == ownUsername
+fun URL.openInBrowser() {
+    Platform.runLater { WorklogViewer.instance.hostServices.showDocument(toExternalForm()) }
 }
 
 fun String.toURL(): URL = URL(this)
@@ -65,38 +42,40 @@ fun String.toURL(): URL = URL(this)
  * to the clone
  */
 fun TimeReport.addWorkItem(newWorkitem: AddWorkItemResult): TimeReport {
-    return if (reportParameters.timerange.includes(newWorkitem.date)) {
-        // only update if the newly created item is for the current timerange
-        val issueList = issues.toMutableList()
-        val issue = issues.find { it.id == newWorkitem.issue.id } ?: createDetachedIssue(newWorkitem).apply {
-            // issue to added work item was not
-            // present when initial report was fetched
-            // add "mock" item
-            issueList.add(this)
-        }
-
-        val newWorkItem = WorklogItem(
-            issue = issue,
-            date = newWorkitem.date,
-            description = newWorkitem.text,
-            durationInMinutes = newWorkitem.durationInMinutes,
-            user = newWorkitem.user,
-            workType = newWorkitem.workType
-        )
-        issue.worklogItems.add(newWorkItem)
-
-        return TimeReport(reportParameters, issueList)
-    } else this
+    TODO("REPLACE WITH FRESHLY LOADED ISSUE FROM RESULT")
+//    return if (reportParameters.timerange.includes(newWorkitem.date)) {
+//        // only update if the newly created item is for the current timerange
+//        val issueList = issues.toMutableList()
+//        val issue = issues.find { it.issue.id == newWorkitem.issue.id } ?: createDetachedIssue(newWorkitem).apply {
+//            // issue to added work item was not
+//            // present when initial report was fetched
+//            // add "mock" item
+//            issueList.add(this)
+//        }
+//
+//        val newWorkItem = WorkItem(
+//            issue = issue,
+//            date = newWorkitem.date,
+//            description = newWorkitem.text,
+//            durationInMinutes = newWorkitem.durationInMinutes,
+//            user = newWorkitem.user,
+//            workType = newWorkitem.workType
+//        )
+//        issue.worklogItems.add(newWorkItem)
+//
+//        return TimeReport(reportParameters, issueList)
+//    } else this
 }
 
-private fun createDetachedIssue(newWorkitem: AddWorkItemResult): Issue {
-    return Issue(
-        newWorkitem.issue.id,
-        newWorkitem.issue.summary ?: "",
-        newWorkitem.issue.project!!,
-        newWorkitem.issue.description ?: "",
-        emptyList()
-    )
+private fun createDetachedIssue(newWorkitem: AddWorkItemResult): IssueWithWorkItems {
+    TODO("NOP")
+//    return Issue(
+//        newWorkitem.issue.id,
+//        newWorkitem.issue.summary ?: "",
+//        newWorkitem.issue.project!!,
+//        newWorkitem.issue.description ?: "",
+//        emptyList()
+//    )
 }
 
 fun <T> MutableCollection<T>.addIfMissing(item : T) {

@@ -3,7 +3,7 @@ package de.pbauerochse.worklogviewer.excel.columns
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer
 import de.pbauerochse.worklogviewer.excel.POIRow
 import de.pbauerochse.worklogviewer.excel.setTimeSpent
-import de.pbauerochse.worklogviewer.report.view.ReportRow
+import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 
 /**

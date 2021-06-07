@@ -2,49 +2,65 @@ package de.pbauerochse.worklogviewer.datasource.dummy
 
 import de.pbauerochse.worklogviewer.datasource.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
-import de.pbauerochse.worklogviewer.datasource.AddWorkItemResultIssue
 import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource
-import de.pbauerochse.worklogviewer.report.*
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.timereport.*
 import org.slf4j.LoggerFactory
+import java.net.URL
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import kotlin.random.Random
 
+/**
+ * A [TimeTrackingDataSource] that generates random example data. Can be used during
+ * application development.
+ */
 class DummyDataSource(username: String) : TimeTrackingDataSource {
 
     private val ownUser = User(username, "Yourself ($username)")
 
     override fun getTimeReport(parameters: TimeReportParameters, progress: Progress): TimeReport {
-        val issues = generateRandomIssues(parameters)
+        val issues = generateRandomIssues(parameters.timerange.start, parameters.timerange.end, progress)
         return TimeReport(parameters, issues)
     }
 
     override fun addWorkItem(request: AddWorkItemRequest, progress: Progress): AddWorkItemResult {
         LOGGER.info("Adding Workitem $request")
-        val resultIssue = AddWorkItemResultIssue(
-            id = request.issueId,
-            project = generateRandomProjects().first().let { Project(it.id, it.name, it.name) },
-            summary = null,
-            description = null
-        )
-
+        val issue = generateRandomIssues(1).first()
+        val workItem = generateWorkItems(issue, LocalDate.now(), listOf(ownUser), progress).first()
         return AddWorkItemResult(
-            issue = resultIssue,
-            user = ownUser,
-            date = request.date,
-            durationInMinutes = request.durationInMinutes,
-            text = request.description,
-            workType = request.workItemType?.name
+            issue = issue,
+            addedWorkItem = workItem
         )
     }
 
-    override fun searchIssues(query: String, offset: Int, progress: Progress): List<Issue> {
-        return generateRandomIssues().take(30)
+    override fun loadIssuesByIds(issueIds: List<String>, progress: Progress): List<Issue> {
+        return generateRandomIssues(issueIds.size)
     }
 
-    override fun loadIssue(id: String, progress: Progress): Issue {
-        return generateRandomIssues().first()
+    override fun searchIssues(query: String, offset: Int, maxResults: Int, progress: Progress): List<Issue> {
+        return generateRandomIssues(Random.nextInt(1, maxResults))
+    }
+
+    override fun loadIssue(id: String, progress: Progress): IssueWithWorkItems {
+        val issue = generateRandomIssues(1).first()
+        val workItems = generateWorkItems(issue, LocalDate.now(), generateRandomUsers(), progress)
+        return IssueWithWorkItems(issue, workItems)
+    }
+
+    override fun loadWorkItems(issue: Issue, progress: Progress): IssueWithWorkItems {
+        var currentDate = LocalDate.now().minusDays(30)
+        val workItems = mutableListOf<WorkItem>()
+        val users = generateRandomUsers()
+
+        while (currentDate <= LocalDate.now()) {
+            workItems.addAll(generateWorkItems(issue, currentDate, users, progress))
+            currentDate = currentDate.plusDays(1)
+        }
+
+        return IssueWithWorkItems(issue, workItems)
     }
 
     override fun getWorkItemTypes(projectId: String, progress: Progress): List<WorkItemType> {
@@ -55,26 +71,27 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         )
     }
 
-    private fun generateRandomIssues(parameters: TimeReportParameters): List<Issue> {
-        LOGGER.info("Generating Random Issues for ${parameters.timerange}")
+    private fun generateRandomIssues(startDate: LocalDate, endDate: LocalDate, progress: Progress): List<IssueWithWorkItems> {
+        LOGGER.info("Generating Random Issues between $startDate and $endDate")
         val users = generateRandomUsers()
-        val issues = generateRandomIssues()
+        val issues = generateRandomIssues(Random.nextInt(10, 50))
 
         LOGGER.info("Generated ${issues.size} issues")
 
-        var currentDate = parameters.timerange.start
-        while (currentDate <= parameters.timerange.end) {
+        return issues.map { issue ->
+            val workItems = mutableListOf<WorkItem>()
 
-            val numerOfWorkedOnIssuesThisDay = Random.nextInt(1, issues.size + 1)
-            repeat(numerOfWorkedOnIssuesThisDay) {
-                val issue = issues.random()
-                fillWithTimeEntries(issue, currentDate, users)
+            var currentDate = startDate
+            while (currentDate <= endDate) {
+                repeat(Random.nextInt(1, issues.size + 1)) {
+                    workItems.addAll(generateWorkItems(issue, currentDate, users, progress))
+                }
+
+                currentDate = currentDate.plusDays(1)
             }
 
-            currentDate = currentDate.plusDays(1)
+            return@map IssueWithWorkItems(issue, workItems)
         }
-
-        return issues
     }
 
     private fun generateRandomUsers(): List<User> {
@@ -90,9 +107,8 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         return genereatedUsers + ownUser
     }
 
-    private fun generateRandomIssues(): List<Issue> {
-        val projects = generateRandomProjects()
-        val amount = Random.nextInt(1, 30)
+    private fun generateRandomIssues(amount: Int): List<Issue> {
+        val projects = generateRandomProjects(Random.nextInt(1, 10))
         return (1..amount).map {
             val project = projects.random()
             val issueId = "$project-$it"
@@ -100,26 +116,40 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
             val resolved = Random.nextBoolean()
             val resolveDate = if (resolved) LocalDateTime.now() else null
             val issueFields = fieldsWithValues(project.possibleFields)
-            Issue(issueId, issueDescription, Project(project.id, project.name, project.name), issueDescription, issueFields, resolveDate)
+            return@map object : Issue {
+                override val id: String = issueId
+                override val issueNumber: Long = it.toLong()
+                override val humanReadableId: String = issueDescription
+                override val externalUrl: URL = URL("http://localhost/issue/$issueId")
+                override val title: String = issueDescription
+                override val description: String = issueDescription
+                override val project: Project = project
+                override val resolutionDate: ZonedDateTime? = resolveDate?.atZone(ZoneId.systemDefault())
+                override val fields: List<Field> = issueFields
+            }
         }
     }
 
-    private fun fillWithTimeEntries(issue: Issue, currentDate: LocalDate, users: List<User>) {
+    private fun generateWorkItems(issue: Issue, currentDate: LocalDate, users: List<User>, progress: Progress): List<WorkItem> {
         LOGGER.info("Generating TimeEntries for Issue ${issue.id} and date $currentDate")
         val maxTimebookings = Random.nextInt(0, 10)
 
-        repeat(maxTimebookings) {
+        return (0 until maxTimebookings).map {
             val user = users.random()
             val durationInQuarterHours = Random.nextLong(1, 5)
             val durationInMinutes = durationInQuarterHours * 15
-            val workType = getRandomWorkType()
-
-            val worklogItem = WorklogItem(issue, user, currentDate, durationInMinutes, "Working for $durationInMinutes minutes", workType)
-            issue.worklogItems.add(worklogItem)
+            val workType = (getWorkItemTypes(issue.project.id, progress) + listOf(null)).random()
+            return@map object : WorkItem {
+                override val id: String = "${issue.id}-$it"
+                override val owner: User = user
+                override val workDate: ZonedDateTime = currentDate.atStartOfDay(ZoneId.systemDefault())
+                override val durationInMinutes: Long = durationInMinutes
+                override val description: String = ""
+                override val workType: WorkItemType? = workType
+                override val belongsToCurrentUser: Boolean = false
+            }
         }
     }
-
-    private fun getRandomWorkType(): String? = listOf(null, "Development", "Testing", "Analysis", "Communication").random()
 
     private fun fieldsWithValues(possibleFields: List<DummyNames.ProjectField>): List<Field> = possibleFields.map { field ->
         val isMultiValueField = Random.nextBoolean()
@@ -134,8 +164,8 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         Field(field.name, values)
     }
 
-    private fun generateRandomProjects(): List<DummyProject> {
-        val amount = Random.nextInt(1, 15)
+    private fun generateRandomProjects(amount: Int): List<DummyProject> {
+//        val amount = Random.nextInt(1, 15)
         LOGGER.info("Generating $amount Projects")
 
         return (1..amount).map {
@@ -147,11 +177,11 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         }
     }
 
-    internal data class DummyProject(
-        val id: String,
-        val name: String,
+    internal class DummyProject(
+        id: String,
+        name: String,
         val possibleFields: List<DummyNames.ProjectField> = emptyList()
-    ) {
+    ): Project(id, name, name) {
         override fun toString(): String = name
     }
 

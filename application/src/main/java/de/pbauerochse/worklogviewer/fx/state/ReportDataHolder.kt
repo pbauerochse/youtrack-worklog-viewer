@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.state
 
-import de.pbauerochse.worklogviewer.report.TimeReport
+import de.pbauerochse.worklogviewer.timereport.TimeReport
 import javafx.beans.property.SimpleObjectProperty
 
 /**

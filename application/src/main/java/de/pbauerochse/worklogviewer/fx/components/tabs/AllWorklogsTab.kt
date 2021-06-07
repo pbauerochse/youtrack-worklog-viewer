@@ -5,8 +5,8 @@ import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUse
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TaskCountByUserAndProjectStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserAndProjectGraphStatistics
-import de.pbauerochse.worklogviewer.report.TimeReport
-import de.pbauerochse.worklogviewer.report.view.ReportView
+import de.pbauerochse.worklogviewer.timereport.TimeReport
+import de.pbauerochse.worklogviewer.timereport.view.ReportView
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
 import javafx.scene.Node

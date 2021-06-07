@@ -47,14 +47,14 @@ class TimePerUserAndProjectGraphStatistics(
     }
 
     private fun renderStatistics() {
-        statisticsData.projectStatistic.forEach {
+        statisticsData.projectStatistic.forEach { projectStatistic ->
             val series = Series<Number, String>()
-            series.name = it.projectName
+            series.name = projectStatistic.projectName
 
-            it.userStatistics.forEach {
-                val timeSpentInHours = it.timeSpentInMinutes.toDouble() / 60.0
-                val formattedTime = formatMinutes(it.timeSpentInMinutes)
-                val data = Data<Number, String>(timeSpentInHours, it.user.displayName)
+            projectStatistic.userStatistics.forEach { userSummary ->
+                val timeSpentInHours = userSummary.timeSpentInMinutes.toDouble() / 60.0
+                val formattedTime = formatMinutes(userSummary.timeSpentInMinutes)
+                val data = Data<Number, String>(timeSpentInHours, userSummary.user.label)
                 series.data.add(data)
 
                 data.nodeProperty().addListener { _, _, newNode -> Tooltip.install(newNode, Tooltip("${series.name} - $formattedTime")) }

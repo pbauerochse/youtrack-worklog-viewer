@@ -13,6 +13,7 @@ import java.time.ZonedDateTime
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class YouTrackIssueWorkItem @JsonCreator constructor(
+    @JsonProperty("id") val id: String,
     @JsonProperty("author") val author: YouTrackUser?,
     @JsonProperty("creator") val creator: YouTrackUser?,
     @JsonProperty("text") val text: String?,

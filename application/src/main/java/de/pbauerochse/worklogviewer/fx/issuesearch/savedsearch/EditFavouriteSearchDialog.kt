@@ -1,6 +1,6 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.savedsearch
 
-import de.pbauerochse.worklogviewer.settings.favourites.FavouriteSearch
+import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.beans.property.SimpleStringProperty

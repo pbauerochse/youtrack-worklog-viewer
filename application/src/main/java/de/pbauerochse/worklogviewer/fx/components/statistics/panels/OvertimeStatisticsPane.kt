@@ -1,10 +1,10 @@
 package de.pbauerochse.worklogviewer.fx.components.statistics.panels
 
 import de.pbauerochse.worklogviewer.isSameDayOrBefore
-import de.pbauerochse.worklogviewer.report.TimeRange
-import de.pbauerochse.worklogviewer.report.view.ReportView
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
+import de.pbauerochse.worklogviewer.timereport.TimeRange
+import de.pbauerochse.worklogviewer.timereport.view.ReportView
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
 import javafx.fxml.FXMLLoader
@@ -66,7 +66,7 @@ class OvertimeStatisticsPane(private val reportView: ReportView) : GridPane() {
         }
 
         if (ignoreDaysWithoutWorklogItems.isSelected) {
-            relevantDaysInTimeRange.removeAll { day -> reportView.issues.none { it.getTimeInMinutesSpentOn(day) > 0 } }
+            relevantDaysInTimeRange.removeAll { day -> reportView.issues.none { it.getWorkItemsForDate(day).isNotEmpty() } }
         }
 
         if (ignoreToday.isSelected) {
@@ -74,19 +74,19 @@ class OvertimeStatisticsPane(private val reportView: ReportView) : GridPane() {
         }
 
         totalDays.text = "${relevantDaysInTimeRange.size}"
-        totalDaysWithTimeEntries.text = relevantDaysInTimeRange.count { date -> reportView.issues.any { it.getTimeInMinutesSpentOn(date) > 0 } }.toString()
-        totalDaysWithoutTimeEntries.text = relevantDaysInTimeRange.count { date ->  reportView.issues.none { it.getTimeInMinutesSpentOn(date) > 0 } }.toString()
+        totalDaysWithTimeEntries.text = relevantDaysInTimeRange.count { date -> reportView.issues.any { it.getWorkItemsForDate(date).isNotEmpty() } }.toString()
+        totalDaysWithoutTimeEntries.text = relevantDaysInTimeRange.count { date ->  reportView.issues.none { it.getWorkItemsForDate(date).isNotEmpty() } }.toString()
         totalDaysWithIncompleteTimeEntries.text = relevantDaysInTimeRange.count { date ->
-            val totalTimeSpentThisDay = reportView.issues.map { it.getTimeInMinutesSpentOn(date) }.sum()
+            val totalTimeSpentThisDay = reportView.issues.sumOf { it.getWorkItemsForDate(date).sumOf { workItem -> workItem.durationInMinutes } }
             // more than 0, less than expectedWorkMinutesPerDay
             return@count totalTimeSpentThisDay in 1 until expectedWorkMinutesPerDay
         }.toString()
         totalDaysWithOverfilledTimeEntries.text = relevantDaysInTimeRange.count { date ->
-            val totalTimeSpentThisDay = reportView.issues.map { it.getTimeInMinutesSpentOn(date) }.sum()
+            val totalTimeSpentThisDay = reportView.issues.sumOf { it.getWorkItemsForDate(date).sumOf { workItem -> workItem.durationInMinutes } }
             return@count totalTimeSpentThisDay > expectedWorkMinutesPerDay
         }.toString()
 
-        val totalBookedTimeInMinutes = relevantDaysInTimeRange.flatMap { date -> reportView.issues.map { it.getTimeInMinutesSpentOn(date) } }.sum()
+        val totalBookedTimeInMinutes = relevantDaysInTimeRange.flatMap { date -> reportView.issues.map { it.getWorkItemsForDate(date).sumOf { workItem -> workItem.durationInMinutes } } }.sum()
         val expectedTotalBookedTimeInMinutes = relevantDaysInTimeRange.size.times(settingsViewModel.workhoursProperty.value).times(60).toLong()
 
         totalBookedTime.text = formatMinutes(totalBookedTimeInMinutes)

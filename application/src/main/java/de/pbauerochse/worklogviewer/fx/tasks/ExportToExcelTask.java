@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.tasks;
 
 import de.pbauerochse.worklogviewer.excel.ExcelExporter;
-import de.pbauerochse.worklogviewer.report.view.ReportView;
 import de.pbauerochse.worklogviewer.tasks.Progress;
+import de.pbauerochse.worklogviewer.timereport.view.ReportView;
 import de.pbauerochse.worklogviewer.util.ExceptionUtil;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.jetbrains.annotations.NotNull;

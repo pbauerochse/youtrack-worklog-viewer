@@ -2,12 +2,12 @@ package de.pbauerochse.worklogviewer.fx.workitem.add
 
 import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.fx.tasks.WorklogViewerTask
-import de.pbauerochse.worklogviewer.report.WorkItemType
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.timereport.WorkItemType
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 
 /**
- * Task, that loads the valid [de.pbauerochse.worklogviewer.report.WorklogItem] Types
+ * Task, that loads the valid [de.pbauerochse.worklogviewer.timereport.WorkItem] Types
  */
 class FetchWorkItemTypesTask(private val projectId: String) : WorklogViewerTask<List<WorkItemType>>(FormattingUtil.getFormatted("task.addworkitem.task.workitems.title")) {
 

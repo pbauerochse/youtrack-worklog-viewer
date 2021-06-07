@@ -21,16 +21,18 @@ import de.pbauerochse.worklogviewer.plugins.state.WorklogViewerState
 import de.pbauerochse.worklogviewer.plugins.tasks.PluginTask
 import de.pbauerochse.worklogviewer.plugins.tasks.TaskCallback
 import de.pbauerochse.worklogviewer.plugins.tasks.TaskRunner
-import de.pbauerochse.worklogviewer.report.TimeRange
-import de.pbauerochse.worklogviewer.report.TimeReport
-import de.pbauerochse.worklogviewer.report.TimeReportParameters
 import de.pbauerochse.worklogviewer.setHref
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
+import de.pbauerochse.worklogviewer.tasks.DefaultTaskExecutor
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.tasks.Tasks
 import de.pbauerochse.worklogviewer.timerange.CustomTimerangeProvider
 import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import de.pbauerochse.worklogviewer.timerange.TimerangeProviders
+import de.pbauerochse.worklogviewer.timereport.TimeRange
+import de.pbauerochse.worklogviewer.timereport.TimeReport
+import de.pbauerochse.worklogviewer.timereport.TimeReportParameters
 import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.version.Version
@@ -116,6 +118,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
         LOGGER.debug("Initializing main view")
         this.resources = resources
         this.settingsModel = SettingsUtil.settingsViewModel
+        Tasks.delegate = this // register self as main TaskExecutor
 
         initializeTaskRunner()
         checkForUpdate()
@@ -136,7 +139,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
     }
 
     private fun initializeTaskRunner() {
-        waitScreenOverlay.visibleProperty().bind(MainTaskRunner.runningTasksProperty.emptyProperty().not())
+        waitScreenOverlay.visibleProperty().bind(DefaultTaskExecutor.hasRunningForegroundTasks)
         resultTabPane.setTaskExecutor(this)
     }
 
@@ -416,9 +419,14 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
         startTask(wrapper)
     }
 
+    override fun <T> startBackgroundTask(task: WorklogViewerTask<T>): Future<T> {
+        val wrappedTask = TaskInitializer.initialize(taskProgressContainer, task)
+        return DefaultTaskExecutor.startBackgroundTask(wrappedTask)
+    }
+
     override fun <T> startTask(task: WorklogViewerTask<T>): Future<T> {
         val wrappedTask = TaskInitializer.initialize(taskProgressContainer, task)
-        return MainTaskRunner.startTask(wrappedTask)
+        return DefaultTaskExecutor.startTask(wrappedTask)
     }
 
     companion object {

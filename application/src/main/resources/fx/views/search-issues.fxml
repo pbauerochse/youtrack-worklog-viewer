@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
             styleClass="issue-search"
-            fx:controller="de.pbauerochse.worklogviewer.fx.issuesearch.SearchIssuesController">
+            fx:controller="de.pbauerochse.worklogviewer.search.fx.SearchTabController">
 
     <top>
         <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" BorderPane.alignment="CENTER_LEFT">
@@ -33,9 +33,8 @@
 
     <center>
         <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
-<!--            <ListView fx:id="issuesView"/>-->
-            <TreeView fx:id="issuesView"/>
-            <BorderPane fx:id="issueDetailPanelContainer"/>
+            <fx:include source="favourites.fxml" />
+            <fx:include source="issue-details.fxml" />
         </SplitPane>
     </center>
 </BorderPane>
