@@ -21,11 +21,11 @@ import java.time.LocalDate
 class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate? = null, showAddForOtherIssueItem : Boolean = true) : ContextMenu() {
 
     init {
-        val openIssueInBrowserMenu = MenuItem(getFormatted("contextmenu.issue.openinyoutrack", issue.id))
+        val openIssueInBrowserMenu = MenuItem(getFormatted("contextmenu.issue.openinyoutrack", issue.humanReadableId))
         openIssueInBrowserMenu.onAction = EventHandler { issue.externalUrl.openInBrowser() }
         items.add(openIssueInBrowserMenu)
 
-        val addWorkItemForIssueMenu = MenuItem(getFormatted("contextmenu.issue.addworkitem", issue.id))
+        val addWorkItemForIssueMenu = MenuItem(getFormatted("contextmenu.issue.addworkitem", issue.humanReadableId))
         addWorkItemForIssueMenu.onAction = EventHandler { showAddWorkItemToIssueDialog() }
         items.add(addWorkItemForIssueMenu)
 
@@ -43,18 +43,18 @@ class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate
 
         val issueAlreadyMarkedAsFavourite = Bindings.createBooleanBinding({ FavouritesService.isFavourite(issue) }, SearchTabModel.favouriteIssues)
 
-        val markAsFavourite = MenuItem(getFormatted("contextmenu.issue.addfavourite", issue.id)).apply {
+        val markAsFavourite = MenuItem(getFormatted("contextmenu.issue.addfavourite", issue.humanReadableId)).apply {
             visibleProperty().bind(issueAlreadyMarkedAsFavourite.not())
             onAction = EventHandler {
-                LOGGER.info("Marking ${issue.id} as Favourite")
+                LOGGER.info("Marking ${issue.humanReadableId} as Favourite")
                 FavouritesService.addFavourite(FavouriteIssue(issue))
             }
         }
 
-        val removeFromFavourites = MenuItem(getFormatted("contextmenu.issue.removefavourite", issue.id)).apply {
+        val removeFromFavourites = MenuItem(getFormatted("contextmenu.issue.removefavourite", issue.humanReadableId)).apply {
             visibleProperty().bind(issueAlreadyMarkedAsFavourite)
             onAction = EventHandler {
-                LOGGER.info("Removing ${issue.id} from Favourites")
+                LOGGER.info("Removing ${issue.humanReadableId} from Favourites")
                 FavouritesService.removeFavourite(issue)
             }
         }
