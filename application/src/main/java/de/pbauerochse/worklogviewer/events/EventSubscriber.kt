@@ -1,5 +1,6 @@
 package de.pbauerochse.worklogviewer.events
 
+import org.slf4j.LoggerFactory
 import java.lang.reflect.Method
 
 internal class EventSubscriber(
@@ -14,6 +15,11 @@ internal class EventSubscriber(
     }
 
     fun handleEvent(event: Any) {
-        method.invoke(event)
+        LOGGER.debug("Invoking $method with Parameter $event")
+        method.invoke(subscriber, event)
+    }
+
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(EventSubscriber::class.java)
     }
 }
