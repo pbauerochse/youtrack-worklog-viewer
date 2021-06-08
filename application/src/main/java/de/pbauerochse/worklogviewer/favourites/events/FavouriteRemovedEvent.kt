@@ -4,8 +4,8 @@ import de.pbauerochse.worklogviewer.favourites.issue.FavouriteIssue
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 
 class FavouriteRemovedEvent private constructor(
-    val addedIssue: FavouriteIssue?,
-    val addedSearch: FavouriteSearch?
+    val removedIssue: FavouriteIssue?,
+    val removedSearch: FavouriteSearch?
 ) {
     companion object {
         fun forIssue(issue: FavouriteIssue) = FavouriteRemovedEvent(issue, null)

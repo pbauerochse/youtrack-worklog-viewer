@@ -23,8 +23,8 @@ object SettingsFavouritesChangedListener {
     fun onFavouritesRemoved(event: FavouriteRemovedEvent) {
         logger.debug("Handling $event")
         val settings = SettingsUtil.settings
-        event.addedSearch?.let { settings.favourites.searches.removeIf { search -> it.name == search.name && it.query == search.query } }
-        event.addedIssue?.let { settings.favourites.issues.removeIf { issue -> issue.id == it.issue.humanReadableId } }
+        event.removedSearch?.let { settings.favourites.searches.removeIf { search -> it.name == search.name && it.query == search.query } }
+        event.removedIssue?.let { settings.favourites.issues.removeIf { issue -> issue.id == it.issue.humanReadableId } }
     }
 
 }
