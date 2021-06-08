@@ -10,13 +10,13 @@ internal class EventSubscriber(
     val eventClass: Class<*> = method.parameterTypes.first()
     val genericEntityParameterClass = method.getDeclaredAnnotation(Subscribe::class.java).genericType
 
-    override fun toString(): String {
-        return "EventSubscriber(method=$method, subscriber=$subscriber, eventClass=$eventClass, genericEntityParameterClass=$genericEntityParameterClass)"
-    }
-
     fun handleEvent(event: Any) {
         LOGGER.debug("Invoking $method with Parameter $event")
         method.invoke(subscriber, event)
+    }
+
+    override fun toString(): String {
+        return "EventSubscriber(method=$method)"
     }
 
     companion object {

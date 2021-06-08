@@ -19,7 +19,7 @@ object EventBus {
         subscribers
             .filter { it.eventClass.isAssignableFrom(eventClass) }
             .forEach { eventSubscriber ->
-                logger.info("Invoking Subscriber $event for Event $event")
+                logger.info("Invoking Subscriber $eventSubscriber for Event $event")
                 eventSubscriber.handleEvent(event)
             }
     }

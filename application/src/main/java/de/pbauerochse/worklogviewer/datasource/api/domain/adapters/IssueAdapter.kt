@@ -17,7 +17,7 @@ class IssueAdapter(
 
     override val id: String = youtrackIssue.id
     override val humanReadableId: String = youtrackIssue.idReadable
-    override val issueNumber: Long = id.substringAfterLast('-').toLong()
+    override val issueNumber: Long = humanReadableId.substringAfterLast('-').toLong()
     override val title: String = youtrackIssue.summary ?: youtrackIssue.idReadable
     override val description: String = youtrackIssue.description
     override val project: Project = youtrackIssue.project?.let { Project(it.id, it.name ?: it.id, it.shortName ?: it.id) } ?: UNKNOWN_PROJECT

@@ -24,7 +24,15 @@ object SettingsFavouritesChangedListener {
         logger.debug("Handling $event")
         val settings = SettingsUtil.settings
         event.removedSearch?.let { settings.favourites.searches.removeIf { search -> it.name == search.name && it.query == search.query } }
-        event.removedIssue?.let { settings.favourites.issues.removeIf { issue -> issue.id == it.issue.humanReadableId } }
+        event.removedIssue?.let {
+            // Issues might have switched projects since adding
+            // them as Favourite so they might not have the same
+            // humanReadableId anymore. Hence completely rebuild
+            // the PersistedFavouriteIssues
+            val persistedFavourIssues = event.currentFavouriteIssues.map { favourite -> PersistedFavouriteIssue(favourite.issue.humanReadableId, favourite.issue.title) }
+            settings.favourites.issues.clear()
+            settings.favourites.issues.addAll(persistedFavourIssues)
+        }
     }
 
 }
