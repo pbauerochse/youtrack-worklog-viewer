@@ -4,6 +4,7 @@ import de.pbauerochse.worklogviewer.events.EventBus
 import de.pbauerochse.worklogviewer.events.Subscribe
 import de.pbauerochse.worklogviewer.favourites.FavouritesService
 import de.pbauerochse.worklogviewer.favourites.events.FavouriteAddedEvent
+import de.pbauerochse.worklogviewer.favourites.events.FavouriteRemovedEvent
 import de.pbauerochse.worklogviewer.favourites.issue.FavouriteIssue
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.issue.details.FetchWorkItemsForIssueTask
@@ -69,8 +70,14 @@ object SearchTabModel {
     }
 
     @Subscribe
-    fun onFavouritesChanged(event: FavouriteAddedEvent) {
+    fun onFavouritesAdded(event: FavouriteAddedEvent) {
         event.addedIssue?.let { favouriteIssues.add(it) }
         event.addedSearch?.let { favouriteSearches.add(it) }
+    }
+
+    @Subscribe
+    fun onFavouritesRemoved(event: FavouriteRemovedEvent) {
+        event.removedIssue?.let { favouriteIssues.remove(it) }
+        event.removedSearch?.let { favouriteSearches.remove(it) }
     }
 }
