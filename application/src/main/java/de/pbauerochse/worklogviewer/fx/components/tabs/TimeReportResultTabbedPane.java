@@ -1,6 +1,5 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs;
 
-import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
 import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems;
@@ -29,6 +28,10 @@ public class TimeReportResultTabbedPane extends TabPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeReportResultTabbedPane.class);
 
     private final SettingsViewModel settingsViewModel = SettingsUtil.getSettingsViewModel();
+
+    public TimeReportResultTabbedPane() {
+        getTabs().add(new IssueSearchTab());
+    }
 
     /**
      * Updates this Pane with the given data
@@ -130,7 +133,4 @@ public class TimeReportResultTabbedPane extends TabPane {
         return null;
     }
 
-    public void setTaskExecutor(TaskExecutor taskExecutor) {
-        getTabs().add(new IssueSearchTab(taskExecutor));
-    }
 }

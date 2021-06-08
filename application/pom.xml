@@ -123,11 +123,6 @@
             <classifier>${javafx-binary-variant}</classifier>
         </dependency>
 
-        <dependency>
-            <groupId>eu.lestard</groupId>
-            <artifactId>advanced-bindings</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>

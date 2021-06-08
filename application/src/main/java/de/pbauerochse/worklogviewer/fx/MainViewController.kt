@@ -13,7 +13,8 @@ import de.pbauerochse.worklogviewer.fx.plugins.PluginActionContextAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogViewerStateAdapter
 import de.pbauerochse.worklogviewer.fx.plugins.WorklogviewerUiState
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder.currentTimeReportProperty
-import de.pbauerochse.worklogviewer.fx.tasks.*
+import de.pbauerochse.worklogviewer.fx.tasks.CheckForUpdateTask
+import de.pbauerochse.worklogviewer.fx.tasks.FetchTimereportTask
 import de.pbauerochse.worklogviewer.plugins.PluginLoader
 import de.pbauerochse.worklogviewer.plugins.actions.PluginActionContext
 import de.pbauerochse.worklogviewer.plugins.dialog.DialogSpecification
@@ -24,9 +25,11 @@ import de.pbauerochse.worklogviewer.plugins.tasks.TaskRunner
 import de.pbauerochse.worklogviewer.setHref
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel
-import de.pbauerochse.worklogviewer.tasks.DefaultTaskExecutor
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.tasks.TaskPreparer
 import de.pbauerochse.worklogviewer.tasks.Tasks
+import de.pbauerochse.worklogviewer.tasks.WorklogViewerTask
+import de.pbauerochse.worklogviewer.tasks.fx.TaskProgressBar
 import de.pbauerochse.worklogviewer.timerange.CustomTimerangeProvider
 import de.pbauerochse.worklogviewer.timerange.TimerangeProvider
 import de.pbauerochse.worklogviewer.timerange.TimerangeProviders
@@ -58,12 +61,11 @@ import org.slf4j.LoggerFactory
 import java.net.URL
 import java.time.LocalDate
 import java.util.*
-import java.util.concurrent.Future
 
 /**
  * Java FX Controller for the main window
  */
-class MainViewController : Initializable, TaskRunner, TaskExecutor {
+class MainViewController : Initializable, TaskRunner, TaskPreparer {
 
     @FXML
     private lateinit var timerangeComboBox: ComboBox<TimerangeProvider>
@@ -118,7 +120,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
         LOGGER.debug("Initializing main view")
         this.resources = resources
         this.settingsModel = SettingsUtil.settingsViewModel
-        Tasks.delegate = this // register self as main TaskExecutor
+        Tasks.registerPreparer(this)
 
         initializeTaskRunner()
         checkForUpdate()
@@ -139,15 +141,14 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
     }
 
     private fun initializeTaskRunner() {
-        waitScreenOverlay.visibleProperty().bind(DefaultTaskExecutor.hasRunningForegroundTasks)
-        resultTabPane.setTaskExecutor(this)
+        waitScreenOverlay.visibleProperty().bind(Tasks.hasRunningForegroundTasks)
     }
 
     private fun checkForUpdate() {
         Platform.runLater {
             val versionCheckTask = CheckForUpdateTask()
             versionCheckTask.onSucceeded = EventHandler { this.addDownloadLinkToToolbarIfNeverVersionPresent(it) }
-            startTask(versionCheckTask)
+            Tasks.startBackgroundTask(versionCheckTask)
         }
     }
 
@@ -232,7 +233,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
      * Exports the currently visible data to an excel spreadsheet
      */
     private fun startExportToExcelTask() {
-        resultTabPane.currentlyVisibleTab?.startDownloadAsExcel(this)
+        resultTabPane.currentlyVisibleTab?.startDownloadAsExcel()
     }
 
     private fun showSettingsDialogue() {
@@ -392,7 +393,7 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
 
         val task = FetchTimereportTask(DataSources.activeDataSource!!, parameters)
         task.setOnSucceeded { event -> currentTimeReportProperty.value = event.source.value as TimeReport }
-        startTask(task)
+        Tasks.startTask(task)
     }
 
     private fun showAddWorkitemDialog() {
@@ -416,17 +417,11 @@ class MainViewController : Initializable, TaskRunner, TaskExecutor {
             override fun start(progress: Progress): T? = task.run(progress)
         }
         wrapper.setOnSucceeded { callback?.invoke(it.source.value as T?) }
-        startTask(wrapper)
+        Tasks.startTask(wrapper)
     }
 
-    override fun <T> startBackgroundTask(task: WorklogViewerTask<T>): Future<T> {
-        val wrappedTask = TaskInitializer.initialize(taskProgressContainer, task)
-        return DefaultTaskExecutor.startBackgroundTask(wrappedTask)
-    }
-
-    override fun <T> startTask(task: WorklogViewerTask<T>): Future<T> {
-        val wrappedTask = TaskInitializer.initialize(taskProgressContainer, task)
-        return DefaultTaskExecutor.startTask(wrappedTask)
+    override fun <T> prepareTaskForExecution(task: WorklogViewerTask<T>): WorklogViewerTask<T> {
+        return TaskInitializer.initialize(taskProgressContainer, task)
     }
 
     companion object {

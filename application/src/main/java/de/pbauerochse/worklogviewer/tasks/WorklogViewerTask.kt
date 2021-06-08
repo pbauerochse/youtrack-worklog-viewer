@@ -1,6 +1,5 @@
-package de.pbauerochse.worklogviewer.fx.tasks
+package de.pbauerochse.worklogviewer.tasks
 
-import de.pbauerochse.worklogviewer.tasks.Progress
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.concurrent.Task
 

@@ -48,7 +48,6 @@
         <kotlin-compiler-java-target.version>1.8</kotlin-compiler-java-target.version>
         <kotlin.version>1.5.10</kotlin.version>
         <openjfx.version>16</openjfx.version>
-        <advanced-bindings.version>0.4.0</advanced-bindings.version>
 
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
@@ -319,12 +318,6 @@
                 <artifactId>javafx-graphics</artifactId>
                 <classifier>${javafx-binary-variant}</classifier>
                 <version>${openjfx.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>eu.lestard</groupId>
-                <artifactId>advanced-bindings</artifactId>
-                <version>${advanced-bindings.version}</version>
             </dependency>
 
         </dependencies>

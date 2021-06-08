@@ -1,6 +1,6 @@
-package de.pbauerochse.worklogviewer.fx.tasks
+package de.pbauerochse.worklogviewer.tasks
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class ProgressHandlerTest {
@@ -8,7 +8,7 @@ internal class ProgressHandlerTest {
     @Test
     fun `Progress starts at 0`() {
         val progress = ProgressHandler()
-        assertEquals(0.0, progress.currentValue)
+        Assertions.assertEquals(0.0, progress.currentValue)
     }
 
     @Test
@@ -16,7 +16,7 @@ internal class ProgressHandlerTest {
         val progress = ProgressHandler()
         progress.setProgress("Some message", 150)
 
-        assertEquals(100.0, progress.currentValue)
+        Assertions.assertEquals(100.0, progress.currentValue)
     }
 
     @Test
@@ -24,7 +24,7 @@ internal class ProgressHandlerTest {
         val progress = ProgressHandler()
         progress.setProgress("Some message", -150)
 
-        assertEquals(0.0, progress.currentValue)
+        Assertions.assertEquals(0.0, progress.currentValue)
     }
 
     @Test
@@ -32,10 +32,10 @@ internal class ProgressHandlerTest {
         val progress = ProgressHandler(20.0, null)
 
         progress.setProgress("Some message", 50)
-        assertEquals(10.0, progress.currentValue)
+        Assertions.assertEquals(10.0, progress.currentValue)
 
         progress.setProgress("Some message", 100)
-        assertEquals(20.0, progress.currentValue)
+        Assertions.assertEquals(20.0, progress.currentValue)
     }
 
     @Test
@@ -43,7 +43,7 @@ internal class ProgressHandlerTest {
         val progress = ProgressHandler(50.0, null)
 
         progress.setProgress("Some message", 500)
-        assertEquals(50.0, progress.currentValue)
+        Assertions.assertEquals(50.0, progress.currentValue)
     }
 
     @Test
@@ -52,8 +52,8 @@ internal class ProgressHandlerTest {
         val subProgress = mainProgress.subProgress(50) as ProgressHandler
 
         subProgress.setProgress("Subprogress message", 50)
-        assertEquals(25.0, subProgress.currentValue)
-        assertEquals(25.0, mainProgress.currentValue)
+        Assertions.assertEquals(25.0, subProgress.currentValue)
+        Assertions.assertEquals(25.0, mainProgress.currentValue)
     }
 
     @Test
@@ -65,7 +65,7 @@ internal class ProgressHandlerTest {
         subProgressA.setProgress("SubprogressA message", 50)
         subProgressB.setProgress("SubprogressB message", 10)
 
-        assertEquals(30.0, mainProgress.currentValue)
+        Assertions.assertEquals(30.0, mainProgress.currentValue)
     }
 
     @Test
@@ -74,7 +74,7 @@ internal class ProgressHandlerTest {
         mainProgress.setProgress("Main Progress message", 25)
 
         val subProgressA = mainProgress.subProgress(100)
-        assertEquals(75.0, (subProgressA as ProgressHandler).upperLimit)
+        Assertions.assertEquals(75.0, (subProgressA as ProgressHandler).upperLimit)
     }
 
     @Test
@@ -82,13 +82,13 @@ internal class ProgressHandlerTest {
         val mainProgress = ProgressHandler()
 
         mainProgress.setProgress("Main Progress message", 20)
-        assertEquals("Main Progress message", mainProgress.currentMessage)
+        Assertions.assertEquals("Main Progress message", mainProgress.currentMessage)
 
         val subProgress = mainProgress.subProgress(50)
         subProgress.setProgress("Subprogress message", 20)
 
-        assertEquals("Subprogress message", mainProgress.currentMessage)
-        assertEquals("Subprogress message", (subProgress as ProgressHandler).currentMessage)
+        Assertions.assertEquals("Subprogress message", mainProgress.currentMessage)
+        Assertions.assertEquals("Subprogress message", (subProgress as ProgressHandler).currentMessage)
     }
 
     @Test
@@ -96,7 +96,7 @@ internal class ProgressHandlerTest {
         val progress = ProgressHandler()
         progress.incrementProgress(10)
 
-        assertEquals(10.0, progress.currentValue)
+        Assertions.assertEquals(10.0, progress.currentValue)
     }
 
     @Test
@@ -110,7 +110,7 @@ internal class ProgressHandlerTest {
         subprogressA.incrementProgress(50) // 50% of 25 = 12.5
         subprogressB.incrementProgress(75) // 75% of 25 = 18.75
 
-        assertEquals(81.25, mainProgress.currentValue)
+        Assertions.assertEquals(81.25, mainProgress.currentValue)
     }
 
     @Test
@@ -125,26 +125,26 @@ internal class ProgressHandlerTest {
         val subprogress = mainProgress.subProgress(50) as ProgressHandler
 
         // subprogress internal progress at 50% -> mainProgress at 75% = 75
-        assertEquals(50.0, subprogress.upperLimit)
-        assertEquals(0.0, subprogress.currentValue, "Subprogress should be at 0% internal value")
-        assertEquals(50.0, mainProgress.currentValue, "Main Progress should be at 50% value")
+        Assertions.assertEquals(50.0, subprogress.upperLimit)
+        Assertions.assertEquals(0.0, subprogress.currentValue, "Subprogress should be at 0% internal value")
+        Assertions.assertEquals(50.0, mainProgress.currentValue, "Main Progress should be at 50% value")
 
         // adding 50% to subprogress
         subprogress.setProgress("Subprogress changed to 50%", 50)
-        assertEquals(25.0, subprogress.currentValue, "Subprogress should have an absolute value of 25")
-        assertEquals(75.0, mainProgress.currentValue, "Main Progress should be at 75% value")
+        Assertions.assertEquals(25.0, subprogress.currentValue, "Subprogress should have an absolute value of 25")
+        Assertions.assertEquals(75.0, mainProgress.currentValue, "Main Progress should be at 75% value")
 
         // sub sub progresses
         val subSubprogressA = subprogress.subProgress(50) as ProgressHandler // 50% of 50% of 50
-        assertEquals(25.0, subSubprogressA.upperLimit)
+        Assertions.assertEquals(25.0, subSubprogressA.upperLimit)
 
         val subSubprogressB = subprogress.subProgress(50) as ProgressHandler
-        assertEquals(25.0, subSubprogressB.upperLimit)
+        Assertions.assertEquals(25.0, subSubprogressB.upperLimit)
 
         subSubprogressA.setProgress("Sub Sub A", 50)
-        assertEquals(12.5, subSubprogressA.currentValue)
-        assertEquals(37.5, subprogress.currentValue)
-        assertEquals(87.5, mainProgress.currentValue)
+        Assertions.assertEquals(12.5, subSubprogressA.currentValue)
+        Assertions.assertEquals(37.5, subprogress.currentValue)
+        Assertions.assertEquals(87.5, mainProgress.currentValue)
     }
 
 }
