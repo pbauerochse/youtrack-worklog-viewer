@@ -36,7 +36,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         )
     }
 
-    override fun loadIssuesByIds(issueIds: List<String>, progress: Progress): List<Issue> {
+    override fun loadIssuesByIds(issueIds: Set<String>, progress: Progress): List<Issue> {
         return generateRandomIssues(issueIds.size)
     }
 

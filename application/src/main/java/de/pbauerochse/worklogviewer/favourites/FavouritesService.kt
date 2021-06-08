@@ -33,10 +33,11 @@ object FavouritesService {
     val searches: List<FavouriteSearch>
         get() = favouriteSearches.toList()
 
-    fun addFavourite(issue: FavouriteIssue) {
-        if (!favouriteIssues.contains(issue)) {
-            favouriteIssues.add(issue)
-            EventBus.publish(FavouriteAddedEvent.forIssue(issue))
+    fun addFavourite(issue: Issue) {
+        if (!isFavourite(issue)) {
+            val favourite = FavouriteIssue(issue)
+            favouriteIssues.add(favourite)
+            EventBus.publish(FavouriteAddedEvent.forIssue(favourite))
         }
     }
 
@@ -56,13 +57,13 @@ object FavouritesService {
 
         if (favourite != null) {
             favouriteIssues.remove(favourite)
-            EventBus.publish(FavouriteRemovedEvent.forIssue(favourite))
+            EventBus.publish(FavouriteRemovedEvent.forIssue(favourite, favouriteIssues, favouriteSearches))
         }
     }
 
     fun removeFavourite(search: FavouriteSearch) {
         if (favouriteSearches.remove(search)) {
-            EventBus.publish(FavouriteRemovedEvent.forSearch(search))
+            EventBus.publish(FavouriteRemovedEvent.forSearch(search, favouriteIssues, favouriteSearches))
         }
     }
 

@@ -98,7 +98,7 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
         return loadWorkItems(IssueAdapter(youtrackIssue, issueUrlBuilder.invoke(youtrackIssue)), progress)
     }
 
-    override fun loadIssuesByIds(issueIds: List<String>, progress: Progress): List<Issue> {
+    override fun loadIssuesByIds(issueIds: Set<String>, progress: Progress): List<Issue> {
         val query = "Issue ID: ${issueIds.joinToString(",")}"
         return searchIssues(query, 0, issueIds.size, progress)
     }

@@ -1,7 +1,6 @@
 package de.pbauerochse.worklogviewer.timereport.fx.table.columns.context
 
 import de.pbauerochse.worklogviewer.favourites.FavouritesService
-import de.pbauerochse.worklogviewer.favourites.issue.FavouriteIssue
 import de.pbauerochse.worklogviewer.fx.dialog.workitem.WorkitemDialogs
 import de.pbauerochse.worklogviewer.openInBrowser
 import de.pbauerochse.worklogviewer.search.fx.SearchTabModel
@@ -47,7 +46,7 @@ class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate
             visibleProperty().bind(issueAlreadyMarkedAsFavourite.not())
             onAction = EventHandler {
                 LOGGER.info("Marking ${issue.humanReadableId} as Favourite")
-                FavouritesService.addFavourite(FavouriteIssue(issue))
+                FavouritesService.addFavourite(issue)
             }
         }
 

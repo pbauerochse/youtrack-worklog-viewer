@@ -13,8 +13,8 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 class LoadFavouriteIssuesDetailsTask(private val persistedIssues: List<PersistedFavouriteIssue>): WorklogViewerTask<List<FavouriteIssue>>(getFormatted("favourites.issues.loading")) {
 
     override fun start(progress: Progress): List<FavouriteIssue> {
-        val issueIds = persistedIssues.map { it.id }
-        val searchResults = DataSources.activeDataSource!!.loadIssuesByIds(issueIds, progress)
+        val issueIds = persistedIssues.associateBy { it.id }
+        val searchResults = DataSources.activeDataSource!!.loadIssuesByIds(issueIds.keys, progress)
         return searchResults.map {
             FavouriteIssue(it)
         }

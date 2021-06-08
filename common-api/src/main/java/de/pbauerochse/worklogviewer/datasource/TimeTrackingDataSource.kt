@@ -40,6 +40,6 @@ interface TimeTrackingDataSource {
      */
     fun getWorkItemTypes(projectId: String, progress: Progress): List<WorkItemType>
 
-    fun loadIssuesByIds(issueIds: List<String>, progress: Progress): List<Issue>
+    fun loadIssuesByIds(issueIds: Set<String>, progress: Progress): List<Issue>
 
 }
