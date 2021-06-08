@@ -10,8 +10,12 @@ import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.IssueCel
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import javafx.collections.ListChangeListener
 import javafx.fxml.Initializable
+import javafx.scene.Node
+import javafx.scene.control.TreeCell
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
+import javafx.scene.input.MouseEvent.MOUSE_PRESSED
+import javafx.scene.text.Text
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.util.*
@@ -46,6 +50,24 @@ class FavouritesController : Initializable {
         }
 
         // Tree View
+
+        favouritesTreeView.addEventFilter(MOUSE_PRESSED) { event ->
+            // prevent selection on right click, but still show context menu
+            // see https://stackoverflow.com/a/61779016
+            if (event.isSecondaryButtonDown) {
+                val node = event.target as Node
+                val treeCell: TreeCell<*>? = when (node) {
+                    is TreeCell<*> -> node
+                    is Text -> node.parent as TreeCell<*>
+                    else -> null
+                }
+
+                treeCell?.let {
+                    it.contextMenu?.show(treeCell, 0.0, 0.0)
+                    event.consume()
+                }
+            }
+        }
         favouritesTreeView.apply {
             cellFactory = IssueSearchTreeItemCell.cellFactory()
             isShowRoot = false
