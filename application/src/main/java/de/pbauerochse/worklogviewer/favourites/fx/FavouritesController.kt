@@ -101,11 +101,11 @@ class FavouritesController : Initializable {
     }
 
     private fun updateFavouriteIssuesTreeItem(issues: List<FavouriteIssue>) {
-        favouriteIssuesTreeItem.children.setAll(issueTreeItems(issues.map { it.issue }))
+        favouriteIssuesTreeItem.children.setAll(issueTreeItems(issues.map { it.issue }.sorted()))
     }
 
     private fun updateSavedSearchesTreeItem(searches: List<FavouriteSearch>) {
-        favouriteSearchesTreeItem.children.setAll(searchesTreeItems(searches))
+        favouriteSearchesTreeItem.children.setAll(searchesTreeItems(searches.sortedBy { it.name }))
     }
 
     private fun updateSearchResultsTreeItem(issues: List<Issue>) {
