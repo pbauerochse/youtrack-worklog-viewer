@@ -2,6 +2,7 @@ package de.pbauerochse.worklogviewer.fx.tasks;
 
 import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource;
 import de.pbauerochse.worklogviewer.tasks.Progress;
+import de.pbauerochse.worklogviewer.tasks.WorklogViewerTask;
 import de.pbauerochse.worklogviewer.timereport.TimeReport;
 import de.pbauerochse.worklogviewer.timereport.TimeReportParameters;
 import org.jetbrains.annotations.NotNull;

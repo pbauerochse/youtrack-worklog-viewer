@@ -2,8 +2,8 @@ package de.pbauerochse.worklogviewer.favourites.issue
 
 import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.favourites.settings.PersistedFavouriteIssue
-import de.pbauerochse.worklogviewer.fx.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 
 /**

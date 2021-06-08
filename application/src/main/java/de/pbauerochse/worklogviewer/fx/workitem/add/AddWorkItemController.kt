@@ -6,7 +6,7 @@ import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
 import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
 import de.pbauerochse.worklogviewer.fx.state.ReportDataHolder
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
-import de.pbauerochse.worklogviewer.tasks.DefaultTaskExecutor
+import de.pbauerochse.worklogviewer.tasks.Tasks
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.timereport.WorkItemType
 import de.pbauerochse.worklogviewer.trimToNull
@@ -101,7 +101,7 @@ class AddWorkItemController : Initializable {
             onFailed = EventHandler { handleError(it.source.exception) }
         }
 
-        DefaultTaskExecutor.startTask(task)
+        Tasks.startTask(task)
     }
 
     private fun onFormShown() {
@@ -149,7 +149,7 @@ class AddWorkItemController : Initializable {
                 onFailed = EventHandler { handleError(it.source.exception) }
             }
 
-            DefaultTaskExecutor.startTask(task)
+            Tasks.startTask(task)
         }
     }
 

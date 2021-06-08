@@ -3,8 +3,8 @@ package de.pbauerochse.worklogviewer.fx.workitem.add
 import de.pbauerochse.worklogviewer.datasource.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
 import de.pbauerochse.worklogviewer.datasource.DataSources
-import de.pbauerochse.worklogviewer.fx.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 
 class AddWorkItemTask(private val request: AddWorkItemRequest) : WorklogViewerTask<AddWorkItemResult>(getFormatted("task.addworkitem.title")) {

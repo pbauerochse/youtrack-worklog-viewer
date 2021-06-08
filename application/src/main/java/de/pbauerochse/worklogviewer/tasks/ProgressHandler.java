@@ -1,6 +1,5 @@
-package de.pbauerochse.worklogviewer.fx.tasks;
+package de.pbauerochse.worklogviewer.tasks;
 
-import de.pbauerochse.worklogviewer.tasks.Progress;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;

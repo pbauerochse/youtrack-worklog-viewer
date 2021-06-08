@@ -5,7 +5,7 @@ import de.pbauerochse.worklogviewer.favourites.FavouritesService
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.fx.issuesearch.savedsearch.EditFavouriteSearchDialog
 import de.pbauerochse.worklogviewer.fx.issuesearch.task.SearchIssuesTask
-import de.pbauerochse.worklogviewer.fx.tasks.TaskExecutor
+import de.pbauerochse.worklogviewer.tasks.Tasks
 import javafx.beans.property.SimpleStringProperty
 import javafx.concurrent.WorkerStateEvent
 import javafx.event.EventHandler
@@ -25,7 +25,6 @@ class SearchTabController : Initializable {
     lateinit var queryTextField: TextField
     lateinit var triggerSearchButton: Button
     lateinit var saveSearchButton: Button
-    lateinit var taskExecutor: TaskExecutor
 
     private val lastSearchQueryProperty = SimpleStringProperty()
 
@@ -54,7 +53,7 @@ class SearchTabController : Initializable {
         val task = SearchIssuesTask(query, 0, MAX_SEARCH_RESULTS, DataSources.activeDataSource!!)
         task.onSucceeded = EventHandler { showSearchResults(it) }
         lastSearchQueryProperty.value = query
-        taskExecutor.startTask(task)
+        Tasks.startTask(task)
     }
 
     private fun showSearchResults(event: WorkerStateEvent) {

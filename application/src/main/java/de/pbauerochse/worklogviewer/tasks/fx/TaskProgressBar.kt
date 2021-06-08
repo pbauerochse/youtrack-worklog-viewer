@@ -1,5 +1,6 @@
-package de.pbauerochse.worklogviewer.fx.tasks
+package de.pbauerochse.worklogviewer.tasks.fx
 
+import de.pbauerochse.worklogviewer.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.animation.FadeTransition
 import javafx.animation.PauseTransition

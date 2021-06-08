@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.issuesearch.task
 
 import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource
-import de.pbauerochse.worklogviewer.fx.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.tasks.Progress
+import de.pbauerochse.worklogviewer.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import org.slf4j.LoggerFactory
