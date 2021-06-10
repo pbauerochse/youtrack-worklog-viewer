@@ -4,7 +4,9 @@ import de.pbauerochse.worklogviewer.favourites.issue.FavouriteIssue
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import de.pbauerochse.worklogviewer.fx.issuesearch.SavedSearchContextMenu
-import de.pbauerochse.worklogviewer.search.fx.SearchTabModel
+import de.pbauerochse.worklogviewer.issue.details.fx.IssueDetailsModel
+import de.pbauerochse.worklogviewer.search.fx.Search
+import de.pbauerochse.worklogviewer.search.fx.SearchModel
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.util.FormattingUtil
@@ -83,21 +85,20 @@ class FavouritesController : Initializable {
     }
 
     private fun initializeFavourites() {
-        SearchTabModel.favouriteIssues.addListener(ListChangeListener {
+        FavouritesModel.favouriteIssues.addListener(ListChangeListener {
             updateFavouriteIssuesTreeItem(it.list)
         })
 
-        SearchTabModel.favouriteSearches.addListener(ListChangeListener {
+        FavouritesModel.favouriteSearches.addListener(ListChangeListener {
             updateSavedSearchesTreeItem(it.list)
-
         })
 
-        updateSavedSearchesTreeItem(SearchTabModel.favouriteSearches)
-        updateFavouriteIssuesTreeItem(SearchTabModel.favouriteIssues)
+        updateSavedSearchesTreeItem(FavouritesModel.favouriteSearches)
+        updateFavouriteIssuesTreeItem(FavouritesModel.favouriteIssues)
     }
 
     private fun initializeSearchResults() {
-        SearchTabModel.searchResults.addListener(ListChangeListener { updateSearchResultsTreeItem(it.list) })
+        SearchModel.searchResults.addListener(ListChangeListener { updateSearchResultsTreeItem(it.list) })
     }
 
     private fun updateFavouriteIssuesTreeItem(issues: List<FavouriteIssue>) {
@@ -125,7 +126,7 @@ class FavouritesController : Initializable {
 
     private fun searchesTreeItems(searches: List<FavouriteSearch>): List<TreeItem<IssueSearchTreeItem>> {
         return searches.map {
-            val data = IssueSearchTreeItem(it.name, { startNewSearch(it.query) }, SavedSearchContextMenu(it))
+            val data = IssueSearchTreeItem(it.name, { Search.issues(it.query) }, SavedSearchContextMenu(it))
             TreeItem(data)
         }
     }
@@ -135,13 +136,9 @@ class FavouritesController : Initializable {
         item.onSelect.invoke()
     }
 
-    private fun startNewSearch(query: String) {
-        TODO("Not yet implemented")
-    }
-
     private fun showIssueDetails(issue: Issue) {
         LOGGER.info("Selected issue ${issue.fullTitle}")
-        SearchTabModel.selectedIssueForDetails.set(issue)
+        IssueDetailsModel.selectedIssueForDetails.set(issue)
     }
 
     companion object {

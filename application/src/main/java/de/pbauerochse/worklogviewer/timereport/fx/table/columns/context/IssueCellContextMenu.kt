@@ -1,9 +1,9 @@
 package de.pbauerochse.worklogviewer.timereport.fx.table.columns.context
 
 import de.pbauerochse.worklogviewer.favourites.FavouritesService
+import de.pbauerochse.worklogviewer.favourites.fx.FavouritesModel
 import de.pbauerochse.worklogviewer.fx.dialog.workitem.WorkitemDialogs
 import de.pbauerochse.worklogviewer.openInBrowser
-import de.pbauerochse.worklogviewer.search.fx.SearchTabModel
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.beans.binding.Bindings
@@ -17,7 +17,7 @@ import java.time.LocalDate
 /**
  * Context menu for an [de.pbauerochse.worklogviewer.fx.components.treetable.columns.IssueLinkColumn]
  */
-class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate? = null, showAddForOtherIssueItem : Boolean = true) : ContextMenu() {
+class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate? = null, showAddForOtherIssueItem: Boolean = true) : ContextMenu() {
 
     init {
         val openIssueInBrowserMenu = MenuItem(getFormatted("contextmenu.issue.openinyoutrack", issue.humanReadableId))
@@ -40,7 +40,7 @@ class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate
     private fun addFavourites() {
         items.add(SeparatorMenuItem())
 
-        val issueAlreadyMarkedAsFavourite = Bindings.createBooleanBinding({ FavouritesService.isFavourite(issue) }, SearchTabModel.favouriteIssues)
+        val issueAlreadyMarkedAsFavourite = Bindings.createBooleanBinding({ FavouritesService.isFavourite(issue) }, FavouritesModel.favouriteIssues)
 
         val markAsFavourite = MenuItem(getFormatted("contextmenu.issue.addfavourite", issue.humanReadableId)).apply {
             visibleProperty().bind(issueAlreadyMarkedAsFavourite.not())

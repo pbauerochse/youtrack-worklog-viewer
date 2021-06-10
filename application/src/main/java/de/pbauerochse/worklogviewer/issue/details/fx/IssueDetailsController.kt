@@ -2,7 +2,6 @@ package de.pbauerochse.worklogviewer.issue.details.fx
 
 import de.pbauerochse.worklogviewer.fx.Theme
 import de.pbauerochse.worklogviewer.fx.issuesearch.WebViewSanitizer
-import de.pbauerochse.worklogviewer.search.fx.SearchTabModel
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.timereport.WorkItem
 import javafx.beans.binding.Bindings
@@ -29,15 +28,15 @@ class IssueDetailsController : Initializable {
     lateinit var issueWorklogsTableView: TableView<WorkItem>
 
     override fun initialize(url: URL?, resourceBundle: ResourceBundle?) {
-        placeholderContent.visibleProperty().bind(SearchTabModel.selectedIssueForDetails.isNull)
-        issueDetailsPanel.visibleProperty().bind(SearchTabModel.selectedIssueForDetails.isNotNull)
+        placeholderContent.visibleProperty().bind(IssueDetailsModel.selectedIssueForDetails.isNull)
+        issueDetailsPanel.visibleProperty().bind(IssueDetailsModel.selectedIssueForDetails.isNotNull)
 
-        issueSummaryLabel.textProperty().bind(Bindings.createStringBinding({ SearchTabModel.selectedIssueForDetails.get()?.fullTitle }, SearchTabModel.selectedIssueForDetails))
-        SearchTabModel.selectedIssueForDetails.addListener { _, _, newValue ->
+        issueSummaryLabel.textProperty().bind(Bindings.createStringBinding({ IssueDetailsModel.selectedIssueForDetails.get()?.fullTitle }, IssueDetailsModel.selectedIssueForDetails))
+        IssueDetailsModel.selectedIssueForDetails.addListener { _, _, newValue ->
             LOGGER.info("Showing Issue Details for $newValue")
             issueDescriptionWebView.engine.loadContent(WebViewSanitizer.sanitize(newValue.description))
         }
-        issueWorklogsTableView.itemsProperty().bind(SimpleObjectProperty(SearchTabModel.selectedIssueWorkItems))
+        issueWorklogsTableView.itemsProperty().bind(SimpleObjectProperty(IssueDetailsModel.selectedIssueWorkItems))
         SettingsUtil.settingsViewModel.themeProperty.addListener { _, _, newValue ->
             updateWebviewStyleSheet(newValue)
         }

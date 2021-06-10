@@ -25,7 +25,9 @@ object FavouritesService {
         return@lazy results.toMutableList()
     }
 
-    private val favouriteSearches = mutableListOf<FavouriteSearch>()
+    private val favouriteSearches: MutableList<FavouriteSearch> = SettingsUtil.settings.favourites.searches
+        .map { FavouriteSearch(it.name, it.query) }
+        .toMutableList()
 
     val issues: List<FavouriteIssue>
         get() = favouriteIssues.toList()
