@@ -1,18 +1,12 @@
 package de.pbauerochse.worklogviewer.search.fx
 
-import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.favourites.FavouritesService
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.fx.issuesearch.savedsearch.EditFavouriteSearchDialog
-import de.pbauerochse.worklogviewer.fx.issuesearch.task.SearchIssuesTask
-import de.pbauerochse.worklogviewer.tasks.Tasks
-import javafx.beans.property.SimpleStringProperty
-import javafx.concurrent.WorkerStateEvent
 import javafx.event.EventHandler
 import javafx.fxml.Initializable
 import javafx.scene.control.Button
 import javafx.scene.control.TextField
-import org.slf4j.LoggerFactory
 import java.net.URL
 import java.util.*
 
@@ -25,8 +19,6 @@ class SearchTabController : Initializable {
     lateinit var queryTextField: TextField
     lateinit var triggerSearchButton: Button
     lateinit var saveSearchButton: Button
-
-    private val lastSearchQueryProperty = SimpleStringProperty()
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         initializeSearchElements()
@@ -42,32 +34,13 @@ class SearchTabController : Initializable {
         triggerSearchButton.onAction = EventHandler { startNewSearch(queryTextField.text) }
     }
 
-    private fun startNewSearch(query: String?) {
-        if (query.isNullOrBlank().not()) {
-            lastSearchQueryProperty.value = query
-            performSearch(query!!)
-        }
-    }
-
-    private fun performSearch(query: String) {
-        val task = SearchIssuesTask(query, 0, MAX_SEARCH_RESULTS, DataSources.activeDataSource!!)
-        task.onSucceeded = EventHandler { showSearchResults(it) }
-        lastSearchQueryProperty.value = query
-        Tasks.startTask(task)
-    }
-
-    private fun showSearchResults(event: WorkerStateEvent) {
-        val task = event.source as SearchIssuesTask
-        LOGGER.info("Found ${task.value.size} Issues")
-        if (task.isNewSearch) {
-            SearchTabModel.searchResults.setAll(task.value)
-        } else {
-            SearchTabModel.searchResults.addAll(task.value)
+    private fun startNewSearch(query: String) {
+        if (query.isNotBlank()) {
+            Search.issues(query, 0, MAX_SEARCH_RESULTS)
         }
     }
 
     companion object {
-        private val LOGGER = LoggerFactory.getLogger(SearchTabController::class.java)
         private const val MAX_SEARCH_RESULTS = 50
     }
 
