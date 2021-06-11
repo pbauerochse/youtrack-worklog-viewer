@@ -45,7 +45,6 @@ import de.pbauerochse.worklogviewer.view.grouping.NoopGrouping
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
-import javafx.concurrent.Worker
 import javafx.concurrent.WorkerStateEvent
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -438,6 +437,7 @@ class MainViewController : Initializable, TaskRunner, TaskPreparer {
 
         internal fun <T> initialize(taskProgressContainer: Pane, task: WorklogViewerTask<T>) : WorklogViewerTask<T> {
             val progressbar = TaskProgressBar(task, true)
+            task.stateProperty().addListener(progressbar)
             bindOnRunning(task, progressbar, taskProgressContainer)
             bindOnSucceeded(task, progressbar)
             bindOnFailed(task, progressbar)
@@ -450,7 +450,6 @@ class MainViewController : Initializable, TaskRunner, TaskPreparer {
                 progressbarContainer.children.add(progressbar)
                 progressbar.progressText.textProperty().bind(task.messageProperty())
                 progressbar.progressBar.progressProperty().bind(task.progressProperty())
-                progressbar.updateStatus(Worker.State.RUNNING)
 
                 initialHandler?.handle(it)
             }
@@ -461,7 +460,6 @@ class MainViewController : Initializable, TaskRunner, TaskPreparer {
             task.setOnSucceeded {
                 progressbar.progressText.textProperty().unbind()
                 progressbar.progressBar.progressProperty().unbind()
-                progressbar.updateStatus(Worker.State.SUCCEEDED)
                 initialHandler?.handle(it)
             }
         }
@@ -471,7 +469,6 @@ class MainViewController : Initializable, TaskRunner, TaskPreparer {
             task.setOnFailed {
                 progressbar.progressText.textProperty().unbind()
                 progressbar.progressBar.progressProperty().unbind()
-                progressbar.updateStatus(Worker.State.FAILED)
 
                 progressbar.progressText.text = getErrorMessage(it)
                 progressbar.progressBar.progress = 1.0
