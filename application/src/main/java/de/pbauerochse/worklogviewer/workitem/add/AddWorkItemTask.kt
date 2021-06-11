@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.fx.workitem.add
+package de.pbauerochse.worklogviewer.workitem.add
 
 import de.pbauerochse.worklogviewer.datasource.AddWorkItemRequest
 import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult

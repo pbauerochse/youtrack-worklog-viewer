@@ -27,7 +27,7 @@ interface TimeTrackingDataSource {
     /**
      * Returns the given [Issue] with all of its [WorkItem]s
      */
-    fun loadWorkItems(issue: Issue, progress: Progress): IssueWithWorkItems
+    fun loadWorkItems(issue: Issue, timeRange: TimeRange?, progress: Progress): IssueWithWorkItems
 
     /**
      * Loads the details for an [Issue] by id

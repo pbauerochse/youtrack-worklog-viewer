@@ -50,7 +50,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         return IssueWithWorkItems(issue, workItems)
     }
 
-    override fun loadWorkItems(issue: Issue, progress: Progress): IssueWithWorkItems {
+    override fun loadWorkItems(issue: Issue, timeRange: TimeRange?, progress: Progress): IssueWithWorkItems {
         var currentDate = LocalDate.now().minusDays(30)
         val workItems = mutableListOf<WorkItem>()
         val users = generateRandomUsers()

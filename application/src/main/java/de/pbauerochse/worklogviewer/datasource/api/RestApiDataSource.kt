@@ -118,22 +118,27 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
 
         val issues: List<YouTrackIssue> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackIssue>>() {})
         LOGGER.debug("Got ${issues.size} Issues for query '$query'")
-//        progress.setProgress(i18n("connector.rest.issue.search.progress.workitems", issues.size), 50)
-//
-//        val withWorkitems = loadWorkitems(issues, progress.subProgress(50))
         progress.setProgress(i18n("connector.rest.done"), 100)
 
         return issues.map { IssueAdapter(it, issueUrlBuilder.invoke(it)) }
     }
 
-    override fun loadWorkItems(issue: Issue, progress: Progress): IssueWithWorkItems {
+    private fun loadWorkItems(issue: Issue, progress: Progress): IssueWithWorkItems = loadWorkItems(issue, null, progress)
+    override fun loadWorkItems(issue: Issue, timeRange: TimeRange?, progress: Progress): IssueWithWorkItems {
         LOGGER.info("Loading WorkItems for Issue $issue")
 
         var keepOnFetching = true
         val workItems = mutableListOf<YouTrackIssueWorkItem>()
+        val query = URLEncoder.encode("Issue ID:${issue.humanReadableId}", StandardCharsets.UTF_8)
+        val dateUrlParams = timeRange?.let {
+            val startDateFormatted = it.start.format(DATE_FORMATTER)
+            val endDateFormatted = it.end.format(DATE_FORMATTER)
+            "&startDate=$startDateFormatted&endDate=$endDateFormatted"
+        } ?: ""
 
         while (keepOnFetching) {
-            val url = "/api/issues/${issue.id}/timeTracking/workItems?\$skip=${workItems.size}&\$top=$MAX_WORKITEMS_PER_BATCH&fields=$WORKITEM_FIELDS"
+            val url = "/api/workItems?query=$query&\$skip=${workItems.size}&\$top=$MAX_WORKITEMS_PER_BATCH&fields=${WORKITEM_FIELDS}$dateUrlParams"
+//            val url = "/api/issues/${issue.id}/timeTracking/workItems?\$skip=${workItems.size}&\$top=$MAX_WORKITEMS_PER_BATCH&fields=$WORKITEM_FIELDS"
 
             val response = http.get(url)
             if (response.isError) {
