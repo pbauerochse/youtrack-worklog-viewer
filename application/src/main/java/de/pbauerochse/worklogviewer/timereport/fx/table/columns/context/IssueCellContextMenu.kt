@@ -2,10 +2,10 @@ package de.pbauerochse.worklogviewer.timereport.fx.table.columns.context
 
 import de.pbauerochse.worklogviewer.favourites.FavouritesService
 import de.pbauerochse.worklogviewer.favourites.fx.FavouritesModel
-import de.pbauerochse.worklogviewer.fx.dialog.workitem.WorkitemDialogs
 import de.pbauerochse.worklogviewer.openInBrowser
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
+import de.pbauerochse.worklogviewer.workitem.add.fx.AddWorkItemDialog
 import javafx.beans.binding.Bindings
 import javafx.event.EventHandler
 import javafx.scene.control.ContextMenu
@@ -61,8 +61,8 @@ class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate
         items.addAll(markAsFavourite, removeFromFavourites)
     }
 
-    fun showAddWorkItemToIssueDialog() = WorkitemDialogs.show(scene, date, issue)
-    private fun showAddWorkItemToAnyIssueDialog() = WorkitemDialogs.show(scene, date)
+    fun showAddWorkItemToIssueDialog() = AddWorkItemDialog.show(scene, date, issue)
+    private fun showAddWorkItemToAnyIssueDialog() = AddWorkItemDialog.show(scene, date)
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(IssueCellContextMenu::class.java)

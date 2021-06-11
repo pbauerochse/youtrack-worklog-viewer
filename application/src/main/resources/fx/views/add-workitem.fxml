@@ -3,7 +3,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane minHeight="330.0" minWidth="380.0" prefHeight="330.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.fx.workitem.add.AddWorkItemController">
+<BorderPane minHeight="330.0" minWidth="380.0" prefHeight="330.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.workitem.add.fx.AddWorkItemController">
 
     <center>
         <StackPane alignment="TOP_LEFT" maxHeight="Infinity" maxWidth="Infinity" BorderPane.alignment="TOP_LEFT">
