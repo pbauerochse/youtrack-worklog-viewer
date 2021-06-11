@@ -46,10 +46,11 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>, private val showTa
 
     override fun changed(observable: ObservableValue<out Worker.State>?, oldValue: Worker.State?, newValue: Worker.State?) {
         taskName.text = if (showTaskName) getTaskNameLabel(newValue) else ""
+        newValue?.let { updateStatus(it) }
     }
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
-    fun updateStatus(status : Worker.State) {
+    private fun updateStatus(status : Worker.State) {
         when (status) {
             Worker.State.RUNNING -> updateStyles(RUNNING_CLASS)
             Worker.State.SUCCEEDED -> updateStyles(SUCCESSFUL_CLASS)
@@ -63,7 +64,7 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>, private val showTa
 
     private fun getTaskNameLabel(state: Worker.State?): String {
         val taskName = task.label
-        val stateLabel = state?.let { getFormatted("task.state.${it.name.toLowerCase()}") }
+        val stateLabel = state?.let { getFormatted("task.state.${it.name.lowercase()}") }
         val stateLabelWithSeperator = stateLabel?.let { ":: $it" } ?: ""
         return "[ $taskName ] $stateLabelWithSeperator"
     }
