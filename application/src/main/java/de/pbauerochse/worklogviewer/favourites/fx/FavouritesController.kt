@@ -4,9 +4,8 @@ import de.pbauerochse.worklogviewer.favourites.issue.FavouriteIssue
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import de.pbauerochse.worklogviewer.fx.issuesearch.SavedSearchContextMenu
-import de.pbauerochse.worklogviewer.issue.details.fx.IssueDetailsModel
 import de.pbauerochse.worklogviewer.search.fx.Search
-import de.pbauerochse.worklogviewer.search.fx.SearchModel
+import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsModel
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.util.FormattingUtil
@@ -32,7 +31,6 @@ class FavouritesController : Initializable {
 
     private lateinit var favouriteSearchesTreeItem: TreeItem<IssueSearchTreeItem>
     private lateinit var favouriteIssuesTreeItem: TreeItem<IssueSearchTreeItem>
-    private lateinit var searchResultsTreeItem: TreeItem<IssueSearchTreeItem>
 
     override fun initialize(url: URL?, resourceBundle: ResourceBundle?) {
         // FavouriteSearches
@@ -45,20 +43,13 @@ class FavouritesController : Initializable {
             isExpanded = true
         }
 
-
-        // SearchResults (will be removed later)
-        searchResultsTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(FormattingUtil.getFormatted("dialog.issuesearch.groups.searchresult"))).apply {
-            isExpanded = true
-        }
-
         // Tree View
 
         favouritesTreeView.addEventFilter(MOUSE_PRESSED) { event ->
             // prevent selection on right click, but still show context menu
             // see https://stackoverflow.com/a/61779016
             if (event.isSecondaryButtonDown) {
-                val node = event.target as Node
-                val treeCell: TreeCell<*>? = when (node) {
+                val treeCell: TreeCell<*>? = when (val node = event.target as Node) {
                     is TreeCell<*> -> node
                     is Text -> node.parent as TreeCell<*>
                     else -> null
@@ -76,12 +67,11 @@ class FavouritesController : Initializable {
             isEditable = false
             selectionModel.selectedItemProperty().addListener { _, _, selectedItem -> selectedItem?.let { selectIssue(it.value) } }
             root = TreeItem<IssueSearchTreeItem>().apply {
-                children.addAll(favouriteSearchesTreeItem, favouriteIssuesTreeItem, searchResultsTreeItem)
+                children.addAll(favouriteSearchesTreeItem, favouriteIssuesTreeItem)
             }
         }
 
         initializeFavourites()
-        initializeSearchResults()
     }
 
     private fun initializeFavourites() {
@@ -97,20 +87,12 @@ class FavouritesController : Initializable {
         updateFavouriteIssuesTreeItem(FavouritesModel.favouriteIssues)
     }
 
-    private fun initializeSearchResults() {
-        SearchModel.searchResults.addListener(ListChangeListener { updateSearchResultsTreeItem(it.list) })
-    }
-
     private fun updateFavouriteIssuesTreeItem(issues: List<FavouriteIssue>) {
         favouriteIssuesTreeItem.children.setAll(issueTreeItems(issues.map { it.issue }.sorted()))
     }
 
     private fun updateSavedSearchesTreeItem(searches: List<FavouriteSearch>) {
         favouriteSearchesTreeItem.children.setAll(searchesTreeItems(searches.sortedBy { it.name }))
-    }
-
-    private fun updateSearchResultsTreeItem(issues: List<Issue>) {
-        searchResultsTreeItem.children.setAll(issueTreeItems(issues))
     }
 
     private fun issueTreeItems(issues: List<Issue>): List<TreeItem<IssueSearchTreeItem>> {
@@ -138,7 +120,7 @@ class FavouritesController : Initializable {
 
     private fun showIssueDetails(issue: Issue) {
         LOGGER.info("Selected issue ${issue.fullTitle}")
-        IssueDetailsModel.selectedIssueForDetails.set(issue)
+        IssueDetailsModel.showDetails(issue)
     }
 
     companion object {

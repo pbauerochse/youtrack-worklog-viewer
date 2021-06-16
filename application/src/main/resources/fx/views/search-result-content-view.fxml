@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.search.fx.results.SearchResultContentController">
+
+    <top>
+        <ToolBar>
+            <VBox spacing="2.0">
+              <Label fx:id="searchTermLabel">
+               <font>
+                  <Font size="15.0" />
+               </font></Label>
+              <Label fx:id="searchResultCountLabel" />
+            </VBox>
+        </ToolBar>
+    </top>
+
+    <center>
+        <TabPane fx:id="searchContentPane">
+            <Tab fx:id="searchResultsTab" closable="false" text="%search.results.tab.title">
+                <ListView fx:id="searchResultsListView" />
+            </Tab>
+        </TabPane>
+    </center>
+
+</BorderPane>

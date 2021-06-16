@@ -258,3 +258,12 @@
 .split-pane {
     -fx-background-color: -ytwlv-dark-background-color, -ytwlv-dark-background-color;
 }
+
+.search-result-issue-field .separator .line {
+    -fx-border-color: transparent transparent transparent transparent,
+    transparent transparent transparent -ytwlv-border-color;
+}
+
+.search-result-issue .issue-id, .search-result-issue .issue-title {
+    -fx-fill: whitesmoke;
+}

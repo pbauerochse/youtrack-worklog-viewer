@@ -6,7 +6,6 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
@@ -61,13 +60,5 @@ public class FormattingUtil {
         return longDateFormatter.format(date);
     }
 
-    public static String formatDateTime(LocalDateTime date) {
-        if (date == null) return "";
-
-        if (dateTimeFormatter == null) {
-            dateTimeFormatter = DateTimeFormatter.ofPattern(getFormatted("datetime.column.format"));
-        }
-        return dateTimeFormatter.format(date);
-    }
 
 }

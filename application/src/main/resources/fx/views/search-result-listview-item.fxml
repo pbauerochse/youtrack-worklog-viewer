@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<BorderPane fx:id="listViewItem" styleClass="search-result-issue" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <VBox spacing="5.0" BorderPane.alignment="CENTER">
+            <HBox spacing="5.0">
+                <Text fx:id="issueIdLabel" styleClass="issue-id" HBox.hgrow="NEVER" />
+                <Text fx:id="issueTitleLabel" styleClass="issue-title" HBox.hgrow="ALWAYS" />
+            </HBox>
+            <FlowPane fx:id="fieldsFlowPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="issue-fields" vgap="3.0" VBox.vgrow="SOMETIMES" />
+        </VBox>
+    </center>
+</BorderPane>

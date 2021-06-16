@@ -16,6 +16,8 @@ object Search {
                     this.isNewSearch -> SearchModel.searchResults.setAll(value)
                     else -> SearchModel.searchResults.addAll(value)
                 }
+
+                SearchModel.searchTerm.set(query)
             }
         })
     }

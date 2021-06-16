@@ -119,7 +119,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
             return@map object : Issue {
                 override val id: String = issueId
                 override val issueNumber: Long = it.toLong()
-                override val humanReadableId: String = issueDescription
+                override val humanReadableId: String = issueId
                 override val externalUrl: URL = URL("http://localhost/issue/$issueId")
                 override val title: String = issueDescription
                 override val description: String = issueDescription

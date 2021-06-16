@@ -3,9 +3,13 @@ package de.pbauerochse.worklogviewer.search.fx
 import de.pbauerochse.worklogviewer.favourites.FavouritesService
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.fx.issuesearch.savedsearch.EditFavouriteSearchDialog
+import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsModel
+import javafx.beans.binding.Bindings
 import javafx.event.EventHandler
 import javafx.fxml.Initializable
+import javafx.scene.Parent
 import javafx.scene.control.Button
+import javafx.scene.control.Label
 import javafx.scene.control.TextField
 import java.net.URL
 import java.util.*
@@ -20,18 +24,23 @@ class SearchTabController : Initializable {
     lateinit var triggerSearchButton: Button
     lateinit var saveSearchButton: Button
 
-    override fun initialize(location: URL?, resources: ResourceBundle?) {
-        initializeSearchElements()
+    lateinit var searchResultView: Parent
+    lateinit var placeholderContent: Label
 
+    private val shouldShowPlaceholder = Bindings.isEmpty(SearchModel.searchResults).and(Bindings.isEmpty(IssueDetailsModel.issuesForDetailsPanel))
+
+    override fun initialize(location: URL?, resources: ResourceBundle?) {
+        triggerSearchButton.apply {
+            disableProperty().bind(queryTextField.textProperty().isEmpty)
+            onAction = EventHandler { startNewSearch(queryTextField.text) }
+        }
         saveSearchButton.onAction = EventHandler {
             val result = EditFavouriteSearchDialog(FavouriteSearch("", queryTextField.text), queryTextField.scene?.window).showAndWait()
             result.ifPresent { FavouritesService.addFavourite(it) }
         }
-    }
 
-    private fun initializeSearchElements() {
-        triggerSearchButton.disableProperty().bind(queryTextField.textProperty().isEmpty)
-        triggerSearchButton.onAction = EventHandler { startNewSearch(queryTextField.text) }
+        placeholderContent.visibleProperty().bind(shouldShowPlaceholder)
+        searchResultView.visibleProperty().bind(shouldShowPlaceholder.not())
     }
 
     private fun startNewSearch(query: String) {

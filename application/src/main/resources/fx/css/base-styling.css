@@ -1,6 +1,10 @@
 /**
  * YouTrack Worklog Viewer basic styling
  */
+.root {
+    -ytwlv-faint-text-color: derive(-fx-text-background-color, -15%);
+}
+
 #fetchWorklogButton {
     -fx-background-image: url(../img/application_view_detail.png);
     -fx-background-position: center;
@@ -112,6 +116,42 @@
     -fx-font-weight: bold;
 }
 
+Text {
+    -fx-fill: -fx-text-background-color;
+}
+
 .statistics-label {
+    -fx-font-weight: bold;
+}
+
+.search-result-issue {
+    -fx-padding: 5.0;
+}
+
+.search-result-issue.resolved .issue-id,
+.search-result-issue.resolved .issue-title {
+    -fx-strikethrough: true;
+}
+
+.search-result-issue .issue-id, .search-result-issue .issue-title {
+    -fx-font-size: 16.0;
+}
+
+.search-result-issue .issue-fields {
+    -fx-start-margin: 10.0;
+}
+
+.search-result-issue-field {
+    -fx-padding: 2.0;
+    -fx-spacing: 5.0;
+}
+
+.search-result-issue-field .field-name,
+.search-result-issue-field .field-value {
+    -fx-font-size: 11.0;
+    -fx-text-fill: -ytwlv-faint-text-color;
+}
+
+.search-result-issue-field .field-name {
     -fx-font-weight: bold;
 }
