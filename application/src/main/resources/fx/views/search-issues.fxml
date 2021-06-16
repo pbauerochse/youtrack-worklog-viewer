@@ -34,7 +34,10 @@
     <center>
         <SplitPane dividerPositions="0.3" BorderPane.alignment="CENTER">
             <fx:include source="favourites.fxml" />
-            <fx:include source="issue-details.fxml" />
+            <StackPane>
+                <fx:include fx:id="searchResultView" source="search-result-content-view.fxml" />
+                <Label fx:id="placeholderContent" text="%search.issue.nosearch" wrapText="true" />
+            </StackPane>
         </SplitPane>
     </center>
 </BorderPane>

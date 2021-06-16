@@ -6,72 +6,65 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
-<BorderPane minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.issue.details.fx.IssueDetailsController">
-    <center>
-        <StackPane>
-            <BorderPane fx:id="issueDetailsPanel">
-                <padding>
-                    <Insets bottom="7.0" left="7.0" right="7.0" top="7.0" />
-                </padding>
+<BorderPane fx:id="issueDetailsPane" minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
+    </padding>
 
-                <top>
-                    <Label fx:id="issueSummaryLabel" wrapText="true">
+    <top>
+        <Label fx:id="issueSummaryLabel" wrapText="true">
+            <font>
+                <Font name="System Bold" size="16.0"/>
+            </font>
+        </Label>
+    </top>
+
+    <center>
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+            <WebView fx:id="issueDescriptionWebView"/>
+            <BorderPane.margin>
+                <Insets top="20.0"/>
+            </BorderPane.margin>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <VBox spacing="3.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <BorderPane>
+                <center>
+                    <Label text="Zeitbuchungen" BorderPane.alignment="CENTER_LEFT">
                         <font>
-                            <Font name="System Bold" size="16.0" />
+                            <Font name="System Bold" size="13.0"/>
                         </font>
                     </Label>
-                </top>
-
-                <center>
-                    <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
-                        <WebView fx:id="issueDescriptionWebView" />
-                        <BorderPane.margin>
-                            <Insets top="20.0" />
-                        </BorderPane.margin>
-                    </ScrollPane>
                 </center>
-
-                <bottom>
-                    <VBox spacing="3.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                        <BorderPane>
-                            <center>
-                                <Label text="Zeitbuchungen" BorderPane.alignment="CENTER_LEFT">
-                                    <font>
-                                        <Font name="System Bold" size="13.0" />
-                                    </font>
-                                </Label>
-                            </center>
-                            <!--                <right>-->
-                            <!--                    <HBox BorderPane.alignment="CENTER">-->
-                            <!--                        <Button fx:id="addWorklogButton" mnemonicParsing="false" text="+" />-->
-                            <!--                        <Button fx:id="editWorklogButton" mnemonicParsing="false" text="ED" />-->
-                            <!--                    </HBox>-->
-                            <!--                </right>-->
-                        </BorderPane>
-                        <TableView fx:id="issueWorklogsTableView" prefHeight="200.0">
-                            <columnResizePolicy>
-                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                            </columnResizePolicy>
-                            <columns>
-                                <WorklogDateColumn fx:id="dateColumn" />
-                                <WorklogAuthorColumn />
-                                <WorklogTypeColumn />
-                                <WorklogDescriptionColumn />
-                                <WorklogDurationColumn />
-                                <WorklogActionsColumn />
-                            </columns>
-                            <sortOrder>
-                                <fx:reference source="dateColumn"/>
-                            </sortOrder>
-                        </TableView>
-                        <BorderPane.margin>
-                            <Insets top="20.0" />
-                        </BorderPane.margin>
-                    </VBox>
-                </bottom>
+                <!--                <right>-->
+                <!--                    <HBox BorderPane.alignment="CENTER">-->
+                <!--                        <Button fx:id="addWorklogButton" mnemonicParsing="false" text="+" />-->
+                <!--                        <Button fx:id="editWorklogButton" mnemonicParsing="false" text="ED" />-->
+                <!--                    </HBox>-->
+                <!--                </right>-->
             </BorderPane>
-            <Label fx:id="placeholderContent" text="%dialog.issuesearch.noselection" wrapText="true" />
-        </StackPane>
-    </center>
+            <TableView fx:id="issueWorklogsTableView" prefHeight="200.0">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+                <columns>
+                    <WorklogDateColumn fx:id="dateColumn"/>
+                    <WorklogAuthorColumn/>
+                    <WorklogTypeColumn/>
+                    <WorklogDescriptionColumn/>
+                    <WorklogDurationColumn/>
+                    <WorklogActionsColumn/>
+                </columns>
+                <sortOrder>
+                    <fx:reference source="dateColumn"/>
+                </sortOrder>
+            </TableView>
+            <BorderPane.margin>
+                <Insets top="20.0"/>
+            </BorderPane.margin>
+        </VBox>
+    </bottom>
 
 </BorderPane>
