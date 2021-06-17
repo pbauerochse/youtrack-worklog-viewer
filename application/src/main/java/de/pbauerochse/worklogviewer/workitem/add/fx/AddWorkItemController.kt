@@ -34,7 +34,7 @@ class AddWorkItemController : Initializable {
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         issueTextField.apply {
             disableProperty().bind(model.selectedIssue.isNotNull)
-            textProperty().bind(model.issueId)
+            textProperty().bindBidirectional(model.issueId)
         }
 
         workDateDatePicker.valueProperty().bindBidirectional(model.selectedDate)
