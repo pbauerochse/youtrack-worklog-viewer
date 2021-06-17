@@ -23,6 +23,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Important changes
 * **v2.7.0**  
+  * Added a logo created by [Patrick Marx](https://twitter.com/ptrckmrx)
   * Minor changes to the plugin API
   * New search results view, containing more information
   * Creating new work items dialog now also contains a field for the work type
