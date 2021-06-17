@@ -22,8 +22,13 @@ If you find this tool useful and would like to show me your appreciation [buy me
 * two color schemes: light and dark
 
 # Important changes
-* **v2.6.2**
+* **v2.7.0**  
   * Minor changes to the plugin API
+  * New search results view, containing more information
+  * Creating new work items dialog now also contains a field for the work type
+  * Statistics pane shows graphs depending on the selected grouping criteria
+  * Progressbar shows the current tasks name
+  * Issue details view now also contains the issues fields
 
 * **v2.6.1**
   * Booked time overview in the statistics pane on the "own worklogs" tab
