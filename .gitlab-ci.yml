@@ -1,0 +1,60 @@
+image: docker:latest
+
+cache:
+  paths:
+    - .m2/
+
+stages:
+  - build
+  - verify
+  - package
+
+build:
+  image: maven:3-jdk-11
+  tags:
+    - docker
+  stage: build
+  script: $CI_PROJECT_DIR/mvnw clean compile -P linux
+
+verify:
+  image: maven:3-jdk-11
+  tags:
+    - docker
+  stage: verify
+  script: $CI_PROJECT_DIR/mvnw verify -P linux
+
+build-linux:
+  image: maven:3-jdk-11
+  tags:
+    - docker
+  stage: package
+  script:
+    - $CI_PROJECT_DIR/mvnw clean package -P linux -DskipTests
+  artifacts:
+    expire_in: 1 month
+    paths:
+      - $CI_PROJECT_DIR/application/target/youtrack*-linux-*.jar
+
+build-mac:
+  image: maven:3-jdk-11
+  tags:
+    - docker
+  stage: package
+  script:
+    - $CI_PROJECT_DIR/mvnw clean package -P mac -DskipTests
+  artifacts:
+    expire_in: 1 month
+    paths:
+      - $CI_PROJECT_DIR/application/target/youtrack*-mac-*.jar
+
+build-windows:
+  image: maven:3-jdk-11
+  tags:
+    - docker
+  stage: package
+  script:
+    - $CI_PROJECT_DIR/mvnw clean package -P windows -DskipTests
+  artifacts:
+    expire_in: 1 month
+    paths:
+      - $CI_PROJECT_DIR/application/target/youtrack*-windows-*.jar
