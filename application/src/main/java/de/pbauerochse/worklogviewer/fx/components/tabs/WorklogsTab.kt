@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.fx.components.statistics.StatisticsPane
+import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimeByGroupingCriteriaChart
 import de.pbauerochse.worklogviewer.fx.dialog.Dialog
 import de.pbauerochse.worklogviewer.fx.tasks.ExportToExcelTask
 import de.pbauerochse.worklogviewer.plugins.dialog.FileChooserSpecification
@@ -77,7 +78,7 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
 
             worklogsTableView.update(currentData!!)
 
-            val statistics = getStatistics(currentData!!)
+            val statistics = getStatistics(currentData!!) + getGroupingDependantStatistics(currentData!!)
             statisticsPane.replaceAll(statistics)
         }
     }
@@ -104,6 +105,14 @@ abstract class WorklogsTab(label: String) : Tab(label), TabContext {
                 LOGGER.debug("Exporting tab {} to excel {}", text, it.absoluteFile)
                 Tasks.startTask(ExportToExcelTask(text, currentData!!, it))
             }
+    }
+
+    private fun getGroupingDependantStatistics(reportView: ReportView): List<Node> {
+        return if (reportView.appliedGrouping != null) {
+            listOf(
+                TimeByGroupingCriteriaChart(reportView)
+            )
+        } else emptyList()
     }
 
     override val view: ReportView

@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.view
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
 import de.pbauerochse.worklogviewer.timereport.TimeReportParameters
+import de.pbauerochse.worklogviewer.timereport.view.AppliedGrouping
 import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.timereport.view.ReportView
 import de.pbauerochse.worklogviewer.view.grouping.Grouping
@@ -40,7 +41,8 @@ object ReportViewFactory {
         LOGGER.debug("Converting ${issues.size} Issues for ${reportParameters.timerange} with grouping $grouping to ReportView")
         val groups = grouping.rows(issues).sortedWith(REPORT_ROW_COMPARATOR)
         val summaryReportRow = SummaryReportRow(issues)
-        return ReportView(groups + summaryReportRow, issues, reportParameters)
+        val appliedGrouping = grouping.takeIf { it != NoopGrouping }?.let { AppliedGrouping(it.id, it.label) }
+        return ReportView(groups + summaryReportRow, issues, reportParameters, appliedGrouping)
     }
 
 }

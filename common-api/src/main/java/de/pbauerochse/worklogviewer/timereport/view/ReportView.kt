@@ -10,5 +10,6 @@ import de.pbauerochse.worklogviewer.timereport.TimeReportParameters
 class ReportView(
     val rows: List<ReportRow>,
     val issues: List<IssueWithWorkItems>,
-    val reportParameters: TimeReportParameters
+    val reportParameters: TimeReportParameters,
+    val appliedGrouping: AppliedGrouping?
 )
