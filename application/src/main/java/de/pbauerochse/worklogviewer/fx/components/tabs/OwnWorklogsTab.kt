@@ -28,7 +28,8 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
     override fun getStatistics(reportView: ReportView): List<Node> {
         val dataByUser = TaskCountByUserAndProjectStatisticData(reportView.issues)
         val dataByProject = TaskCountByProjectAndUserStatisticData(reportView.issues)
-        return arrayListOf(
+
+        return listOf(
             TaskCountByUserAndProjectStatistics(dataByUser),
             OvertimeStatisticsPane(reportView),
             TimePerProjectAndUserGraphStatistics(dataByUser),
