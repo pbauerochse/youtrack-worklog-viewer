@@ -8,6 +8,7 @@ import de.pbauerochse.worklogviewer.favourites.events.FavouriteRemovedEvent
 import de.pbauerochse.worklogviewer.favourites.issue.FavouriteIssue
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.timereport.Issue
+import javafx.beans.binding.Bindings
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 
@@ -28,8 +29,8 @@ object FavouritesModel {
 
 
     init {
-        favouriteIssues.setAll(FavouritesService.issues)
-        favouriteSearches.setAll(FavouritesService.searches)
+        Bindings.bindContent(favouriteIssues, FavouritesService.issues)
+        Bindings.bindContent(favouriteSearches, FavouritesService.searches)
         EventBus.subscribe(this)
     }
 
