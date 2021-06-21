@@ -2,17 +2,14 @@ package de.pbauerochse.worklogviewer.search.fx.results
 
 import de.pbauerochse.worklogviewer.search.fx.SearchModel
 import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsModel
-import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsTab
+import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsPane
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.beans.binding.Bindings.createStringBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ListChangeListener
 import javafx.fxml.Initializable
-import javafx.scene.control.Label
-import javafx.scene.control.ListView
-import javafx.scene.control.Tab
-import javafx.scene.control.TabPane
+import javafx.scene.control.*
 import javafx.scene.input.MouseEvent
 import javafx.util.Callback
 import org.slf4j.LoggerFactory
@@ -74,7 +71,10 @@ class SearchResultContentController : Initializable {
     private fun createNewTab(issue: Issue): Tab {
         LOGGER.debug("Adding Tab for $issue")
 
-        val tab = IssueDetailsTab(issue).apply {
+        val tab = Tab(issue.humanReadableId).apply {
+            tooltip = Tooltip(issue.fullTitle)
+            isClosable = true
+            content = IssueDetailsPane(issue)
             setOnCloseRequest { IssueDetailsModel.issuesForDetailsPanel.remove(issue) }
         }
         searchContentPane.tabs.add(tab)
