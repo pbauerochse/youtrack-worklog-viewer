@@ -6,17 +6,24 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
-<BorderPane fx:id="issueDetailsPane" minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="BorderPane" fx:id="issueDetailsPane" minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
     </padding>
 
     <top>
-        <Label fx:id="issueSummaryLabel" wrapText="true">
-            <font>
-                <Font name="System Bold" size="16.0"/>
-            </font>
-        </Label>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" />
+            </padding>
+
+            <Label fx:id="issueSummaryLabel" wrapText="true">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Label>
+            <FlowPane fx:id="issueFieldsPane" VBox.vgrow="SOMETIMES" />
+        </VBox>
     </top>
 
     <center>
@@ -38,12 +45,6 @@
                         </font>
                     </Label>
                 </center>
-                <!--                <right>-->
-                <!--                    <HBox BorderPane.alignment="CENTER">-->
-                <!--                        <Button fx:id="addWorklogButton" mnemonicParsing="false" text="+" />-->
-                <!--                        <Button fx:id="editWorklogButton" mnemonicParsing="false" text="ED" />-->
-                <!--                    </HBox>-->
-                <!--                </right>-->
             </BorderPane>
             <TableView fx:id="issueWorklogsTableView" prefHeight="200.0">
                 <columnResizePolicy>
@@ -67,4 +68,4 @@
         </VBox>
     </bottom>
 
-</BorderPane>
+</fx:root>
