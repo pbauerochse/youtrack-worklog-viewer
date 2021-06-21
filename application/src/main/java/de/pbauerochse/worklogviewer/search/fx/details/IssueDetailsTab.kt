@@ -38,7 +38,6 @@ class IssueDetailsTab(private val issue: Issue) : Tab(issue.humanReadableId), In
         isClosable = true
         tooltip = Tooltip(issue.fullTitle)
 
-        // slow as hell!! optimize me
         val loader = FXMLLoader(IssueDetailsTab::class.java.getResource("/fx/views/issue-details.fxml"))
         loader.setController(this)
         loader.load<BorderPane>()
