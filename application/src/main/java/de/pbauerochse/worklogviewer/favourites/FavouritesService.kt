@@ -9,63 +9,69 @@ import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.tasks.Tasks
 import de.pbauerochse.worklogviewer.timereport.Issue
+import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 
 /**
  * Service for managing [Issue]s and Searches marked as favourite
  */
 object FavouritesService {
 
-    private val favouriteIssues: MutableList<FavouriteIssue> by lazy {
-        val storedIssues = SettingsUtil.settings.favourites.issues
-        val loadDetailsTask = LoadFavouriteIssuesDetailsTask(storedIssues)
+    val issues: ObservableList<FavouriteIssue> = FXCollections.observableArrayList()
+    val searches: ObservableList<FavouriteSearch> = FXCollections.observableArrayList()
 
-        val issuesFuture = Tasks.startBackgroundTask(loadDetailsTask)
-        val results = issuesFuture.get()
-
-        return@lazy results.toMutableList()
+    init {
+        loadFavouriteIssues()
+        loadFavouriteSearches()
     }
 
-    private val favouriteSearches: MutableList<FavouriteSearch> = SettingsUtil.settings.favourites.searches
-        .map { FavouriteSearch(it.name, it.query) }
-        .toMutableList()
+    private fun loadFavouriteIssues() {
+        val storedIssues = SettingsUtil.settings.favourites.issues
+        val loadDetailsTask = LoadFavouriteIssuesDetailsTask(storedIssues).apply {
+            setOnSucceeded { issues.setAll(this.value) }
+        }
+        Tasks.startBackgroundTask(loadDetailsTask)
+    }
 
-    val issues: List<FavouriteIssue>
-        get() = favouriteIssues.toList()
-
-    val searches: List<FavouriteSearch>
-        get() = favouriteSearches.toList()
+    private fun loadFavouriteSearches() {
+        searches.setAll(
+            SettingsUtil.settings.favourites.searches
+                .map { FavouriteSearch(it.name, it.query) }
+                .toMutableList()
+        )
+    }
 
     fun addFavourite(issue: Issue) {
         if (!isFavourite(issue)) {
             val favourite = FavouriteIssue(issue)
-            favouriteIssues.add(favourite)
+            issues.add(favourite)
             EventBus.publish(FavouriteAddedEvent.forIssue(favourite))
         }
     }
 
     fun addFavourite(search: FavouriteSearch) {
-        if (!favouriteSearches.contains(search)) {
-            favouriteSearches.add(search)
+        if (!searches.contains(search)) {
+            searches.add(search)
             EventBus.publish(FavouriteAddedEvent.forSearch(search))
         }
     }
 
     fun isFavourite(issue: Issue): Boolean {
-        return favouriteIssues.any { it.issue.id == issue.id }
+        return issues.any { it.issue.id == issue.id }
     }
 
     fun removeFavourite(issue: Issue) {
-        val favourite = favouriteIssues.find { it.issue.id == issue.id }
+        val favourite = issues.find { it.issue.id == issue.id }
 
         if (favourite != null) {
-            favouriteIssues.remove(favourite)
-            EventBus.publish(FavouriteRemovedEvent.forIssue(favourite, favouriteIssues, favouriteSearches))
+            issues.remove(favourite)
+            EventBus.publish(FavouriteRemovedEvent.forIssue(favourite, issues, searches))
         }
     }
 
     fun removeFavourite(search: FavouriteSearch) {
-        if (favouriteSearches.remove(search)) {
-            EventBus.publish(FavouriteRemovedEvent.forSearch(search, favouriteIssues, favouriteSearches))
+        if (searches.remove(search)) {
+            EventBus.publish(FavouriteRemovedEvent.forSearch(search, issues, searches))
         }
     }
 
