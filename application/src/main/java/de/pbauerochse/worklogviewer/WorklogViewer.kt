@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer
 
 import de.pbauerochse.worklogviewer.fx.theme.ThemeChangeListener
+import de.pbauerochse.worklogviewer.preloader.Preloader
 import de.pbauerochse.worklogviewer.settings.SettingsUtil.saveSettings
 import de.pbauerochse.worklogviewer.settings.SettingsUtil.settings
 import de.pbauerochse.worklogviewer.settings.SettingsUtil.settingsViewModel
@@ -40,11 +41,13 @@ class WorklogViewer : Application() {
         LOGGER.info("Default TimeZone: {}", TimeZone.getDefault().toZoneId())
         LOGGER.info("Theme: {}", settings.theme)
 
+        Preloader.preload()
+
         val loader = FXMLLoader(StandardCharsets.UTF_8).apply {
             resources = FormattingUtil.RESOURCE_BUNDLE
         }
 
-        val root = classPathResource("/fx/views/main.fxml").use {
+        val root = classPathResource("/fx/views/main.fxml")!!.use {
             loader.load<Parent>(it)
         }
 
@@ -57,9 +60,9 @@ class WorklogViewer : Application() {
         primaryStage = stage.apply {
             title = "YouTrack Worklog Viewer ${FormattingUtil.getFormatted("release.version")}"
             icons.addAll(listOf(
-                classPathResource("/fx/img/icons/logo-128.png").use { Image(it) },
-                classPathResource("/fx/img/icons/logo-64.png").use { Image(it) },
-                classPathResource("/fx/img/icons/logo-32.png").use { Image(it) }
+                classPathResource("/fx/img/icons/logo-128.png")!!.use { Image(it) },
+                classPathResource("/fx/img/icons/logo-64.png")!!.use { Image(it) },
+                classPathResource("/fx/img/icons/logo-32.png")!!.use { Image(it) }
             ))
             scene = mainScene
 
@@ -87,7 +90,7 @@ class WorklogViewer : Application() {
         primaryStage.fireEvent(WindowEvent(primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST))
     }
 
-    private fun classPathResource(resource: String): InputStream = WorklogViewer::class.java.getResource(resource).openStream()
+    private fun classPathResource(resource: String): InputStream? = WorklogViewer::class.java.getResource(resource)?.openStream()
 
     companion object {
         private val LOGGER = LoggerFactory.getLogger(WorklogViewer::class.java)
