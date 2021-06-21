@@ -59,7 +59,7 @@
                     <WorklogActionsColumn/>
                 </columns>
                 <sortOrder>
-                    <fx:reference source="dateColumn"/>
+                    <fx:reference source="dateColumn" sortType="DESCENDING" />
                 </sortOrder>
             </TableView>
             <BorderPane.margin>

@@ -53,7 +53,10 @@ class IssueDetailsPane(private val issue: Issue): BorderPane(), Initializable {
 
     private fun loadIssueWorkItems() {
         val task = FetchWorkItemsForIssueTask(issue).apply {
-            onSucceeded = EventHandler { workItems.setAll(this.value.workItems) }
+            onSucceeded = EventHandler {
+                val sortedByDateDescending = this.value.workItems.sortedByDescending { it.workDateAtLocalZone }
+                workItems.setAll(sortedByDateDescending)
+            }
         }
         Tasks.startBackgroundTask(task)
     }
