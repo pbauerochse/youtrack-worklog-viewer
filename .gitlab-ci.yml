@@ -57,4 +57,4 @@ build-windows:
   artifacts:
     expire_in: 1 month
     paths:
-      - $CI_PROJECT_DIR/application/target/youtrack*-windows-*.jar
+      - $CI_PROJECT_DIR/application/target/youtrack*-win-*.jar
