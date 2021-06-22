@@ -1,5 +1,7 @@
 package de.pbauerochse.worklogviewer.timereport.fx.table.columns.context
 
+import de.pbauerochse.worklogviewer.details.events.ShowIssueDetailsRequestEvent
+import de.pbauerochse.worklogviewer.events.EventBus
 import de.pbauerochse.worklogviewer.favourites.FavouritesService
 import de.pbauerochse.worklogviewer.favourites.fx.FavouritesModel
 import de.pbauerochse.worklogviewer.openInBrowser
@@ -23,6 +25,10 @@ class IssueCellContextMenu(private val issue: Issue, private val date: LocalDate
         val openIssueInBrowserMenu = MenuItem(getFormatted("contextmenu.issue.openinyoutrack", issue.humanReadableId))
         openIssueInBrowserMenu.onAction = EventHandler { issue.externalUrl.openInBrowser() }
         items.add(openIssueInBrowserMenu)
+
+        val openIssueInDetailsPaneMenu = MenuItem(getFormatted("contextmenu.issue.openindetails", issue.humanReadableId))
+        openIssueInDetailsPaneMenu.onAction = EventHandler { EventBus.publish(ShowIssueDetailsRequestEvent(issue)) }
+        items.add(openIssueInDetailsPaneMenu)
 
         val addWorkItemForIssueMenu = MenuItem(getFormatted("contextmenu.issue.addworkitem", issue.humanReadableId))
         addWorkItemForIssueMenu.onAction = EventHandler { showAddWorkItemToIssueDialog() }

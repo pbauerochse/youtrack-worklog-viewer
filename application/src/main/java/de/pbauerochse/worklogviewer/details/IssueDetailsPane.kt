@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.search.fx.details
+package de.pbauerochse.worklogviewer.details
 
 import de.pbauerochse.worklogviewer.fx.Theme
 import de.pbauerochse.worklogviewer.fx.issuesearch.WebViewSanitizer

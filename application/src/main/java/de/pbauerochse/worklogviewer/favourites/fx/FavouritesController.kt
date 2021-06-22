@@ -1,11 +1,12 @@
 package de.pbauerochse.worklogviewer.favourites.fx
 
+import de.pbauerochse.worklogviewer.details.events.ShowIssueDetailsRequestEvent
+import de.pbauerochse.worklogviewer.events.EventBus
 import de.pbauerochse.worklogviewer.favourites.issue.FavouriteIssue
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import de.pbauerochse.worklogviewer.fx.issuesearch.SavedSearchContextMenu
 import de.pbauerochse.worklogviewer.search.fx.Search
-import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsModel
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.util.FormattingUtil
@@ -120,7 +121,7 @@ class FavouritesController : Initializable {
 
     private fun showIssueDetails(issue: Issue) {
         LOGGER.info("Selected issue ${issue.fullTitle}")
-        IssueDetailsModel.showDetails(issue)
+        EventBus.publish(ShowIssueDetailsRequestEvent(issue))
     }
 
     companion object {

@@ -14,6 +14,7 @@ object EventBus {
     /**
      *
      */
+    @JvmStatic
     fun publish(event: Any) {
         val eventClass = event.javaClass
         subscribers
@@ -24,6 +25,7 @@ object EventBus {
             }
     }
 
+    @JvmStatic
     fun subscribe(subscriber: Any) {
         getAllMethods(subscriber)
             .filter { it.isAnnotationPresent(Subscribe::class.java) }
