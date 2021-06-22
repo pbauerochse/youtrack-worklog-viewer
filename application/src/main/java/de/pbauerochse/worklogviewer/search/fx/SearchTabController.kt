@@ -1,9 +1,9 @@
 package de.pbauerochse.worklogviewer.search.fx
 
+import de.pbauerochse.worklogviewer.details.IssueDetailsModel
 import de.pbauerochse.worklogviewer.favourites.FavouritesService
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
 import de.pbauerochse.worklogviewer.fx.issuesearch.savedsearch.EditFavouriteSearchDialog
-import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsModel
 import javafx.beans.binding.Bindings
 import javafx.event.EventHandler
 import javafx.fxml.Initializable

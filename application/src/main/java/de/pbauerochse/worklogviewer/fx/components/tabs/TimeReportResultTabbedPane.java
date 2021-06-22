@@ -1,5 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.components.tabs;
 
+import de.pbauerochse.worklogviewer.details.events.ShowIssueDetailsRequestEvent;
+import de.pbauerochse.worklogviewer.events.EventBus;
+import de.pbauerochse.worklogviewer.events.Subscribe;
 import de.pbauerochse.worklogviewer.settings.SettingsUtil;
 import de.pbauerochse.worklogviewer.settings.SettingsViewModel;
 import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems;
@@ -31,6 +34,7 @@ public class TimeReportResultTabbedPane extends TabPane {
 
     public TimeReportResultTabbedPane() {
         getTabs().add(new IssueSearchTab());
+        EventBus.subscribe(this);
     }
 
     /**
@@ -131,6 +135,11 @@ public class TimeReportResultTabbedPane extends TabPane {
             return (WorklogsTab) selectedTab;
         }
         return null;
+    }
+
+    @Subscribe
+    public void onShowIssueDetailsRequest(ShowIssueDetailsRequestEvent event) {
+        showSearchTab();
     }
 
 }

@@ -1,8 +1,8 @@
 package de.pbauerochse.worklogviewer.fx.state
 
+import de.pbauerochse.worklogviewer.details.FetchWorkItemsForIssueTask
 import de.pbauerochse.worklogviewer.events.EventBus
 import de.pbauerochse.worklogviewer.events.Subscribe
-import de.pbauerochse.worklogviewer.search.fx.details.FetchWorkItemsForIssueTask
 import de.pbauerochse.worklogviewer.tasks.Tasks
 import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
 import de.pbauerochse.worklogviewer.timereport.TimeReport

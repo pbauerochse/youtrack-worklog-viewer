@@ -1,8 +1,11 @@
 package de.pbauerochse.worklogviewer.search.fx.results
 
+import de.pbauerochse.worklogviewer.details.IssueDetailsModel
+import de.pbauerochse.worklogviewer.details.IssueDetailsPane
+import de.pbauerochse.worklogviewer.details.events.CloseIssueDetailsRequestEvent
+import de.pbauerochse.worklogviewer.details.events.ShowIssueDetailsRequestEvent
+import de.pbauerochse.worklogviewer.events.EventBus
 import de.pbauerochse.worklogviewer.search.fx.SearchModel
-import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsModel
-import de.pbauerochse.worklogviewer.search.fx.details.IssueDetailsPane
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.beans.binding.Bindings.createStringBinding
@@ -50,7 +53,7 @@ class SearchResultContentController : Initializable {
             cellFactory = Callback { SearchResultListViewItem() }
             selectionModel.selectedItemProperty().addListener { _, oldValue, newValue ->
                 LOGGER.info("Selection $oldValue, $newValue")
-                newValue?.let { IssueDetailsModel.showDetails(it) }
+                newValue?.let { EventBus.publish(ShowIssueDetailsRequestEvent(it)) }
             }
         }
 
@@ -76,7 +79,7 @@ class SearchResultContentController : Initializable {
             tooltip = Tooltip(issue.fullTitle)
             isClosable = true
             content = IssueDetailsPane(issue)
-            setOnClosed { IssueDetailsModel.remove(issue) }
+            setOnClosed { EventBus.publish(CloseIssueDetailsRequestEvent(issue)) }
             contextMenu = createTabContextMenu(this)
         }
 

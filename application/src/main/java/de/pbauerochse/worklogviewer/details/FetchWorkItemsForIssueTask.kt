@@ -1,4 +1,4 @@
-package de.pbauerochse.worklogviewer.search.fx.details
+package de.pbauerochse.worklogviewer.details
 
 import de.pbauerochse.worklogviewer.datasource.DataSources
 import de.pbauerochse.worklogviewer.tasks.Progress
