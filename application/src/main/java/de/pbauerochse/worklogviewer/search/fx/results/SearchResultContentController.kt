@@ -8,6 +8,7 @@ import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.beans.binding.Bindings.createStringBinding
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.ListChangeListener
+import javafx.event.Event
 import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.input.MouseEvent
@@ -75,10 +76,39 @@ class SearchResultContentController : Initializable {
             tooltip = Tooltip(issue.fullTitle)
             isClosable = true
             content = IssueDetailsPane(issue)
-            setOnCloseRequest { IssueDetailsModel.issuesForDetailsPanel.remove(issue) }
+            setOnClosed { IssueDetailsModel.remove(issue) }
+            contextMenu = createTabContextMenu(this)
         }
+
         searchContentPane.tabs.add(tab)
         return tab
+    }
+
+    private fun createTabContextMenu(tab: Tab) = ContextMenu(
+        MenuItem(getFormatted("search.results.details.tab.close.all")).apply {
+            setOnAction { closeDetailTabs() }
+        },
+        MenuItem(getFormatted("search.results.details.tab.close.left", tab.text)).apply {
+            setOnAction { closeDetailTabs { searchContentPane.tabs.indexOf(it) < searchContentPane.tabs.indexOf(tab) } }
+        },
+        MenuItem(getFormatted("search.results.details.tab.close.right", tab.text)).apply {
+            setOnAction { closeDetailTabs { searchContentPane.tabs.indexOf(it) > searchContentPane.tabs.indexOf(tab) } }
+        },
+        MenuItem(getFormatted("search.results.details.tab.close.other")).apply {
+            setOnAction { closeDetailTabs { it != tab } }
+        }
+    )
+
+    private fun closeDetailTabs(filter: (tab: Tab) -> Boolean = { true }) {
+        val tabsToClose = searchContentPane.tabs
+            .filter { it.isClosable }
+            .filter { filter.invoke(it) }
+            .onEach {
+                LOGGER.debug("Closing Tab ${it.text}")
+                it.onClosed?.handle(Event(it, it, Tab.TAB_CLOSE_REQUEST_EVENT))
+            }
+
+        searchContentPane.tabs.removeAll(tabsToClose)
     }
 
 
