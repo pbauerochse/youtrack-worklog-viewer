@@ -45,6 +45,11 @@
                         </font>
                     </Label>
                 </center>
+                <right>
+                    <HBox BorderPane.alignment="CENTER">
+                        <Button fx:id="createWorkItemButton" />
+                    </HBox>
+                </right>
             </BorderPane>
             <TableView fx:id="issueWorklogsTableView" prefHeight="200.0">
                 <columnResizePolicy>
