@@ -27,10 +27,13 @@ object FavouritesService {
 
     private fun loadFavouriteIssues() {
         val storedIssues = SettingsUtil.settings.favourites.issues
-        val loadDetailsTask = LoadFavouriteIssuesDetailsTask(storedIssues).apply {
-            setOnSucceeded { issues.setAll(this.value) }
+
+        if (storedIssues.isNotEmpty()) {
+            val loadDetailsTask = LoadFavouriteIssuesDetailsTask(storedIssues).apply {
+                setOnSucceeded { issues.setAll(this.value) }
+            }
+            Tasks.startBackgroundTask(loadDetailsTask)
         }
-        Tasks.startBackgroundTask(loadDetailsTask)
     }
 
     private fun loadFavouriteSearches() {
