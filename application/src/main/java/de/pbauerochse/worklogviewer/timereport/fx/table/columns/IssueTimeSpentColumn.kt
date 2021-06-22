@@ -109,11 +109,23 @@ private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData
     }
 
     private fun handleIssue(date: LocalDate, row: IssueReportRow) {
+
+        val workItemsForDate = row.issueWithWorkItems.getWorkItemsForDate(date)
+        val workItemsAsString = workItemsForDate.joinToString(prefix = "\n\n", separator = "\n") { workItem ->
+            listOfNotNull(
+                workItem.owner.label,
+                formatMinutes(workItem.durationInMinutes),
+                workItem.workType?.label,
+                workItem.description.takeIf { it.isNotBlank() }
+            ).joinToString(separator = " - ")
+        }
+
         contextMenu = IssueCellContextMenu(row.issueWithWorkItems.issue, date)
-        val timeSpentInMinutes = row.issueWithWorkItems.getWorkItemsForDate(date).sumOf { it.durationInMinutes }
+
+        val timeSpentInMinutes = workItemsForDate.sumOf { it.durationInMinutes }
         if (timeSpentInMinutes > 0) {
             text = formatMinutes(timeSpentInMinutes)
-            tooltip = Tooltip("${tableColumn.text} - ${row.issueWithWorkItems.issue.humanReadableId} : $text")
+            tooltip = Tooltip("${row.issueWithWorkItems.issue.fullTitle}\n\n${tableColumn.text} : $text$workItemsAsString")
             styleClass.add(TIMESPENT_CELL)
         }
     }
