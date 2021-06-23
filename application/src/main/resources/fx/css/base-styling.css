@@ -131,10 +131,11 @@ Text {
 .search-result-issue.resolved .issue-id,
 .search-result-issue.resolved .issue-title {
     -fx-strikethrough: true;
+    -fx-fill: derive(-fx-text-background-color, -20%);
 }
 
 .search-result-issue .issue-id, .search-result-issue .issue-title {
-    -fx-font-size: 16.0;
+    -fx-font-size: 14.0;
 }
 
 .search-result-issue .issue-fields {
