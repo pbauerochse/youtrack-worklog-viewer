@@ -72,6 +72,10 @@ class Settings {
     var isOvertimeStatisticsIgnoreWithoutTimeEntries = false
     var isOvertimeStatisticsIgnoreToday = false
 
+    var isShowTagsInSearchResults: Boolean = true
+    var isShowFieldsInSearchResults: Boolean = true
+    var isShowDescriptionInSearchResults: Boolean = false
+
     @JsonSerialize(using = WeekdaySettingsSerializer::class)
     @JsonDeserialize(using = WeekdaySettingsDeserializer::class)
     var collapseState = WeekdaySettings(SATURDAY, SUNDAY)

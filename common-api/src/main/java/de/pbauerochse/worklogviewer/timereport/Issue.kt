@@ -38,9 +38,23 @@ interface Issue: Comparable<Issue> {
     val title: String
 
     /**
-     * The description of the [Issue]
+     * The description of the [Issue] which may contain
+     * HTML Markup
      */
-    val description: String
+    val descriptionWithHtmlMarkup: String
+
+    /**
+     * The description of the [Issue] with all
+     * HTML Tags stripped.
+     */
+    val descriptionPlaintext: String
+        get() = descriptionWithHtmlMarkup
+            .replace("\n", "")
+            .replace("</li>", "\n")
+            .replace("<li>", "- ")
+            .replace("</p>", "\n\n")
+            .replace("<br/>", "\n")
+            .replace(Regex("<[^>]*>"), "")
 
     /**
      * The [Project] this [Issue] belongs to

@@ -20,7 +20,7 @@ class IssueAdapter(
     override val humanReadableId: String = youtrackIssue.idReadable
     override val issueNumber: Long = humanReadableId.substringAfterLast('-').toLong()
     override val title: String = youtrackIssue.summary ?: youtrackIssue.idReadable
-    override val description: String = youtrackIssue.description
+    override val descriptionWithHtmlMarkup: String = youtrackIssue.description
     override val project: Project = youtrackIssue.project?.let { Project(it.id, it.name ?: it.id, it.shortName ?: it.id) } ?: UNKNOWN_PROJECT
     override val resolutionDate: ZonedDateTime? = youtrackIssue.resolveDate
     override val tags: List<Tag> = youtrackIssue.tags.map { Tag(label = it.name, backgroundColor = it.color.backgroundColor, foregroundColor = it.color.foregroundColor) }

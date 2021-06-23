@@ -85,18 +85,20 @@ class WorklogViewer : Application() {
     }
 
     /**
-     * MacOS does not show the icon in the dock..this might be a workaround
+     * MacOS does not show the icon in the dock
+     *
+     * Causes a "Gdk-WARNING **: 12:55:57.537: XSetErrorHandler() called with a GDK error trap pushed. Don't do that."
+     * Warning on GTK3...don't know how to get rid of it, yet
      */
     private fun setDockAndTaskbarIcon() {
         Platform.runLater {
-            try {
-                val icon = Toolkit.getDefaultToolkit().getImage(WorklogViewer::class.java.getResource("/fx/img/icons/logo-128.png"))
-                val taskbar = Taskbar.getTaskbar()
-                taskbar?.iconImage = icon
-            } catch (e: UnsupportedOperationException) {
-                LOGGER.info("Taskbar is not supported on current platform. Not setting Taskbar Icon")
-            } catch (e: Exception) {
-                LOGGER.warn("Could not set Taskbar image", e)
+            if (Taskbar.isTaskbarSupported()) {
+                try {
+                    val icon = Toolkit.getDefaultToolkit().getImage(WorklogViewer::class.java.getResource("/fx/img/icons/logo-128.png"))
+                    Taskbar.getTaskbar()?.iconImage = icon
+                } catch (e: Exception) {
+                    LOGGER.warn("Could not set Taskbar image", e)
+                }
             }
         }
     }
