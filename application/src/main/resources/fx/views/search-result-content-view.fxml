@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.search.fx.results.SearchResultContentController">
 
@@ -19,11 +19,25 @@
     </top>
 
     <center>
+
         <TabPane fx:id="searchContentPane">
             <Tab fx:id="searchResultsTab" closable="false" text="%search.results.tab.title">
-                <ListView fx:id="searchResultsListView" />
+                <VBox>
+                    <FlowPane hgap="15.0">
+                        <padding>
+                            <Insets topRightBottomLeft="7.0" />
+                        </padding>
+
+                        <CheckBox fx:id="showIssueTagsCheckbox" text="%search.results.show.tags" />
+                        <CheckBox fx:id="showIssueFieldsCheckbox" text="%search.results.show.fields" />
+                        <CheckBox fx:id="showIssueDescriptionCheckbox" text="%search.results.show.description" />
+
+                    </FlowPane>
+                    <ListView fx:id="searchResultsListView" VBox.vgrow="ALWAYS"/>
+                </VBox>
             </Tab>
         </TabPane>
+
     </center>
 
 </BorderPane>

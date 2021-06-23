@@ -123,7 +123,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
                 override val humanReadableId: String = issueId
                 override val externalUrl: URL = URL("http://localhost/issue/$issueId")
                 override val title: String = issueDescription
-                override val description: String = issueDescription
+                override val descriptionWithHtmlMarkup: String = issueDescription
                 override val project: Project = project
                 override val resolutionDate: ZonedDateTime? = resolveDate?.atZone(ZoneId.systemDefault())
                 override val fields: List<Field> = issueFields

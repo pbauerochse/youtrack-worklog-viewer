@@ -9,7 +9,9 @@
                 <Text fx:id="issueIdLabel" styleClass="issue-id" HBox.hgrow="NEVER" />
                 <Text fx:id="issueTitleLabel" styleClass="issue-title" HBox.hgrow="ALWAYS" />
             </HBox>
+            <FlowPane fx:id="tagsFlowPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="issue-tags" hgap="5.0" vgap="3.0" VBox.vgrow="SOMETIMES" />
             <FlowPane fx:id="fieldsFlowPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="issue-fields" vgap="3.0" VBox.vgrow="SOMETIMES" />
+            <Text fx:id="issueDescriptionLabel" styleClass="issue-description" />
         </VBox>
     </center>
 </BorderPane>

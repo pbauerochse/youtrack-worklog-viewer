@@ -6,6 +6,7 @@ import de.pbauerochse.worklogviewer.details.events.CloseIssueDetailsRequestEvent
 import de.pbauerochse.worklogviewer.details.events.ShowIssueDetailsRequestEvent
 import de.pbauerochse.worklogviewer.events.EventBus
 import de.pbauerochse.worklogviewer.search.fx.SearchModel
+import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.beans.binding.Bindings.createStringBinding
@@ -29,9 +30,17 @@ class SearchResultContentController : Initializable {
     lateinit var searchResultsTab: Tab
     lateinit var searchResultsListView: ListView<Issue>
 
+    lateinit var showIssueTagsCheckbox: CheckBox
+    lateinit var showIssueFieldsCheckbox: CheckBox
+    lateinit var showIssueDescriptionCheckbox: CheckBox
+
     private val searchTriggeredBinding = SearchModel.searchTerm.isNotEmpty
 
     override fun initialize(url: URL?, resourceBundle: ResourceBundle?) {
+        showIssueTagsCheckbox.selectedProperty().bindBidirectional(SettingsUtil.settingsViewModel.showTagsInSearchResults)
+        showIssueFieldsCheckbox.selectedProperty().bindBidirectional(SettingsUtil.settingsViewModel.showFieldsInSearchResults)
+        showIssueDescriptionCheckbox.selectedProperty().bindBidirectional(SettingsUtil.settingsViewModel.showDescriptionInSearchResults)
+
         searchTermLabel.apply {
             textProperty().bind(createStringBinding({ getFormatted("search.results.term", SearchModel.searchTerm.value) }, SearchModel.searchTerm))
             visibleProperty().bind(searchTriggeredBinding)
@@ -50,7 +59,7 @@ class SearchResultContentController : Initializable {
                     it.consume()
                 }
             }
-            cellFactory = Callback { SearchResultListViewItem() }
+            cellFactory = Callback { createSearchResultListViewItem() }
             selectionModel.selectedItemProperty().addListener { _, oldValue, newValue ->
                 LOGGER.info("Selection $oldValue, $newValue")
                 newValue?.let { EventBus.publish(ShowIssueDetailsRequestEvent(it)) }
@@ -101,6 +110,19 @@ class SearchResultContentController : Initializable {
             setOnAction { closeDetailTabs { it != tab } }
         }
     )
+
+    private fun createSearchResultListViewItem(): SearchResultListViewItem {
+        return SearchResultListViewItem().apply {
+            fieldsFlowPane.visibleProperty().bind(showIssueFieldsCheckbox.selectedProperty())
+            fieldsFlowPane.managedProperty().bind(showIssueFieldsCheckbox.selectedProperty())
+
+            tagsFlowPane.visibleProperty().bind(showIssueTagsCheckbox.selectedProperty())
+            tagsFlowPane.managedProperty().bind(showIssueTagsCheckbox.selectedProperty())
+
+            issueDescriptionLabel.visibleProperty().bind(showIssueDescriptionCheckbox.selectedProperty())
+            issueDescriptionLabel.managedProperty().bind(showIssueDescriptionCheckbox.selectedProperty())
+        }
+    }
 
     private fun closeDetailTabs(filter: (tab: Tab) -> Boolean = { true }) {
         val tabsToClose = searchContentPane.tabs

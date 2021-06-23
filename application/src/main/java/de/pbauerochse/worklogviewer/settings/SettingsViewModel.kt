@@ -52,6 +52,11 @@ class SettingsViewModel internal constructor(val settings: Settings) {
     val highlightStateSaturdayProperty = SimpleBooleanProperty()
     val highlightStateSundayProperty = SimpleBooleanProperty()
 
+    // search result
+    val showTagsInSearchResults = SimpleBooleanProperty()
+    val showFieldsInSearchResults = SimpleBooleanProperty()
+    val showDescriptionInSearchResults = SimpleBooleanProperty()
+
     val hasMissingConnectionSettings = hasMissingConnectionSettingsBinding
 
     // shortcuts
@@ -105,6 +110,10 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         settings.highlightState.set(SATURDAY, highlightStateSaturdayProperty.get())
         settings.highlightState.set(SUNDAY, highlightStateSundayProperty.get())
 
+        settings.isShowTagsInSearchResults = showTagsInSearchResults.get()
+        settings.isShowFieldsInSearchResults = showFieldsInSearchResults.get()
+        settings.isShowDescriptionInSearchResults = showDescriptionInSearchResults.get()
+
         settings.shortcuts.fetchWorklogs = fetchWorklogsKeyboardCombination.get()?.name
         settings.shortcuts.showIssueSearch = showIssueSearchKeyboardCombination.get()?.name
         settings.shortcuts.toggleStatistics = toggleStatisticsKeyboardCombination.get()?.name
@@ -153,6 +162,10 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         highlightStateSaturdayProperty.set(settings.highlightState.isSet(SATURDAY))
         highlightStateSundayProperty.set(settings.highlightState.isSet(SUNDAY))
 
+        showTagsInSearchResults.set(settings.isShowTagsInSearchResults)
+        showFieldsInSearchResults.set(settings.isShowFieldsInSearchResults)
+        showDescriptionInSearchResults.set(settings.isShowDescriptionInSearchResults)
+
         settings.shortcuts.fetchWorklogs?.let { fetchWorklogsKeyboardCombination.set(KeyCombination.valueOf(it)) }
         settings.shortcuts.showIssueSearch?.let { showIssueSearchKeyboardCombination.set(KeyCombination.valueOf(it)) }
         settings.shortcuts.toggleStatistics?.let { toggleStatisticsKeyboardCombination.set(KeyCombination.valueOf(it)) }
@@ -188,6 +201,10 @@ class SettingsViewModel internal constructor(val settings: Settings) {
         overtimeStatisticsIgnoreWeekendsProperty.addListener(invokeSetter { settings.isOvertimeStatisticsIgnoreWeekends = it })
         overtimeStatisticsIgnoreWithoutTimeEntriesProperty.addListener(invokeSetter { settings.isOvertimeStatisticsIgnoreWithoutTimeEntries = it })
         overtimeStatisticsIgnoreTodayProperty.addListener(invokeSetter { settings.isOvertimeStatisticsIgnoreToday = it })
+
+        showFieldsInSearchResults.addListener(invokeSetter { settings.isShowFieldsInSearchResults = it })
+        showTagsInSearchResults.addListener(invokeSetter { settings.isShowTagsInSearchResults = it })
+        showDescriptionInSearchResults.addListener(invokeSetter { settings.isShowDescriptionInSearchResults = it })
 
         statisticsPaneDividerPosition.addListener(invokeSetter { settings.statisticsPaneDividerPosition = it.toDouble() })
     }
