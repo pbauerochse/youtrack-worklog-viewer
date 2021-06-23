@@ -166,3 +166,9 @@ Text {
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.5) , 10, 0.0 , 0 , 3 );
     -fx-font-size: 0.85em;
 }
+
+.issue-tag {
+    -fx-font-size: 11.0;
+    -fx-padding: 3px 5px 3px 5px;
+    -fx-background-radius: 3px;
+}

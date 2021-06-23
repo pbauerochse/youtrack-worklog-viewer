@@ -8,6 +8,7 @@ import de.pbauerochse.worklogviewer.search.fx.results.SearchResultIssueField
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.tasks.Tasks
 import de.pbauerochse.worklogviewer.timereport.Issue
+import de.pbauerochse.worklogviewer.timereport.Tag
 import de.pbauerochse.worklogviewer.timereport.WorkItem
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.workitem.add.event.WorkItemAddedEvent
@@ -32,6 +33,7 @@ import java.util.*
 class IssueDetailsPane(private val issue: Issue) : BorderPane(), Initializable {
 
     lateinit var issueSummaryLabel: Label
+    lateinit var issueTagsPane: FlowPane
     lateinit var issueFieldsPane: FlowPane
     lateinit var issueDescriptionWebView: WebView
     lateinit var issueWorklogsTableView: TableView<WorkItem>
@@ -60,11 +62,26 @@ class IssueDetailsPane(private val issue: Issue) : BorderPane(), Initializable {
             itemsProperty().bind(SimpleObjectProperty(workItems))
         }
         issue.fields.forEach { issueFieldsPane.children.add(SearchResultIssueField(it)) }
+        issue.tags.forEach { issueTagsPane.children.add(createTagLabel(it)) }
 
         SettingsUtil.settingsViewModel.themeProperty.addListener { _, _, newValue -> updateWebviewStyleSheet(newValue) }
 
         updateWebviewStyleSheet(SettingsUtil.settings.theme)
         loadIssueWorkItems()
+    }
+
+    private fun createTagLabel(tag: Tag): Label {
+        val styles = listOfNotNull(
+            tag.backgroundColorHex?.let { "-fx-background-color: $it;" },
+            tag.foregroundColorHex?.let { "-fx-fill: $it;" },
+            tag.foregroundColorHex?.let { "-fx-text-fill: $it;" }
+        )
+        .joinToString(separator = "\n")
+
+        return Label(tag.label).apply {
+            style = styles
+            styleClass.add("issue-tag")
+        }
     }
 
     @Subscribe

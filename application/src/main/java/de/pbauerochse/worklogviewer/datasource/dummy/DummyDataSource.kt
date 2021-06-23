@@ -116,6 +116,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
             val resolved = Random.nextBoolean()
             val resolveDate = if (resolved) LocalDateTime.now() else null
             val issueFields = fieldsWithValues(project.possibleFields)
+            val tags = randomTags(Random.nextInt(3, 10))
             return@map object : Issue {
                 override val id: String = issueId
                 override val issueNumber: Long = it.toLong()
@@ -126,6 +127,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
                 override val project: Project = project
                 override val resolutionDate: ZonedDateTime? = resolveDate?.atZone(ZoneId.systemDefault())
                 override val fields: List<Field> = issueFields
+                override val tags: List<Tag> = tags
             }
         }
     }
@@ -146,7 +148,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
                 override val durationInMinutes: Long = durationInMinutes
                 override val description: String = ""
                 override val workType: WorkItemType? = workType
-                override val belongsToCurrentUser: Boolean = false
+                override val belongsToCurrentUser: Boolean = user.id == ownUser.id
             }
         }
     }
@@ -183,6 +185,10 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         val possibleFields: List<DummyNames.ProjectField> = emptyList()
     ): Project(id, name, name) {
         override fun toString(): String = name
+    }
+
+    private fun randomTags(count: Int): List<Tag> {
+        return (1..count).map { DummyNames.tags.random() }
     }
 
     companion object {

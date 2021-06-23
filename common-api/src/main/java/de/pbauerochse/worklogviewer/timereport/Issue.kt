@@ -60,6 +60,11 @@ interface Issue: Comparable<Issue> {
     val fields: List<Field>
 
     /**
+     * Optional tags for this issue
+     */
+    val tags: List<Tag>
+
+    /**
      * The `humanReadableId` and the `title` combined in one field
      */
     val fullTitle: String

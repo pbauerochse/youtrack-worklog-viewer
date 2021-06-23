@@ -22,6 +22,7 @@
                     <Font name="System Bold" size="16.0"/>
                 </font>
             </Label>
+            <FlowPane fx:id="issueTagsPane" VBox.vgrow="SOMETIMES" hgap="5.0" vgap="3.0" />
             <FlowPane fx:id="issueFieldsPane" VBox.vgrow="SOMETIMES" />
         </VBox>
     </top>

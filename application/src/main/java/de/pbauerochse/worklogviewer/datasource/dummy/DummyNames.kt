@@ -1,5 +1,7 @@
 package de.pbauerochse.worklogviewer.datasource.dummy
 
+import de.pbauerochse.worklogviewer.timereport.Tag
+
 object DummyNames {
 
     val projects = listOf(
@@ -46,6 +48,18 @@ object DummyNames {
         ProjectField("Difficulty", listOf("Easy peasy", "Easy", "Quite alright", "Medium", "Not too easy", "Hard", "Tough", "Oh my gosh!", "Please help me!")),
         ProjectField("Costs", listOf("Thrift shop", "Cheap", "Affordable", "Moderate", "Tad expensive", "Rip off", "Muhahaha", "2nd mortgage")),
         ProjectField("Deadline", listOf("yesterday", "ASAP", "Now!", "Take your time", "Better work overtime"))
+    )
+
+    val tags = listOf(
+        Tag("Important", backgroundColor = "ff0000"),
+        Tag("Hotfix", backgroundColor = "ff0000"),
+        Tag("Feeback required", backgroundColor = "ddddff", foregroundColor = "ffffff"),
+        Tag("Easy", backgroundColor = "ddffdd", foregroundColor = "000000"),
+        Tag("Needs more details", backgroundColor = "ddffff", foregroundColor = "ff0000"),
+        Tag("Ugly UI", backgroundColor = "00FF00", foregroundColor = "0000FF"),
+        Tag("Refactoring", backgroundColor = "0000ff"),
+        Tag("A very very long tag name", backgroundColor = "dd00dd"),
+        Tag("DB Migration", backgroundColor = "bbbbbb", foregroundColor = "ffffff")
     )
 
     data class ProjectField(
