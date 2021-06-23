@@ -8,6 +8,7 @@ import de.pbauerochse.worklogviewer.settings.SettingsUtil.settingsViewModel
 import de.pbauerochse.worklogviewer.tasks.Tasks.shutdown
 import de.pbauerochse.worklogviewer.util.FormattingUtil
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.beans.value.ObservableValue
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
@@ -16,6 +17,8 @@ import javafx.scene.image.Image
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
 import org.slf4j.LoggerFactory
+import java.awt.Taskbar
+import java.awt.Toolkit
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
@@ -72,12 +75,30 @@ class WorklogViewer : Application() {
             height = settings.windowSettings.height.toDouble()
         }
         primaryStage.show()
+        setDockAndTaskbarIcon()
 
         // settings listener
         stage.widthProperty().addListener { _: ObservableValue<out Number>?, _: Number?, newValue: Number -> settings.windowSettings.width = newValue.toInt() }
         stage.heightProperty().addListener { _: ObservableValue<out Number>?, _: Number?, newValue: Number -> settings.windowSettings.height = newValue.toInt() }
         stage.xProperty().addListener { _: ObservableValue<out Number>?, _: Number?, newValue: Number -> settings.windowSettings.positionX = newValue.toInt() }
         stage.yProperty().addListener { _: ObservableValue<out Number>?, _: Number?, newValue: Number -> settings.windowSettings.positionY = newValue.toInt() }
+    }
+
+    /**
+     * MacOS does not show the icon in the dock..this might be a workaround
+     */
+    private fun setDockAndTaskbarIcon() {
+        Platform.runLater {
+            try {
+                val icon = Toolkit.getDefaultToolkit().getImage(WorklogViewer::class.java.getResource("/fx/img/icons/logo-128.png"))
+                val taskbar = Taskbar.getTaskbar()
+                taskbar?.iconImage = icon
+            } catch (e: UnsupportedOperationException) {
+                LOGGER.info("Taskbar is not supported on current platform. Not setting Taskbar Icon")
+            } catch (e: Exception) {
+                LOGGER.warn("Could not set Taskbar image", e)
+            }
+        }
     }
 
     override fun stop() {
