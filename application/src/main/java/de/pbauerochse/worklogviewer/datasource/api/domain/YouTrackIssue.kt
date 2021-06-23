@@ -19,7 +19,8 @@ data class YouTrackIssue @JsonCreator constructor(
     @JsonProperty("project") val project : YouTrackProject?,
     @JsonProperty("summary") val summary : String?,
     @JsonProperty("wikifiedDescription") val description : String,
-    @JsonProperty("customFields") val customFields : List<YouTrackCustomField>
+    @JsonProperty("customFields") val customFields : List<YouTrackCustomField>,
+    @JsonProperty("tags") val tags: List<YouTrackIssueTag>
 ) {
 
     @get:JsonIgnore

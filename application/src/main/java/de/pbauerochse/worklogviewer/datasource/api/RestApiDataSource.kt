@@ -230,7 +230,7 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
 
         private const val MAX_WORKITEMS_PER_BATCH = 400
         private const val USER_FIELDS = "id,login,fullName,email"
-        private const val ISSUE_FIELDS = "id,idReadable,resolved,project(id,shortName,name),summary,wikifiedDescription,customFields(name,localizedName,value(name))"
+        private const val ISSUE_FIELDS = "id,idReadable,tags(color(background,foreground),name),resolved,project(id,shortName,name),summary,wikifiedDescription,customFields(name,localizedName,value(name))"
         private const val WORKITEM_FIELDS = "id,author($USER_FIELDS),creator($USER_FIELDS),type(id,name),text,duration(minutes,presentation),date,issue($ISSUE_FIELDS)"
     }
 }

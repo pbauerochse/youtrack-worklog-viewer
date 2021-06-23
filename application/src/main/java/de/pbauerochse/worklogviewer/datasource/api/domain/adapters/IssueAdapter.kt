@@ -4,6 +4,7 @@ import de.pbauerochse.worklogviewer.datasource.api.domain.YouTrackIssue
 import de.pbauerochse.worklogviewer.timereport.Field
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.timereport.Project
+import de.pbauerochse.worklogviewer.timereport.Tag
 import java.net.URL
 import java.time.ZonedDateTime
 
@@ -22,6 +23,7 @@ class IssueAdapter(
     override val description: String = youtrackIssue.description
     override val project: Project = youtrackIssue.project?.let { Project(it.id, it.name ?: it.id, it.shortName ?: it.id) } ?: UNKNOWN_PROJECT
     override val resolutionDate: ZonedDateTime? = youtrackIssue.resolveDate
+    override val tags: List<Tag> = youtrackIssue.tags.map { Tag(label = it.name, backgroundColor = it.color.backgroundColor, foregroundColor = it.color.foregroundColor) }
     override val fields: List<Field> = youtrackIssue.customFields.map { youtrackField ->
         val fieldValues = youtrackField.values.asSequence()
             .mapNotNull { value -> value.value.takeIf { !it.isNullOrBlank() } }
