@@ -60,16 +60,3 @@ interface WorkItem {
         get() = workDate.withZoneSameInstant(ZoneId.systemDefault())
 
 }
-
-
-/**
- * Represents a single time booking entry
- */
-//private data class WorkIteme(
-//    val issue : Issue,
-//    val user : User,
-//    val date : LocalDate,
-//    val durationInMinutes : Long,
-//    val description : String?,
-//    val workType : String?
-//)
