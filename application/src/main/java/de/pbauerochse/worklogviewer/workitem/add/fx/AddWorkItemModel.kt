@@ -122,7 +122,10 @@ class AddWorkItemModel() {
 
         project?.id?.let { projectId ->
             val task = FetchWorkItemTypesTask(projectId).apply {
-                onSucceeded = EventHandler { workItemTypes.value.setAll((it.source as FetchWorkItemTypesTask).value) }
+                onSucceeded = EventHandler {
+                    val types = (it.source as FetchWorkItemTypesTask).value
+                    workItemTypes.value.setAll(listOf(null) + types)
+                }
                 onFailed = EventHandler { errorMessage.set(it.source.exception.message) }
             }
 
