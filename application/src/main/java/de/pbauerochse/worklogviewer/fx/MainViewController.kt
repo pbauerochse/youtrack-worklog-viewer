@@ -181,21 +181,13 @@ class MainViewController : Initializable, TaskRunner, TaskPreparer {
 
     private fun initializeDatePickers() {
         // start and end datepicker are only editable if report timerange is CUSTOM
-        val dateChangeListener = ChangeListener<LocalDate> { observable, _, newDate ->
-            LOGGER.debug("Setting date on $observable to $newDate")
-            val datePicker = (observable as SimpleObjectProperty<*>).bean as DatePicker
-            if (newDate == null) {
-                datePicker.styleClass.add(REQUIRED_FIELD_CLASS)
-            } else {
-                datePicker.styleClass.remove(REQUIRED_FIELD_CLASS)
-            }
-        }
-
+        val startDateListener = datePickerValidationListener("timerange.custom.startrequired")
         startDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isNotEqualTo(CustomTimerangeProvider))
-        startDatePicker.valueProperty().addListener(dateChangeListener)
+        startDatePicker.valueProperty().addListener(startDateListener)
 
+        val endDateListener = datePickerValidationListener("timerange.custom.endrequired")
         endDatePicker.disableProperty().bind(timerangeComboBox.selectionModel.selectedItemProperty().isNotEqualTo(CustomTimerangeProvider))
-        endDatePicker.valueProperty().addListener(dateChangeListener)
+        endDatePicker.valueProperty().addListener(endDateListener)
 
         DatePickerManualEditListener.applyTo(startDatePicker)
         DatePickerManualEditListener.applyTo(endDatePicker)
@@ -208,8 +200,22 @@ class MainViewController : Initializable, TaskRunner, TaskPreparer {
         if (settingsModel.lastUsedReportTimerangeProperty.get() == CustomTimerangeProvider) {
             startDatePicker.value = settingsModel.startDateProperty.get()
             endDatePicker.value = settingsModel.endDateProperty.get()
-            dateChangeListener.changed(startDatePicker.valueProperty(), null, startDatePicker.value)
-            dateChangeListener.changed(endDatePicker.valueProperty(), null, endDatePicker.value)
+            startDateListener.changed(startDatePicker.valueProperty(), null, startDatePicker.value)
+            endDateListener.changed(endDatePicker.valueProperty(), null, endDatePicker.value)
+        }
+    }
+
+    private fun datePickerValidationListener(errorLabelKey: String): ChangeListener<LocalDate> {
+        return ChangeListener { observable, _, newDate ->
+            LOGGER.debug("Setting date on $observable to $newDate")
+            val datePicker = (observable as SimpleObjectProperty<*>).bean as DatePicker
+            if (newDate == null) {
+                datePicker.styleClass.add(REQUIRED_FIELD_CLASS)
+                datePicker.tooltip = Tooltip(getFormatted(errorLabelKey))
+            } else {
+                datePicker.styleClass.remove(REQUIRED_FIELD_CLASS)
+                datePicker.tooltip = null
+            }
         }
     }
 

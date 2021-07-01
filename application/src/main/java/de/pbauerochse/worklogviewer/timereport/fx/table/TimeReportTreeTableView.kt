@@ -18,6 +18,7 @@ class TimeReportTreeTableView : TreeTableView<ReportRow>() {
 
     init {
         isShowRoot = false
+        styleClass.add("time-report-table")
         addListeners()
     }
 

@@ -1,65 +1,72 @@
-/*+
- * Dark theme for the YouTrack Worklog Viewer
- * For a full reference of the available properties
- * in a JavaFX application see modena.css or
- * https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
+/**
+ * Dark Theme
  */
 .root {
-    -fx-base: derive(#3c3f41, -20%);
-    -fx-accent: #245d81;
-    -fx-default-button: -fx-accent;
-    -fx-light-text-color: derive(whitesmoke, -20%);
-    -fx-control-inner-background: -fx-base;
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
-    -fx-hover-base: derive(-fx-base, 10%);
+    -ytwlv-dark-background-color: #2a2a2a;
+    -ytwlv-bright-text-color: derive(whitesmoke, -20%);
+    -ytwlv-faint-text-color: derive(-fx-light-text-color, -20%);;
+    -ytwlv-warning-color: #b12b44;
+    -ytwlv-highlighted-text-color: #245d81;
+    -ytwlv-bright-highlighted-text-color: derive(-ytwlv-highlighted-text-color, 80%);
+    -ytwlv-inactive-tab-foreground-color: -ytwlv-bright-text-color;
+    -ytwlv-inactive-tab-background-color: #35383a;
+    -ytwlv-inactive-tab-hover-foreground-color: -ytwlv-bright-text-color;
+    -ytwlv-search-hover-cell-background-color: -ytwlv-dark-background-color;
+    -ytwlv-time-report-grouping-background-color: derive(-ytwlv-highlighted-text-color, -40%);
+    -ytwlv-summary-background-color: derive(-ytwlv-time-report-grouping-background-color, -20%);
+    -ytwlv-today-cell-background-color: rgba(193, 255, 152, 0.2);
+    -ytwlv-highlight-cell-background-color: rgba(75, 165, 229, 0.2);
 
     -ytwlv-border-color: derive(-fx-base, 20%);
-    -ytwlv-dark-background-color: #2a2a2a;
-    -ytwlv-hightlight-cell-color: rgba(36, 93, 126, 0.2);
+
+    -fx-base: #2f2f2f;
+    -fx-accent: -ytwlv-highlighted-text-color;
+    -fx-selection-bar-non-focused: #282b36;
 
     -fx-background-color: -ytwlv-dark-background-color;
+    -fx-control-inner-background: -fx-base;
+    -fx-default-button: -fx-accent;
+    -fx-hover-base: derive(-fx-base, 10%);
+    -fx-focus-color: -ytwlv-highlighted-text-color;
+    -fx-faint-focus-color: transparent;
 }
 
-.menu-bar {
-    -fx-background-color: -ytwlv-dark-background-color;
+.menu-bar,
+.statistics-pane,
+.statistic-item,
+.chart-plot-background {
+    -fx-background-color: -fx-base;
 }
 
-.menu-item {
-    -fx-padding: 7px 20px 7px 20px;
+.chart-legend {
+    -fx-background-color: derive(-fx-base,-20%);
 }
 
-.required {
-    -fx-border-color: #b7444d;
+.series0 {
+    -fx-bar-fill: #deab10;
+    -fx-pie-color: #deab10;
 }
 
 .tool-bar {
     -fx-background-color: -fx-base;
     -fx-border-width: 1px 0 1px 0;
-    -fx-border-color: -ytwlv-border-color;
+    -fx-border-color: derive(-fx-base, 20%);
     -fx-padding: 7px 18px 7px 18px;
 }
 
-.context-menu {
-    -fx-background-color: -fx-base;
-    -fx-border-width: 1px;
-    -fx-border-color: -fx-shadow-highlight-color;
-    -fx-padding: 5px 0 5px 0;
+.favourite-issue-cell,
+.favourite-search-cell,
+.time-report-table .issue-title {
+    -fx-text-fill: -ytwlv-bright-highlighted-text-color;
 }
 
-.context-menu .separator:horizontal .line {
-    -fx-border-color: -fx-shadow-highlight-color transparent transparent transparent;
-    -fx-border-insets: 1 0 0 0;
+.search-result-issue .issue-id,
+.search-result-issue .issue-title {
+    -fx-text-fill: -ytwlv-bright-highlighted-text-color;
 }
 
-.tool-bar .separator:vertical .line {
-    -fx-border-color: transparent transparent transparent -fx-shadow-highlight-color;
-    -fx-border-width: 1;
-    -fx-border-insets: 5 0 5 0;
-}
-
-.progress-bar.error > .bar {
-    -fx-background-color: #8f2b3c;
+.search-result-issue .issue-description {
+    -fx-text-fill: derive(-ytwlv-faint-text-color, 60%);
 }
 
 .tab-pane > .tab-header-area > .tab-header-background,
@@ -91,7 +98,7 @@
 
 .tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label,
 .tab-pane > .tab-header-area > .headers-region > .tab:selected:hover > .tab-container > .tab-label {
-    -fx-text-fill: derive(-fx-accent, 60%);
+    -fx-text-fill: -ytwlv-bright-highlighted-text-color;
 }
 
 .tab-pane > .tab-header-area > .headers-region > .tab:hover {
@@ -103,67 +110,31 @@
     -fx-border-width: 0;
 }
 
-.progress-text, .task-name-text {
-    -fx-fill: -fx-light-text-color;
-    -fx-font-size: 9pt;
+.search-result-issue-field .field-name,
+.search-result-issue-field .field-value {
+    -fx-font-size: 11.0;
+    -fx-text-fill: derive(-ytwlv-bright-text-color, -30%);
 }
 
-.group-cell, .group-title-cell {
-    -fx-background-color: derive(-fx-accent, -30%) !important;
-    -fx-font-size: 12pt;
-    -fx-fill: derive(-fx-light-text-color, -60%);
+.progress-text,
+.task-name-text {
+    -fx-fill: -ytwlv-bright-text-color;
 }
 
-.group-cell.today-highlight-cell, .group-title-cell.today-highlight-cell {
-    -fx-background-color: rgba(42, 178, 180, 0.2) !important;
+.separator:horizontal .line {
+    -fx-border-color: -fx-shadow-highlight-color transparent transparent transparent;
+    -fx-border-insets: 1 0 0 0;
 }
 
-.today-highlight-cell {
-    -fx-background-color: rgba(172, 225, 164, 0.3);
+.separator:vertical .line {
+    -fx-border-color: transparent transparent transparent -fx-shadow-highlight-color;
+    -fx-border-width: 1;
+    -fx-border-insets: 2 0 2 0;
 }
 
-.highlight-cell {
-    -fx-background-color: -ytwlv-hightlight-cell-color;
-}
-
-.issue-cell {
-    -fx-text-fill: derive(-fx-accent, 80%);
-    -fx-highlight-text-fill: derive(-fx-accent, -60%);
-    -fx-underline: true;
-}
-
-.resolved-issue-cell {
-    -fx-text-fill: derive(-fx-light-text-color, -20%);
-    -fx-underline: false;
-}
-
-.combo-box-popup > .list-view {
-    -fx-background-color: -fx-base;
-    -fx-border-width: 1px;
-    -fx-border-color: -fx-shadow-highlight-color;
-}
-
-.combo-box-popup > .list-view {
-    -fx-pref-width: 300px;
-}
-
-.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell {
-    -fx-padding: 7px 20px 7px 20px;
-}
-
-.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
-.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
-    -fx-background-insets: 0;
-}
-
-.chart-plot-background, .chart-legend {
-    -fx-background-color: rgba(255, 255, 255, 0.05);
-}
-
-.chart-legend {
-    -fx-background-insets: 0;
-    -fx-background-radius: 2;
-    -fx-padding: 6px;
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: derive(-fx-background, -20%);
 }
 
 .date-picker-popup {
@@ -220,50 +191,7 @@
     -fx-background-color: -fx-accent;
 }
 
-.list-cell:filled:selected,
-.tree-cell:filled:selected,
-.table-row-cell:filled:selected,
-.tree-table-row-cell:filled:selected,
-.table-row-cell:filled > .table-cell:selected,
-.tree-table-row-cell:filled > .tree-table-cell:selected,
-.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:focused,
-.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:focused,
-.table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell:focused,
-.tree-table-view:focused:row-selection > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:focused,
-.table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .table-row-cell > .table-cell:focused,
-.tree-table-view:focused:cell-selection > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell > .tree-table-cell:focused,
-.list-view:focused > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
-.tree-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-cell:filled:selected,
-.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected,
-.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell:filled:selected,
-.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell .table-cell:selected,
-.tree-table-view:focused > .virtual-flow > .clipped-container > .sheet > .tree-table-row-cell .tree-table-cell:selected {
-    -fx-background: -ytwlv-hightlight-cell-color;
-    -fx-table-cell-border-color: transparent;
-}
-
-.error-label {
-    -fx-text-fill: #d2394d;
-    -fx-font-weight: bold;
-}
-
-.negative {
-    -fx-text-fill: #d2394d;
-}
-
-.positive {
-    -fx-text-fill: #4a8b4c;
-}
-
-.split-pane {
-    -fx-background-color: -ytwlv-dark-background-color, -ytwlv-dark-background-color;
-}
-
-.search-result-issue-field .separator .line {
-    -fx-border-color: transparent transparent transparent transparent,
-    transparent transparent transparent -ytwlv-border-color;
-}
-
-.search-result-issue .issue-id, .search-result-issue .issue-title {
-    -fx-fill: whitesmoke;
+.time-report-table .cell:filled:selected {
+    -fx-background-color: derive(-fx-accent, 20%);
+    -fx-table-cell-border-color: derive(-fx-accent, 20%);
 }

@@ -2,14 +2,16 @@ package de.pbauerochse.worklogviewer.favourites.fx
 
 import de.pbauerochse.worklogviewer.details.events.ShowIssueDetailsRequestEvent
 import de.pbauerochse.worklogviewer.events.EventBus
+import de.pbauerochse.worklogviewer.favourites.fx.FavouritesStyleClasses.FAVOURITE_ISSUE_CELL
+import de.pbauerochse.worklogviewer.favourites.fx.FavouritesStyleClasses.FAVOURITE_SEARCH_CELL
+import de.pbauerochse.worklogviewer.favourites.fx.FavouritesStyleClasses.RESOLVED_ISSUE_CELL
 import de.pbauerochse.worklogviewer.favourites.issue.FavouriteIssue
 import de.pbauerochse.worklogviewer.favourites.searches.FavouriteSearch
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses
 import de.pbauerochse.worklogviewer.fx.issuesearch.SavedSearchContextMenu
 import de.pbauerochse.worklogviewer.search.fx.Search
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.IssueCellContextMenu
-import de.pbauerochse.worklogviewer.util.FormattingUtil
+import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.collections.ListChangeListener
 import javafx.fxml.Initializable
 import javafx.scene.Node
@@ -28,19 +30,20 @@ import java.util.*
  */
 class FavouritesController : Initializable {
 
-    lateinit var favouritesTreeView: TreeView<IssueSearchTreeItem>
+    lateinit var favouritesTreeView: TreeView<FavouriteItem>
 
-    private lateinit var favouriteSearchesTreeItem: TreeItem<IssueSearchTreeItem>
-    private lateinit var favouriteIssuesTreeItem: TreeItem<IssueSearchTreeItem>
+    private lateinit var favouriteSearchesTreeItem: TreeItem<FavouriteItem>
+    private lateinit var favouriteIssuesTreeItem: TreeItem<FavouriteItem>
 
     override fun initialize(url: URL?, resourceBundle: ResourceBundle?) {
         // FavouriteSearches
-        favouriteSearchesTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(FormattingUtil.getFormatted("dialog.issuesearch.groups.favourites.searches"))).apply {
+        favouriteSearchesTreeItem = TreeItem(FavouriteItem.labeledCategoryHeaderItem(getFormatted("dialog.issuesearch.groups.favourites.searches"))).apply {
             isExpanded = true
+
         }
 
         // FavouriteIssues
-        favouriteIssuesTreeItem = TreeItem(IssueSearchTreeItem.labelledNoopItem(FormattingUtil.getFormatted("dialog.issuesearch.groups.favourites.issues"))).apply {
+        favouriteIssuesTreeItem = TreeItem(FavouriteItem.labeledCategoryHeaderItem(getFormatted("dialog.issuesearch.groups.favourites.issues"))).apply {
             isExpanded = true
         }
 
@@ -67,7 +70,7 @@ class FavouritesController : Initializable {
             isShowRoot = false
             isEditable = false
             selectionModel.selectedItemProperty().addListener { _, _, selectedItem -> selectedItem?.let { selectIssue(it.value) } }
-            root = TreeItem<IssueSearchTreeItem>().apply {
+            root = TreeItem<FavouriteItem>().apply {
                 children.addAll(favouriteSearchesTreeItem, favouriteIssuesTreeItem)
             }
         }
@@ -96,27 +99,33 @@ class FavouritesController : Initializable {
         favouriteSearchesTreeItem.children.setAll(searchesTreeItems(searches.sortedBy { it.name }))
     }
 
-    private fun issueTreeItems(issues: List<Issue>): List<TreeItem<IssueSearchTreeItem>> {
-        return issues.map {
-            val styleClasses = mutableSetOf(ComponentStyleClasses.ISSUE_LINK_CELL)
-            if (it.resolutionDate != null) {
-                styleClasses.add(ComponentStyleClasses.RESOLVED_ISSUE_CELL)
-            }
-
-            TreeItem(IssueSearchTreeItem(it.fullTitle, { showIssueDetails(it) }, IssueCellContextMenu(it), styleClasses))
+    private fun issueTreeItems(issues: List<Issue>): List<TreeItem<FavouriteItem>> {
+        return issues.map { issue ->
+            val styleClasses = listOfNotNull(FAVOURITE_ISSUE_CELL, RESOLVED_ISSUE_CELL.takeIf { issue.isResolved })
+            TreeItem(FavouriteItem(
+                label = issue.fullTitle,
+                onSelect = { showIssueDetails(issue) },
+                contextMenu = IssueCellContextMenu(issue),
+                styleClasses = styleClasses
+            ))
         }
     }
 
-    private fun searchesTreeItems(searches: List<FavouriteSearch>): List<TreeItem<IssueSearchTreeItem>> {
+    private fun searchesTreeItems(searches: List<FavouriteSearch>): List<TreeItem<FavouriteItem>> {
         return searches.map {
-            val data = IssueSearchTreeItem(it.name, { Search.issues(it.query) }, SavedSearchContextMenu(it))
+            val data = FavouriteItem(
+                label = it.name,
+                onSelect = { Search.issues(it.query) },
+                contextMenu = SavedSearchContextMenu(it),
+                styleClasses = setOf(FAVOURITE_SEARCH_CELL)
+            )
             TreeItem(data)
         }
     }
 
-    private fun selectIssue(item: IssueSearchTreeItem) {
+    private fun selectIssue(item: FavouriteItem) {
         LOGGER.debug("Selected TreeItem $item")
-        item.onSelect.invoke()
+        item.onSelect?.invoke()
     }
 
     private fun showIssueDetails(issue: Issue) {

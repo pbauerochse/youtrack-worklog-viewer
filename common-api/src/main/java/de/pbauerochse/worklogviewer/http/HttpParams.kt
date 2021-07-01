@@ -41,10 +41,9 @@ class HttpParams(
 
     private val httpHeaders: List<Header> by lazy {
         listOf(
-            BasicHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"),
             BasicHeader(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate, sdch"),
-            BasicHeader(HttpHeaders.ACCEPT_LANGUAGE, "de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4"),
-            BasicHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*"),
+            BasicHeader(HttpHeaders.ACCEPT, "application/json"),
+            BasicHeader(HttpHeaders.CACHE_CONTROL, "no-cache"),
             BasicHeader(HttpHeaders.AUTHORIZATION, "Bearer $youtrackPermanentToken")
         )
     }

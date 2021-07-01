@@ -1,11 +1,13 @@
 package de.pbauerochse.worklogviewer.timereport.fx.table.columns
 
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.ALL_WORKLOGVIEWER_CLASSES
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.GROUP_TITLE_CELL
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.ISSUE_LINK_CELL
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.RESOLVED_ISSUE_CELL
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.openInBrowser
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.ALL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.GRAND_SUMMARY_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.GROUPING_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.ISSUE_ITEM_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.ISSUE_TITLE_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.RESOLVED
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.SUMMARY_CELL
 import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
@@ -52,37 +54,37 @@ private class IssueLinkCell : TreeTableCell<ReportRow, ReportRow>() {
     override fun updateItem(item: ReportRow?, empty: Boolean) {
         super.updateItem(item, empty)
 
-        styleClass.removeAll(ALL_WORKLOGVIEWER_CLASSES)
+        styleClass.removeAll(ALL)
         tooltip = null
         text = null
 
-        item?.let { reportGroup ->
-            text = reportGroup.label
-            tooltip = Tooltip(reportGroup.label)
+        item?.let { reportRow ->
+            text = reportRow.label
+            tooltip = Tooltip(reportRow.label)
 
             when {
-                reportGroup.isGrouping -> handleGrouping()
-                reportGroup.isIssue -> handleIssue(reportGroup as IssueReportRow)
-                reportGroup.isSummary -> handleSummary()
+                reportRow.isGrouping -> handleGrouping()
+                reportRow.isIssue -> handleIssue(reportRow as IssueReportRow)
+                reportRow.isSummary -> handleSummary()
             }
         }
     }
 
     private fun handleGrouping() {
         contextMenu = null
-        styleClass.add(GROUP_TITLE_CELL)
+        styleClass.add(GROUPING_CELL)
     }
 
     private fun handleIssue(reportGroup: IssueReportRow) {
         contextMenu = IssueCellContextMenu(reportGroup.issueWithWorkItems.issue)
-        styleClass.add(ISSUE_LINK_CELL)
-        reportGroup.issueWithWorkItems.issue.resolutionDate?.let {
-            styleClass.add(RESOLVED_ISSUE_CELL)
+        styleClass.addAll(ISSUE_ITEM_CELL, ISSUE_TITLE_CELL)
+        if (reportGroup.issueWithWorkItems.issue.isResolved) {
+            styleClass.add(RESOLVED)
         }
     }
 
     private fun handleSummary() {
-        styleClass.add(SUMMARY_CELL)
+        styleClass.addAll(SUMMARY_CELL, GRAND_SUMMARY_CELL)
     }
 
     private fun openIssueLinkInBrowser() {

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Text?>
-<BorderPane fx:id="listViewItem" styleClass="search-result-issue" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="listViewItem" prefWidth="1" minWidth="0" styleClass="search-result-issue" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <center>
         <VBox spacing="5.0" BorderPane.alignment="CENTER">
             <HBox spacing="5.0">
-                <Text fx:id="issueIdLabel" styleClass="issue-id" HBox.hgrow="NEVER" />
-                <Text fx:id="issueTitleLabel" styleClass="issue-title" HBox.hgrow="ALWAYS" />
+                <Label fx:id="issueIdLabel" styleClass="issue-id" HBox.hgrow="NEVER" />
+                <Label fx:id="issueTitleLabel" styleClass="issue-title" HBox.hgrow="ALWAYS" wrapText="true" />
             </HBox>
-            <FlowPane fx:id="tagsFlowPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="issue-tags" hgap="5.0" vgap="3.0" VBox.vgrow="SOMETIMES" />
-            <FlowPane fx:id="fieldsFlowPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="issue-fields" vgap="3.0" VBox.vgrow="SOMETIMES" />
-            <Text fx:id="issueDescriptionLabel" styleClass="issue-description" />
+            <FlowPane fx:id="tagsFlowPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="issue-tags" hgap="5.0" vgap="2.0" VBox.vgrow="SOMETIMES" />
+            <FlowPane fx:id="fieldsFlowPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="issue-fields" vgap="2.0" VBox.vgrow="SOMETIMES" />
+            <Label fx:id="issueDescriptionLabel" styleClass="issue-description" wrapText="true" />
         </VBox>
     </center>
 </BorderPane>

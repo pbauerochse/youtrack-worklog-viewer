@@ -2,7 +2,35 @@
  * YouTrack Worklog Viewer basic styling
  */
 .root {
-    -ytwlv-faint-text-color: derive(-fx-text-background-color, -15%);
+    -ytwlv-faint-text-color: #555;
+    -ytwlv-highlighted-text-color: derive(-fx-accent, -20%);
+    -ytwlv-bright-text-color: #fefefe;
+    -ytwlv-dark-text-color: #333;
+    -ytwlv-warning-color: #d74646;
+    -ytwlv-success-color: #56951e;
+    -ytwlv-task-progress-background-color: derive(-fx-accent, -40%);
+    -ytwlv-task-progress-foreground-color: derive(-fx-accent, 5%);
+    -ytwlv-active-tab-foreground-color: derive(-fx-accent, -30%);
+    -ytwlv-active-tab-top-border-color: -fx-accent;
+    -ytwlv-inactive-tab-background-color: derive(-fx-base, 5%);
+    -ytwlv-inactive-tab-foreground-color: -ytwlv-dark-text-color;
+    -ytwlv-inactive-tab-hover-foreground-color: -ytwlv-highlighted-text-color;
+
+    -ytwlv-time-report-grouping-background-color: rgba(0, 150, 201, 0.53);
+    -ytwlv-today-cell-background-color: rgba(178, 212, 147, 0.53);
+    -ytwlv-highlight-cell-background-color: rgba(85, 167, 241, 0.53);
+    -ytwlv-search-hover-cell-background-color: rgba(85, 167, 241, 0.53);
+    -ytwlv-summary-background-color: rgba(132, 143, 182, 0.53);
+
+    -fx-selection-bar-non-focused: #9a9da8;
+
+    -fx-dark-text-color: -ytwlv-dark-text-color;
+    -fx-mid-text-color: derive(-ytwlv-dark-text-color, 40%);
+    -fx-light-text-color: -ytwlv-bright-text-color;
+}
+
+#mainView {
+    -fx-background-color: -fx-base;
 }
 
 #fetchWorklogButton {
@@ -12,29 +40,9 @@
     -fx-background-size: auto;
 }
 
-.resolved-issue-cell .text {
-    -fx-strikethrough: true;
-}
-
-.issue-cell:hover {
-    -fx-cursor: hand;
-}
-
-.timespent-cell {
-    -fx-alignment: center-right;
-}
-
-.summary-cell {
-    -fx-font-weight: bold;
-    -fx-alignment: center-right;
-}
-
-.group-cell, .group-title-cell {
-    -fx-font-weight: bold;
-}
-
-.group-cell {
-    -fx-alignment: center-right;
+.required {
+    -fx-border-color: -ytwlv-warning-color;
+    -fx-border-radius: 4px;
 }
 
 .scroll-bar {
@@ -42,34 +50,35 @@
     -fx-block-increment: 500.0;
 }
 
-.task-by-user-statistics-username {
-    -fx-padding: 20 0 0 0;
+.tool-bar {
+    -fx-background-color: -fx-color;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1px;
 }
 
-.task-by-user-statistics-percentage {
-    -fx-alignment: center-right;
-    -fx-padding: 0 0 0 20;
-    -fx-column-halignment: right;
+.menu-item {
+    -fx-padding: 0.75em 1.5em;
 }
 
-.task-by-user-statistics-total-spent-time-label,
-.task-by-user-statistics-username,
-.task-by-user-statistics-project,
-.task-by-user-statistics-percentage,
-.task-by-user-statistics-total-spent-time {
-    -fx-font-weight: bold;
+.combo-box-popup  > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:hover,
+.menu-button:hover > .label,
+.menu-button:focused > .label,
+.menu-button:showing > .label,
+.menu-item:hover .label,
+.menu-item:focused .label {
+    -fx-text-fill: -ytwlv-bright-text-color;
+    -fx-stroke: -ytwlv-bright-text-color;
 }
 
-.tree-table-row-cell:odd {
-    -fx-background-color: -fx-table-cell-border-color, derive(-fx-control-inner-background, -5%);
-    -fx-background-insets: 0, 0 0 1 0;
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected,
+.combo-box-popup > .list-view > .virtual-flow > .clipped-container > .sheet > .list-cell:filled:selected:hover {
+    -fx-background-insets: 0;
 }
 
-.tree-table-row-cell:selected:odd {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-focus-color;
-    -fx-background-insets: 0, 1, 2;
-}
-
+/**
+ * Task Progressbar
+ */
 .task-progress-bar > .task-name-text, .task-progress-bar > .progress-text {
     -fx-font-size: 10.0;
     -fx-stroke-type: OUTSIDE;
@@ -80,61 +89,183 @@
     -fx-start-margin: 5;
 }
 
-/* http://blog.mynotiz.de/programmieren/java/javafx-progress-bar-css-styling-2271/ */
+/*!* http://blog.mynotiz.de/programmieren/java/javafx-progress-bar-css-styling-2271/ *!*/
 .progress-bar > .track {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-padding: 0;
-    -fx-background-color: derive(-fx-accent, -40%);
+    -fx-background-color: -ytwlv-task-progress-background-color;
 }
 
 .progress-bar > .bar {
     -fx-background-insets: 0;
     -fx-background-radius: 0;
     -fx-padding: 0.6em;
-    -fx-background-color: derive(-fx-accent, 5%);
+    -fx-background-color: -ytwlv-task-progress-foreground-color;
 }
 
-#logMessagesComponent {
-    -fx-font-size: 11;
-    -fx-font-family: "DejaVu Sans Mono", monospace;
+.progress-bar.error > .bar {
+    -fx-background-color: -ytwlv-warning-color;
 }
 
-.hint-label {
-     -fx-text-fill: derive(-fx-light-text-color, -40%);
+.progress-text,
+.task-name-text {
+    -fx-fill: -ytwlv-dark-text-color;
+    -fx-font-size: 9pt;
 }
 
-.tree-parent {
-    -fx-font-weight: bold;
-    -fx-padding: 7 0 7 0;
-    -fx-background-color: -fx-box-border, -fx-inner-border, -fx-body-color;
-}
-
-.chart-title {
-    -fx-text-alignment: CENTER;
-    -fx-alignment: CENTER;
+.error-label {
+    -fx-text-fill: -ytwlv-warning-color;
     -fx-font-weight: bold;
 }
 
-Text {
-    -fx-fill: -fx-text-background-color;
+/**
+ * Tabs
+ */
+.tab-pane > .tab-header-area > .headers-region > .tab {
+    -fx-background-radius: 0;
+    -fx-padding: 0.1em 0.7em 0.1em 0.5em;
 }
 
-.statistics-label {
+.tab-pane > .tab-header-area > .headers-region > .tab:selected,
+.tab-pane > .tab-header-area > .headers-region > .tab:selected:hover {
+    -fx-background-color: -ytwlv-active-tab-top-border-color, -fx-outer-border, -fx-inner-border, -fx-background;
+    -fx-background-insets: 0 1 1 0, 3 1 1 0, 4 2 0 1, 5 3 0 2;
+}
+
+/**
+ * Tab general text-color
+ */
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container > .tab-label {
+    -fx-text-fill: -ytwlv-inactive-tab-foreground-color;
+}
+
+/**
+ * active Tab text-color
+ */
+.tab-pane > .tab-header-area > .headers-region > .tab:selected > .tab-container > .tab-label {
+    -fx-text-fill: -ytwlv-active-tab-foreground-color;
+}
+
+/**
+ * Tab:hover text-color
+ */
+.tab-pane > .tab-header-area > .headers-region > .tab:hover > .tab-container > .tab-label {
+    -fx-text-fill: -ytwlv-inactive-tab-hover-foreground-color;
+}
+
+/**
+ * No focus-indicator as the active tab is already marked by a top border
+ */
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-border-width: 0;
+}
+
+/**
+ * Favourites
+ */
+.favourite-category-header {
     -fx-font-weight: bold;
+    -fx-padding: 0.5em 0;
+    -fx-indent: 0;
+    -fx-background-color: -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-border-color: -fx-outer-border;
+    -fx-border-width: 1 0;
 }
 
-.search-result-issue {
-    -fx-padding: 5.0;
+.favourite-category-header:selected {
+    -fx-text-fill: -fx-mid-text-color;
 }
 
+.favourite-category-header:selected > .tree-disclosure-node > .arrow {
+    -fx-background-color: -fx-mid-text-color;
+}
+
+.favourite-issue-cell,
+.favourite-search-cell,
+.time-report-table .issue-title,
+.search-result-issue .issue-id,
+.search-result-issue .issue-title {
+    -fx-padding: 0.4em 0;
+    -fx-indent: 0;
+    -fx-text-fill: -ytwlv-highlighted-text-color;
+    -fx-highlight-text-fill: -ytwlv-bright-text-color;
+}
+
+.search-result-issue .issue-description {
+    -fx-text-fill: -ytwlv-dark-text-color;
+}
+
+.favourite-issue-cell:selected,
+.favourite-issue-cell:selected.resolved,
+.favourite-search-cell:selected,
+.time-report-table .issue-title:selected {
+    -fx-text-fill: -ytwlv-bright-text-color;
+}
+
+.favourite-issue-cell.resolved .text,
+.time-report-table .issue-title.resolved .text,
 .search-result-issue.resolved .issue-id,
 .search-result-issue.resolved .issue-title {
     -fx-strikethrough: true;
-    -fx-fill: derive(-fx-text-background-color, -20%);
 }
 
-.search-result-issue .issue-id, .search-result-issue .issue-title {
+.favourite-issue-cell.resolved,
+.time-report-table .issue-title.resolved,
+.search-result-issue.resolved .issue-id,
+.search-result-issue.resolved .issue-title {
+    -fx-text-fill: -ytwlv-faint-text-color;
+}
+
+.favourite-issue-cell:hover,
+.favourite-search-cell:hover,
+.time-report-table .issue-title:hover {
+    -fx-cursor: hand;
+}
+
+/**
+ * Issue Details Pane
+ */
+.issue-details-pane {
+    -fx-padding: 7.0;
+}
+
+.issue-details-pane .issue-summary {
+    -fx-font-weight: bold;
+    -fx-font-size: 16.0;
+}
+
+.issue-tag {
+    -fx-font-size: 11.0;
+    -fx-padding: 3px 5px 3px 5px;
+    -fx-background-radius: 3px;
+}
+
+/**
+ * Issue Search
+ */
+.issue-search {
+    -fx-background-color: -fx-background;
+}
+
+.search-results-list .list-cell {
+    -fx-padding: 0;
+}
+
+.search-result-issue {
+    -fx-padding: 7.0 10.0;
+}
+
+.search-result-issue:hover {
+    -fx-background-color: -ytwlv-search-hover-cell-background-color;
+}
+
+.search-result-issue .search-result-issue-field .separator:vertical .line {
+    -fx-border-color: transparent, transparent transparent transparent #828282;
+}
+
+.search-result-issue .issue-id,
+.search-result-issue .issue-title {
     -fx-font-size: 14.0;
 }
 
@@ -150,10 +281,107 @@ Text {
 .search-result-issue-field .field-name,
 .search-result-issue-field .field-value {
     -fx-font-size: 11.0;
-    -fx-text-fill: -ytwlv-faint-text-color;
+    -fx-text-fill: derive(-fx-mid-text-color, 20%);
 }
 
 .search-result-issue-field .field-name {
+    -fx-font-weight: bold;
+}
+
+/**
+ * TimeReport TreeTable View
+ */
+.time-report-table:focused {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 1;
+}
+
+.time-report-table .tree-cell > .tree-disclosure-node > .arrow,
+.time-report-table .tree-table-row-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -ytwlv-bright-text-color;
+}
+
+.time-report-table .tree-table-row-cell:odd {
+    -fx-background: -fx-control-inner-background-alt;
+}
+
+.time-report-table .highlight {
+    -fx-background-color: -ytwlv-highlight-cell-background-color;
+}
+
+.time-report-table .issue-item.today {
+    -fx-background-color: -ytwlv-today-cell-background-color;
+}
+
+.time-report-table .grouping-item {
+    -fx-font-size: 1.1em;
+}
+
+.time-report-table .grand-summary-item {
+    -fx-font-size: 1.1em;
+    -fx-padding: 0.5em 0.75em;
+    -fx-font-weight: bold;
+    -fx-background-color: -ytwlv-summary-background-color;
+    -fx-border-color: -ytwlv-summary-background-color;
+}
+
+.time-report-table .grouping-item,
+.time-report-table .grand-summary-item {
+    -fx-padding: 0.4em;
+}
+
+.time-report-table .grouping-item {
+    -fx-font-weight: bold;
+    -fx-background-color: -ytwlv-time-report-grouping-background-color;
+    -fx-border-color: -ytwlv-time-report-grouping-background-color;
+    -fx-text-fill: -ytwlv-bright-text-color;
+}
+
+.time-report-table .time-spent {
+    -fx-alignment: top-right;
+}
+
+.time-report-table .cell:filled:selected {
+    -fx-background-color: derive(-fx-accent, 40%);
+    -fx-table-cell-border-color: derive(-fx-accent, 40%);
+}
+
+.time-report-table .cell:filled:selected .time-spent,
+.time-report-table .cell:filled:selected .issue-title {
+    -fx-text-fill: -ytwlv-bright-text-color;
+    -fx-font-weight: bold;
+}
+
+/**
+ * Statistics Pane
+ */
+.statistics-pane {
+    -fx-padding: 7.0;
+}
+
+.task-by-user-statistics-total-spent-time-label,
+.task-by-user-statistics-username,
+.task-by-user-statistics-project,
+.task-by-user-statistics-percentage,
+.task-by-user-statistics-total-spent-time,
+.statistics-label {
+    -fx-font-weight: bold;
+}
+
+.task-by-user-statistics-username {
+    -fx-padding: 20 0 0 0;
+}
+
+.task-by-user-statistics-percentage {
+    -fx-alignment: center-right;
+    -fx-padding: 0 0 0 20;
+    -fx-column-halignment: right;
+}
+
+.chart-title {
+    -fx-text-alignment: CENTER;
+    -fx-alignment: CENTER;
     -fx-font-weight: bold;
 }
 
@@ -168,8 +396,130 @@ Text {
     -fx-font-size: 0.85em;
 }
 
-.issue-tag {
-    -fx-font-size: 11.0;
-    -fx-padding: 3px 5px 3px 5px;
-    -fx-background-radius: 3px;
+.chart-legend {
+    -fx-background-insets: 0;
+    -fx-background-radius: 4px;
+    -fx-padding: 0.75em;
 }
+
+/**
+ * Chart colors
+ */
+.series0 {
+    -fx-bar-fill: #f9bf09;
+    -fx-pie-color: #f9bf09;
+}
+
+.series1 {
+    -fx-bar-fill: #75e25e;
+    -fx-pie-color: #75e25e;
+}
+
+.series2 {
+    -fx-bar-fill: #22bad9;
+    -fx-pie-color: #22bad9;
+}
+
+.series3 {
+    -fx-bar-fill: #0181e2;
+    -fx-pie-color: #0181e2;
+}
+
+.series4 {
+    -fx-bar-fill: #2f357f;
+    -fx-pie-color: #2f357f;
+}
+
+.series5 {
+    -fx-bar-fill: #860061;
+    -fx-pie-color: #860061;
+}
+
+.series6 {
+    -fx-bar-fill: #c62b00;
+    -fx-pie-color: #c62b00;
+}
+
+.series7 {
+    -fx-bar-fill: #ff5700;
+    -fx-pie-color: #ff5700;
+}
+
+.series8 {
+    -fx-bar-fill: #3dddda;
+    -fx-pie-color: #3dddda;
+}
+
+.series9 {
+    -fx-bar-fill: #a9e200aa;
+    -fx-pie-color: #a9e200aa;
+}
+
+.series10 {
+    -fx-bar-fill: rgba(186, 0, 140, 0.98);
+    -fx-pie-color: rgba(186, 0, 140, 0.98);
+}
+
+.series11 {
+    -fx-bar-fill: #b10bb8;
+    -fx-pie-color: #b10bb8;
+}
+
+.series12 {
+    -fx-bar-fill: #860061;
+    -fx-pie-color: #860061;
+}
+
+.series13 {
+    -fx-bar-fill: #2f357faa;
+    -fx-pie-color: #2f357faa;
+}
+
+.series14 {
+    -fx-bar-fill: #baffba;
+    -fx-pie-color: #baffba;
+}
+
+.series15 {
+    -fx-bar-fill: #36c6b0;
+    -fx-pie-color: #36c6b0;
+}
+
+.series16 {
+    -fx-bar-fill: #860061aa;
+    -fx-pie-color: #860061aa;
+}
+
+.series17 {
+    -fx-bar-fill: #677fd9;
+    -fx-pie-color: #677fd9;
+}
+
+.series18 {
+    -fx-bar-fill: #1cc3e2;
+    -fx-pie-color: #1cc3e2;
+}
+
+.series19 {
+    -fx-bar-fill: #88b501;
+    -fx-pie-color: #88b501;
+}
+
+/**
+ * Booked time statistics
+ */
+.negative {
+    -fx-text-fill: -ytwlv-warning-color;
+}
+
+.positive {
+    -fx-text-fill: -ytwlv-success-color;
+}
+
+/**
+ * Settings
+ */
+.hint-label {
+     -fx-text-fill: derive(-fx-light-text-color, -40%);
+}
+

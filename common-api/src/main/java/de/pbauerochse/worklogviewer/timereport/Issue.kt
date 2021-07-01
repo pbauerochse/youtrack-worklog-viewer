@@ -84,6 +84,12 @@ interface Issue: Comparable<Issue> {
     val fullTitle: String
         get() = "$humanReadableId - $title"
 
+    /**
+     * Returns whether this Issue is resolved
+     */
+    val isResolved: Boolean
+        get() = resolutionDate != null
+
     override fun compareTo(other: Issue): Int {
         return when (val byProject = project.shortName.compareTo(other.project.shortName)) {
             0 -> issueNumber.compareTo(other.issueNumber)

@@ -1,186 +1,21 @@
-#waitScreenOverlay .progress-indicator {
-    -fx-progress-color: #a5cdff;
+/**
+ * Light Theme
+ */
+.root {
+    -fx-accent: #089acb;
+    -ytwlv-time-report-grouping-background-color: #c8ddff;
+    -ytwlv-today-cell-background-color: rgba(178, 233, 255, 0.5);
+    -ytwlv-highlight-cell-background-color: rgba(189, 255, 209, 0.5);
 }
 
-.tool-bar {
-    -fx-background-color: -fx-color;
-    -fx-border-color: #ccc;
-    -fx-border-width: 1px;
+.time-report-table .grouping-item,
+.time-report-table .summary-item,
+.time-report-table .cell:selected .grouping-item,
+.time-report-table .cell:selected .summary-item {
+    -fx-text-fill: -ytwlv-dark-text-color;
 }
 
-.required {
-    -fx-border-color: red;
+.time-report-table .tree-cell > .tree-disclosure-node > .arrow,
+.time-report-table .tree-table-row-cell > .tree-disclosure-node > .arrow {
+    -fx-background-color: -ytwlv-dark-text-color;
 }
-
-.highlight-cell {
-    -fx-background-color: rgba(189, 255, 209, 0.5);
-}
-
-.today-highlight-cell {
-    -fx-background-color: rgba(178, 233, 255, 0.5);
-}
-
-.tree-table-view .column-header {
-    -fx-font-size: 11px;
-}
-
-.tree-table-cell {
-    -fx-font-size: 11px;
-}
-
-.tree-table-row-cell {
-    -fx-background-color: -fx-table-cell-border-color, -fx-control-inner-background;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-padding: 0.0em;
-    -fx-text-fill: -fx-text-inner-color;
-}
-
-.tree-table-row-cell:selected {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-focus-color;
-    -fx-background-insets: 0, 1, 2;
-}
-
-.tree-table-view:focused .tree-table-row-cell:filled:focused:selected .issue-cell {
-    -fx-text-fill: #ffffff;
-}
-
-.issue-cell {
-    -fx-text-fill: #3b6aed;
-    -fx-highlight-text-fill: #ffffff;
-    -fx-underline: true;
-}
-
-.resolved-issue-cell {
-    -fx-text-fill: #555555;
-    -fx-underline: false !important;
-}
-
-.summary-cell {
-    -fx-font-weight: bold;
-    -fx-font-size: 12px;
-    -fx-alignment: center-right;
-}
-
-.group-cell, .group-title-cell {
-    -fx-background-color: #c8ddff;
-    -fx-font-size: 14px;
-}
-
-/* chart colors */
-.series0 {
-    -fx-bar-fill: #f9bf09;
-    -fx-pie-color: #f9bf09;
-}
-
-.series1 {
-    -fx-bar-fill: #75e25e;
-    -fx-pie-color: #75e25e;
-}
-
-.series2 {
-    -fx-bar-fill: #22bad9;
-    -fx-pie-color: #22bad9;
-}
-
-.series3 {
-    -fx-bar-fill: #0181e2;
-    -fx-pie-color: #0181e2;
-}
-
-.series4 {
-    -fx-bar-fill: #2f357f;
-    -fx-pie-color: #2f357f;
-}
-
-.series5 {
-    -fx-bar-fill: #860061;
-    -fx-pie-color: #860061;
-}
-
-.series6 {
-    -fx-bar-fill: #c62b00;
-    -fx-pie-color: #c62b00;
-}
-
-.series7 {
-    -fx-bar-fill: #ff5700;
-    -fx-pie-color: #ff5700;
-}
-
-.series8 {
-    -fx-bar-fill: #3dddda;
-    -fx-pie-color: #3dddda;
-}
-
-.series9 {
-    -fx-bar-fill: #a9e200aa;
-    -fx-pie-color: #a9e200aa;
-}
-
-.series10 {
-    -fx-bar-fill: rgba(186, 0, 140, 0.98);
-    -fx-pie-color: rgba(186, 0, 140, 0.98);
-}
-
-.series11 {
-    -fx-bar-fill: #b10bb8;
-    -fx-pie-color: #b10bb8;
-}
-
-.series12 {
-    -fx-bar-fill: #860061;
-    -fx-pie-color: #860061;
-}
-
-.series13 {
-    -fx-bar-fill: #2f357faa;
-    -fx-pie-color: #2f357faa;
-}
-
-.series14 {
-    -fx-bar-fill: #baffba;
-    -fx-pie-color: #baffba;
-}
-
-.series15 {
-    -fx-bar-fill: #36c6b0;
-    -fx-pie-color: #36c6b0;
-}
-
-.series16 {
-    -fx-bar-fill: #860061aa;
-    -fx-pie-color: #860061aa;
-}
-
-.series17 {
-    -fx-bar-fill: #677fd9;
-    -fx-pie-color: #677fd9;
-}
-
-.series18 {
-    -fx-bar-fill: #1cc3e2;
-    -fx-pie-color: #1cc3e2;
-}
-
-.series19 {
-    -fx-bar-fill: #88b501;
-    -fx-pie-color: #88b501;
-}
-
-.progress-bar.error > .bar {
-    -fx-background-color: #dd3e3b;
-}
-
-.error-label {
-    -fx-text-fill: #dd3e3b;
-    -fx-font-weight: bold;
-}
-
-.negative {
-    -fx-text-fill: #dd3e3b;
-}
-
-.positive {
-    -fx-text-fill: #4ba101;
-}
-

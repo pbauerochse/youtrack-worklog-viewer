@@ -6,22 +6,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
-<fx:root type="BorderPane" fx:id="issueDetailsPane" minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
-    <padding>
-        <Insets bottom="7.0" left="7.0" right="7.0" top="7.0"/>
-    </padding>
-
+<fx:root type="BorderPane" fx:id="issueDetailsPane" styleClass="issue-details-pane" minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <top>
         <VBox spacing="10">
             <padding>
                 <Insets top="10" />
             </padding>
 
-            <Label fx:id="issueSummaryLabel" wrapText="true">
-                <font>
-                    <Font name="System Bold" size="16.0"/>
-                </font>
-            </Label>
+            <Label fx:id="issueSummaryLabel" styleClass="issue-summary" wrapText="true" />
             <FlowPane fx:id="issueTagsPane" VBox.vgrow="SOMETIMES" hgap="5.0" vgap="3.0" />
             <FlowPane fx:id="issueFieldsPane" VBox.vgrow="SOMETIMES" />
         </VBox>

@@ -15,6 +15,7 @@ import java.text.NumberFormat
 class TimeByGroupingCriteriaChart(reportView: ReportView) : StackPane() {
 
     init {
+        styleClass.add("statistic-item")
         val mouseOverLabel = Label().apply {
             isPickOnBounds = false
             visibleProperty().set(false)

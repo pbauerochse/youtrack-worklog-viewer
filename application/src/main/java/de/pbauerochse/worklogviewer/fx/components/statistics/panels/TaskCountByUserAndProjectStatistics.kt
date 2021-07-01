@@ -3,9 +3,7 @@ package de.pbauerochse.worklogviewer.fx.components.statistics.panels
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.ProjectSummary
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.UserStatistic
-import de.pbauerochse.worklogviewer.util.FormattingUtil.formatMinutes
-import de.pbauerochse.worklogviewer.util.FormattingUtil.formatPercentage
-import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
+import de.pbauerochse.worklogviewer.util.FormattingUtil.*
 import javafx.geometry.HPos
 import javafx.scene.control.Label
 import javafx.scene.layout.GridPane
@@ -24,6 +22,7 @@ class TaskCountByUserAndProjectStatistics(private val data: TaskCountByUserAndPr
     init {
         hgap = 5.0
         vgap = 5.0
+        styleClass.add("statistic-item")
 
         renderStatisticsIfNecessary()
         visibleProperty().addListener { _, _, _ -> renderStatisticsIfNecessary() }
@@ -66,7 +65,6 @@ class TaskCountByUserAndProjectStatistics(private val data: TaskCountByUserAndPr
         val totalNumberOfTickets = userStatistic.totalNumberOfTickets
         val label = Label(getFormatted("view.statistics.somethingtoamountoftickets", userStatistic.userDisplayLabel, totalNumberOfTickets))
         label.styleClass.add("task-by-user-statistics-username")
-//        label.padding = Insets(20.0, 0.0, 0.0, 0.0)
         setConstraints(label, 0, index)
         setColumnSpan(label, 3)
         return label

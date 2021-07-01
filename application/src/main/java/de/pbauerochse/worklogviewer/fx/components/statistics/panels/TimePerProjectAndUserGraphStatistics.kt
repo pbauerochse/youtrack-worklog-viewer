@@ -28,6 +28,7 @@ class TimePerProjectAndUserGraphStatistics(
     init {
         title = getFormatted("view.statistics.byprojectandemployee")
         prefHeight = (HEIGHT_PER_Y_AXIS_ELEMENT * statisticsData.numberOfProjects + HEIGHT_PER_X_AXIS_ELEMENT * statisticsData.userStatistics.size + ADDITIONAL_HEIGHT).toDouble()
+        styleClass.add("statistic-item")
 
         projectAxis.apply {
             label = getFormatted("view.statistics.timespentinhours")

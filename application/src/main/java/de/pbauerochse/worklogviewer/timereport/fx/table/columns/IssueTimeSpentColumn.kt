@@ -1,12 +1,14 @@
 package de.pbauerochse.worklogviewer.timereport.fx.table.columns
 
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.ALL_WORKLOGVIEWER_CLASSES
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.GROUP_CELL
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.HIGHLIGHT_CELL
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.SUMMARY_CELL
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TIMESPENT_CELL
-import de.pbauerochse.worklogviewer.fx.components.ComponentStyleClasses.TODAY_HIGHLIGHT_CELL
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.ALL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.GRAND_SUMMARY_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.GROUPING_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.HIGHLIGHT
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.ISSUE_ITEM_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.SUMMARY_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.TIME_SPENT_CELL
+import de.pbauerochse.worklogviewer.timereport.fx.table.TimeReportTreeViewStyleClasses.TODAY
 import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.IssueCellContextMenu
 import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatDate
@@ -21,7 +23,6 @@ import javafx.scene.control.Tooltip
 import javafx.scene.control.TreeTableCell
 import javafx.scene.control.TreeTableColumn
 import javafx.scene.input.MouseButton
-import javafx.scene.input.MouseEvent
 import javafx.util.Callback
 import java.time.LocalDate
 
@@ -69,7 +70,7 @@ data class TimeSpentColumnData(
 private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData>() {
 
     init {
-        onMouseClicked = EventHandler<MouseEvent> {
+        onMouseClicked = EventHandler {
             when {
                 it.button == MouseButton.PRIMARY && it.clickCount == 2 -> showAddWorkItemDialog()
             }
@@ -81,10 +82,11 @@ private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData
 
         text = null
         tooltip = null
-        styleClass.removeAll(ALL_WORKLOGVIEWER_CLASSES)
+        styleClass.removeAll(ALL)
 
         if (!empty && item != null) {
             val date = item.dateProperty.get()
+            styleClass.add(TIME_SPENT_CELL)
 
             when {
                 item.reportRow.isGrouping -> handleGroupBy(date, item.reportRow as GroupReportRow)
@@ -93,50 +95,43 @@ private class TimeSpentColumnCell : TreeTableCell<ReportRow, TimeSpentColumnData
             }
 
             when {
-                isHighlighted(date) -> styleClass.add(HIGHLIGHT_CELL)
-                isToday(date) -> styleClass.add(TODAY_HIGHLIGHT_CELL)
+                isHighlighted(date) -> styleClass.add(HIGHLIGHT)
+                isToday(date) -> styleClass.add(TODAY)
             }
         }
     }
 
     private fun handleGroupBy(date: LocalDate, row: GroupReportRow) {
         contextMenu = null
-        val totalTimeSpentInMinutes = row.getDurationInMinutes(date)
-        if (totalTimeSpentInMinutes > 0) {
-            text = formatMinutes(totalTimeSpentInMinutes)
-        }
-        styleClass.add(GROUP_CELL)
+        text = row.getDurationInMinutes(date).takeIf { it > 0 }?.let { formatMinutes(it) }
+        styleClass.add(GROUPING_CELL)
     }
 
     private fun handleIssue(date: LocalDate, row: IssueReportRow) {
+        contextMenu = IssueCellContextMenu(row.issueWithWorkItems.issue, date)
+        styleClass.addAll(ISSUE_ITEM_CELL, TIME_SPENT_CELL)
 
         val workItemsForDate = row.issueWithWorkItems.getWorkItemsForDate(date)
-        val workItemsAsString = workItemsForDate.joinToString(prefix = "\n\n", separator = "\n") { workItem ->
-            listOfNotNull(
-                workItem.owner.label,
-                formatMinutes(workItem.durationInMinutes),
-                workItem.workType?.label,
-                workItem.description.takeIf { it.isNotBlank() }
-            ).joinToString(separator = " - ")
-        }
-
-        contextMenu = IssueCellContextMenu(row.issueWithWorkItems.issue, date)
-
         val timeSpentInMinutes = workItemsForDate.sumOf { it.durationInMinutes }
         if (timeSpentInMinutes > 0) {
+            val workItemsAsString = workItemsForDate.joinToString(prefix = "\n\n", separator = "\n") { workItem ->
+                listOfNotNull(
+                    workItem.owner.label,
+                    formatMinutes(workItem.durationInMinutes),
+                    workItem.workType?.label,
+                    workItem.description.takeIf { it.isNotBlank() }
+                ).joinToString(separator = " - ")
+            }
+
             text = formatMinutes(timeSpentInMinutes)
             tooltip = Tooltip("${row.issueWithWorkItems.issue.fullTitle}\n\n${tableColumn.text} : $text$workItemsAsString")
-            styleClass.add(TIMESPENT_CELL)
         }
     }
 
     private fun handleSummary(date: LocalDate, row: SummaryReportRow) {
+        styleClass.addAll(SUMMARY_CELL, GRAND_SUMMARY_CELL)
         contextMenu = null
-        val totalTimeSpentInMinutes = row.getDurationInMinutes(date)
-        if (totalTimeSpentInMinutes > 0) {
-            text = formatMinutes(totalTimeSpentInMinutes)
-            styleClass.add(SUMMARY_CELL)
-        }
+        text = row.getDurationInMinutes(date).takeIf { it > 0 }?.let { formatMinutes(it) }
     }
 
     private fun showAddWorkItemDialog() {
