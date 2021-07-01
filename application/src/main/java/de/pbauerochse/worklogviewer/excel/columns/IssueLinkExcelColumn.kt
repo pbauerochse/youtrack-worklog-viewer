@@ -33,7 +33,7 @@ class IssueLinkExcelColumn : ExcelColumnRenderer {
 
     private fun renderIssue(workbook: POIWorkbook, cell: Cell, value: IssueReportRow) {
         val link = workbook.createHyperlink(value.issueWithWorkItems.issue.externalUrl)
-        val cellStyle = if (value.issueWithWorkItems.issue.resolutionDate != null) workbook.resolvedIssueStyle else workbook.regularIssueStyle
+        val cellStyle = if (value.issueWithWorkItems.issue.isResolved) workbook.resolvedIssueStyle else workbook.regularIssueStyle
 
         cell.hyperlink = link
         cell.setCellValue(value.label)

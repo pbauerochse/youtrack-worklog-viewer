@@ -33,7 +33,7 @@
                         <CheckBox fx:id="showIssueDescriptionCheckbox" text="%search.results.show.description" />
 
                     </FlowPane>
-                    <ListView fx:id="searchResultsListView" VBox.vgrow="ALWAYS"/>
+                    <ListView fx:id="searchResultsListView" styleClass="search-results-list" VBox.vgrow="ALWAYS" />
                 </VBox>
             </Tab>
         </TabPane>

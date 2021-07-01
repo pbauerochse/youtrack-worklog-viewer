@@ -6,10 +6,10 @@ import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.IssueCel
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Insets
 import javafx.scene.Parent
+import javafx.scene.control.Label
 import javafx.scene.control.ListCell
-import javafx.scene.layout.BorderPane
 import javafx.scene.layout.FlowPane
-import javafx.scene.text.Text
+import javafx.scene.layout.Pane
 
 /**
  * Custom component to display more information about
@@ -17,10 +17,10 @@ import javafx.scene.text.Text
  */
 class SearchResultListViewItem : ListCell<Issue>() {
 
-    lateinit var listViewItem: BorderPane
-    lateinit var issueIdLabel: Text
-    lateinit var issueTitleLabel: Text
-    lateinit var issueDescriptionLabel: Text
+    lateinit var listViewItem: Pane
+    lateinit var issueIdLabel: Label
+    lateinit var issueTitleLabel: Label
+    lateinit var issueDescriptionLabel: Label
     lateinit var fieldsFlowPane: FlowPane
     lateinit var tagsFlowPane: FlowPane
 
@@ -43,7 +43,7 @@ class SearchResultListViewItem : ListCell<Issue>() {
         } else {
             issueIdLabel.text = issue.humanReadableId
             issueTitleLabel.text = issue.title
-            issueDescriptionLabel.text = issue.descriptionPlaintext
+            issueDescriptionLabel.text = issue.descriptionPlaintext.trim()
             fieldsFlowPane.children.setAll(
                 issue.fields
                     .filter { it.value.isNotEmpty() }
@@ -51,7 +51,7 @@ class SearchResultListViewItem : ListCell<Issue>() {
             )
             tagsFlowPane.children.setAll(issue.tags.map { IssueTagLabel(it) })
 
-            issue.resolutionDate?.let {
+            if (issue.isResolved) {
                 listViewItem.styleClass.add(RESOLVED_CLASS)
             }
 

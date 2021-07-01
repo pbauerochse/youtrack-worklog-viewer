@@ -42,6 +42,7 @@ class OvertimeStatisticsPane(private val reportView: ReportView) : GridPane() {
         loader.setRoot(this)
         loader.setController(this)
         loader.load<Parent>()
+        styleClass.add("statistic-item")
 
         val settingsViewModel = SettingsUtil.settingsViewModel
 

@@ -13,8 +13,8 @@ internal object CustomTimerangeProvider : TimerangeProvider {
     override val settingsKey: String = "CUSTOM"
     override val isComputed: Boolean = false
     override fun buildTimeRange(start: LocalDate?, end: LocalDate?): TimeRange {
-        checkNotNull(start) { getFormatted("timerange.custom.startrequired") }
-        checkNotNull(end) { getFormatted("timerange.custom.endrequired") }
-        return TimeRange(start, end)
+        return if (start != null && end != null) {
+            TimeRange(start, end)
+        } else TimeRange.currentAndLastWeek()
     }
 }
