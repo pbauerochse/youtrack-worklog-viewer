@@ -8,6 +8,9 @@ import de.pbauerochse.worklogviewer.events.EventBus
 import de.pbauerochse.worklogviewer.search.fx.SearchModel
 import de.pbauerochse.worklogviewer.settings.SettingsUtil
 import de.pbauerochse.worklogviewer.timereport.Issue
+import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.AddWorkItemToIssueMenuItem
+import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.OpenIssueInBrowserMenuItem
+import de.pbauerochse.worklogviewer.timereport.fx.table.columns.context.ToggleFavouriteMenuItem
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import javafx.beans.binding.Bindings.createStringBinding
 import javafx.beans.property.SimpleObjectProperty
@@ -89,27 +92,35 @@ class SearchResultContentController : Initializable {
             isClosable = true
             content = IssueDetailsPane(issue)
             setOnClosed { EventBus.publish(CloseIssueDetailsRequestEvent(issue)) }
-            contextMenu = createTabContextMenu(this)
+            contextMenu = createTabContextMenu(issue, this)
         }
 
         searchContentPane.tabs.add(tab)
         return tab
     }
 
-    private fun createTabContextMenu(tab: Tab) = ContextMenu(
-        MenuItem(getFormatted("search.results.details.tab.close.all")).apply {
-            setOnAction { closeDetailTabs() }
-        },
-        MenuItem(getFormatted("search.results.details.tab.close.left", tab.text)).apply {
-            setOnAction { closeDetailTabs { searchContentPane.tabs.indexOf(it) < searchContentPane.tabs.indexOf(tab) } }
-        },
-        MenuItem(getFormatted("search.results.details.tab.close.right", tab.text)).apply {
-            setOnAction { closeDetailTabs { searchContentPane.tabs.indexOf(it) > searchContentPane.tabs.indexOf(tab) } }
-        },
-        MenuItem(getFormatted("search.results.details.tab.close.other")).apply {
-            setOnAction { closeDetailTabs { it != tab } }
-        }
-    )
+    private fun createTabContextMenu(issue: Issue, tab: Tab): ContextMenu {
+        return ContextMenu(
+            OpenIssueInBrowserMenuItem(issue),
+            AddWorkItemToIssueMenuItem(issue) { tab.tabPane.scene },
+            ToggleFavouriteMenuItem(issue),
+
+            SeparatorMenuItem(),
+
+            MenuItem(getFormatted("search.results.details.tab.close.all")).apply {
+                setOnAction { closeDetailTabs() }
+            },
+            MenuItem(getFormatted("search.results.details.tab.close.left", tab.text)).apply {
+                setOnAction { closeDetailTabs { searchContentPane.tabs.indexOf(it) < searchContentPane.tabs.indexOf(tab) } }
+            },
+            MenuItem(getFormatted("search.results.details.tab.close.right", tab.text)).apply {
+                setOnAction { closeDetailTabs { searchContentPane.tabs.indexOf(it) > searchContentPane.tabs.indexOf(tab) } }
+            },
+            MenuItem(getFormatted("search.results.details.tab.close.other")).apply {
+                setOnAction { closeDetailTabs { it != tab } }
+            }
+        )
+    }
 
     private fun createSearchResultListViewItem(): SearchResultListViewItem {
         return SearchResultListViewItem().apply {
