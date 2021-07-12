@@ -13,6 +13,7 @@ import de.pbauerochse.worklogviewer.trimToNull
 import de.pbauerochse.worklogviewer.util.WorklogTimeFormatter
 import de.pbauerochse.worklogviewer.workitem.add.AddWorkItemTask
 import de.pbauerochse.worklogviewer.workitem.add.event.WorkItemAddedEvent
+import de.pbauerochse.worklogviewer.workitem.add.fx.task.LoadIssueByReadableIdTask
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -113,6 +114,18 @@ class AddWorkItemModel() {
         Tasks.startTask(task)
     }
 
+    internal fun updateIssueById(humanReadableIssueId: String) {
+        val task = LoadIssueByReadableIdTask(humanReadableIssueId).apply {
+            onSucceeded = EventHandler {
+                this@AddWorkItemModel.selectedIssue.value = this.value
+                updateWorkItemTypes(this.value.project)
+            }
+            onFailed = EventHandler { errorMessage.set(it.source.exception.message) }
+        }
+
+        Tasks.startBackgroundTask(task)
+    }
+
     private fun handleAddWorkItemResponse(addWorkItemResult: AddWorkItemResult) {
         EventBus.publish(WorkItemAddedEvent(addWorkItemResult.issue, addWorkItemResult.addedWorkItem))
     }
@@ -129,7 +142,7 @@ class AddWorkItemModel() {
                 onFailed = EventHandler { errorMessage.set(it.source.exception.message) }
             }
 
-            Tasks.startTask(task)
+            Tasks.startBackgroundTask(task)
         }
     }
 

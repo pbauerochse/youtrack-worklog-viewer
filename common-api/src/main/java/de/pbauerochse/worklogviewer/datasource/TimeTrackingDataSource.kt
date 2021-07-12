@@ -32,7 +32,7 @@ interface TimeTrackingDataSource {
     /**
      * Loads the details for an [Issue] by id
      */
-    fun loadIssue(id: String, progress: Progress): IssueWithWorkItems
+    fun loadIssue(id: String, progress: Progress): Issue
 
     /**
      * returns the [WorkItemType]s currently valid for the
