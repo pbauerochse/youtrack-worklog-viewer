@@ -44,10 +44,8 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         return generateRandomIssues(Random.nextInt(1, maxResults))
     }
 
-    override fun loadIssue(id: String, progress: Progress): IssueWithWorkItems {
-        val issue = generateRandomIssues(1).first()
-        val workItems = generateWorkItems(issue, LocalDate.now(), generateRandomUsers(), progress)
-        return IssueWithWorkItems(issue, workItems)
+    override fun loadIssue(id: String, progress: Progress): Issue {
+        return generateRandomIssues(1).first()
     }
 
     override fun loadWorkItems(issue: Issue, timeRange: TimeRange?, progress: Progress): IssueWithWorkItems {
@@ -183,7 +181,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
         id: String,
         name: String,
         val possibleFields: List<DummyNames.ProjectField> = emptyList()
-    ): Project(id, name, name) {
+    ) : Project(id, name, name) {
         override fun toString(): String = name
     }
 

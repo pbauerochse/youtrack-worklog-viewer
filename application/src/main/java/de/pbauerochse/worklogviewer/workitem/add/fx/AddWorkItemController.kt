@@ -37,6 +37,10 @@ class AddWorkItemController : Initializable {
             textProperty().bindBidirectional(model.issueId)
         }
 
+        if (model.selectedIssue.isNull.value) {
+            attachIssueChangeListener()
+        }
+
         workDateDatePicker.valueProperty().bindBidirectional(model.selectedDate)
         DatePickerManualEditListener.applyTo(workDateDatePicker)
 
@@ -68,6 +72,14 @@ class AddWorkItemController : Initializable {
         }
     }
 
+    private fun attachIssueChangeListener() {
+        issueTextField.focusedProperty().addListener { _, wasPreviouslyFocused, isCurrentlyFocused ->
+            if (wasPreviouslyFocused && !isCurrentlyFocused && !issueTextField.text.isNullOrBlank()) {
+                model.updateIssueById(issueTextField.text)
+            }
+        }
+    }
+
     private fun onFormShown() {
         focusBestInputElement()
     }
@@ -77,6 +89,7 @@ class AddWorkItemController : Initializable {
         val window = progressBarContainer.scene.window
         window.fireEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST))
     }
+
 
     fun createNewWorkItem() {
         model.submitWorkItem {

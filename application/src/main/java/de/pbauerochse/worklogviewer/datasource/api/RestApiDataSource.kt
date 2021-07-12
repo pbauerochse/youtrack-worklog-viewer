@@ -85,9 +85,10 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
         )
     }
 
-    override fun loadIssue(id: String, progress: Progress): IssueWithWorkItems {
+    override fun loadIssue(id: String, progress: Progress): Issue {
         val url = "/api/issues/$id?fields=$ISSUE_FIELDS"
 
+        progress.setProgress(i18n("connector.rest.issue.byid", id), 1.0)
         val response = http.get(url)
         if (response.isError) {
             LOGGER.error("Got Error Response Message from YouTrack while loading single Issue $id from URL $url: ${response.statusLine.statusCode} ${response.error}")
@@ -95,7 +96,8 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
         }
 
         val youtrackIssue = MAPPER.readValue(response.content!!, YouTrackIssue::class.java)
-        return loadWorkItems(IssueAdapter(youtrackIssue, issueUrlBuilder.invoke(youtrackIssue)), progress)
+        progress.setProgress(i18n("connector.rest.done"), 100.0)
+        return IssueAdapter(youtrackIssue, issueUrlBuilder.invoke(youtrackIssue))
     }
 
     override fun loadIssuesByIds(issueIds: Set<String>, progress: Progress): List<Issue> {
