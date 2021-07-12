@@ -85,7 +85,11 @@ class AddWorkItemController : Initializable {
     }
 
     private fun focusBestInputElement() {
-        val focusedElement = if (model.selectedIssue.isNull.value) issueTextField else workDurationTextField
+        val focusedElement = when {
+            model.selectedIssue.isNull.value -> issueTextField
+            model.selectedDate.isNull.value -> workDateDatePicker
+            else -> workDurationTextField
+        }
         focusedElement.requestFocus()
     }
 
