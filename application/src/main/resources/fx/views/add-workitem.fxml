@@ -32,6 +32,11 @@
                                     <Insets bottom="2.0" top="2.0" />
                                 </GridPane.margin>
                             </TextField>
+                            <Hyperlink fx:id="issueTitleLink" GridPane.columnSpan="2147483647" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                                <GridPane.margin>
+                                    <Insets bottom="2.0" top="2.0" />
+                                </GridPane.margin>
+                            </Hyperlink>
 
                             <Label text="%dialog.addworkitem.date" GridPane.rowIndex="2" />
                             <Label text="%dialog.addworkitem.time" GridPane.columnIndex="1" GridPane.rowIndex="2" />

@@ -39,6 +39,11 @@ class AddWorkItemModel() {
     internal val issueId: StringProperty = SimpleStringProperty()
 
     /**
+     * The title of the selected [Issue] if available
+     */
+    internal val issueTitle: StringProperty = SimpleStringProperty()
+
+    /**
      * A prefilled [LocalDate] for the new [de.pbauerochse.worklogviewer.timereport.WorkItem]
      */
     internal val selectedDate: ObjectProperty<LocalDate?> = SimpleObjectProperty()
@@ -87,11 +92,8 @@ class AddWorkItemModel() {
         .and(selectedDate.isNotNull)
 
     fun forIssueAtDate(issue: Issue?, date: LocalDate?) {
-        issueId.set(issue?.humanReadableId)
-        selectedIssue.set(issue)
+        updateSelectedIssue(issue)
         selectedDate.set(date)
-
-        updateWorkItemTypes(issue?.project)
     }
 
     internal fun submitWorkItem(successCallback: () -> Unit) {
@@ -117,13 +119,20 @@ class AddWorkItemModel() {
     internal fun updateIssueById(humanReadableIssueId: String) {
         val task = LoadIssueByReadableIdTask(humanReadableIssueId).apply {
             onSucceeded = EventHandler {
-                this@AddWorkItemModel.selectedIssue.value = this.value
-                updateWorkItemTypes(this.value.project)
+                updateSelectedIssue(value)
             }
             onFailed = EventHandler { errorMessage.set(it.source.exception.message) }
         }
 
         Tasks.startBackgroundTask(task)
+    }
+
+    private fun updateSelectedIssue(issue: Issue?) {
+        issueId.set(issue?.humanReadableId)
+        issueTitle.set(issue?.fullTitle)
+        selectedIssue.set(issue)
+
+        updateWorkItemTypes(issue?.project)
     }
 
     private fun handleAddWorkItemResponse(addWorkItemResult: AddWorkItemResult) {

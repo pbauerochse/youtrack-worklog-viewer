@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.workitem.add.fx
 
 import de.pbauerochse.worklogviewer.fx.listener.DatePickerManualEditListener
+import de.pbauerochse.worklogviewer.setHref
 import de.pbauerochse.worklogviewer.timereport.WorkItemType
 import javafx.fxml.Initializable
 import javafx.scene.control.*
@@ -23,6 +24,7 @@ class AddWorkItemController : Initializable {
     lateinit var saveButton: Button
     lateinit var cancelButton: Button
     lateinit var issueTextField: TextField
+    lateinit var issueTitleLink: Hyperlink
     lateinit var workDateDatePicker: DatePicker
     lateinit var workDurationTextField: TextField
     lateinit var workDescriptionTextField: TextField
@@ -33,9 +35,18 @@ class AddWorkItemController : Initializable {
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         issueTextField.apply {
-            disableProperty().bind(model.selectedIssue.isNotNull)
+            visibleProperty().bind(model.selectedIssue.isNull)
+            managedProperty().bind(model.selectedIssue.isNull)
             textProperty().bindBidirectional(model.issueId)
         }
+
+        issueTitleLink.apply {
+            visibleProperty().bind(model.selectedIssue.isNotNull)
+            managedProperty().bind(model.selectedIssue.isNotNull)
+            textProperty().bind(model.issueTitle)
+            tooltip = Tooltip().apply { textProperty().bind(model.issueTitle) }
+        }
+        model.selectedIssue.addListener { _, _, issue -> issue?.let { issueTitleLink.setHref(it.externalUrl.toExternalForm()) } }
 
         if (model.selectedIssue.isNull.value) {
             attachIssueChangeListener()
