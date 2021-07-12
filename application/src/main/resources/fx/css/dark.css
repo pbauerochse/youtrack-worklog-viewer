@@ -56,7 +56,8 @@
 
 .favourite-issue-cell,
 .favourite-search-cell,
-.time-report-table .issue-title {
+.time-report-table .issue-title,
+.hyperlink {
     -fx-text-fill: -ytwlv-bright-highlighted-text-color;
 }
 
