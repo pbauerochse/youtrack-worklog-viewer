@@ -22,6 +22,7 @@ import javafx.scene.input.MouseEvent.MOUSE_PRESSED
 import javafx.scene.text.Text
 import org.slf4j.LoggerFactory
 import java.net.URL
+import java.time.LocalDate
 import java.util.*
 
 /**
@@ -105,7 +106,7 @@ class FavouritesController : Initializable {
             TreeItem(FavouriteItem(
                 label = issue.fullTitle,
                 onSelect = { showIssueDetails(issue) },
-                contextMenu = IssueCellContextMenu(issue),
+                contextMenu = IssueCellContextMenu(issue, LocalDate.now()),
                 styleClasses = styleClasses
             ))
         }

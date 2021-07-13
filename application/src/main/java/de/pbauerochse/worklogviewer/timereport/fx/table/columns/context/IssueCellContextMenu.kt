@@ -8,7 +8,7 @@ import java.time.LocalDate
 /**
  * Context menu for an [de.pbauerochse.worklogviewer.fx.components.treetable.columns.IssueLinkColumn]
  */
-class IssueCellContextMenu(issue: Issue, date: LocalDate? = null, showAddForOtherIssueItem: Boolean = true) : ContextMenu() {
+class IssueCellContextMenu(issue: Issue, date: LocalDate, showAddForOtherIssueItem: Boolean = true) : ContextMenu() {
 
     private val addWorkItemMenuItem: AddWorkItemToIssueMenuItem = AddWorkItemToIssueMenuItem(issue, date) { scene }
 

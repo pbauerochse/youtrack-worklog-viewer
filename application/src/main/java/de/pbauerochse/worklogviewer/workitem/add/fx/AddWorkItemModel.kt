@@ -91,7 +91,7 @@ class AddWorkItemModel() {
         .and(isValidDuration)
         .and(selectedDate.isNotNull)
 
-    fun forIssueAtDate(issue: Issue?, date: LocalDate?) {
+    fun forIssueAtDate(issue: Issue?, date: LocalDate) {
         updateSelectedIssue(issue)
         selectedDate.set(date)
     }

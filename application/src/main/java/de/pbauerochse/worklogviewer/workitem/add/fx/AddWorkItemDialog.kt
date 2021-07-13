@@ -13,8 +13,8 @@ import java.time.LocalDate
  * Opens a dialog to add an work item
  */
 object AddWorkItemDialog {
-    fun show(scene: Scene, date: LocalDate? = null, issue: Issue? = null) = show(Dialog(scene), date, issue)
-    private fun show(dialog: Dialog, date: LocalDate? = null, issue: Issue? = null) {
+    fun show(scene: Scene, date: LocalDate, issue: Issue? = null) = show(Dialog(scene), date, issue)
+    private fun show(dialog: Dialog, date: LocalDate, issue: Issue? = null) {
         val loader = FXMLLoader(AddWorkItemDialog::class.java.getResource("/fx/views/add-workitem.fxml"), FormattingUtil.RESOURCE_BUNDLE)
         val root = loader.load<Parent>()
 
