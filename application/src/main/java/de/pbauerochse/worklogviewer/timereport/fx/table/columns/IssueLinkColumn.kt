@@ -19,6 +19,7 @@ import javafx.scene.control.TreeTableCell
 import javafx.scene.control.TreeTableColumn
 import javafx.scene.input.MouseButton
 import javafx.util.Callback
+import java.time.LocalDate
 
 /**
  * Displays the description and the id of the
@@ -76,7 +77,7 @@ private class IssueLinkCell : TreeTableCell<ReportRow, ReportRow>() {
     }
 
     private fun handleIssue(reportGroup: IssueReportRow) {
-        contextMenu = IssueCellContextMenu(reportGroup.issueWithWorkItems.issue)
+        contextMenu = IssueCellContextMenu(reportGroup.issueWithWorkItems.issue, LocalDate.now())
         styleClass.addAll(ISSUE_ITEM_CELL, ISSUE_TITLE_CELL)
         if (reportGroup.issueWithWorkItems.issue.isResolved) {
             styleClass.add(RESOLVED)

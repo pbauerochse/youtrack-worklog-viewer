@@ -10,6 +10,7 @@ import javafx.scene.control.Label
 import javafx.scene.control.ListCell
 import javafx.scene.layout.FlowPane
 import javafx.scene.layout.Pane
+import java.time.LocalDate
 
 /**
  * Custom component to display more information about
@@ -55,7 +56,7 @@ class SearchResultListViewItem : ListCell<Issue>() {
                 listViewItem.styleClass.add(RESOLVED_CLASS)
             }
 
-            contextMenu = IssueCellContextMenu(issue, showAddForOtherIssueItem = false)
+            contextMenu = IssueCellContextMenu(issue, date = LocalDate.now(), showAddForOtherIssueItem = false)
             graphic = listViewItem
         }
     }

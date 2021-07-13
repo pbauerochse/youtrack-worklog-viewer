@@ -28,7 +28,7 @@ class OpenIssueInDetailsPaneMenuItem(issue: Issue) : MenuItem(getFormatted("cont
     }
 }
 
-class AddWorkItemToIssueMenuItem(private val issue: Issue, private val date: LocalDate? = null, private val sceneProvider: () -> Scene) :
+class AddWorkItemToIssueMenuItem(private val issue: Issue, private val date: LocalDate = LocalDate.now(), private val sceneProvider: () -> Scene) :
     MenuItem(getFormatted("contextmenu.issue.addworkitem", issue.humanReadableId)) {
     init {
         onAction = EventHandler { showAddWorkItemToIssueDialog() }
@@ -39,7 +39,7 @@ class AddWorkItemToIssueMenuItem(private val issue: Issue, private val date: Loc
     }
 }
 
-class AddWorkItemToOtherIssueMenuItem(date: LocalDate? = null, private val sceneProvider: () -> Scene) : MenuItem(getFormatted("contextmenu.issue.addanyworkitem")) {
+class AddWorkItemToOtherIssueMenuItem(date: LocalDate = LocalDate.now(), private val sceneProvider: () -> Scene) : MenuItem(getFormatted("contextmenu.issue.addanyworkitem")) {
     init {
         onAction = EventHandler { AddWorkItemDialog.show(sceneProvider.invoke(), date) }
     }
