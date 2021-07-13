@@ -3,6 +3,7 @@ package de.pbauerochse.worklogviewer.fx.components.tabs
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByProjectAndUserStatisticData
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TaskCountByUserAndProjectStatistics
+import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimeByGroupingCriteriaChart
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
 import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserAndProjectGraphStatistics
 import de.pbauerochse.worklogviewer.timereport.TimeReport
@@ -26,7 +27,8 @@ internal class AllWorklogsTab : WorklogsTab(getFormatted("view.main.tabs.all")) 
     override fun getStatistics(reportView: ReportView): List<Node> {
         val dataByUser = TaskCountByUserAndProjectStatisticData(reportView.issues)
         val dataByProject = TaskCountByProjectAndUserStatisticData(reportView.issues)
-        return arrayListOf(
+        return listOfNotNull(
+            reportView.appliedGrouping?.let { TimeByGroupingCriteriaChart(reportView) },
             TaskCountByUserAndProjectStatistics(dataByUser),
             TimePerProjectAndUserGraphStatistics(dataByUser),
             TimePerUserAndProjectGraphStatistics(dataByProject)

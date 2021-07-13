@@ -2,10 +2,7 @@ package de.pbauerochse.worklogviewer.fx.components.tabs
 
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByProjectAndUserStatisticData
 import de.pbauerochse.worklogviewer.fx.components.statistics.data.TaskCountByUserAndProjectStatisticData
-import de.pbauerochse.worklogviewer.fx.components.statistics.panels.OvertimeStatisticsPane
-import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TaskCountByUserAndProjectStatistics
-import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerProjectAndUserGraphStatistics
-import de.pbauerochse.worklogviewer.fx.components.statistics.panels.TimePerUserAndProjectGraphStatistics
+import de.pbauerochse.worklogviewer.fx.components.statistics.panels.*
 import de.pbauerochse.worklogviewer.timereport.IssueWithWorkItems
 import de.pbauerochse.worklogviewer.timereport.TimeReport
 import de.pbauerochse.worklogviewer.timereport.view.ReportView
@@ -29,9 +26,10 @@ internal class OwnWorklogsTab : WorklogsTab(LABEL) {
         val dataByUser = TaskCountByUserAndProjectStatisticData(reportView.issues)
         val dataByProject = TaskCountByProjectAndUserStatisticData(reportView.issues)
 
-        return listOf(
-            TaskCountByUserAndProjectStatistics(dataByUser),
+        return listOfNotNull(
             OvertimeStatisticsPane(reportView),
+            reportView.appliedGrouping?.let { TimeByGroupingCriteriaChart(reportView) },
+            TaskCountByUserAndProjectStatistics(dataByUser),
             TimePerProjectAndUserGraphStatistics(dataByUser),
             TimePerUserAndProjectGraphStatistics(dataByProject)
         )
