@@ -7,7 +7,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Latest Version
 
-[Download v2.7.0](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.7.0)
+[Download v2.7.1](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.7.1)
 
 # Features
 
@@ -22,6 +22,9 @@ If you find this tool useful and would like to show me your appreciation [buy me
 * two color schemes: light and dark
 
 # Important changes
+* **v2.7.1**
+
+
 * **v2.7.0**  
   * Added a logo created by [Patrick Marx](https://twitter.com/ptrckmrx)
   * Minor changes to the plugin API

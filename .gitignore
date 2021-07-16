@@ -3,3 +3,4 @@ target
 build
 dependency-reduced-pom.xml
 *.iml
+pom.xml.versionsBackup
