@@ -3,19 +3,13 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pbauerochse.worklogviewer.search.fx.results.SearchResultContentController">
 
     <top>
-        <ToolBar>
-            <VBox spacing="2.0">
-              <Label fx:id="searchTermLabel">
-               <font>
-                  <Font size="15.0" />
-               </font></Label>
-              <Label fx:id="searchResultCountLabel" />
-            </VBox>
-        </ToolBar>
+        <VBox styleClass="search-summary">
+            <Label fx:id="searchTermLabel" styleClass="search-term"/>
+            <Label fx:id="searchResultCountLabel" styleClass="search-result-count"/>
+        </VBox>
     </top>
 
     <center>
@@ -25,15 +19,15 @@
                 <VBox>
                     <FlowPane hgap="15.0">
                         <padding>
-                            <Insets topRightBottomLeft="7.0" />
+                            <Insets topRightBottomLeft="7.0"/>
                         </padding>
 
-                        <CheckBox fx:id="showIssueTagsCheckbox" text="%search.results.show.tags" />
-                        <CheckBox fx:id="showIssueFieldsCheckbox" text="%search.results.show.fields" />
-                        <CheckBox fx:id="showIssueDescriptionCheckbox" text="%search.results.show.description" />
+                        <CheckBox fx:id="showIssueTagsCheckbox" text="%search.results.show.tags"/>
+                        <CheckBox fx:id="showIssueFieldsCheckbox" text="%search.results.show.fields"/>
+                        <CheckBox fx:id="showIssueDescriptionCheckbox" text="%search.results.show.description"/>
 
                     </FlowPane>
-                    <ListView fx:id="searchResultsListView" styleClass="search-results-list" VBox.vgrow="ALWAYS" />
+                    <ListView fx:id="searchResultsListView" styleClass="search-results-list" VBox.vgrow="ALWAYS"/>
                 </VBox>
             </Tab>
         </TabPane>
