@@ -125,6 +125,7 @@ class DummyDataSource(username: String) : TimeTrackingDataSource {
                 override val project: Project = project
                 override val resolutionDate: ZonedDateTime? = resolveDate?.atZone(ZoneId.systemDefault())
                 override val fields: List<Field> = issueFields
+                override val estimationInHours: Long = Random.nextLong(14)
                 override val tags: List<Tag> = tags
             }
         }

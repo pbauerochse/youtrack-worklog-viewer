@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
- * https://www.jetbrains.com/help/youtrack/devportal/api-entity-IssueTag.html
+ * https://www.jetbrains.com/help/youtrack/devportal/api-entity-FieldStyle.html
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class YouTrackIssueTag @JsonCreator constructor(
-    @JsonProperty("name") val name: String,
-    @JsonProperty("color") val color: YouTrackFieldStyle
+data class FieldStyle @JsonCreator constructor(
+    @JsonProperty("background") val backgroundColor: String?,
+    @JsonProperty("foreground") val foregroundColor: String?
 )

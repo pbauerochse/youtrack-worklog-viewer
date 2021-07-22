@@ -6,10 +6,10 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class YouTrackCreateWorkItemRequest(
+class CreateWorkItemRequest(
     workDate: LocalDate,
     durationInMinutes: Long,
-    @JsonProperty("author") val author: YouTrackUser,
+    @JsonProperty("author") val author: User,
     @JsonProperty("text") val text: String?,
     @JsonProperty("type") val type: YouTrackWorkItemType?
 ) {
@@ -21,5 +21,5 @@ class YouTrackCreateWorkItemRequest(
         .toEpochMilli()
 
     @JsonProperty("duration")
-    val duration: YouTrackWorkItemDuration = YouTrackWorkItemDuration(durationInMinutes, "${durationInMinutes}m")
+    val duration: DurationValue = DurationValue(durationInMinutes, "${durationInMinutes}m")
 }

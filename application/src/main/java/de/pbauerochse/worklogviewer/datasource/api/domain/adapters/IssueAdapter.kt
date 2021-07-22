@@ -1,5 +1,7 @@
 package de.pbauerochse.worklogviewer.datasource.api.domain.adapters
 
+import de.pbauerochse.worklogviewer.datasource.api.domain.PeriodIssueCustomField
+import de.pbauerochse.worklogviewer.datasource.api.domain.ProjectTimeTrackingSettings
 import de.pbauerochse.worklogviewer.datasource.api.domain.YouTrackIssue
 import de.pbauerochse.worklogviewer.timereport.Field
 import de.pbauerochse.worklogviewer.timereport.Issue
@@ -13,6 +15,7 @@ import java.time.ZonedDateTime
  */
 class IssueAdapter(
     youtrackIssue: YouTrackIssue,
+    projectTimeTrackingSettings: ProjectTimeTrackingSettings?,
     override val externalUrl: URL
 ): Issue {
 
@@ -24,12 +27,25 @@ class IssueAdapter(
     override val project: Project = youtrackIssue.project?.let { Project(it.id, it.name ?: it.id, it.shortName ?: it.id) } ?: UNKNOWN_PROJECT
     override val resolutionDate: ZonedDateTime? = youtrackIssue.resolveDate
     override val tags: List<Tag> = youtrackIssue.tags.map { Tag(label = it.name, backgroundColor = it.color.backgroundColor, foregroundColor = it.color.foregroundColor) }
+    override val estimationInHours: Long? = findEstimation(youtrackIssue, projectTimeTrackingSettings)
+
     override val fields: List<Field> = youtrackIssue.customFields.map { youtrackField ->
-        val fieldValues = youtrackField.values.asSequence()
-            .mapNotNull { value -> value.value.takeIf { !it.isNullOrBlank() } }
+        val fieldValues = youtrackField.valuesAsString.asSequence()
+            .mapNotNull { value -> value.takeIf { it.isNotBlank() } }
             .toList()
 
         Field(youtrackField.localizedName ?: youtrackField.name!!, fieldValues)
+    }
+
+    private fun findEstimation(youtrackIssue: YouTrackIssue, projectTimeTrackingSettings: ProjectTimeTrackingSettings?): Long? {
+        return projectTimeTrackingSettings
+            ?.estimate
+            ?.field
+            ?.let { projectEstimateField -> youtrackIssue.customFields.find { issueField -> issueField.name == projectEstimateField.name } }
+            ?.let { it as PeriodIssueCustomField }
+            ?.value
+            ?.minutes
+
     }
 
     override fun equals(other: Any?): Boolean {
@@ -48,7 +64,6 @@ class IssueAdapter(
     override fun toString(): String {
         return "Issue(externalUrl=$externalUrl, id='$id', humanReadableId='$humanReadableId', title='$title')"
     }
-
 
     companion object {
         private val UNKNOWN_PROJECT: Project = Project("---", "---", "---")

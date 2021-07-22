@@ -7,6 +7,7 @@ import de.pbauerochse.worklogviewer.datasource.AddWorkItemResult
 import de.pbauerochse.worklogviewer.datasource.ConnectionSettings
 import de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource
 import de.pbauerochse.worklogviewer.datasource.api.domain.*
+import de.pbauerochse.worklogviewer.datasource.api.domain.User
 import de.pbauerochse.worklogviewer.datasource.api.domain.adapters.IssueAdapter
 import de.pbauerochse.worklogviewer.datasource.api.domain.adapters.WorkItemAdapter
 import de.pbauerochse.worklogviewer.http.Http
@@ -42,7 +43,9 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
             .groupBy { it.issue.id }
             .map { (_, workItemList) ->
                 val youtrackIssue = workItemList.first().issue
-                val issue = IssueAdapter(youtrackIssue, issueUrlBuilder.invoke(youtrackIssue))
+                val timeTrackingSettings = getProjectTimeTrackingSettings(youtrackIssue.project!!, progress.subProgress(10))
+
+                val issue = IssueAdapter(youtrackIssue, timeTrackingSettings, issueUrlBuilder.invoke(youtrackIssue))
                 val workItems = workItemList.map { WorkItemAdapter(it, belongsToCurrentUserFunction.invoke(it)) }
                 return@map IssueWithWorkItems(issue, workItems)
             }
@@ -64,7 +67,7 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
                 name = it.label
             )
         }
-        val youtrackRequest = YouTrackCreateWorkItemRequest(request.date, request.durationInMinutes, user, request.description, workItemType)
+        val youtrackRequest = CreateWorkItemRequest(request.date, request.durationInMinutes, user, request.description, workItemType)
         val serialized = MAPPER.writeValueAsString(youtrackRequest)
 
         val payload = StringEntity(serialized, StandardCharsets.UTF_8)
@@ -80,7 +83,7 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
         val youTrackIssue = newYouTrackWorkItem.issue
 
         return AddWorkItemResult(
-            issue = IssueAdapter(youTrackIssue, issueUrlBuilder.invoke(youTrackIssue)),
+            issue = IssueAdapter(youTrackIssue, getProjectTimeTrackingSettings(youTrackIssue.project!!, progress.subProgress(20)), issueUrlBuilder.invoke(youTrackIssue)),
             addedWorkItem = WorkItemAdapter(newYouTrackWorkItem, belongsToCurrentUserFunction.invoke(newYouTrackWorkItem))
         )
     }
@@ -96,8 +99,9 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
         }
 
         val youtrackIssue = MAPPER.readValue(response.content!!, YouTrackIssue::class.java)
+        val timeTrackingSettings = getProjectTimeTrackingSettings(youtrackIssue.project!!, progress.subProgress(20))
         progress.setProgress(i18n("connector.rest.done"), 100.0)
-        return IssueAdapter(youtrackIssue, issueUrlBuilder.invoke(youtrackIssue))
+        return IssueAdapter(youtrackIssue, timeTrackingSettings, issueUrlBuilder.invoke(youtrackIssue))
     }
 
     override fun loadIssuesByIds(issueIds: Set<String>, progress: Progress): List<Issue> {
@@ -118,14 +122,14 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
             throw IllegalStateException(i18n("connector.rest.issue.search.http.error", query, response.error))
         }
 
-        val issues: List<YouTrackIssue> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackIssue>>() {})
-        LOGGER.debug("Got ${issues.size} Issues for query '$query'")
+        val youtrackIssues: List<YouTrackIssue> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackIssue>>() {})
+        LOGGER.debug("Got ${youtrackIssues.size} Issues for query '$query'")
+        val issues = youtrackIssues.map { IssueAdapter(it, getProjectTimeTrackingSettings(it.project!!, progress.subProgress(5)), issueUrlBuilder.invoke(it)) }
         progress.setProgress(i18n("connector.rest.done"), 100)
 
-        return issues.map { IssueAdapter(it, issueUrlBuilder.invoke(it)) }
+        return issues
     }
 
-    private fun loadWorkItems(issue: Issue, progress: Progress): IssueWithWorkItems = loadWorkItems(issue, null, progress)
     override fun loadWorkItems(issue: Issue, timeRange: TimeRange?, progress: Progress): IssueWithWorkItems {
         LOGGER.info("Loading WorkItems for Issue $issue")
 
@@ -140,7 +144,6 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
 
         while (keepOnFetching) {
             val url = "/api/workItems?query=$query&\$skip=${workItems.size}&\$top=$MAX_WORKITEMS_PER_BATCH&fields=${WORKITEM_FIELDS}$dateUrlParams"
-//            val url = "/api/issues/${issue.id}/timeTracking/workItems?\$skip=${workItems.size}&\$top=$MAX_WORKITEMS_PER_BATCH&fields=$WORKITEM_FIELDS"
 
             val response = http.get(url)
             if (response.isError) {
@@ -162,24 +165,35 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
 
     override fun getWorkItemTypes(projectId: String, progress: Progress): List<WorkItemType> {
         LOGGER.info("Loading WorkItemTypes for project $projectId")
-        val url = "/api/admin/projects/$projectId/timeTrackingSettings/workItemTypes?fields=id,name"
-
         progress.setProgress(i18n("connector.rest.workitemtypes.progress.loading"), 1)
-        val response = http.get(url)
-        if (response.isError) {
-            LOGGER.error("Got Error Response Message from YouTrack while fetching with URL $url: ${response.statusLine.statusCode} ${response.error}")
-            throw IllegalStateException(i18n("connector.rest.workitemtypes.http.error", response.error))
-        }
-
-        val workItemTypes: List<YouTrackWorkItemType> = MAPPER.readValue(response.content!!, object : TypeReference<List<YouTrackWorkItemType>>() {})
+        val projectTimeTrackingSettings = getProjectTimeTrackingSettings(projectId, progress.subProgress(50))
         progress.setProgress(i18n("connector.rest.done"), 100)
 
-        return workItemTypes.map {
+        return projectTimeTrackingSettings.workItemTypes.map {
             WorkItemType(it.id, it.name ?: it.id)
         }
     }
 
-    private fun getMe(): YouTrackUser {
+    private fun getProjectTimeTrackingSettings(youTrackProject: YouTrackProject, progress: Progress) = getProjectTimeTrackingSettings(youTrackProject.id, progress)
+    private fun getProjectTimeTrackingSettings(projectId: String, progress: Progress): ProjectTimeTrackingSettings {
+        return ProjectTimeSettingsCache.forProject(projectId) {
+            val url = "/api/admin/projects/$projectId/timeTrackingSettings?fields=enabled,estimate($PROJECT_CUSTOM_FIELD_FIELDS),timeSpent($PROJECT_CUSTOM_FIELD_FIELDS),workItemTypes(id,name)"
+            LOGGER.debug("Loading ProjectTimeTrackingSettings for Project $projectId using URL $url")
+
+            progress.setProgress(i18n("connector.rest.timetrackingsettings.http.loading", projectId), 1.0)
+            val response = http.get(url)
+            if (response.isError) {
+                LOGGER.error("Got Error Response Message from YouTrack while fetching with URL $url: ${response.statusLine.statusCode} ${response.error}")
+                throw IllegalStateException(i18n("connector.rest.timetrackingsettings.http.error", response.error))
+            }
+
+            val timeTrackingSettings = MAPPER.readValue(response.content!!, ProjectTimeTrackingSettings::class.java)
+            LOGGER.debug("Project $projectId: $timeTrackingSettings")
+            return@forProject timeTrackingSettings
+        }
+    }
+
+    private fun getMe(): User {
         LOGGER.debug("Getting myself as YouTrack User")
         val url = "/api/admin/users/me?fields=$USER_FIELDS"
         val response = http.get(url)
@@ -188,7 +202,7 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
             throw IllegalStateException(i18n("connector.rest.getme.http.error", response.error))
         }
 
-        return MAPPER.readValue(response.content!!, YouTrackUser::class.java)
+        return MAPPER.readValue(response.content!!, User::class.java)
     }
 
     private fun fetchWorkItems(timerange: TimeRange, progress: Progress): List<YouTrackIssueWorkItem> {
@@ -232,7 +246,10 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
 
         private const val MAX_WORKITEMS_PER_BATCH = 400
         private const val USER_FIELDS = "id,login,fullName,email"
-        private const val ISSUE_FIELDS = "id,idReadable,tags(color(background,foreground),name),resolved,project(id,shortName,name),summary,wikifiedDescription,customFields(name,localizedName,value(name))"
+        private const val CUSTOM_FIELD_VALUES_FIELDS = "name,localizedName,owner($USER_FIELDS),$USER_FIELDS,archived,releaseDate,released,minutes,presentation,isResolved,text,markdownText"
+        private const val CUSTOM_FIELD_FIELDS = "name,localizedName,value($CUSTOM_FIELD_VALUES_FIELDS)"
+        private const val PROJECT_CUSTOM_FIELD_FIELDS = "field($CUSTOM_FIELD_FIELDS),canBeEmpty,emptyFieldText"
+        private const val ISSUE_FIELDS = "id,idReadable,tags(color(background,foreground),name),resolved,project(id,shortName,name),summary,wikifiedDescription,customFields($CUSTOM_FIELD_FIELDS)"
         private const val WORKITEM_FIELDS = "id,author($USER_FIELDS),creator($USER_FIELDS),type(id,name),text,duration(minutes,presentation),date,issue($ISSUE_FIELDS)"
     }
 }

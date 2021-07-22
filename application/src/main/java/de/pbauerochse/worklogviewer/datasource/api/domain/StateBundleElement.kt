@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class YouTrackCustomFieldValue @JsonCreator constructor(
-    @JsonProperty("name") val value : String?
-)
+class StateBundleElement @JsonCreator constructor(
+    @JsonProperty("name") name: String,
+    @JsonProperty("localizedName") localizedName: String?,
+    @JsonProperty("isResolved") val isResolved: Boolean
+): EnumBundleElement(name, localizedName)

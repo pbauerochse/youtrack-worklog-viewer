@@ -104,7 +104,8 @@
     -fx-background-color: -ytwlv-task-progress-foreground-color;
 }
 
-.progress-bar.error > .bar {
+.progress-bar.error > .bar,
+.progress-bar.overbooked > .bar {
     -fx-background-color: -ytwlv-warning-color;
 }
 
@@ -205,8 +206,8 @@
 
 .favourite-issue-cell.resolved .text,
 .time-report-table .issue-title.resolved .text,
-.search-result-issue.resolved .issue-id,
-.search-result-issue.resolved .issue-title {
+.search-result-issue.resolved .issue-id .text,
+.search-result-issue.resolved .issue-title .text {
     -fx-strikethrough: true;
 }
 

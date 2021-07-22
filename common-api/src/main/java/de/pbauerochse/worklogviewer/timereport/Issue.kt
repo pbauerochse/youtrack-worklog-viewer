@@ -69,6 +69,12 @@ interface Issue: Comparable<Issue> {
     val resolutionDate: ZonedDateTime?
 
     /**
+     * an optional estimation of this [Issue]
+     * if provided by the [de.pbauerochse.worklogviewer.datasource.TimeTrackingDataSource]
+     */
+    val estimationInHours: Long?
+
+    /**
      * additional properties as Key-Value Pairs
      */
     val fields: List<Field>
