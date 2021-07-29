@@ -123,6 +123,11 @@
             <classifier>${javafx-binary-variant}</classifier>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

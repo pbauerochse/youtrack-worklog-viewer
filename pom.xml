@@ -59,6 +59,7 @@
         <httpclient.version>4.5.13</httpclient.version>
         <jackson.version>2.12.3</jackson.version>
         <poi.version>4.1.2</poi.version>
+        <commons-text.version>1.9</commons-text.version>
 
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <logback.version>1.2.3</logback.version>
@@ -318,6 +319,12 @@
                 <artifactId>javafx-graphics</artifactId>
                 <classifier>${javafx-binary-variant}</classifier>
                 <version>${openjfx.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${commons-text.version}</version>
             </dependency>
 
         </dependencies>

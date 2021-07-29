@@ -7,6 +7,7 @@ import de.pbauerochse.worklogviewer.timereport.Field
 import de.pbauerochse.worklogviewer.timereport.Issue
 import de.pbauerochse.worklogviewer.timereport.Project
 import de.pbauerochse.worklogviewer.timereport.Tag
+import org.apache.commons.text.StringEscapeUtils
 import java.net.URL
 import java.time.ZonedDateTime
 
@@ -17,13 +18,26 @@ class IssueAdapter(
     youtrackIssue: YouTrackIssue,
     projectTimeTrackingSettings: ProjectTimeTrackingSettings?,
     override val externalUrl: URL
-): Issue {
+) : Issue {
 
     override val id: String = youtrackIssue.id
     override val humanReadableId: String = youtrackIssue.idReadable
     override val issueNumber: Long = humanReadableId.substringAfterLast('-').toLong()
     override val title: String = youtrackIssue.summary ?: youtrackIssue.idReadable
     override val descriptionWithHtmlMarkup: String = youtrackIssue.description
+
+    override val descriptionPlaintext: String
+        get() = descriptionWithHtmlMarkup
+            .let { StringEscapeUtils.unescapeHtml4(it) }
+            .replace("\n", "")
+            .replace("</li>", "</li>\n")
+            .replace("<li>", "- ")
+            .replace("</p>", "</p>\n\n")
+            .replace("<br/>", "\n")
+            .replace(Regex("<[^>]*>"), "")
+            .replace(Regex("[\\t\\x0B\\f\\x20]{2,}"), " ")
+            .trim()
+
     override val project: Project = youtrackIssue.project?.let { Project(it.id, it.name ?: it.id, it.shortName ?: it.id) } ?: UNKNOWN_PROJECT
     override val resolutionDate: ZonedDateTime? = youtrackIssue.resolveDate
     override val tags: List<Tag> = youtrackIssue.tags.map { Tag(label = it.name, backgroundColor = it.color.backgroundColor, foregroundColor = it.color.foregroundColor) }

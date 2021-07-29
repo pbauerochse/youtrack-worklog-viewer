@@ -3,7 +3,7 @@ package de.pbauerochse.worklogviewer.timereport
 import java.net.URL
 import java.time.ZonedDateTime
 
-interface Issue: Comparable<Issue> {
+interface Issue : Comparable<Issue> {
 
     /**
      * Unique ID to distinguish this [Issue]
@@ -48,13 +48,6 @@ interface Issue: Comparable<Issue> {
      * HTML Tags stripped.
      */
     val descriptionPlaintext: String
-        get() = descriptionWithHtmlMarkup
-            .replace("\n", "")
-            .replace("</li>", "\n")
-            .replace("<li>", "- ")
-            .replace("</p>", "\n\n")
-            .replace("<br/>", "\n")
-            .replace(Regex("<[^>]*>"), "")
 
     /**
      * The [Project] this [Issue] belongs to

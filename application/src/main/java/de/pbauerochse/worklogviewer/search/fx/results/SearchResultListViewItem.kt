@@ -44,7 +44,7 @@ class SearchResultListViewItem : ListCell<Issue>() {
         } else {
             issueIdLabel.text = issue.humanReadableId
             issueTitleLabel.text = issue.title
-            issueDescriptionLabel.text = issue.descriptionPlaintext.trim()
+            issueDescriptionLabel.text = issue.descriptionPlaintext
             fieldsFlowPane.children.setAll(
                 issue.fields
                     .filter { it.value.isNotEmpty() }
