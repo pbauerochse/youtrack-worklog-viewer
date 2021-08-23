@@ -23,7 +23,13 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Important changes
 * **v2.7.1**
-
+  * Added an indicator on issues with an estimate, to show how much time of the estimate was already spent
+  * optimized detail view
+    * long field values are abbreviated to prevent breaking the list view
+    * summary in the title bar won't collapse anymore when too long
+    * properly escaping HTML entities in the description
+  * errors while decrypting the stored authentication won't prevent the application from starting anymore
+  * fixing a bug where the file dialog won't show when the previously used directory does not exist anymore 
 
 * **v2.7.0**  
   * Added a logo created by [Patrick Marx](https://twitter.com/ptrckmrx)
