@@ -111,7 +111,7 @@ class Dialog(private val scene: Scene) : WorklogViewerDialog {
         return FileChooser().apply {
             initialFileName = specification.initialFileName
             title = specification.title
-            initialDirectory = SettingsUtil.settingsViewModel.lastUsedFilePath.value?.let { File(it) } ?: File(System.getProperty("user.home"))
+            initialDirectory = SettingsUtil.settingsViewModel.lastUsedFilePath.value?.let { File(it) }?.takeIf { it.exists() && it.isDirectory } ?: File(System.getProperty("user.home"))
             selectedExtensionFilter = specification.fileType?.let {
                 FileChooser.ExtensionFilter(it.description, it.extension)
             }
