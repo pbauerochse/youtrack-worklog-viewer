@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import de.pbauerochse.worklogviewer.util.EncryptionUtil;
-import de.pbauerochse.worklogviewer.util.ExceptionUtil;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+
+import static de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted;
 
 public class EncryptingDeserializer extends StdDeserializer<String> {
 
@@ -21,7 +23,8 @@ public class EncryptingDeserializer extends StdDeserializer<String> {
         try {
             return EncryptionUtil.decryptEncryptedString(encrytpedText);
         } catch (GeneralSecurityException e) {
-            throw ExceptionUtil.getIllegalStateException("exceptions.settings.password.decrypt", e);
+            LoggerFactory.getLogger(EncryptingDeserializer.class).warn(getFormatted("exceptions.settings.password.decrypt", e));
+            return null;
         }
     }
 }
