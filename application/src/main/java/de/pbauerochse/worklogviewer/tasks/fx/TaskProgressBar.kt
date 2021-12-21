@@ -49,7 +49,7 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>, private val showTa
         newValue?.let { updateStatus(it) }
     }
 
-    @Suppress("NON_EXHAUSTIVE_WHEN")
+    @Suppress("NON_EXHAUSTIVE_WHEN_STATEMENT")
     private fun updateStatus(status : Worker.State) {
         when (status) {
             Worker.State.RUNNING -> updateStyles(RUNNING_CLASS)
