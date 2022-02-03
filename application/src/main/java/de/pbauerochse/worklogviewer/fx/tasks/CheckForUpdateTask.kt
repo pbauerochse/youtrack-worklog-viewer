@@ -40,7 +40,7 @@ class CheckForUpdateTask : WorklogViewerTask<GitHubVersion?>(getFormatted("task.
     private val mostRecentGithubReleaseVersion: GitHubVersion?
         get() = allGithubReleaseVersions.stream()
                 .filter { it.isRelease }
-                .max(comparing<GitHubVersion, Date> { it.published })
+                .max(comparing { it.published })
                 .orElse(null)
 
     private val allGithubReleaseVersions: List<GitHubVersion>

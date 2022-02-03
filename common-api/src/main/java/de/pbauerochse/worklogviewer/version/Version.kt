@@ -33,8 +33,13 @@ data class Version(
         @JvmStatic
         fun fromVersionString(versionString: String): Version {
             val split = versionString.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            return Version(split[0].toInt(), split[1].toInt(), split[2].toInt())
+            return Version(split[0].cleanToInt(), split[1].cleanToInt(), split[2].cleanToInt())
         }
     }
+}
 
+private fun String.cleanToInt(): Int {
+    return this
+        .filter { it.isDigit() }
+        .toInt(10)
 }
