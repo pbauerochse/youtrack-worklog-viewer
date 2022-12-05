@@ -7,7 +7,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Latest Version
 
-[Download v2.7.1](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.7.1)
+[Download v2.7.2](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.7.2)
 
 # Features
 
@@ -22,6 +22,10 @@ If you find this tool useful and would like to show me your appreciation [buy me
 * two color schemes: light and dark
 
 # Important changes
+* **v2.7.2**
+  * Fixed a bug reading the correct version from most recent releases
+  * Updated dependencies
+  * Added release for Apple Silicon CPUs
 * **v2.7.1**
   * Added an indicator on issues with an estimate, to show how much time of the estimate was already spent
   * optimized detail view
