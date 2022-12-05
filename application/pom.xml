@@ -5,7 +5,7 @@
     <parent>
         <artifactId>youtrack-worklog-viewer</artifactId>
         <groupId>de.pbauerochse.youtrack-worklog-viewer</groupId>
-        <version>2.7.1</version>
+        <version>2.7.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -35,7 +35,7 @@
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>project-classifier</shadedClassifierName>
-                            <outputFile>${project.build.directory}/${project.parent.artifactId}-${javafx-binary-variant}-${project.version}.jar</outputFile>
+                            <outputFile>${project.build.directory}/${project.parent.artifactId}-${os-display-variant}-${project.version}.jar</outputFile>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">

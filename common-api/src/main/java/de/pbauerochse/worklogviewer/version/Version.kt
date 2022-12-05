@@ -3,23 +3,24 @@ package de.pbauerochse.worklogviewer.version
 /**
  * Defines the three values of a software application version
  */
-data class Version(
+data class Version @JvmOverloads constructor(
     val major: Int,
     val minor: Int,
-    val release: Int
+    val bugfix: Int,
+    val suffix: String? = null
 ) : Comparable<Version> {
 
     fun isNewerThan(other: Version): Boolean {
         return major > other.major ||
                 major == other.major && minor > other.minor ||
-                major == other.major && minor == other.minor && release > other.release
+                major == other.major && minor == other.minor && bugfix > other.bugfix
 
     }
 
     override fun compareTo(other: Version): Int {
         val majorComparison = major.compareTo(other.major)
         val minorComparison = minor.compareTo(other.minor)
-        val releaseComparison = release.compareTo(other.release)
+        val releaseComparison = bugfix.compareTo(other.bugfix)
 
         return when (majorComparison) {
             0 -> if (minorComparison == 0) releaseComparison else minorComparison
@@ -27,19 +28,20 @@ data class Version(
         }
     }
 
-    override fun toString(): String = "v$major.$minor.$release"
+    override fun toString(): String = "v$major.$minor.$bugfix${suffix?.let { "-$it" } ?: ""}"
 
     companion object {
         @JvmStatic
         fun fromVersionString(versionString: String): Version {
-            val split = versionString.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            return Version(split[0].cleanToInt(), split[1].cleanToInt(), split[2].cleanToInt())
-        }
+            val split = versionString.removePrefix("v").split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val suffixed = split[2].split("-")
+            return Version(
+                major = split.getOrElse(0) { "0" }.toInt(),
+                minor = split.getOrElse(1) { "0" }.toInt(),
+                bugfix = suffixed.getOrElse(0) { "0" }.toInt(),
+                suffix = suffixed.getOrNull(1)
+            )
     }
 }
 
-private fun String.cleanToInt(): Int {
-    return this
-        .filter { it.isDigit() }
-        .toInt(10)
 }

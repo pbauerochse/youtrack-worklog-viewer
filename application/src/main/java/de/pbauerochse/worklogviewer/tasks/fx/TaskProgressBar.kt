@@ -55,6 +55,7 @@ class TaskProgressBar(private val task: WorklogViewerTask<*>, private val showTa
             Worker.State.RUNNING -> updateStyles(RUNNING_CLASS)
             Worker.State.SUCCEEDED -> updateStyles(SUCCESSFUL_CLASS)
             Worker.State.FAILED -> updateStyles(ERROR_CLASS)
+            else -> {}
         }
 
         if (isCompletedState(status)) {

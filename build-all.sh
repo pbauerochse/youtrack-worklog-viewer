@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 echo "Building artifacts for all operating systems"
-PROFILES=(linux mac windows)
+PROFILES=(linux mac windows mac-arm)
 BUILD_SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 BUILD_OUTPUT="$BUILD_SCRIPT_LOCATION/build"
 mkdir -p "$BUILD_OUTPUT"
+rm -f "$BUILD_OUTPUT/*"
 
 pushd "$BUILD_SCRIPT_LOCATION"
 
