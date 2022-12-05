@@ -43,10 +43,10 @@
         </profile>
 
         <profile>
-            <id>mac-arm</id>
+            <id>mac-silicon</id>
             <properties>
                 <javafx-binary-variant>mac-aarch64</javafx-binary-variant>
-                <os-display-variant>mac-silicone</os-display-variant>
+                <os-display-variant>mac-silicon</os-display-variant>
             </properties>
         </profile>
     </profiles>

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 echo "Building artifacts for all operating systems"
-PROFILES=(linux mac windows mac-arm)
+PROFILES=(linux mac windows mac-silicon)
 BUILD_SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 BUILD_OUTPUT="$BUILD_SCRIPT_LOCATION/build"
