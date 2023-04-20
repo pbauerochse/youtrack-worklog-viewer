@@ -37,7 +37,6 @@
         </Label>
         <Hyperlink fx:id="youtrackLink" text="YouTrack by JetBrains" />
         <Hyperlink fx:id="worklogViewerLink" text="YouTrack Worklog Viewer @github.com" />
-        <Hyperlink fx:id="logoByPatrickMarx" text="YouTrack Worklog Viewer Logo by Patrick Marx" />
         <Hyperlink fx:id="licenseLink" text="%release.license" />
         <Hyperlink fx:id="iconsLink" layoutX="10.0" layoutY="94.0" text="%release.icons" />
     </VBox>
