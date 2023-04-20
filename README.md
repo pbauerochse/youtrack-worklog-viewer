@@ -7,7 +7,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Latest Version
 
-[Download v2.7.2](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.7.2)
+[Download v2.7.3](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.7.3)
 
 # Features
 
@@ -22,6 +22,8 @@ If you find this tool useful and would like to show me your appreciation [buy me
 * two color schemes: light and dark
 
 # Important changes
+* **v2.7.3**
+  * [#43 - Adding the project full name as grouping criteria](https://github.com/pbauerochse/youtrack-worklog-viewer/issues/43)
 * **v2.7.2**
   * Fixed a bug reading the correct version from most recent releases
   * Updated dependencies
@@ -36,7 +38,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
   * fixing a bug where the file dialog won't show when the previously used directory does not exist anymore 
 
 * **v2.7.0**  
-  * Added a logo created by [Patrick Marx](https://twitter.com/ptrckmrx)
+  * Added a logo created by Patrick Marx
   * Minor changes to the plugin API
   * New search results view, containing more information
   * Creating new work items dialog now also contains a field for the work type
