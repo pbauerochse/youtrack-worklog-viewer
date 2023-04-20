@@ -13,7 +13,8 @@ object GroupingFactory {
 
     private val FIXED_GROUPINGS = listOf(
         NoopGrouping,
-        ProjectGrouping,
+        ProjectFullNameGrouping,
+        ProjectShortNameGrouping,
         WorklogItemBasedGrouping("WORKTYPE", getFormatted("grouping.worktype")) { it.workType?.label },
         WorklogItemBasedGrouping("WORKAUTHOR", getFormatted("grouping.workauthor")) { it.owner.label }
     )

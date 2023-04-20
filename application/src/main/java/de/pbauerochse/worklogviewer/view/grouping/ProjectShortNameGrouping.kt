@@ -9,9 +9,9 @@ import de.pbauerochse.worklogviewer.view.IssueReportRow
 /**
  * Groups WorklogItems by the project its issue belongs to
  */
-internal object ProjectGrouping : Grouping {
+internal object ProjectShortNameGrouping : Grouping {
     override val id: String = "PROJECT"
-    override val label: String = getFormatted("grouping.project")
+    override val label: String = getFormatted("grouping.project.short")
 
     override fun rows(issues: List<IssueWithWorkItems>): List<ReportRow> {
         return issues
