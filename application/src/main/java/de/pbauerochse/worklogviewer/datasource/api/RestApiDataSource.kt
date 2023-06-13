@@ -195,7 +195,7 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
 
     private fun getMe(): User {
         LOGGER.debug("Getting myself as YouTrack User")
-        val url = "/api/admin/users/me?fields=$USER_FIELDS"
+        val url = "/api/users/me?fields=$USER_FIELDS"
         val response = http.get(url)
         if (response.isError) {
             LOGGER.error("Got Error Response Message from YouTrack while fetching Me $url: ${response.statusLine.statusCode} ${response.error}")

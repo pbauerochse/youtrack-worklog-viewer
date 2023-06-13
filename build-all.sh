@@ -14,7 +14,7 @@ for profile in ${PROFILES[*]} ; do
     ./mvnw clean package -P $profile
 
     echo "Copying artifact to build directory $BUILD_OUTPUT"
-    cp $BUILD_SCRIPT_LOCATION/application/target/youtrack-worklog-viewer-*.jar $BUILD_OUTPUT/
+    cp -v $BUILD_SCRIPT_LOCATION/application/target/youtrack-worklog-viewer-*.jar $BUILD_OUTPUT/
 done
 
 popd
