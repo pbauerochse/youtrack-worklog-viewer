@@ -1,8 +1,9 @@
 package de.pbauerochse.worklogviewer.excel.columns
 
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer
-import de.pbauerochse.worklogviewer.excel.POIRow
-import de.pbauerochse.worklogviewer.excel.setTimeSpent
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.groupByTimeSpentStyle
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.issueSummaryStyle
 import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 
@@ -13,13 +14,11 @@ class SummaryExcelColumn : ExcelColumnRenderer {
 
     override val headline: String = getFormatted("view.main.summary")
 
-    override fun write(excelRow: POIRow, columnIndex: Int, reportRow: ReportRow) {
-        val cell = excelRow.createCell(columnIndex)
-        val workbook = excelRow.sheet.workbook
-
+    override fun write(context: ExcelRenderContext, columnIndex: Int, reportRow: ReportRow) {
         val timeSpentInMinutes = reportRow.totalDurationInMinutes
-        cell.setTimeSpent(timeSpentInMinutes)
-        cell.cellStyle = if (reportRow.isGrouping) workbook.groupByTimeSpentStyle else workbook.issueSummaryStyle
+        context
+            .setTimeSpent(columnIndex, timeSpentInMinutes)
+            .style(columnIndex, if (reportRow.isGrouping) groupByTimeSpentStyle else issueSummaryStyle)
     }
 
 }

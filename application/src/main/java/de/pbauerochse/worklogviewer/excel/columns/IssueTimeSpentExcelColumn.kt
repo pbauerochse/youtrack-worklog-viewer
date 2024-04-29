@@ -1,12 +1,12 @@
 package de.pbauerochse.worklogviewer.excel.columns
 
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer
-import de.pbauerochse.worklogviewer.excel.POIRow
-import de.pbauerochse.worklogviewer.excel.POIWorkbook
-import de.pbauerochse.worklogviewer.excel.setTimeSpent
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.groupByTimeSpentStyle
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.issueSummaryStyle
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.issueTimeSpentStyle
 import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.formatDate
-import org.apache.poi.ss.usermodel.Cell
 import java.time.LocalDate
 
 /**
@@ -19,39 +19,38 @@ class IssueTimeSpentExcelColumn(private val date: LocalDate) : ExcelColumnRender
 
     override val headline: String = formatDate(date)
 
-    override fun write(excelRow: POIRow, columnIndex: Int, reportRow: ReportRow) {
-        val cell = excelRow.createCell(columnIndex)
-        val workbook = excelRow.sheet.workbook
-
+    override fun write(context: ExcelRenderContext, columnIndex: Int, reportRow: ReportRow) {
         when {
-            reportRow.isGrouping -> renderGroupBySummary(workbook, cell, reportRow)
-            reportRow.isIssue -> renderIssueSummary(workbook, cell, reportRow)
-            reportRow.isSummary -> renderSummary(workbook, cell, reportRow)
+            reportRow.isGrouping -> renderGroupBySummary(context, columnIndex, reportRow)
+            reportRow.isIssue -> renderIssueSummary(context, columnIndex, reportRow)
+            reportRow.isSummary -> renderSummary(context, columnIndex, reportRow)
         }
     }
 
-    private fun renderGroupBySummary(workbook: POIWorkbook, cell: Cell, value: ReportRow) {
-        val totalTimeSpentInMinutes = value.getDurationInMinutes(date)
+    private fun renderGroupBySummary(context: ExcelRenderContext, columnIndex: Int, reportRow: ReportRow) {
+        val totalTimeSpentInMinutes = reportRow.getDurationInMinutes(date)
         if (totalTimeSpentInMinutes > 0) {
-            cell.setTimeSpent(totalTimeSpentInMinutes)
-            cell.cellStyle = workbook.groupByTimeSpentStyle
+            context
+                .setTimeSpent(columnIndex, totalTimeSpentInMinutes)
+                .style(columnIndex, groupByTimeSpentStyle)
         }
     }
 
-    private fun renderIssueSummary(workbook: POIWorkbook, cell: Cell, value: ReportRow) {
-        val timeSpentInMinutes = value.getDurationInMinutes(date)
+    private fun renderIssueSummary(context: ExcelRenderContext, columnIndex: Int, reportRow: ReportRow) {
+        val timeSpentInMinutes = reportRow.getDurationInMinutes(date)
         if (timeSpentInMinutes > 0) {
-            cell.setTimeSpent(timeSpentInMinutes)
-            cell.cellStyle = workbook.issueTimeSpentStyle
+            context
+                .setTimeSpent(columnIndex, timeSpentInMinutes)
+                .style(columnIndex, issueTimeSpentStyle)
         }
     }
 
-    private fun renderSummary(workbook: POIWorkbook, cell: Cell, value: ReportRow) {
-        val totalTimeSpentInMinutes = value.getDurationInMinutes(date)
+    private fun renderSummary(context: ExcelRenderContext, columnIndex: Int, reportRow: ReportRow) {
+        val totalTimeSpentInMinutes = reportRow.getDurationInMinutes(date)
         if (totalTimeSpentInMinutes > 0) {
-            cell.setTimeSpent(totalTimeSpentInMinutes)
-            cell.cellStyle = workbook.issueSummaryStyle
+            context
+                .setTimeSpent(columnIndex, totalTimeSpentInMinutes)
+                .style(columnIndex, issueSummaryStyle)
         }
     }
-
 }

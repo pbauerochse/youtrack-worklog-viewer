@@ -87,13 +87,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel</artifactId>
         </dependency>
 
         <dependency>

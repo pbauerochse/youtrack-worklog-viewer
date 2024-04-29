@@ -14,7 +14,6 @@ data class Version @JvmOverloads constructor(
         return major > other.major ||
                 major == other.major && minor > other.minor ||
                 major == other.major && minor == other.minor && bugfix > other.bugfix
-
     }
 
     override fun compareTo(other: Version): Int {
@@ -41,7 +40,6 @@ data class Version @JvmOverloads constructor(
                 bugfix = suffixed.getOrElse(0) { "0" }.toInt(),
                 suffix = suffixed.getOrNull(1)
             )
+        }
     }
-}
-
 }

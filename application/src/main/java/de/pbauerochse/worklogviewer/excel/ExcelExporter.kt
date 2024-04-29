@@ -5,9 +5,9 @@ import de.pbauerochse.worklogviewer.excel.columns.IssueTimeSpentExcelColumn
 import de.pbauerochse.worklogviewer.excel.columns.SummaryExcelColumn
 import de.pbauerochse.worklogviewer.timereport.TimeRange
 import de.pbauerochse.worklogviewer.timereport.view.ReportView
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Workbook
+import org.dhatim.fastexcel.Workbook
 import org.slf4j.LoggerFactory
+import java.io.OutputStream
 import java.time.temporal.ChronoUnit
 
 /**
@@ -19,44 +19,39 @@ object ExcelExporter {
     private val LOGGER = LoggerFactory.getLogger(ExcelExporter::class.java)
 
     @JvmStatic
-    fun createWorkbook(text: String, data: ReportView): Workbook {
+    fun writeReport(text: String, data: ReportView, outputStream: OutputStream) {
         LOGGER.info("Creating workbook for ${data.issues.size} '$text' Issues")
-        val workbookWrapper = POIWorkbook(HSSFWorkbook())
-        val sheet = workbookWrapper.createSheet(text)
-
-        renderData(data, sheet)
-
-        return workbookWrapper.workbook
+        Workbook(outputStream, "YouTrack Worklog Viewer", null).use {
+            val sheet = it.newWorksheet(text)
+            val context = ExcelRenderContext(sheet)
+            renderData(data, context)
+        }
     }
 
-    private fun renderData(data: ReportView, sheet: POISheet) {
+    private fun renderData(data: ReportView, context: ExcelRenderContext) {
         val cellWriters = getCellWriters(data.reportParameters.timerange)
-        sheet.writeHeadlines(cellWriters.map { it.headline })
+        context.writeHeadlines(cellWriters)
 
         data.rows.forEach { dataRow ->
-            var excelRow = sheet.createNextRow()
+            context.nextRow()
 
-            cellWriters.forEachIndexed { index, columnRenderer ->
-                columnRenderer.write(excelRow, index, dataRow)
+            cellWriters.forEachIndexed { cellIndex, columnRenderer ->
+                columnRenderer.write(context, cellIndex, dataRow)
             }
-            excelRow.adjustHeight()
 
             if (dataRow.isGrouping) {
                 dataRow.children.forEach { childRow ->
-                    excelRow = sheet.createNextRow()
-                    cellWriters.forEachIndexed { innerIndex, innerColumnRenderer ->
-                        innerColumnRenderer.write(excelRow, innerIndex, childRow)
+                    context.nextRow()
+                    cellWriters.forEachIndexed { cellIndex, innerColumnRenderer ->
+                        innerColumnRenderer.write(context, cellIndex, childRow)
                     }
-                    excelRow.adjustHeight()
                 }
 
-                sheet.addSpacing(2)
+                // add spacing
+                context.addSpacing(2)
             }
         }
-
-        sheet.autoSizeColumns()
     }
-
 
     private fun getCellWriters(timeRange: TimeRange): List<ExcelColumnRenderer> {
         val startDate = timeRange.start
@@ -77,5 +72,4 @@ object ExcelExporter {
 
         return renderers
     }
-
 }

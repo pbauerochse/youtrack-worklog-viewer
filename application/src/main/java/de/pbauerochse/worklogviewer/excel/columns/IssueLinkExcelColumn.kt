@@ -1,12 +1,14 @@
 package de.pbauerochse.worklogviewer.excel.columns
 
 import de.pbauerochse.worklogviewer.excel.ExcelColumnRenderer
-import de.pbauerochse.worklogviewer.excel.POIRow
-import de.pbauerochse.worklogviewer.excel.POIWorkbook
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.groupByHeadlineStyle
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.issueSummaryStyle
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.regularIssueStyle
+import de.pbauerochse.worklogviewer.excel.ExcelRenderContext.Companion.resolvedIssueStyle
 import de.pbauerochse.worklogviewer.timereport.view.ReportRow
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.view.IssueReportRow
-import org.apache.poi.ss.usermodel.Cell
 
 /**
  * Writes the issue description
@@ -15,33 +17,30 @@ class IssueLinkExcelColumn : ExcelColumnRenderer {
 
     override val headline: String = getFormatted("view.main.issue")
 
-    override fun write(excelRow: POIRow, columnIndex: Int, reportRow: ReportRow) {
-        val cell = excelRow.createCell(columnIndex)
-        val workbook = excelRow.sheet.workbook
-
+    override fun write(context: ExcelRenderContext, columnIndex: Int, reportRow: ReportRow) {
         when {
-            reportRow.isGrouping -> renderGroupByHeadline(workbook, cell, reportRow)
-            reportRow.isIssue -> renderIssue(workbook, cell, reportRow as IssueReportRow)
-            reportRow.isSummary -> renderSummary(workbook, cell, reportRow)
+            reportRow.isGrouping -> renderGroupByHeadline(context, columnIndex, reportRow)
+            reportRow.isIssue -> renderIssue(context, columnIndex, reportRow as IssueReportRow)
+            reportRow.isSummary -> renderSummary(context, columnIndex, reportRow)
         }
     }
 
-    private fun renderGroupByHeadline(workbook: POIWorkbook, cell: Cell, value: ReportRow) {
-        cell.cellStyle = workbook.groupByHeadlineStyle
-        cell.setCellValue(value.label)
+    private fun renderGroupByHeadline(context: ExcelRenderContext, cell: Int, value: ReportRow) {
+        context
+            .value(cell, value.label)
+            .style(cell, groupByHeadlineStyle)
     }
 
-    private fun renderIssue(workbook: POIWorkbook, cell: Cell, value: IssueReportRow) {
-        val link = workbook.createHyperlink(value.issueWithWorkItems.issue.externalUrl)
-        val cellStyle = if (value.issueWithWorkItems.issue.isResolved) workbook.resolvedIssueStyle else workbook.regularIssueStyle
-
-        cell.hyperlink = link
-        cell.setCellValue(value.label)
-        cell.cellStyle = cellStyle
+    private fun renderIssue(context: ExcelRenderContext, cell: Int, value: IssueReportRow) {
+        val resolved = value.issueWithWorkItems.issue.isResolved
+        context
+            .hyperLink(cell, value.label, value.issueWithWorkItems.issue.externalUrl)
+            .style(cell, if (resolved) resolvedIssueStyle else regularIssueStyle)
     }
 
-    private fun renderSummary(workbook: POIWorkbook, cell: Cell, value: ReportRow) {
-        cell.cellStyle = workbook.issueSummaryStyle
-        cell.setCellValue(value.label)
+    private fun renderSummary(context: ExcelRenderContext, cell: Int, value: ReportRow) {
+        context
+            .value(cell, value.label)
+            .style(cell, issueSummaryStyle)
     }
 }
