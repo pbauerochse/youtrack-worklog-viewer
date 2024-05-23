@@ -15,9 +15,8 @@ import de.pbauerochse.worklogviewer.http.HttpParams
 import de.pbauerochse.worklogviewer.i18n.I18n
 import de.pbauerochse.worklogviewer.tasks.Progress
 import de.pbauerochse.worklogviewer.timereport.*
-import org.apache.http.HttpHeaders
-import org.apache.http.entity.StringEntity
-import org.apache.http.message.BasicHeader
+import org.apache.hc.core5.http.ContentType
+import org.apache.hc.core5.http.io.entity.StringEntity
 import org.slf4j.LoggerFactory
 import java.net.URL
 import java.net.URLEncoder
@@ -70,9 +69,7 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
         val youtrackRequest = CreateWorkItemRequest(request.date, request.durationInMinutes, user, request.description, workItemType)
         val serialized = MAPPER.writeValueAsString(youtrackRequest)
 
-        val payload = StringEntity(serialized, StandardCharsets.UTF_8)
-        payload.contentType = BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-        payload.contentEncoding = BasicHeader(HttpHeaders.CONTENT_ENCODING, StandardCharsets.UTF_8.name())
+        val payload = StringEntity(serialized, ContentType.APPLICATION_JSON.withCharset(StandardCharsets.UTF_8), StandardCharsets.UTF_8.name(), false)
         val response = http.post(url, payload)
         if (response.isError) {
             LOGGER.error("Got Error Response Message from YouTrack while pushing WorkItem $serialized to URL $url: ${response.statusLine.statusCode} ${response.error}")
@@ -190,7 +187,7 @@ class RestApiDataSource(settings: ConnectionSettings) : TimeTrackingDataSource {
             val timeTrackingSettings = MAPPER.readValue(response.content!!, ProjectTimeTrackingSettings::class.java)
             LOGGER.debug("Project $projectId: $timeTrackingSettings")
             return@forProject timeTrackingSettings
-        }
+        }.get()
     }
 
     private fun getMe(): User {

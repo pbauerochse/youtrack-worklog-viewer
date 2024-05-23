@@ -1,9 +1,14 @@
 package de.pbauerochse.worklogviewer.http
 
-import org.apache.http.HttpEntity
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.*
-import org.apache.http.util.EntityUtils
+import org.apache.hc.client5.http.classic.methods.HttpDelete
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.client5.http.classic.methods.HttpPost
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest
+import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.core5.http.ClassicHttpResponse
+import org.apache.hc.core5.http.HttpEntity
+import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.apache.hc.core5.http.message.StatusLine
 import java.net.URL
 
 /**
@@ -43,12 +48,12 @@ class Http(private val params: HttpParams) {
         execute(request)
     }
 
-    fun <T> download(path: String, handler: (org.apache.http.HttpResponse) -> T): T {
+    fun <T> download(path: String, handler: (org.apache.hc.core5.http.HttpResponse) -> T): T {
         val url = params.buildUrl(path)
         return download(url, handler)
     }
 
-    fun <T> download(url: URL, handler: (org.apache.http.HttpResponse) -> T): T {
+    fun <T> download(url: URL, handler: (org.apache.hc.core5.http.HttpResponse) -> T): T {
         val request = HttpGet(url.toURI())
         request.config = RequestConfig.custom().setContentCompressionEnabled(false).build()
         return execute(request) {
@@ -59,17 +64,18 @@ class Http(private val params: HttpParams) {
     private fun execute(request: HttpUriRequest): HttpResponse {
         return execute(request) { response ->
             val mappedHeaders = mutableMapOf<String, String>()
-            response.allHeaders.map { mappedHeaders[it.name] = it.value }
+            response.headers.map { mappedHeaders[it.name] = it.value }
 
-            if (response.statusLine.isValid().not()) {
+            val statusLine = StatusLine(response)
+            if (statusLine.isValid().not()) {
                 EntityUtils.consumeQuietly(response.entity)
                 HttpResponse(
-                    statusLine = response.statusLine,
+                    statusLine = statusLine,
                     headers = mappedHeaders
                 )
             } else {
                 HttpResponse(
-                    statusLine = response.statusLine,
+                    statusLine = statusLine,
                     content = EntityUtils.toString(response.entity),
                     headers = mappedHeaders
                 )
@@ -77,10 +83,10 @@ class Http(private val params: HttpParams) {
         }
     }
 
-    private fun <T> execute(request: HttpUriRequest, handler: (org.apache.http.HttpResponse) -> T): T {
+    private fun <T> execute(request: HttpUriRequest, handler: (ClassicHttpResponse) -> T): T {
         return params.httpClientBuilder().build().use { client ->
             client.execute(request) { response ->
-                (response as CloseableHttpResponse).use {
+                response.use {
                     handler.invoke(it)
                 }
             }

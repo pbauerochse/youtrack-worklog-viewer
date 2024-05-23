@@ -1,6 +1,11 @@
 package de.pbauerochse.worklogviewer.datasource.api
 
 import de.pbauerochse.worklogviewer.datasource.api.domain.ProjectTimeTrackingSettings
+import org.slf4j.LoggerFactory
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.Future
 
 /**
  * [ProjectTimeTrackingSettings] are very rarely subject to change so
@@ -9,10 +14,14 @@ import de.pbauerochse.worklogviewer.datasource.api.domain.ProjectTimeTrackingSet
  */
 object ProjectTimeSettingsCache {
 
-    private val cache = mutableMapOf<String, ProjectTimeTrackingSettings>()
+    private val LOGGER = LoggerFactory.getLogger(ProjectTimeSettingsCache::class.java)!!
+    private val cache: ConcurrentMap<String, Future<ProjectTimeTrackingSettings>> = ConcurrentHashMap()
 
-    fun forProject(projectId: String, loadSettings: () -> ProjectTimeTrackingSettings): ProjectTimeTrackingSettings {
-        return cache.computeIfAbsent(projectId) { loadSettings.invoke() }
+    fun forProject(projectId: String, loadSettings: () -> ProjectTimeTrackingSettings): Future<ProjectTimeTrackingSettings> {
+        LOGGER.debug("Requested TimeSettings for Project {}", projectId)
+        return cache.computeIfAbsent(projectId) { CompletableFuture.supplyAsync {
+            LOGGER.info("Retrieving TimeSettings for Project {}", projectId)
+            loadSettings.invoke()
+        } }
     }
-
 }

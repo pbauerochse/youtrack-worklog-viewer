@@ -7,21 +7,23 @@ import de.pbauerochse.worklogviewer.tasks.WorklogViewerTask
 import de.pbauerochse.worklogviewer.util.ExceptionUtil
 import de.pbauerochse.worklogviewer.util.FormattingUtil.getFormatted
 import de.pbauerochse.worklogviewer.version.GitHubVersion
-import org.apache.http.Header
-import org.apache.http.HttpStatus
-import org.apache.http.StatusLine
-import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.CloseableHttpClient
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner
-import org.apache.http.message.BasicHeader
-import org.apache.http.util.EntityUtils
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.client5.http.config.ConnectionConfig
+import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner
+import org.apache.hc.core5.http.Header
+import org.apache.hc.core5.http.HttpStatus
+import org.apache.hc.core5.http.io.entity.EntityUtils
+import org.apache.hc.core5.http.message.BasicHeader
+import org.apache.hc.core5.http.message.StatusLine
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.ProxySelector
-import java.util.*
 import java.util.Comparator.comparing
+import java.util.concurrent.TimeUnit
 
 /**
  * Fetches the most recent version of the
@@ -39,9 +41,9 @@ class CheckForUpdateTask : WorklogViewerTask<GitHubVersion?>(getFormatted("task.
 
     private val mostRecentGithubReleaseVersion: GitHubVersion?
         get() = allGithubReleaseVersions.stream()
-                .filter { it.isRelease }
-                .max(comparing { it.published })
-                .orElse(null)
+            .filter { it.isRelease }
+            .max(comparing { it.published })
+            .orElse(null)
 
     private val allGithubReleaseVersions: List<GitHubVersion>
         get() {
@@ -50,13 +52,14 @@ class CheckForUpdateTask : WorklogViewerTask<GitHubVersion?>(getFormatted("task.
 
             try {
                 httpClient.use { client ->
-                    client.execute(request).use { response ->
-                        if (isValidResponseCode(response.statusLine)) {
-                            return MAPPER.readValue(response.entity.content, object : TypeReference<List<GitHubVersion>>() {})
+                    client.execute(request) { response ->
+                        val statusLine = StatusLine(response)
+                        if (isValidResponseCode(statusLine)) {
+                            return@execute MAPPER.readValue(response.entity.content, object : TypeReference<List<GitHubVersion>>() {})
                         }
 
-                        LOGGER.warn("Could not get most recent version: {}", response.statusLine.reasonPhrase)
-                        EntityUtils.consumeQuietly(response.entity)
+                        LOGGER.warn("Could not get most recent version: {}", statusLine.reasonPhrase)
+                        return@execute EntityUtils.consumeQuietly(response.entity)
                     }
                 }
             } catch (e: IOException) {
@@ -68,17 +71,22 @@ class CheckForUpdateTask : WorklogViewerTask<GitHubVersion?>(getFormatted("task.
 
     private val httpClient: CloseableHttpClient
         get() {
+            val connectionConfig = ConnectionConfig.custom()
+                .setConnectTimeout(REQUEST_TIMEOUT_IN_MILLIS, TimeUnit.MILLISECONDS)
+                .build()
+
+
             val config = RequestConfig
-                    .custom()
-                    .setConnectTimeout(REQUEST_TIMEOUT_IN_MILLIS)
-                    .setConnectionRequestTimeout(REQUEST_TIMEOUT_IN_MILLIS)
-                    .build()
+                .custom()
+                .setConnectionRequestTimeout(REQUEST_TIMEOUT_IN_MILLIS, TimeUnit.MILLISECONDS)
+                .build()
 
             return HttpClients.custom()
-                    .setDefaultRequestConfig(config)
-                    .setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault()))
-                    .setDefaultHeaders(WEB_BROWSER_HEADERS)
-                    .build()
+                .setDefaultRequestConfig(config)
+                .setConnectionManager(BasicHttpClientConnectionManager().apply { setConnectionConfig(connectionConfig) })
+                .setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault()))
+                .setDefaultHeaders(WEB_BROWSER_HEADERS)
+                .build()
         }
 
     private fun isValidResponseCode(statusLine: StatusLine?): Boolean {
@@ -90,11 +98,11 @@ class CheckForUpdateTask : WorklogViewerTask<GitHubVersion?>(getFormatted("task.
     companion object {
         private val LOGGER = LoggerFactory.getLogger(CheckForUpdateTask::class.java)
         private val MAPPER = jacksonObjectMapper()
-        private const val REQUEST_TIMEOUT_IN_MILLIS = 2000
+        private const val REQUEST_TIMEOUT_IN_MILLIS = 2000L
         private val WEB_BROWSER_HEADERS: List<Header> = listOf(
-                BasicHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"),
-                BasicHeader("Accept-Encoding", "gzip, deflate, sdch"),
-                BasicHeader("Accept-Language", "de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4")
+            BasicHeader("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36"),
+            BasicHeader("Accept-Encoding", "gzip, deflate, sdch"),
+            BasicHeader("Accept-Language", "de-DE,de;q=0.8,en-US;q=0.6,en;q=0.4")
         )
     }
 }

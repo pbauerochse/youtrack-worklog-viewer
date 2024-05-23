@@ -1,6 +1,7 @@
 package de.pbauerochse.worklogviewer.http
 
-import org.apache.http.StatusLine
+import org.apache.hc.core5.http.message.StatusLine
+
 
 data class HttpResponse(
     val statusLine: StatusLine,
