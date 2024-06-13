@@ -4,10 +4,10 @@ PROFILES=(linux mac windows mac-silicon)
 BUILD_SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 BUILD_OUTPUT="$BUILD_SCRIPT_LOCATION/build"
-mkdir -p "$BUILD_OUTPUT"
-rm -f "$BUILD_OUTPUT/*"
+mkdir -p $BUILD_OUTPUT
+rm -f $BUILD_OUTPUT/*
 
-pushd "$BUILD_SCRIPT_LOCATION"
+pushd $BUILD_SCRIPT_LOCATION
 
 for profile in ${PROFILES[*]} ; do
     echo "Building for $profile in $BUILD_SCRIPT_LOCATION"
