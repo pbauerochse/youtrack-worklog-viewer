@@ -7,7 +7,7 @@ If you find this tool useful and would like to show me your appreciation [buy me
 
 # Latest Version
 
-[Download v2.7.4](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.7.4)
+[Download v2.7.5](https://github.com/pbauerochse/youtrack-worklog-viewer/releases/tag/2.7.5)
 
 # Features
 
@@ -22,6 +22,8 @@ If you find this tool useful and would like to show me your appreciation [buy me
 * two color schemes: light and dark
 
 # Important changes
+* **v2.7.5**
+  * Updating dependencies, as they caused some errors on recent JVMs
 * **v2.7.4**
   * Fixed wrong URL for the `getMe()` Method (Fixes [#44](https://github.com/pbauerochse/youtrack-worklog-viewer/issues/44)) 
 * **v2.7.3**
